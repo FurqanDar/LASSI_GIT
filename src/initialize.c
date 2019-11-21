@@ -106,7 +106,8 @@ void Global_Array_Initialization_AtStart(void) {
     //Checking which bead types interact rotationally and via overlap, separately.
     for (i = 0; i < MAX_AA; i++) {
         nBeadTypeIsSticker[i] = 0;//Assume beads don't rotationally interact.
-        nBeadTypeCanOvlp[i] = 0;//Assume beads don't have an overlap cost
+        nBeadTypeCanOvlp[i]   = 0;//Assume beads don't have an overlap cost
+        nBeadTypeCanCont[i]   = 0;//Assume beads don't have contact costs.
     }
 
     for (i = 0; i < MAX_AA; i++) {
@@ -114,8 +115,11 @@ void Global_Array_Initialization_AtStart(void) {
             if (fEnergy[i][j][E_SC_SC] != 0.0) {//Seeing if this beadType rotationally interacts.
                 nBeadTypeIsSticker[i] = 1;
             }
-            if (fEnergy[i][j][E_OVLP] != 0.0) {//Seeing if this beadType rotationally interacts.
+            if (fEnergy[i][j][E_OVLP] != 0.0) {//Seeing if this beadType interacts via overlap
                 nBeadTypeCanOvlp[i] = 1;
+            }
+            if (fEnergy[i][j][E_CONT] != 0.0) {//Seeing if this beadType interacts via contact
+                nBeadTypeCanCont[i] = 1;
             }
         }
     }

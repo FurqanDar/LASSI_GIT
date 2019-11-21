@@ -71,19 +71,18 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
     int i, j;//Indecies
     int tmpR[POS_MAX], tmpR2[POS_MAX];
     int x, y, z; //Lattice indecies
-    int BoxRad = 1;
     int secBi, resj;//Second bead index
     float xDis = 0.;//Distance between beads.
     int resi = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == 0 ? 0. : Energy_InitPotential(beadID);
 
 
-    if (nBeadTypeCanOvlp[resi] == 0) {
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0) {
         return totEn;
     }//No need to do antying if there's no overlap cost.
 
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
 
-//Going through possible neighbors For now going through (-1,1) neighbors so CONT is a small window
     for (j = 0; j < POS_MAX; j++) {
         tmpR[j] = bead_info[beadID][j];
     }
@@ -96,8 +95,8 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
                 secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = Dist_BeadToBead(beadID, secBi);
-                    //totEn += fEnergy[resi][resj][E_OVLP]/xDis/xDis;
+                    xDis = sqrtf((float)(x*x + y*y + z*z));
+                    //xDis = Dist_BeadToBead(beadID, secBi);
                     if (xDis <= 1.0) {
                         totEn += fEnergy[resi][resj][E_OVLP] / 2.0;
                     } else if (xDis <= 1.42) { // sqrt(2)
@@ -105,10 +104,9 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
                     } else if (xDis <= 1.74) { // sqrt(3)
                         totEn += fEnergy[resi][resj][E_OVLP] / 8.0;
                     }
-                    /*else if (xDis <= fEnRad[resi][resj][E_CONT]*1.74){
-                      totEn += fEnergy[resi][resj][E_CONT];
-                    //}//This way contact and overlap do overlap
-                  }*/
+                    else {//This way, contact is only outside ovlp
+                        totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                  }
                 }
                 //TODO: Add option for solvent interactions in the parfile
                 /*if (secBi == -1 && fSolEnergy != 0.){

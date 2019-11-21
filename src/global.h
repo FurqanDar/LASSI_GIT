@@ -105,6 +105,7 @@ float faCurrEn[MAX_E]; //Vector for current energy
 lInt nBeadTypeIsSticker[MAX_AA];//Used to track if that beadType interacts via rotations.
 lInt nChainTypeIsLinear[MAX_CHAINTYPES];//Used to track if this chainType is linear.
 lInt nBeadTypeCanOvlp[MAX_AA];//Used to track if a certain beadType has an overlap cost.
+lInt nBeadTypeCanCont[MAX_AA];//Used to track if a certain beadType has contact interactions
 
 float fLinkerLength;
 float fLinkerSprCon;
