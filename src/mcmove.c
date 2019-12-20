@@ -1235,7 +1235,7 @@ int Move_Pivot(int chainID, float MyTemp) {
 
     //Randomly select a bead that is neither the first nor last
     int anchorBead = chainLength - 2;
-    anchorBead = 2 + (rand() % anchorBead);
+    anchorBead = 1 + (rand() % anchorBead);
 
     int PivotDir; //-1 Means backwards, +1 means forwards. Always Pivot the smaller portion
     PivotDir = anchorBead > chainLength / 2 ? 1 : -1;
@@ -1922,7 +1922,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
 
     //Randomly select a bead that is neither the first nor last
     int anchorBead = chainLength - 2;
-    anchorBead = 2 + (rand() % anchorBead);
+    anchorBead = 1 + (rand() % anchorBead);
 
     int PivotDir; //-1 Means backwards, +1 means forwards. Always Pivot the smaller portion
     PivotDir = anchorBead > chainLength / 2 ? 1 : -1;
