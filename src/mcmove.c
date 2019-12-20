@@ -1411,9 +1411,10 @@ int Move_BranchedRot(int chainID, float MyTemp) {
     //Get the beadID's for the first and last bead
     firstB = chain_info[chainID][CHAIN_START];
     lastB = firstB + chain_info[chainID][CHAIN_LENGTH];
-    //Randomly select a bead
+
+    //Pick the first bead as the center
     int anchorBead = firstB;
-    anchorBead = firstB + anchorBead;
+    //anchorBead = firstB + anchorBead;
 
     //Randomly selecting a symmetry operation
     int PivotM;
@@ -2030,9 +2031,9 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
     firstB = chain_info[chainID][CHAIN_START];
     lastB = firstB + chain_info[chainID][CHAIN_LENGTH];
 
-    //Randomly select a bead
+    //Pick the first bead as the center
     int anchorBead = firstB;
-    anchorBead = firstB + anchorBead;
+    //anchorBead = firstB + anchorBead;
 
     //Randomly selecting a symmetry operation
     int PivotM;

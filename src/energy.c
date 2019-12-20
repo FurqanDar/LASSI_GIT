@@ -62,8 +62,6 @@ float Energy_InitPotential(int beadID) {
 /// The energy function  is like the BFM, where \f$\epislon$\f represents the overlap cost for total overlap, which is
 /// forbidden explicitly in LASSI, so we have \f$\epislon/2$\f,\f$\epislon/4$\f and \f$\epislon/8$\f with increasing
 /// distance.
-/// Also, TODO: maybe add a standard LJ-like or 1/r^2 energy as well.
-/// Also, TODO: add a way to have a variable BoxRad in the keyfile, although things get real slow if too big.
 /// \param beadID
 /// \return
 float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of bead i

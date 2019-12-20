@@ -200,9 +200,9 @@ int Clus_LimitedCluster(int chainID) {
     //Updates naList to have all proteins bound to  chainID and it's cluster
     //The idea is to check every bead and see if there is a unique bonded chain, and to add it to naList
     //If Cluster becomes larger than 5, exit and return -1
-
+    int ClusterLimit = 15;
     int i, j; //Loop iterators
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < ClusterLimit; i++) {
         naList[i] = -1;
     }
 
@@ -233,7 +233,7 @@ int Clus_LimitedCluster(int chainID) {
                 if (IsUnique == 1) {
                     naList[clusSize++] = chainPart;
                 }
-                if (clusSize >= 5) {
+                if (clusSize >= ClusterLimit) {
                     return -1;
                 }
             }
