@@ -29,6 +29,7 @@ int RDF_ComponentIndex(const int i, const int j);
 
 int RDFArr_Index(const int run_cycle, const int rdf_comp, const int x_pos);
 
+void Calc_SystemCenterOfMass(int *tmpR);
 
 void GyrTensor_GyrRad_Avg(void);
 
