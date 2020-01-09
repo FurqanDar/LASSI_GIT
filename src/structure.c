@@ -457,7 +457,7 @@ int Check_MTLinkerConstraint(int beadID, int (*tmpR)[POS_MAX]) {
 
 void Calc_SystemCenterOfMass(int *tmpR){
 
-    int i, j, k, l; //Iterators
+    int i, j; //Iterators
     float tot_COM[POS_MAX] = {0.}; //This is where the COM will be stored
 
     float zeta[POS_MAX] = {0.};
@@ -470,8 +470,8 @@ void Calc_SystemCenterOfMass(int *tmpR){
         dumConst[j] = 2.*PI/(float)nBoxSize[j];
     }
 
-    for (i = 0; i < nBeadTypes; i++){
-        for (j = 0; j < POS_MAX; j++){
+    for (i=0; i<tot_beads; i++){
+        for (j=0; j<POS_MAX; j++){
             dumArg = dumConst[j] * (float)bead_info[i][j];
             zeta[j] += sin(dumArg);
             xi[j]   += cos(dumArg);
@@ -495,15 +495,14 @@ void Calc_SystemCenterOfMass(int *tmpR){
         for(j=0; j<POS_MAX; j++){
             xi[j] /= (float)tot_beads;
             zeta[j] /= (float)tot_beads;
-            tot_COM[j] = atan2(-xi[j], -zeta[j])  + PI;
+            tot_COM[j] = atan2(-zeta[j], -xi[j])  + PI;
             tot_COM[j] /= dumConst[j];
 
         }
     }
 
-
     for (j=0; j<POS_MAX; j++){
-        tmpR[j] = ((int) tot_COM[j]) % nBoxSize[j];
+        tmpR[j] = ((int) tot_COM[j]);
     }
 
 }
