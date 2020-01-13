@@ -48,7 +48,8 @@
 #define REPORT_MCMOVE  4
 #define REPORT_NETWORK 5
 #define REPORT_RDFTOT  6
-#define MAX_REPORT     7 // just for counting; must be the last number of this list
+#define REPORT_COMDEN  7
+#define MAX_REPORT     8 // just for counting; must be the last number of this list
 
 // auxiliary definitions
 #define POS_X          0
@@ -82,6 +83,7 @@ lInt chain_info[MAX_CHAINS][CHAININFO_MAX];
 
 lInt tot_beads;
 lInt tot_chains;
+lInt tot_chain_types;
 lInt Temp_Mode;
 lInt nThermalization_Mode, RotBias_Mode;
 
@@ -141,14 +143,19 @@ lLong *naClusHistList;
 lInt *naChainCheckList;
 lInt nTotClusCounter;
 lLDub **ld_TOTCLUS_ARR;
+lLDub *ldMOLCLUS_ARR;
+lLDub *ld_TOTMOLCLUS_ARR;
 lInt naTempR[POS_MAX];
 lInt nLargestClusterRightNow;
 
 lLDub *ld_TOTRDF_Arr;
+lLDub *ld_TOTRadDen_Arr;
 lLDub *ldRDF_Arr;
+lLDub *ldRadDen_Arr;
 lInt nRDF_TotComps;
 lInt nRDFCounter;//This counts how many times the RDF has been calculated for averaging at the end.
 lInt nRDF_TotBins;
+lInt nRadDenCounter;//This counts for the Radial Density histograms
 float fGyrTensor[7];//Gyration tensor
 float fSysGyrRad;//Gyration radius of the system.
 lLDub **ld_TOTGYRRAD_ARR;

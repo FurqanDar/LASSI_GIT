@@ -136,6 +136,8 @@ int Parse_Keyfile(char *filename) {
                 sscanf(strLine, "%*s %ld", &nReport[REPORT_NETWORK]);
             } else if (strcmp(strKeyword, "REPORT_RDFTOT_FREQ") == 0) {
                 sscanf(strLine, "%*s %ld", &nReport[REPORT_RDFTOT]);
+            } else if (strcmp(strKeyword, "REPORT_COMDEN_FREQ") == 0) {
+                sscanf(strLine, "%*s %ld", &nReport[REPORT_COMDEN]);
             } else {
                 fprintf(stderr, "ERROR: unable to parse line %d in %s.\n%s", nLine, filename, strLine);
                 exit(1);
@@ -517,5 +519,5 @@ void Parse_StructureFile(char *filename) {
         }
     }
     fclose(inFile);
-
+    tot_chain_types = nChainType + 1;
 }

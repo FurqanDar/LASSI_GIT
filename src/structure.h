@@ -29,7 +29,17 @@ int RDF_ComponentIndex(const int i, const int j);
 
 int RDFArr_Index(const int run_cycle, const int rdf_comp, const int x_pos);
 
+int RadDenArr_Index(const int run_cycle, const int chain_type, const int x_pos);
+
+int MolClusArr_Index(const int run_cycle, const int chain_type, const int clus_size);
+
 void Calc_SystemCenterOfMass(int *tmpR);
+
+void Calc_SystemCenterOfMass_OfMolType(int *tmpR, int const thisType);
+
+void Calc_SystemCenterOfMass_WithoutMolType(int *tmpR, int const thisType);
+
+void RadDen_MolTypeWise_Avg(void);
 
 void GyrTensor_GyrRad_Avg(void);
 

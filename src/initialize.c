@@ -9,6 +9,7 @@ void Memory_Initialization_AtStart(void) {
     naClusHistList = malloc((1 + tot_chains) * sizeof(lLong));
     naChainCheckList = malloc((1 + tot_chains) * sizeof(lInt));
     fKT_Cycle = malloc((1 + nTot_CycleNum) * sizeof(float));
+
     ld_TOTCLUS_ARR = (lLDub **) malloc((nTot_CycleNum) * sizeof(lLDub));
     for (i = 0; i < nTot_CycleNum; i++) {
         ld_TOTCLUS_ARR[i] = (lLDub *) malloc((1 + tot_chains) * sizeof(lLDub));
@@ -17,6 +18,9 @@ void Memory_Initialization_AtStart(void) {
             exit(1);
         }
     }
+    ldMOLCLUS_ARR = malloc((tot_chain_types * tot_chains) * sizeof(lLDub));
+    ld_TOTMOLCLUS_ARR = malloc((nTot_CycleNum * tot_chain_types * tot_chains) * sizeof(lLDub));
+
     ld_TOTGYRRAD_ARR = (lLDub **) malloc((nTot_CycleNum) * sizeof(lLDub));
     for (i = 0; i < nTot_CycleNum; i++) {
         ld_TOTGYRRAD_ARR[i] = (lLDub *) malloc((2) * sizeof(lLDub));
@@ -26,13 +30,45 @@ void Memory_Initialization_AtStart(void) {
     ld_TOTRDF_Arr = malloc((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
     ldRDF_Arr = malloc((nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
 
-    if (naTotLattice == NULL || naClusHistList == NULL ||
-        naChainCheckList == NULL || ldRDF_Arr == NULL ||
-        ld_TOTRDF_Arr == NULL) {
-        printf("Malloc Failed! Crashing. Probably ran out of memory.\n");
+    ldRadDen_Arr = malloc((tot_chain_types * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
+    ld_TOTRadDen_Arr = malloc((nTot_CycleNum * tot_chain_types * nRDF_TotBins) * sizeof(lLDub));
+
+    Memory_VerifyMalloc();
+    printf("Successfully allocated memory! Arrays initialized.\n");
+}
+
+void Memory_VerifyMalloc(void){
+    if (naClusHistList == NULL){
+        printf("naClusHistList malloc failed\n");
         exit(1);
-    } else {
-        printf("Successfully allocated memory! Arrays initialized.\n");
+    }
+    if (naChainCheckList == NULL){
+        printf("naChainCheckList malloc failed\n");
+        exit(1);
+    }
+    if (ldRDF_Arr == NULL){
+        printf("ldRDF_Arr malloc failed\n");
+        exit(1);
+    }
+    if (ld_TOTRDF_Arr == NULL){
+        printf("ld_TOTRDF_Arr malloc failed\n");
+        exit(1);
+    }
+    if (ldRadDen_Arr == NULL){
+        printf("ldRadDen_Arr malloc failed\n");
+        exit(1);
+    }
+    if (ld_TOTRadDen_Arr == NULL){
+        printf("ld_TOTRadDen_Arr malloc failed\n");
+        exit(1);
+    }
+    if (ldMOLCLUS_ARR == NULL){
+        printf("ldMOLCLUS_ARR malloc failed\n");
+        exit(1);
+    }
+    if (ld_TOTMOLCLUS_ARR == NULL){
+        printf("ld_TOTMOLCLUS_ARR malloc failed\n");
+        exit(1);
     }
 }
 
@@ -76,22 +112,39 @@ void Global_Array_Initialization_AtStart(void) {
             naCluster[i][j] = -1;
         }
     }
-    //Initializing arrays for pair-distribution calculations
-    for (j = 0; j < nRDF_TotComps; j++) {
-        for (i = 0; i < nRDF_TotBins; i++) {
-            ldRDF_Arr[RDFArr_Index(0, j, i)] = 0.;
+
+    for (i = 0; i < tot_chains; i++) {//For MolWise Clus arrays
+        for (j = 0; j < tot_chain_types; j++) {
+            ldMOLCLUS_ARR[MolClusArr_Index(0, j,i)] = 0.;
+            for(k=0; k<nTot_CycleNum; k++){
+                ld_TOTMOLCLUS_ARR[MolClusArr_Index(k,j,i)] = 0.;
+            }
         }
     }
-    for (k = 0; k < nTot_CycleNum; k++) {
-        for (j = 0; j < nRDF_TotComps; j++) {
-            for (i = 0; i < nRDF_TotBins; i++) {
+
+
+    for(i=0; i< nRDF_TotBins; i++){//For Radial distributions
+        for(j=0; j<nRDF_TotComps; j++){//For RDFs
+            ld_TOTRDF_Arr[RDFArr_Index(0, j, i)] = 0.;
+            for(k=0; k<nTot_CycleNum; k++){
                 ld_TOTRDF_Arr[RDFArr_Index(k, j, i)] = 0.;
             }
         }
+        for(j=0; j<tot_chain_types; j++){//For Density Dists wrt COM
+            ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
+            for(k=0; k<nTot_CycleNum; k++){
+                ld_TOTRadDen_Arr[RadDenArr_Index(k, j, i)] = 0.;
+            }
+        }
+    }
+
+
+    for (k = 0; k < nTot_CycleNum; k++) {//For GyrRad
         ld_TOTGYRRAD_ARR[k][0] = 0.;
         ld_TOTGYRRAD_ARR[k][1] = 0.;
     }
-    for (k = 0; k < nTot_CycleNum; k++) {
+
+    for (k = 0; k < nTot_CycleNum; k++) {//For ClusterDists
         for (i = 0; i <= tot_chains; i++) {
             ld_TOTCLUS_ARR[k][i] = 0.;
         }
@@ -100,6 +153,7 @@ void Global_Array_Initialization_AtStart(void) {
     fSysGyrRad = 0.;
     nTotGyrRadCounter = 0;
     nRDFCounter = 0;
+    nRadDenCounter = 0;
     nTotClusCounter = 0;
     nLargestClusterRightNow = 0;
 
@@ -142,10 +196,13 @@ void Reset_Global_Arrays(void) {
     //Zero-ing out all the arrays used for data tracking!
     int i, j;
     for (i = 0; i <= tot_chains; i++) {
-        naChainCheckList[i] = 0;
+        naChainCheckList[i] = -1;
         naClusHistList[i] = 0;
         for (j = 0; j <= tot_chains; j++) {
             naCluster[i][j] = -1;
+        }
+        for (j=0; j < tot_chain_types; j++){
+            ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] = 0.;
         }
     }
     //Initializing arrays for pair-distribution calculations
@@ -154,10 +211,17 @@ void Reset_Global_Arrays(void) {
             ldRDF_Arr[RDFArr_Index(0, j, i)] = 0.;
         }
     }
+    //Initalizing for density histograms wrt to the COM
+    for (j = 0; j < tot_chain_types; j++) {
+        for (i = 0; i < nRDF_TotBins; i++) {
+            ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
+        }
+    }
     //Setting counters
     fSysGyrRad = 0.;
     nTotGyrRadCounter = 0;
     nRDFCounter = 0;
+    nRadDenCounter = 0;
     nTotClusCounter = 0;
     nLargestClusterRightNow = 0;
 }

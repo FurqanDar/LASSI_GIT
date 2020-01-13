@@ -416,6 +416,7 @@ void Write_TotalSysProp(char *filename, int run_it) {
      */
     FILE *fp;
     int i, j, k;
+    if (nReport[REPORT_RDFTOT] != 0){
     sprintf(filename, "%s_RDF.dat", strReportPrefix);//Name Of the RDF Files
     fp = fopen(filename, "w");
     fprintf(fp, "#Split RDFs. ALL-ALL; DIAGONALS and then from 0-0, 0-1, and onwards \n");
@@ -424,27 +425,59 @@ void Write_TotalSysProp(char *filename, int run_it) {
         for (j = 0; j < nRDF_TotComps; j++) {
             for (k = 0; k < nRDF_TotBins; k++) {
                 fprintf(fp, "%LE\t", ld_TOTRDF_Arr[RDFArr_Index(i, j, k)]);
-                //fprintf(fp, "%LE\t", ld_TOTRDF_ARR[i][j][k]);
             }
             fprintf(fp, "\n");
         }
     }
     fprintf(fp, "#Done");
     fclose(fp);
-
-    sprintf(filename, "%s_CLUS.dat", strReportPrefix);//Name Of the ClusterHistogram Files
-    fp = fopen(filename, "w");
-    fprintf(fp, "#Cluster Histograms: 1st column is largest cluster, and then clusters of size 1, 2, and so on\n");
-    for (i = 0; i < run_it; i++) {
-        fprintf(fp, "#Run_Cycle = %d\n", i);
-        for (k = 0; k <= tot_chains; k++) {
-            fprintf(fp, "%LE\t", ld_TOTCLUS_ARR[i][k]);
-        }
-        fprintf(fp, "\n");
     }
-    fprintf(fp, "#Done");
-    fclose(fp);
 
+    if (nReport[REPORT_COMDEN] != 0) {
+        sprintf(filename, "%s_COMDen.dat", strReportPrefix);//Name Of the COM Density Distribution
+        fp = fopen(filename, "w");
+        fprintf(fp, "#Density distribution from the COM outwards. Order is ChainType.\n");
+        for (i = 0; i < run_it; i++) {
+            fprintf(fp, "#Run_Cycle = %d\n", i);
+            for (j = 0; j < tot_chain_types; j++) {
+                for (k = 0; k < nRDF_TotBins; k++) {
+                    fprintf(fp, "%LE\t", ld_TOTRadDen_Arr[RadDenArr_Index(i, j, k)]);
+                }
+                fprintf(fp, "\n");
+            }
+        }
+        fprintf(fp, "#Done");
+        fclose(fp);
+        }
+    if (nReport[REPORT_NETWORK] != 0) {
+        sprintf(filename, "%s_CLUS.dat", strReportPrefix);//Name Of the ClusterHistogram Files
+        fp = fopen(filename, "w");
+        fprintf(fp, "#Cluster Histograms: 1st column is largest cluster, and then clusters of size 1, 2, and so on\n");
+        for (i = 0; i < run_it; i++) {
+            fprintf(fp, "#Run_Cycle = %d\n", i);
+            for (k = 0; k <= tot_chains; k++) {
+                fprintf(fp, "%LE\t", ld_TOTCLUS_ARR[i][k]);
+            }
+            fprintf(fp, "\n");
+        }
+        fprintf(fp, "#Done");
+        fclose(fp);
+
+
+        sprintf(filename, "%s_MolClus.dat", strReportPrefix);//Name Of the COM Density Distribution
+        fp = fopen(filename, "w");
+        fprintf(fp, "#Density distribution from the COM outwards. Order is ChainType.\n");
+        for (i = 0; i < run_it; i++) {
+            fprintf(fp, "#Run_Cycle = %d\n", i);
+            for (j = 0; j < tot_chain_types; j++) {
+                for (k = 0; k < tot_chains; k++) {
+                    fprintf(fp, "%LE\t", ld_TOTMOLCLUS_ARR[MolClusArr_Index(i, j, k)]);
+                }
+                fprintf(fp, "\n");
+            }
+        }
+        fprintf(fp, "#Done");
+        fclose(fp);
 
     sprintf(filename, "%s_GR.dat", strReportPrefix);//Name Of the ClusterHistogram Files
     fp = fopen(filename, "w");
@@ -456,6 +489,7 @@ void Write_TotalSysProp(char *filename, int run_it) {
     }
     fprintf(fp, "#Done");
     fclose(fp);
+    }
 
 }
 
@@ -562,9 +596,15 @@ void Print_Data(long nGen, int run_it) {
                 RDF_ComponentWise_Avg();
             }
         }
+        if (nReport[REPORT_COMDEN] != 0) {//SysProp is printed outside of this function in main.c, lol
+            if (nGen % nReport[REPORT_COMDEN] == 0 && nGen > nSteps / 2) {
+                RadDen_MolTypeWise_Avg();
+            }
+        }
         if (nReport[REPORT_NETWORK] != 0) {//SysProp is printed outside of this function in main.c, lol
             if (nGen % nReport[REPORT_NETWORK] == 0 && nGen > nSteps / 2) {
-                Clus_Distribution_Avg();
+                //Clus_Distribution_Avg();
+                Clus_DistributionMolWise_Avg();
                 GyrTensor_GyrRad_Avg();
             }
         }
@@ -630,9 +670,15 @@ void Print_Data(long nGen, int run_it) {
                     RDF_ComponentWise_Avg();
                 }
             }
+            if (nReport[REPORT_COMDEN] != 0) {//SysProp is printed outside of this function in main.c, lol
+                if (nGen % nReport[REPORT_COMDEN] == 0 && nGen > nSteps / 2) {
+                    RadDen_MolTypeWise_Avg();
+                }
+            }
             if (nReport[REPORT_NETWORK] != 0) {//SysProp is printed outside of this function in main.c, lol
                 if (nGen % nReport[REPORT_NETWORK] == 0 && nGen > nSteps / 2) {
-                    Clus_Distribution_Avg();
+                    //Clus_Distribution_Avg();
+                    Clus_DistributionMolWise_Avg();
                     GyrTensor_GyrRad_Avg();
                 }
             }
@@ -653,10 +699,24 @@ void Copy_Data(int run_it) {
 
         }
     }
+    for (i = 0; i < tot_chain_types; i++) {
+        for (j = 0; j < nRDF_TotBins; j++) {
+            ld_TOTRadDen_Arr[RadDenArr_Index(run_it, i, j)] =
+                    ldRadDen_Arr[RadDenArr_Index(0, i, j)] / (long double) nRadDenCounter;
+        }
+
+    }
     ld_TOTCLUS_ARR[run_it][0] = (long double) nLargestClusterRightNow / (long double) nTotClusCounter;
     for (i = 1; i <= tot_chains; i++) {
         ld_TOTCLUS_ARR[run_it][i] = (long double) naClusHistList[i] / (long double) nTotClusCounter;
     }
+    for(i=0; i<tot_chains; i++){
+        for(j=0; j<tot_chain_types; j++) {
+            ld_TOTMOLCLUS_ARR[MolClusArr_Index(run_it, j, i)] =
+                    ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] / (long double) nTotClusCounter;
+        }
+    }
+
     ld_TOTGYRRAD_ARR[run_it][0] = (long double) fSysGyrRad / (long double) nTotGyrRadCounter;
     ld_TOTGYRRAD_ARR[run_it][1] = (long double) nBoxSize[0] / 2.;
 }

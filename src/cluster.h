@@ -10,6 +10,8 @@ int Clus_LimitedCluster(int chainID);
 
 void Clus_Distribution_Avg(void);
 
+void Clus_DistributionMolWise_Avg(void);
+
 int Clus_SecondLargestCluster(void);
 
 void Clus_TotalAnalysis(void);

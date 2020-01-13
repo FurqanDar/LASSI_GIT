@@ -269,6 +269,51 @@ void Clus_Distribution_Avg(void) {
         if (Cluster_length > currentLargest) {
             currentLargest = Cluster_length;
         }
+        for (i = 0; i < Cluster_length; i++) {//Recording the chains in this cluster
+            naList[i] = -1;
+        }
+        IsUnique = 0;//Assume not unique -- just got analyzed.
+        while (curID < tot_chains && IsUnique == 0) {//Finding the next chainID that hasn't been analyzed.
+            curID++;
+            IsUnique = 0;//Assume not unique.
+            if (naChainCheckList[curID] == -1) {
+                IsUnique = 1;
+            }
+        }
+    }
+    nTotClusCounter++;
+    nLargestClusterRightNow += currentLargest;
+}
+
+/// Clus_DistributionMolWise_Avg - do what Clus_TotalAnalysis does but instead of remembering clusters in naCluster, update
+/// naClusHistList[] and keep making the total cluster histogram for the system.
+void Clus_DistributionMolWise_Avg(void) {
+    /*
+    Calculates the cluster distribution using total_network_analysis framework, but keeps adding to
+    naClusHistList for total averaging at the end. Read total_network_analysis() for what's happening here LOL
+    */
+    int curID, Cluster_length, currentLargest, i;
+    int IsUnique = 1;
+    int thisType = 0;
+    for (i = 0; i <= tot_chains; i++) {
+        naList[i] = -1;
+        naChainCheckList[i] = -1;
+    }
+    curID = 0;//Start with the 0th chain
+    currentLargest = 0;
+    while (curID < tot_chains && IsUnique == 1) {
+        Cluster_length = Clus_ChainNetwork_ForTotal(curID);//This is the length of curID cluster
+        //printf("Clus Len: %d\n", Cluster_length);
+        naClusHistList[Cluster_length]++; //Adding to that cluster-size bin
+        if (Cluster_length > currentLargest) {
+            currentLargest = Cluster_length;
+        }
+        for (i = 0; i < Cluster_length; i++) {//Recording the chains in this cluster
+            thisType = chain_info[naList[i]][CHAIN_TYPE];
+            ldMOLCLUS_ARR[MolClusArr_Index(0, thisType, Cluster_length-1)]++;
+            naList[i] = -1;
+            //printf("%d\n", thisType);
+        }
         IsUnique = 0;//Assume not unique -- just got analyzed.
         while (curID < tot_chains && IsUnique == 0) {//Finding the next chainID that hasn't been analyzed.
             curID++;
