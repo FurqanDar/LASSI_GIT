@@ -481,36 +481,34 @@ void Calc_SystemCenterOfMass(int *tmpR){
     for (i=0; i<tot_beads; i++){
         for (j=0; j<POS_MAX; j++){
             dumArg = dumConst[j] * (float)bead_info[i][j];
-            zeta[j] += sin(dumArg);
-            xi[j]   += cos(dumArg);
+            zeta[j] += sinf(dumArg);
+            xi[j]   += cosf(dumArg);
         }
     }
 
-    int nCheck = 0;
+    int nCheck[POS_MAX] = {0};
 
     for (j=0; j<POS_MAX; j++){
-        if (zeta[j] != 0.){
-            nCheck = 1;
-            break;
+        if ((zeta[j] == 0.) && (zeta[j] == 0.)){//If both 0, then undefined, so skip.
+            nCheck[j] = 0;
         }
-        if (xi[j] != 0.){
-            nCheck = 1;
-            break;
+        else{
+            nCheck[j] = 1;
         }
     }
 
-    if (nCheck == 1){
-        for(j=0; j<POS_MAX; j++){
+    for(j=0; j<POS_MAX; j++){
+        if (nCheck[j] == 1){
             xi[j] /= (float)tot_beads;
             zeta[j] /= (float)tot_beads;
             tot_COM[j] = atan2(-zeta[j], -xi[j])  + PI;
             tot_COM[j] /= dumConst[j];
-
         }
     }
 
+
     for (j=0; j<POS_MAX; j++){
-        tmpR[j] = ((int) tot_COM[j]);
+        tmpR[j] = (int) tot_COM[j];
     }
 
 }
@@ -639,7 +637,7 @@ void RadDen_MolTypeWise_Avg(void){
 
     int i;//Iterator for loop
     int thisType;//Tracks the type of the chain
-    int sysCOM[POS_MAX] = {0.};
+    int sysCOM[POS_MAX] = {0};
     int myBin;
     float xDis = 0.;//Tracks the distance between the COM and the specific bead
 
