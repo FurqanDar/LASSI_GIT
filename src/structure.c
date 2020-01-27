@@ -1,4 +1,5 @@
 #include "global.h"
+#include "cluster.h"
 #include "structure.h"
 
 /// Lat_Ind_FromCoords - helper function to get the correct 1D index of this position
@@ -358,8 +359,12 @@ int RDFArr_Index(const int run_cycle, const int rdf_comp, const int x_pos) {
     return x_pos + nRDF_TotBins * (rdf_comp + nRDF_TotComps * run_cycle);
 }
 
-int RadDenArr_Index(const int run_cycle, const int chain_type, const int x_pos){
-    return x_pos + nRDF_TotBins * (chain_type + tot_chain_types * run_cycle);
+int RadDen_ComponentIndex(const int i, const int j){
+    return j + tot_chain_types*i;
+}
+
+int RadDenArr_Index(const int run_cycle, const int rad_comp, const int x_pos){
+    return x_pos + nRDF_TotBins * (rad_comp + tot_chain_types*tot_chain_types * run_cycle);
 }
 
 int MolClusArr_Index(const int run_cycle, const int chain_type, const int clus_size){
@@ -489,7 +494,7 @@ void Calc_SystemCenterOfMass(int *tmpR){
     int nCheck[POS_MAX] = {0};
 
     for (j=0; j<POS_MAX; j++){
-        if ((zeta[j] == 0.) && (zeta[j] == 0.)){//If both 0, then undefined, so skip.
+        if ((zeta[j] == 0.) && (xi[j] == 0.)){//If both 0, then undefined, so skip.
             nCheck[j] = 0;
         }
         else{
@@ -509,6 +514,64 @@ void Calc_SystemCenterOfMass(int *tmpR){
 
     for (j=0; j<POS_MAX; j++){
         tmpR[j] = (int) tot_COM[j];
+    }
+
+}
+
+void Calc_CenterOfMass_OfCluster(int *tmpR, int const cluster_size, int const *ClusList){
+    //This version measures the COM of a cluster of size c
+    // cluster size, given the molecule ID's in naList.
+    //The COM from this is not necessarily the COM of the system as a whole.
+    int thisMol, i, j, k; //Iterators
+    int fB, lB;//Keep track of first and last beads of a given molecule
+    float tot_COM[POS_MAX] = {0.}; //This is where the COM will be stored
+    int bead_total_now=0;
+
+    float zeta[POS_MAX] = {0.};
+    float xi[POS_MAX]   = {0.};
+    float dumArg        = 0.;
+
+
+    float dumConst[POS_MAX] = {0.};
+    for (j=0; j<POS_MAX; j++){
+        dumConst[j] = 2.*PI/(float)nBoxSize[j];
+    }
+
+    for (k=0; k<cluster_size; k++) {
+        thisMol = ClusList[k];
+        fB      = chain_info[thisMol][CHAIN_START];
+        lB      = fB + chain_info[thisMol][CHAIN_LENGTH];
+        for (i = fB; i < lB; i++) {
+            bead_total_now++;
+            for (j = 0; j < POS_MAX; j++) {
+                dumArg = dumConst[j] * (float) bead_info[i][j];
+                zeta[j] += sin(dumArg);
+                xi[j] += cos(dumArg);
+            }
+        }
+    }
+    int nCheck[POS_MAX] = {0};
+
+    for (j=0; j<POS_MAX; j++){
+        if ((zeta[j] == 0.) && (xi[j] == 0.)){//If both 0, then undefined, so skip.
+            nCheck[j] = 0;
+        }
+        else{
+            nCheck[j] = 1;
+        }
+    }
+
+    for(j=0; j<POS_MAX; j++){
+        if (nCheck[j] == 1){
+            xi[j] /= (float)bead_total_now;
+            zeta[j] /= (float)bead_total_now;
+            tot_COM[j] = atan2(-zeta[j], -xi[j])  + PI;
+            tot_COM[j] /= dumConst[j];
+        }
+    }
+
+    for (j=0; j<POS_MAX; j++){
+        tmpR[j] = ((int) tot_COM[j]);
     }
 
 }
@@ -633,7 +696,7 @@ void Calc_SystemCenterOfMass_WithoutMolType(int *tmpR, int const thisType){
 
 }
 
-void RadDen_MolTypeWise_Avg(void){
+void RadDen_Avg_MolTypeWise_FromSysCen(void){
 
     int i;//Iterator for loop
     int thisType;//Tracks the type of the chain
@@ -642,6 +705,7 @@ void RadDen_MolTypeWise_Avg(void){
     float xDis = 0.;//Tracks the distance between the COM and the specific bead
 
     Calc_SystemCenterOfMass(sysCOM);
+    //printf("SYS COM = (%d, %d, %d) \n", sysCOM[0], sysCOM[1], sysCOM[2]);
     for(i=0; i<tot_beads; i++){
         thisType = bead_info[i][BEAD_CHAINID];
         thisType = chain_info[thisType][CHAIN_TYPE];
@@ -649,6 +713,43 @@ void RadDen_MolTypeWise_Avg(void){
         myBin = (int) floor(4. * xDis);
         ldRadDen_Arr[RadDenArr_Index(0, thisType, myBin)] += 1.0;
     }
+    nRadDenCounter++;
+}
+
+void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
+
+    int i;//Iterator for loop
+    int thisType;//Tracks the type of the chain
+    int thisComp;//Tracks the
+    int typeCOM[POS_MAX] = {0};
+    int myBin;
+    float xDis = 0.;//Tracks the distance between the COM and the specific bead
+    int cur_type = 0;
+    int clusSize_forType = 0;
+    int clusID_forType   = -1;
+    int *ClusList; ClusList = malloc((tot_chains+1) * sizeof(lInt));
+    for(i=0; i<=tot_chain_types; i++){ ClusList[i] = -1;}
+    Clus_MolWiseLargestCluster();
+    for (cur_type=0; cur_type<tot_chain_types; cur_type++){//Go through each molType's center
+        clusID_forType = naList[cur_type];
+        clusSize_forType = naCluster[clusID_forType][0];
+        //printf("%d: %d %d\n", cur_type, clusID_forType, clusSize_forType);
+        for (i=0; i<clusSize_forType; i++){
+        ClusList[i] = naCluster[clusID_forType][i+1];
+        }
+        Calc_CenterOfMass_OfCluster(typeCOM, clusSize_forType, ClusList);
+        for(i=0; i<tot_beads; i++){
+            thisType = bead_info[i][BEAD_CHAINID];
+            thisType = chain_info[thisType][CHAIN_TYPE];
+            thisComp = RadDen_ComponentIndex(thisType, cur_type);
+            xDis     = Dist_BeadToPoint(i, typeCOM);
+            myBin    = (int) floor(4. * xDis);
+            ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
+        }
+
+    }
+
+    free(ClusList);
     nRadDenCounter++;
 }
 

@@ -16,4 +16,6 @@ int Clus_SecondLargestCluster(void);
 
 void Clus_TotalAnalysis(void);
 
+void Clus_MolWiseLargestCluster(void);
+
 #endif // _CLUSTER_H_

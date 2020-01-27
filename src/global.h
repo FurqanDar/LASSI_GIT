@@ -12,7 +12,7 @@
 #define MAX_BEADS      53000
 #define MAX_AA         10
 #define MAX_CHAINTYPES 6
-#define MAX_CHAINS     10000
+#define MAX_CHAINS     20000
 #define MAX_CHAINLEN   1000
 #define MAX_BONDS      15
 #define MAX_VALENCY    1000

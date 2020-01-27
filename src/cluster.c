@@ -326,3 +326,75 @@ void Clus_DistributionMolWise_Avg(void) {
     nTotClusCounter++;
     nLargestClusterRightNow += currentLargest;
 }
+
+/// Clus_MolWiseLargestCluster - performs a total clustering analysis of the system. Then finds out the largest cluster
+/// for each MolType, where redundancy is allowed. naList contains the cluster IDs of the chain types.
+///
+void Clus_MolWiseLargestCluster(void) {
+    int curID, Cluster_length, i;
+    int ClusNum = 0;
+    int IsUnique = 1;
+    for (i = 0; i <= tot_chains; i++) {
+        naChainCheckList[i] = -1;
+        naList[i] = -1;
+    }
+    curID = 0;//Start with the 0th chain
+
+    int molType = 0;
+    int *clus_numof_MolType; //Tracks the number breakdown in each cluster
+    int *clusID_of_type;     //Tracks the clusterID of largest of each type
+    int *largestClus_of_type;//Tracks the largest number seen for each type
+
+    clus_numof_MolType  = malloc( tot_chain_types * sizeof(lInt));
+    clusID_of_type      = malloc( tot_chain_types * sizeof(lInt));
+    largestClus_of_type = malloc( tot_chain_types * sizeof(lInt));
+
+    for(i=0; i<tot_chain_types; i++){
+        clus_numof_MolType[i]  = 0;
+        clusID_of_type[i]      = 0;
+        largestClus_of_type[i] = 0;
+    }
+
+
+    while (curID < tot_chains && IsUnique == 1) {
+        Cluster_length = Clus_ChainNetwork_ForTotal(curID);//This is the length of curID cluster
+
+        for(i=0; i<tot_chain_types; i++){
+            clus_numof_MolType[i] = 0;
+        }
+
+        for (i = 0; i < Cluster_length; i++) {//Recording the chains in this cluster
+            naCluster[ClusNum][i + 1] = naList[i];
+            molType = chain_info[naList[i]][CHAIN_TYPE];
+            clus_numof_MolType[molType]++;
+            naList[i] = -1;
+        }
+
+        for(i=0; i<tot_chain_types; i++){
+            if (clus_numof_MolType[i] > largestClus_of_type[i]){
+                largestClus_of_type[i] = clus_numof_MolType[i];
+                clusID_of_type[i] = ClusNum;
+            }
+            clus_numof_MolType[i] = 0;
+        }
+
+        naCluster[ClusNum++][0] = Cluster_length;
+        IsUnique = 0;//Assume not unique -- just got analyzed.
+        while (curID < tot_chains && IsUnique == 0) {//Finding the next chainID that hasn't been analyzed.
+            curID++;
+            IsUnique = 0;//Assume not unique.
+            if (naChainCheckList[curID] == -1) {
+                IsUnique = 1;
+            }
+        }
+    }
+
+    for(i=0; i<tot_chain_types; i++){
+        //printf("(%d %d)\t", largestClus_of_type[i],clusID_of_type[i]);
+        naList[i] = clusID_of_type[i];//Now naList contains the cluster ID's.
+    }
+    //printf("\n");
+    free(clus_numof_MolType);
+    free(clusID_of_type);
+    free(largestClus_of_type);
+}
