@@ -737,7 +737,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
         ClusList[i] = naCluster[clusID_forType][i+1];
         }
         Calc_CenterOfMass_OfCluster(typeCOM, clusSize_forType, ClusList);*/
-        //Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type);
+        Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type);
         for(i=0; i<tot_beads; i++){
             thisType = bead_info[i][BEAD_CHAINID];
             thisType = chain_info[thisType][CHAIN_TYPE];
