@@ -363,7 +363,7 @@ void Clus_MolWiseLargestCluster(void) {
             clus_numof_MolType[i] = 0;
         }
 
-        for (i = 0; i < Cluster_length; i++) {//Recording the chains in this cluster
+        for (i=0; i<Cluster_length; i++) {//Recording the chains in this cluster
             naCluster[ClusNum][i + 1] = naList[i];
             molType = chain_info[naList[i]][CHAIN_TYPE];
             clus_numof_MolType[molType]++;
