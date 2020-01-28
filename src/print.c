@@ -439,7 +439,7 @@ void Write_TotalSysProp(char *filename, int run_it) {
         fprintf(fp, "#Density distribution from the COM outwards. Order is ChainType.\n");
         for (i = 0; i < run_it; i++) {
             fprintf(fp, "#Run_Cycle = %d\n", i);
-            for (j = 0; j < tot_chain_types*tot_chain_types; j++) {
+            for (j = 0; j < nRadDen_TotComps; j++) {
                 for (k = 0; k < nRDF_TotBins; k++) {
                     fprintf(fp, "%LE\t", ld_TOTRadDen_Arr[RadDenArr_Index(i, j, k)]);
                 }
@@ -701,7 +701,7 @@ void Copy_Data(int run_it) {
 
         }
     }
-    for (i = 0; i < tot_chain_types*tot_chain_types; i++) {
+    for (i = 0; i < nRadDen_TotComps; i++) {
         for (j = 0; j < nRDF_TotBins; j++) {
             ld_TOTRadDen_Arr[RadDenArr_Index(run_it, i, j)] =
                     ldRadDen_Arr[RadDenArr_Index(0, i, j)] / (long double) nRadDenCounter;

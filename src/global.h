@@ -155,6 +155,7 @@ lLDub *ldRadDen_Arr;
 lInt nRDF_TotComps;
 lInt nRDFCounter;//This counts how many times the RDF has been calculated for averaging at the end.
 lInt nRDF_TotBins;
+lInt nRadDen_TotComps;
 lInt nRadDenCounter;//This counts for the Radial Density histograms
 float fGyrTensor[7];//Gyration tensor
 float fSysGyrRad;//Gyration radius of the system.

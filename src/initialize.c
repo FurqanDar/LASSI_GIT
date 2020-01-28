@@ -29,9 +29,9 @@ void Memory_Initialization_AtStart(void) {
     nRDF_TotComps /= 2;
     ld_TOTRDF_Arr = malloc((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
     ldRDF_Arr = malloc((nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
-
-    ldRadDen_Arr = malloc((tot_chain_types * tot_chain_types * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
-    ld_TOTRadDen_Arr = malloc((nTot_CycleNum * tot_chain_types * tot_chain_types * nRDF_TotBins) * sizeof(lLDub));
+    nRadDen_TotComps = tot_chain_types * (tot_chain_types + 1);
+    ldRadDen_Arr = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
+    ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * tot_chain_types * nRDF_TotBins) * sizeof(lLDub));
 
     Memory_VerifyMalloc();
     printf("Successfully allocated memory! Arrays initialized.\n");
@@ -130,7 +130,7 @@ void Global_Array_Initialization_AtStart(void) {
                 ld_TOTRDF_Arr[RDFArr_Index(k, j, i)] = 0.;
             }
         }
-        for(j=0; j<tot_chain_types*tot_chain_types; j++){//For Density Dists wrt COM
+        for(j=0; j<nRadDen_TotComps; j++){//For Density Dists wrt COM
             ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
             for(k=0; k<nTot_CycleNum; k++){
                 ld_TOTRadDen_Arr[RadDenArr_Index(k, j, i)] = 0.;
@@ -212,7 +212,7 @@ void Reset_Global_Arrays(void) {
         }
     }
     //Initalizing for density histograms wrt to the COM
-    for (j = 0; j < tot_chain_types*tot_chain_types; j++) {
+    for (j = 0; j < nRadDen_TotComps; j++) {
         for (i = 0; i < nRDF_TotBins; i++) {
             ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
         }

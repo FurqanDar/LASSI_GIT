@@ -360,11 +360,16 @@ int RDFArr_Index(const int run_cycle, const int rdf_comp, const int x_pos) {
 }
 
 int RadDen_ComponentIndex(const int i, const int j){
-    return j + tot_chain_types*i;
+    if (i < 0){
+        return j;
+    }
+    else {
+        return tot_chain_types + j + tot_chain_types * i;
+    }
 }
 
 int RadDenArr_Index(const int run_cycle, const int rad_comp, const int x_pos){
-    return x_pos + nRDF_TotBins * (rad_comp + tot_chain_types*tot_chain_types * run_cycle);
+    return x_pos + nRDF_TotBins * (rad_comp + nRadDen_TotComps * run_cycle);
 }
 
 int MolClusArr_Index(const int run_cycle, const int chain_type, const int clus_size){
@@ -604,9 +609,9 @@ void Calc_SystemCenterOfMass_OfMolType(int *tmpR, int const thisType){
         for (i=fB; i<lB; i++) {
             bead_total_now++;
             for (j = 0; j < POS_MAX; j++) {
-                dumArg = dumConst[j] * (float) bead_info[i][j];
+                dumArg   = dumConst[j] * (float) bead_info[i][j];
                 zeta[j] += sin(dumArg);
-                xi[j] += cos(dumArg);
+                xi[j]   += cos(dumArg);
             }
         }
     }
@@ -725,23 +730,23 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
     int myBin;
     float xDis = 0.;//Tracks the distance between the COM and the specific bead
     int cur_type = 0;
-    int clusSize_forType = 0;
-    int clusID_forType   = -1;
-    /*int *ClusList; ClusList = malloc((tot_chains+1) * sizeof(lInt));
-    for(i=0; i<=tot_chains; i++){ ClusList[i] = -1;}
-    Clus_MolWiseLargestCluster();*/
+
+    Calc_SystemCenterOfMass(typeCOM);
+    for(i=0; i<tot_beads; i++){
+        thisType = bead_info[i][BEAD_CHAINID];
+        thisType = chain_info[thisType][CHAIN_TYPE];
+        thisComp = RadDen_ComponentIndex(-1, thisType);
+        xDis     = Dist_BeadToPoint(i, typeCOM);
+        myBin    = (int) floor(4. * xDis);
+        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
+    }
+
     for (cur_type=0; cur_type<tot_chain_types; cur_type++){//Go through each molType's center
-        /*clusID_forType = naList[cur_type];
-        clusSize_forType = naCluster[clusID_forType][0];
-        for (i=0; i<clusSize_forType; i++){
-        ClusList[i] = naCluster[clusID_forType][i+1];
-        }
-        Calc_CenterOfMass_OfCluster(typeCOM, clusSize_forType, ClusList);*/
         Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type);
         for(i=0; i<tot_beads; i++){
             thisType = bead_info[i][BEAD_CHAINID];
             thisType = chain_info[thisType][CHAIN_TYPE];
-            thisComp = RadDen_ComponentIndex(thisType, cur_type);
+            thisComp = RadDen_ComponentIndex(cur_type, thisType);
             xDis     = Dist_BeadToPoint(i, typeCOM);
             myBin    = (int) floor(4. * xDis);
             ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
@@ -749,7 +754,6 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
 
     }
 
-    //free(ClusList);
     nRadDenCounter++;
 }
 
