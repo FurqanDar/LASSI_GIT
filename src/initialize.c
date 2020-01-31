@@ -31,7 +31,7 @@ void Memory_Initialization_AtStart(void) {
     ldRDF_Arr = malloc((nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
     nRadDen_TotComps = tot_chain_types * (tot_chain_types + 1);
     ldRadDen_Arr = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
-    ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * tot_chain_types * nRDF_TotBins) * sizeof(lLDub));
+    ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins) * sizeof(lLDub));
 
     Memory_VerifyMalloc();
     printf("Successfully allocated memory! Arrays initialized.\n");
@@ -402,6 +402,7 @@ void Initial_Conditions_Simple(void) {
     for (i = 0; i < tot_beads; i++) {
         bead_info[i][BEAD_FACE] = -1;
     }
+
 }
 
 /// Initial_Conditions_FromFile - reads the restart file and sets the initial conditions for the system

@@ -478,7 +478,6 @@ void Parse_StructureFile(char *filename) {
                     nCursor++;
 
                 }
-
             }
             chain_info[nChainID][CHAIN_START] = nChainStart;
             chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
@@ -489,14 +488,14 @@ void Parse_StructureFile(char *filename) {
                 nChainStart += nBEADS;//This accounts for chain lengths.
                 nChainID++;//Going to the next chainID
                 tot_chains++;//Add a chain
-                chain_info[nChainID][CHAIN_START] = nChainStart;
+                chain_info[nChainID][CHAIN_START]  = nChainStart;
                 chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
-                chain_info[nChainID][CHAIN_TYPE] = nChainType;
+                chain_info[nChainID][CHAIN_TYPE]   = nChainType;
                 for (i = 0; i < nBEADS; i++) {
                     tot_beads++;
                     curID = i + nChainStart;
                     nTemp = curID - nBEADS;
-                    bead_info[curID][BEAD_TYPE] = bead_info[nTemp][BEAD_TYPE];
+                    bead_info[curID][BEAD_TYPE]    = bead_info[nTemp][BEAD_TYPE];
                     bead_info[curID][BEAD_CHAINID] = nChainID;
                     for (j = 0; j < MAX_BONDS; j++) {
                         linker_len[curID][j] = linker_len[nTemp][j];
