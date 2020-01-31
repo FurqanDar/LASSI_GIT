@@ -300,14 +300,14 @@ void Initial_Conditions_Simple(void) {
                     tmpR2[j] = tmpR[j];
                 }
                 TlCnt = 0;//Reset this counter.
-                while (naTotLattice[Lat_Ind_FromVec(tmpR2)] != -1 && TlCnt < 500000) {
+                while (naTotLattice[Lat_Ind_FromVec(tmpR2)] != -1 && TlCnt < 5000000) {
                     for (j = 0; j < POS_MAX; j++) {
                         tmpR2[j] = (rand() % radUp) - radLow;
                         tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
                     }
                     TlCnt++;
                 }
-                if (TlCnt == 500000) {
+                if (TlCnt == 5000000) {
                     printf("Not enough space in the lattice. Crashing. Maybe try increasing max trials, "
                            "or make the box bigger!\t\n");
                     exit(1);
@@ -326,13 +326,13 @@ void Initial_Conditions_Simple(void) {
                 //This usually means this is the first bead in the chain.
                 TlCnt = 0;
                 while (naTotLattice[Lat_Ind_FromVec(tmpR)] != -1 &&
-                       TlCnt < 500000) {//Keep looping till we find an empty lattice site.
+                       TlCnt < 5000000) {//Keep looping till we find an empty lattice site.
                     TlCnt++;
                     for (j = 0; j < POS_MAX; j++) {//Generate a random point in the lattice.
                         tmpR[j] = rand() % nBoxSize[j];
                     }
                 }
-                if (TlCnt == 500000) {
+                if (TlCnt == 5000000) {
                     printf("\n\nNot enough space in the lattice for first bead, bruh. Maybe try increasing max trials, "
                            "or make the box bigger!\n\n");
                     exit(1);
@@ -369,7 +369,7 @@ void Initial_Conditions_Simple(void) {
                     tmpR2[j] = tmpR[j];
                 }
                 TlCnt = 0;//Reset this counter.
-                while (naTotLattice[Lat_Ind_FromVec(tmpR2)] != -1 && TlCnt < 500000) {
+                while (naTotLattice[Lat_Ind_FromVec(tmpR2)] != -1 && TlCnt < 5000000) {
                     for (j = 0; j < POS_MAX; j++) {
                         tmpR2[j] = (rand() % radUp) - radLow;
                         tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
@@ -377,7 +377,7 @@ void Initial_Conditions_Simple(void) {
                     //printf("%d %d %d\n", tmpR2[0], tmpR2[1], tmpR2[2]);
                     TlCnt++;
                 }
-                if (TlCnt == 500000) {
+                if (TlCnt == 5000000) {
                     printf("\n\nNot enough space in the lattice. Crashing. Maybe try increasing max trials, "
                            "or make the box bigger!\t %d\t%d %d\n\n", TlCnt, i, naTotLattice[Lat_Ind_FromVec(
                             tmpR2)]);
