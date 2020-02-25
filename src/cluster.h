@@ -6,7 +6,7 @@ int Clus_ChainNetwork_General(int chainID);
 
 int Clus_ChainNetwork_ForTotal(int chainID);
 
-int Clus_LimitedCluster(int chainID);
+int Clus_LimitedNetworkCluster(int chainID);
 
 void Clus_Distribution_Avg(void);
 
@@ -17,5 +17,9 @@ int Clus_SecondLargestCluster(void);
 void Clus_TotalAnalysis(void);
 
 void Clus_MolWiseLargestCluster(void);
+
+int Clus_ChainProximity_ForTotal(int chainID);
+
+int Clus_LimitedProximityCluster(int chainID);
 
 #endif // _CLUSTER_H_

@@ -196,7 +196,7 @@ int Clus_SecondLargestCluster(void) {
 /// which acts as sort of a hash table!
 /// \param chainID
 /// \return clusSize - the size of the cluster; also naList[] now has the chainIDs. -1 if clusSize >= 5
-int Clus_LimitedCluster(int chainID) {
+int Clus_LimitedNetworkCluster(int chainID) {
     //Updates naList to have all proteins bound to  chainID and it's cluster
     //The idea is to check every bead and see if there is a unique bonded chain, and to add it to naList
     //If Cluster becomes larger than 5, exit and return -1
@@ -397,4 +397,116 @@ void Clus_MolWiseLargestCluster(void) {
     free(clus_numof_MolType);
     free(clusID_of_type);
     free(largestClus_of_type);
+}
+
+int Clus_ChainProximity_ForTotal(int chainID) {
+    //Updates naList to have all proteins close to chainID
+    //The idea is to check every bead and see if there is a unique chain in the (+-1,+-1) cubce, and to add it to naList
+    //This one is specifically made to be used in total system proximity cluster analyses, so naList and naChainCheckList aren't
+    //reinitialized to -1. Instead, we just use naChainCheckList fully.
+    int i,j,k; //Loop iterators
+    int list_it  = 0;//Iterator for naList
+    int clusSize = 0;//Index to track the cluster size.
+    int curID;//Index to track the current chain being looked at.
+    curID = chainID;
+    naList[clusSize++] = curID;//The cluster contains chainID by definition, and ClusSize = 1
+    naChainCheckList[curID] = 1;//This means that curID has been checked!
+    int fB, lB;//Indecies to track the first and last bead of chains.
+    int chainPart;
+    int tmpBead = 0;
+    int tmpR[POS_MAX]  = {0};
+    int tmpR2[POS_MAX] = {0};
+    while (curID != -1) {//Keep going through naList till it is exhausted.
+        fB = chain_info[curID][CHAIN_START];//First bead of this chain.
+        lB = fB + chain_info[curID][CHAIN_LENGTH];//Last bead+1 of this chain. Makes for-loops easier this way.
+        for (i = fB; i < lB; i++) {//Loop over all the beads in this chain and see if there is another bead around.
+            for (j=0; j<POS_MAX; j++){//This is where I am right now
+                tmpR[j] = bead_info[fB][j];
+            }
+            for (k = 0; k < MAX_ROTSTATES - 1; k++) {
+                tmpBead = Rot_IndArr[k];
+                for (j = 0; j < POS_MAX; j++) {
+                    tmpR2[j] = (tmpR[j] + LocalArr[tmpBead][j] + nBoxSize[j]) % nBoxSize[j];
+                }
+                tmpBead = Lat_Ind_FromVec(tmpR2);
+                tmpBead = naTotLattice[tmpBead];
+                if (tmpBead != -1) {
+                    chainPart = bead_info[tmpBead][BEAD_CHAINID];
+                    if (naChainCheckList[chainPart] == -1) {//This is a unique chain.
+                        naList[clusSize++] = chainPart;
+                        naChainCheckList[chainPart] = 1;//Recording that this chain has been looked at
+                    }
+                }
+            }
+            //Moving on to the next bead in this chain
+        }
+        //Done with this chain, so let's move to the next chain in the cluster, if it exists.
+        list_it++;//Going one forward in naList to completely exhaust the tree.
+        curID = naList[list_it];
+    }
+    return clusSize;
+}
+
+int Clus_LimitedProximityCluster(int chainID) {
+    //Updates naList to have all proteins bound to  chainID and it's cluster
+    //The idea is to check every bead and see if there is a unique bonded chain, and to add it to naList
+    //If Cluster becomes larger than 15, exit and return -1
+    int ClusterLimit = 15;
+    int i, j, k; //Loop iterators
+    for (i = 0; i < ClusterLimit; i++) {
+        naList[i] = -1;
+    }
+
+    int list_it = 0;//Iterator for naList
+    int clusSize = 0;//Index to track the cluster size.
+    int curID;//Index to track the current chain being looked at.
+    curID = chainID;
+    naList[clusSize++] = curID;//The cluster contains chainID by definition, and ClusSize = 1
+    int fB, lB;//Indecies to track the first and last bead of chains.
+    int chainPart;
+    int tmpBead = 0;
+    int tmpR[POS_MAX]  = {0};
+    int tmpR2[POS_MAX] = {0};
+    int IsUnique = 1;//Tracks if a chain is unique or not. 0 is non-unique, and 1 is unique.
+
+    while (curID != -1) {//Keep going through naList till it is exhausted.
+        fB = chain_info[curID][CHAIN_START];//First bead of this chain.
+        lB = fB + chain_info[curID][CHAIN_LENGTH];//Last bead+1 of this chain. Makes for-loops easier this way.
+
+        for (i = fB; i < lB; i++) {//Loop over all the beads in this chain and see if there is another bead around.
+            for (j=0; j<POS_MAX; j++){//This is where I am right now
+                tmpR[j] = bead_info[fB][j];
+            }
+            for (k = 0; k < MAX_ROTSTATES - 1; k++) {
+                tmpBead = Rot_IndArr[k];
+                for (j = 0; j < POS_MAX; j++) {
+                    tmpR2[j] = (tmpR[j] + LocalArr[tmpBead][j] + nBoxSize[j]) % nBoxSize[j];
+                }
+                tmpBead = Lat_Ind_FromVec(tmpR2);
+                tmpBead = naTotLattice[tmpBead];
+                if (tmpBead != -1) {
+                    //Checking if this chain is unique
+                    IsUnique = 1;
+                    for (j = 0; j < clusSize; j++) {
+                        if (chainPart == naList[j]) {
+                            IsUnique = 0;
+                            break;
+                        }
+                    }
+                    if (IsUnique == 1) {
+                        naList[clusSize++] = chainPart;
+                    }
+                    if (clusSize >= ClusterLimit) {
+                        return -1;
+                    }
+                }
+            }
+            //Moving on to the next bead in this chain
+        }
+        //Done with this chain, so let's move to the next chain, if it exists.
+        list_it++;//Going one forward in naList to completely exhaust the tree.
+        curID = naList[list_it];
+    }
+    //printf("%d\n", list_it);
+    return clusSize;
 }

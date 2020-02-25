@@ -84,7 +84,7 @@ lInt chain_info[MAX_CHAINS][CHAININFO_MAX];
 lInt tot_beads;
 lInt tot_chains;
 lInt tot_chain_types;
-lInt Temp_Mode;
+lInt Temp_Mode, nTemp_inv;
 lInt nThermalization_Mode, RotBias_Mode;
 
 // system setup

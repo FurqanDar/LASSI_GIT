@@ -209,7 +209,11 @@ void Print_Key(void) { // should be output-dependent (stdout, stderr, other file
     printf("\n");
 
     printf("%s MC Setup %s\n", lBrace, rBrace);
-    printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", fKT, fKT + (float) (nTot_CycleNum - 1) * fdelta_temp);
+    printf("Temperature Inverted           = %d\n", nTemp_inv);
+    if (nTemp_inv == 0){
+    printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", fKT, fKT + (float) (nTot_CycleNum - 1) * fdelta_temp);}
+    if (nTemp_inv == 1){
+        printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", 1./fKT, 1./(fKT + (float) (nTot_CycleNum - 1) * fdelta_temp));}
     printf("Temperature Mode               = %d\n", Temp_Mode);
     printf("Indent Mode                    = %d\n", nThermalization_Mode);
     printf("Rotational Bias Mode           = %d\n", RotBias_Mode);

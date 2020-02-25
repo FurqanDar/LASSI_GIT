@@ -743,7 +743,7 @@ int Move_SmallClus(int chainID, float MyTemp) {
     oldEn = 0.0;
     newEn = 0.0;
     //printf("Beginning CLUS\n");
-    ClusSize = Clus_LimitedCluster(chainID);//Looking at everything that is connected to chainID
+    ClusSize = Clus_LimitedNetworkCluster(chainID);//Looking at everything that is connected to chainID
     //Remember that naList[] contains the chainID's of the network chainID is part of from 0 - ClusSize-1.
     //printf("Done with network\t %d\n", ClusSize);
     if (ClusSize >= 1) {

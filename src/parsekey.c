@@ -81,6 +81,8 @@ int Parse_Keyfile(char *filename) {
                 sscanf(strLine, "%*s %d", &Temp_Mode);
             } else if (strcmp(strKeyword, "MC_DELTA_TEMP") == 0) {
                 sscanf(strLine, "%*s %f", &fdelta_temp);
+            } else if (strcmp(strKeyword, "MC_INVERT_TEMP") == 0) {
+                sscanf(strLine, "%*s %d", &nTemp_inv);
             } else if (strcmp(strKeyword, "MC_CYCLE_NUM") == 0) {
                 sscanf(strLine, "%*s %d", &nTot_CycleNum);
             } else if (strcmp(strKeyword, "MC_INDENT_MODE") == 0) {
@@ -397,7 +399,7 @@ void Parse_StructureFile(char *filename) {
             bead_info[i][j] = -1;
         }
         for (j = 0; j < MAX_BONDS; j++) {
-            topo_info[i][j] = -1;
+            topo_info[i][j]  = -1;
             linker_len[i][j] = -1;
         }
     }
@@ -439,7 +441,6 @@ void Parse_StructureFile(char *filename) {
                 nFlag = -1;
             }
         }
-
         if (nFlag == 1) {//This signifies that a new molecule has started
             //It's assumed that the next line contains the number of copies for this molecule.
             nChainType++;
@@ -467,7 +468,7 @@ void Parse_StructureFile(char *filename) {
                     nCursor = 0;//This is a counter for number of bonds, which should reset when you have a 'new' bead.
                 }
 
-                if (curPartner != -1) {//This bead has a bonded partner
+                if (curPartner != -1){//This bead has a bonded partner
                     if (nCursor >
                         1) {//This signifies that the chain is not linear because a bead has more than two bonds because indecies start at 0
                         nChainTypeIsLinear[nChainType] = 0;
@@ -479,11 +480,11 @@ void Parse_StructureFile(char *filename) {
 
                 }
             }
-            chain_info[nChainID][CHAIN_START] = nChainStart;
+            chain_info[nChainID][CHAIN_START]  = nChainStart;
             chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
-            chain_info[nChainID][CHAIN_TYPE] = nChainType;
+            chain_info[nChainID][CHAIN_TYPE]   = nChainType;
             //We just fully store the first chain 'manually'. Now we just copy the chain nCopies times.
-
+            //printf("%d\n", nBEADS)
             for (k = 1; k < nCopies; k++) {//Now we just copy this molecule nMOL-1 times
                 nChainStart += nBEADS;//This accounts for chain lengths.
                 nChainID++;//Going to the next chainID
@@ -491,6 +492,7 @@ void Parse_StructureFile(char *filename) {
                 chain_info[nChainID][CHAIN_START]  = nChainStart;
                 chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
                 chain_info[nChainID][CHAIN_TYPE]   = nChainType;
+
                 for (i = 0; i < nBEADS; i++) {
                     tot_beads++;
                     curID = i + nChainStart;
@@ -506,11 +508,9 @@ void Parse_StructureFile(char *filename) {
                     }
                 }
             }
-            nFlag = -1;//Reseting the flag.
+            nFlag = -1;//Resetting the flag.
         }
 
-        //printf("Done with structure!\n");
-        //exit(1);
         //This is to make sure that the reading was done correctly.
         if (nFlag != -1) {
             printf("Incorrectly formatted input structure file. I must crash :(\n\n");

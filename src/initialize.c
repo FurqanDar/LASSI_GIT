@@ -188,6 +188,12 @@ void Global_Array_Initialization_AtStart(void) {
         fKT_Cycle[i] = fKT + (float) i * fdelta_temp;
     }
 
+    if (nTemp_inv == 1){
+        for (i = 0; i < nTot_CycleNum; i++) {
+            fKT_Cycle[i] = 1./fKT_Cycle[i];
+        }
+    }
+
     printf("All setup has been completed!\n");
 }
 
