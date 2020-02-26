@@ -210,10 +210,7 @@ void Print_Key(void) { // should be output-dependent (stdout, stderr, other file
 
     printf("%s MC Setup %s\n", lBrace, rBrace);
     printf("Temperature Inverted           = %d\n", nTemp_inv);
-    if (nTemp_inv == 0){
-    printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", fKT, fKT + (float) (nTot_CycleNum - 1) * fdelta_temp);}
-    if (nTemp_inv == 1){
-        printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", 1./fKT, 1./(fKT + (float) (nTot_CycleNum - 1) * fdelta_temp));}
+    printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", fKT, fKT + (float) (nTot_CycleNum - 1) * fdelta_temp);
     printf("Temperature Mode               = %d\n", Temp_Mode);
     printf("Indent Mode                    = %d\n", nThermalization_Mode);
     printf("Rotational Bias Mode           = %d\n", RotBias_Mode);
@@ -223,17 +220,17 @@ void Print_Key(void) { // should be output-dependent (stdout, stderr, other file
     printf("Number of Thermalizing Steps   = %e\n", (float) nPreSteps);
     printf("RNG Seed                       = %d\n", RNG_Seed);
     char *MoveName[MAX_MV];
-    MoveName[MV_PIVOT] = "Pivot           ";
-    MoveName[MV_DBPVT] = "Double Pivot    ";
-    MoveName[MV_CLSTR] = "Larger Cluster  ";
+    MoveName[MV_PIVOT]   = "Pivot           ";
+    MoveName[MV_DBPVT]   = "Double Pivot    ";
+    MoveName[MV_CLSTR]   = "Larger Cluster  ";
     MoveName[MV_SMCLSTR] = "Smaller Cluster ";
-    MoveName[MV_STROT] = "Face Change     ";
-    MoveName[MV_LOCAL] = "Local           ";
+    MoveName[MV_STROT]   = "Face Change     ";
+    MoveName[MV_LOCAL]   = "Local           ";
     MoveName[MV_COLOCAL] = "Co-local        ";
     MoveName[MV_MTLOCAL] = "Shake           ";
-    MoveName[MV_BRROT] = "Rotate Branched ";
-    MoveName[MV_SNAKE] = "Slithering Snake";
-    MoveName[MV_TRANS] = "Translation     ";
+    MoveName[MV_BRROT]   = "Rotate Branched ";
+    MoveName[MV_SNAKE]   = "Slithering Snake";
+    MoveName[MV_TRANS]   = "Translation     ";
     float freqMin = 1e10;
     for (i = MV_NULL + 1; i < MAX_MV; i++) {
         if (freqMin >= fMCFreq[i] && fMCFreq[i] != 0.) {
