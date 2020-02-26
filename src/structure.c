@@ -309,25 +309,19 @@ void GyrTensor_GyrRad_Avg(void) {
     I shall borrow most of the code from above, and so read GyrTensor_ClusterSpecific for what's happening here.
     */
     int i, j;//Loop indecies
-    float tot_COM[POS_MAX] = {0.};
-    float dumArg = 0.;
+    int tot_COM[POS_MAX] = {0};
+
+    Calc_SystemCenterOfMass(tot_COM);
+    int dumArg[POS_MAX] = {0};
     for (i = 0; i < 7; i++) {//Initializing to 0
         fGyrTensor[i] = 0.;
     }
 
     for (i = 0; i < tot_beads; i++) {
         for (j = 0; j < POS_MAX; j++) {
-            tot_COM[j] += bead_info[i][j];
-        }
-    }
-    for (j = 0; j < POS_MAX; j++) {//Dividing by number of beads
-        tot_COM[j] /= (float) tot_beads;
-    }
-
-    for (i = 0; i < tot_beads; i++) {
-        for (j = 0; j < POS_MAX; j++) {
-            dumArg = (float) bead_info[i][j] - tot_COM[j];
-            fGyrTensor[j] += dumArg * dumArg;
+            dumArg[j] = bead_info[i][j] - tot_COM[j];
+            dumArg[j] = dumArg[j] > nBoxSize[i] / 2 ? nBoxSize[i] - dumArg[j] : dumArg[j];
+            fGyrTensor[j] += (float)(dumArg[j] * dumArg[j]);
         }
     }
 

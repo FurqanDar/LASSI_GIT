@@ -2757,7 +2757,6 @@ int OP_PickRotState(int CandNums) {
                 break;
             }
         }
-
         newRot = rot_trial[0][i];
     }
     return newRot;
