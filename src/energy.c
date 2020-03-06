@@ -38,11 +38,11 @@ float Energy_InitPotential(int beadID) {
                     tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
                     totEn += (float) (tmpR[j] * tmpR[j]);
                 }
-                if (totEn > 800) {
+                if (totEn >= 250) {
                     totEn = (fCuTemp - fKT) * ((float) totEn);
-                }/* else if (totEn <= 2000) {
-                    totEn = fKT * ((float) tot_beads + 1. / (totEn + 0.02));
-                }*/
+                } else if (totEn <= 600) {
+                    totEn = (fCuTemp - fKT) * ((float) tot_beads + 1. / (totEn + 0.02));
+                }
                 else{
                     totEn=0.;
                 }
@@ -52,7 +52,7 @@ float Energy_InitPotential(int beadID) {
                 break;
         }
     } else {
-        nThermalization_Mode = 0;
+        nThermalization_Mode = -1;
     }
 
     return totEn;
@@ -73,6 +73,7 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
     float xDis = 0.;//Distance between beads.
     int resi = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == 0 ? 0. : Energy_InitPotential(beadID);
+    //totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
 
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0) {

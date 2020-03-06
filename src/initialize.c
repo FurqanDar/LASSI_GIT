@@ -471,7 +471,7 @@ void Calculate_Rot_Bias(float CurrentTemp) {
     int i, j;
     for (i = 0; i < MAX_AA; i++) {
         for (j = 0; j < MAX_AA; j++) {
-            dbias_bolt_fac[i][j] = expf(-fEnergy[i][j][E_SC_SC] / CurrentTemp);
+            dbias_bolt_fac[i][j] = (lLDub) expf(-fEnergy[i][j][E_SC_SC] / CurrentTemp);
         }
     }
     //TODO: Make sure that fRot_Bias can be used in the future to set a solvent 'anisotropy'

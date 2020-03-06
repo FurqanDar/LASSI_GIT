@@ -94,7 +94,7 @@ The system has thermalized!
     //Going through the MC cycles.
     for (run_cycle = 0; run_cycle < nTot_CycleNum; run_cycle++) {
         fKT = fKT_Cycle[run_cycle];//temp_cycle[run_cycle];
-        Calculate_Rot_Bias(fKT_Cycle[run_cycle]);
+        Calculate_Rot_Bias(fKT);
         Print_Data(-1, run_cycle);
         for (nGen = 0; nGen <= nSteps; nGen++) {
             fCuTemp = Temperature_Function(Temp_Mode, nGen);

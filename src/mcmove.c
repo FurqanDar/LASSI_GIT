@@ -30,13 +30,13 @@ int MC_Step(float fMCTemp) {
 
             //Cluster translation
         case MV_CLSTR:
-            nAccept = Move_Clus(fMCTemp);
+            nAccept = Move_Clus_Network(fMCTemp);
             break;
 
             //Cluster translation iff ClusSize <= 5
         case MV_SMCLSTR:
             i = rand() % tot_chains;//Pick a random chain
-            nAccept = Move_SmallClus(i, fMCTemp);
+            nAccept = Move_SmallClus_Network(i, fMCTemp);
             break;
 
             //Change Rotational State
@@ -86,7 +86,11 @@ int MC_Step(float fMCTemp) {
             i = rand() % tot_chains;
             nAccept = Move_BranchedRot(i, fMCTemp);
             break;
-
+        case MV_PR_SMCLSTR:
+            i = rand() % tot_chains;
+            //printf("%d\n",i);
+            nAccept = Move_SmallClus_Proximity(i);
+            break;
         default:
             nAccept = 0;
             break;
@@ -123,12 +127,12 @@ int MC_Step_Equil(float fMCTemp) {
 
             // cluster translation: moves largest cluster to another spot.
         case MV_CLSTR:
-            nAccept = Move_Clus(fMCTemp);
+            nAccept = Move_Clus_Network(fMCTemp);
             break;
 
         case MV_SMCLSTR:
             i = rand() % tot_chains;//Pick a random chain
-            nAccept = Move_SmallClus(i, fMCTemp);
+            nAccept = Move_SmallClus_Network(i, fMCTemp);
             break;
 
             // face change
@@ -394,7 +398,8 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
     int xTemp, yTemp, lRadUp, lRadLow;//Random numbers to store things
     int tmpR[POS_MAX], tmpR2[POS_MAX], tmpR3[POS_MAX];//Vectors to store positions.
     int FWWeight, BWWeight;//Used to perform orientational bias MC
-    double FSum, BSum;
+    float FSum, BSum, Ros_Offset;
+
 
     MCProb = (float) rand() / (float) RAND_MAX;//To decide if we slither forwards or backwards
     if (MCProb < 0.5) {//Forwards slither, so lastB-1 (last bead) is anchor
@@ -455,11 +460,11 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
         yTemp++;
     }
     //Done with checking states in the old location. Take the sum.
-    BSum = 1.;
+    BSum = 0.;
     for (i = 0; i < yTemp; i++) {
-        BSum += log10(bolt_norm[i]);
+        BSum += log(bolt_norm[i]);
     }
-
+    //BSum = expf(BSum);
     if (MCProb < 0.5) {//Slithering the chain forwards in ID-space
         for (i = firstB; i < lastB - 1; i++) {
             for (j = 0; j < POS_MAX; j++) {
@@ -529,10 +534,17 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
         }
         yTemp++;//This keeps track of which residue*/
     }
-    FSum = 1.;
+    FSum = 0.;
     for (i = 0; i < yTemp; i++) {
-        FSum += log10(bolt_norm[i]);
+        FSum += log(bolt_norm[i]);
     }
+    //FSum = expf(FSum);
+    Ros_Offset = FSum > BSum ? FSum : BSum;
+    BSum -= Ros_Offset;
+    FSum -= Ros_Offset;
+    BSum  = expf(BSum);
+    FSum  = expf(FSum);
+
     //Doing the Metropolis-Hastings thing
     MCProb = (float) rand() / (float) RAND_MAX;
     if (MCProb < (FSum / BSum) * expf((oldEn - newEn) / MyTemp)) {//Accept. Bonds have been handled before!
@@ -564,7 +576,7 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
     int xTemp, yTemp, lRadUp, lRadLow;//Random numbers to store things
     int tmpR[POS_MAX];//Vectors to store coordinates.
     int FWWeight, BWWeight;//Used to perform orientational bias MC
-    float FSum, BSum;//Overall Rosenbluth sums
+    float FSum, BSum, Ros_Offset;//Overall Rosenbluth sums
 
 
     //Finding the bounds for looping over the molecule/chain
@@ -608,10 +620,11 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
         yTemp++;
     }
 
-    BSum = 1.;
+    BSum = 0.;
     for (i = 0; i < yTemp; i++) {
-        BSum += log10(bolt_norm[i]);
+        BSum += log(bolt_norm[i]);
     }
+    //BSum = expf(BSum);
 
     OP_DispChain_ForTrans(chainID, tmpR);//Moved the chain, broke bonds, and remembered stuff
 
@@ -640,10 +653,16 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
         yTemp++;//This keeps track of which residue*/
     }
 
-    FSum = 1.;
+    FSum = 0.;
     for (i = 0; i < yTemp; i++) {
-        FSum += log10(bolt_norm[i]);
+        FSum += log(bolt_norm[i]);
     }
+    //FSum = expf(FSum);
+    Ros_Offset = FSum > BSum ? FSum : BSum;
+    BSum -= Ros_Offset;
+    FSum -= Ros_Offset;
+    BSum  = expf(BSum);
+    FSum  = expf(FSum);
     MCProb = (float) rand() / (float) RAND_MAX;
     if (MCProb <
         (FSum / BSum) * expf((oldEn - newEn) / MyTemp)) {//Accept the move. Remember that the bonds were assigned above!
@@ -667,7 +686,7 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
 /// 4. Calculate the new energy and perform the Metropolis-Hastings step.
 /// \param MyTemp
 /// \return 1 if accepted, 0 if rejected.
-int Move_Clus(float MyTemp) {
+int Move_Clus_Network(float MyTemp) {
     //Attempts to move the second largest cluster
 
     int bAccept = 0; //Used in MC steps, assume that move fails initially.
@@ -731,7 +750,7 @@ int Move_Clus(float MyTemp) {
 /// 4. Calculate the new energy and perform the Metropolis-Hastings step.
 /// \param MyTemp
 /// \return 1 if accepted, 0 if rejected.
-int Move_SmallClus(int chainID, float MyTemp) {
+int Move_SmallClus_Network(int chainID, float MyTemp) {
     //Performs a cluster move where a given chain and it's cluster are moved. No new 'bonds' are made so the move is reversible....
 
     int bAccept = 0; //Used in MC steps, assume that move fails initially.
@@ -1081,7 +1100,7 @@ int Move_MultiLocal(int beadID, float MyTemp) {
     }
 
     int FWWeight, BWWeight;//Used to perform orientational bias MC
-    float FSum, BSum;
+    float FSum, BSum, Ros_Offset;
     int resi, resj;
     //int tmpR2[POS_MAX], tmpR3[POS_MAX];
     float oldEn = 0.;
@@ -1111,11 +1130,11 @@ int Move_MultiLocal(int beadID, float MyTemp) {
         yTemp++;
     }
 
-    BSum = 1.;
+    BSum = 0.;
     for (i = 0; i < yTemp; i++) {
-        BSum += log10(bolt_norm[i]);
+        BSum += log(bolt_norm[i]);
     }
-
+    //BSum = expf(BSum);
     curID = beadID;
     topIt = 0;
     while (curID != -1) {
@@ -1160,10 +1179,17 @@ int Move_MultiLocal(int beadID, float MyTemp) {
         yTemp++;
     }
 
-    FSum = 1.;
+    FSum = 0.;
     for (i = 0; i < yTemp; i++) {
-        FSum += log10(bolt_norm[i]);
+        FSum += log(bolt_norm[i]);
     }
+    //FSum = expf(FSum);
+
+    Ros_Offset = FSum > BSum ? FSum : BSum;
+    BSum -= Ros_Offset;
+    FSum -= Ros_Offset;
+    BSum  = expf(BSum);
+    FSum  = expf(FSum);
 
     MCProb = (float) rand() / (float) RAND_MAX;
     if (MCProb <
@@ -1292,7 +1318,7 @@ int Move_Pivot(int chainID, float MyTemp) {
     }
 
     int FWWeight, BWWeight;//Used to perform orientational bias MC
-    float FSum, BSum;
+    float FSum, BSum, Ros_Offset;
     int resi, resj;
     float oldEn = 0.;
     float newEn = 0.;
@@ -1316,10 +1342,11 @@ int Move_Pivot(int chainID, float MyTemp) {
         yTemp++;
     }
 
-    BSum = 1.;
+    BSum = 0.;
     for (i = 0; i < yTemp; i++) {
-        BSum += log10(bolt_norm[i]);
+        BSum += log(bolt_norm[i]);
     }
+    //BSum = expf(BSum);
 
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
@@ -1360,11 +1387,16 @@ int Move_Pivot(int chainID, float MyTemp) {
         yTemp++;
     }
 
-    FSum = 1.;
+    FSum = 0.;
     for (i = 0; i < yTemp; i++) {
-        FSum += log10(bolt_norm[i]);
+        FSum += log(bolt_norm[i]);
     }
-
+    //FSum = expf(FSum);
+    Ros_Offset = FSum > BSum ? FSum : BSum;
+    BSum -= Ros_Offset;
+    FSum -= Ros_Offset;
+    BSum  = expf(BSum);
+    FSum  = expf(FSum);
 //printf("%f\n", (FSum/BSum)*expf((oldEn-newEn)/MyTemp));
     MCProb = (float) rand() / (float) RAND_MAX;
     if (MCProb <
@@ -1451,7 +1483,7 @@ int Move_BranchedRot(int chainID, float MyTemp) {
     }
 
     int FWWeight, BWWeight;//Used to perform orientational bias MC
-    double FSum, BSum;
+    float FSum, BSum, Ros_Offset;
     int resi, resj;
     float oldEn = 0.;
     float newEn = 0.;
@@ -1473,11 +1505,11 @@ int Move_BranchedRot(int chainID, float MyTemp) {
         OP_NormalizeRotState(yTemp, BWWeight);
         yTemp++;
     }
-    BSum = 1.;
+    BSum = 0.;
     for (i = 0; i < yTemp; i++) {
-        BSum += log10(bolt_norm[i]);
+        BSum += log(bolt_norm[i]);
     }
-
+    //BSum = expf(BSum);
     for (i = anchorBead + 1; i < lastB; i++) {
         OP_Rotation(PivotM, i, anchorPos);
         OP_MoveBeadTo(i, naTempR);
@@ -1513,11 +1545,18 @@ int Move_BranchedRot(int chainID, float MyTemp) {
         }
         yTemp++;
     }
-    FSum = 1.;
 
+    FSum = 0.;
     for (i = 0; i < yTemp; i++) {
-        FSum += log10(bolt_norm[i]);
+        FSum += log(bolt_norm[i]);
     }
+    //FSum = expf(FSum);
+
+    Ros_Offset = FSum > BSum ? FSum : BSum;
+    BSum -= Ros_Offset;
+    FSum -= Ros_Offset;
+    BSum  = expf(BSum);
+    FSum  = expf(FSum);
 
     MCProb = (float) rand() / (float) RAND_MAX;
     if (MCProb <
@@ -1537,6 +1576,62 @@ int Move_BranchedRot(int chainID, float MyTemp) {
         bAccept = 0;
         return bAccept;
     }
+}
+
+int Move_SmallClus_Proximity(int chainID){
+//Performs a cluster move where a given chain and it's cluster are moved. No new 'bonds' are made so the move is reversible....
+
+    int bAccept = 0; //Used in MC steps, assume that move fails initially.
+    int ClusSize, i, j;//Loop iterators
+    int naClusList[15] = {0};
+    int ClusCheck = -1;
+    int yTemp;
+    int nTemp[POS_MAX];
+    int lRadLow, lRadUp;//Radii bounds.
+    float oldEn, newEn, MCProb;
+    oldEn = 0.0;
+    newEn = 0.0;
+    //printf("Beginning CLUS\n");
+    ClusSize = Clus_LimitedProximityCluster(chainID);//Looking at everything that is connected to chainID
+    //Remember that naList[] contains the chainID's of the network chainID is part of from 0 - ClusSize-1.
+    //printf("Done with network\t %d\n", ClusSize);
+    if (ClusSize >= 1) {
+        //Radii for translation moves. All moves are L/4 radius
+        //I guess moving single chains around as well is not a bad idea
+        lRadLow = nBoxSize[2] / 2;
+        lRadUp = 2 * lRadLow + 1;
+        for (j = 0; j < POS_MAX; j++) {
+            nTemp[j] = (rand() % lRadUp) - lRadLow;   //Random vector to displace the cluster
+        }
+        for (i = 0; i < ClusSize; i++) {
+            //printf("%d\n", naList[i]);
+            yTemp = Check_ChainDisp(naList[i], nTemp);//Checking for steric clash
+            if (yTemp == 0) {
+                bAccept = 0;
+                //printf("End CLUS - No space\n");
+                return bAccept;
+            }
+        }
+        for (i = 0; i < ClusSize; i++) {
+            OP_DispChain(naList[i], nTemp);//Moving the cluster properly
+            naClusList[i] = naList[i];
+        }
+        //Recalculating cluster to see if we have the same cluster or not. If so, we accept. If not, we reject.
+        ClusCheck = Clus_LimitedProximityCluster_Check(chainID, naClusList);
+        if (ClusCheck != -1) {
+            bAccept = 1;//Accept the move
+            //printf("End pCLUS - Yes\n");
+        } else {
+            bAccept = 0;   //Reject the move so I have to restore cluster back
+            for (i = 0; i < ClusSize; i++) {
+                OP_RestoreChain(naClusList[i]);//Placing  the cluster back properly
+            }
+            //printf("End pCLUS - Failed.\n");
+        }
+    }
+    //printf("Ending CLUS w/ %d clus\n", ClusSize);
+    return bAccept;
+
 }
 
 // All the _Equil variants of the moves are spatially the same as their non _Equil variants.
@@ -2721,8 +2816,9 @@ int Check_RotStatesNew(int beadID, int resi, float MyTemp) {
 /// step.
 void OP_NormalizeRotState(int beadVal, int CandNums) {
     int i;
-    bolt_norm[beadVal] = 0.;
+
     if (CandNums > 0) {//There is a possible candidate, so normalize bolt_fac
+        bolt_norm[beadVal] = 0.;
         for (i = 0; i < CandNums; i++) {
             bolt_norm[beadVal] += bolt_fac[i];
         }
@@ -2733,7 +2829,9 @@ void OP_NormalizeRotState(int beadVal, int CandNums) {
             bolt_fac[i] += bolt_fac[i - 1];
         }
     }
-    bolt_norm[beadVal] += 10.;
+    else{
+        bolt_norm[beadVal] = 1.; //If no candidates, we set it to 1 because this will not be used
+    }
 }
 
 /// OP_PickRotState - propose a new bonding partner.
@@ -2752,7 +2850,7 @@ int OP_PickRotState(int CandNums) {
         newRot = -1;
     } else {
         fProb = (float) rand() / (float) RAND_MAX;
-        for (i = 0; i < CandNums-1; i++) {
+        for (i = 0; i < CandNums; i++) {
             if (fProb < bolt_fac[i]) {
                 break;
             }

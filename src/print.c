@@ -220,17 +220,18 @@ void Print_Key(void) { // should be output-dependent (stdout, stderr, other file
     printf("Number of Thermalizing Steps   = %e\n", (float) nPreSteps);
     printf("RNG Seed                       = %d\n", RNG_Seed);
     char *MoveName[MAX_MV];
-    MoveName[MV_PIVOT]   = "Pivot           ";
-    MoveName[MV_DBPVT]   = "Double Pivot    ";
-    MoveName[MV_CLSTR]   = "Larger Cluster  ";
-    MoveName[MV_SMCLSTR] = "Smaller Cluster ";
-    MoveName[MV_STROT]   = "Face Change     ";
-    MoveName[MV_LOCAL]   = "Local           ";
-    MoveName[MV_COLOCAL] = "Co-local        ";
-    MoveName[MV_MTLOCAL] = "Shake           ";
-    MoveName[MV_BRROT]   = "Rotate Branched ";
-    MoveName[MV_SNAKE]   = "Slithering Snake";
-    MoveName[MV_TRANS]   = "Translation     ";
+    MoveName[MV_PIVOT]        = "Pivot           ";
+    MoveName[MV_DBPVT]        = "Double Pivot    ";
+    MoveName[MV_CLSTR]        = "Larger Cluster  ";
+    MoveName[MV_SMCLSTR]      = "Smaller Cluster ";
+    MoveName[MV_STROT]        = "Face Change     ";
+    MoveName[MV_LOCAL]        = "Local           ";
+    MoveName[MV_COLOCAL]      = "Co-local        ";
+    MoveName[MV_MTLOCAL]      = "Shake           ";
+    MoveName[MV_BRROT]        = "Rotate Branched ";
+    MoveName[MV_SNAKE]        = "Slithering Snake";
+    MoveName[MV_TRANS]        = "Translation     ";
+    MoveName[MV_PR_SMCLSTR]   = "Pr. Smal Cluster";
     float freqMin = 1e10;
     for (i = MV_NULL + 1; i < MAX_MV; i++) {
         if (freqMin >= fMCFreq[i] && fMCFreq[i] != 0.) {

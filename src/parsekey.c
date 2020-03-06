@@ -113,6 +113,8 @@ int Parse_Keyfile(char *filename) {
                 sscanf(strLine, "%*s %f", &fMCFreq[MV_PIVOT]);
             } else if (strcmp(strKeyword, "MV_BRROT_FREQ") == 0) {
                 sscanf(strLine, "%*s %f", &fMCFreq[MV_BRROT]);
+            } else if (strcmp(strKeyword, "MV_PR_SMCLSTR") == 0) {
+                sscanf(strLine, "%*s %f", &fMCFreq[MV_PR_SMCLSTR]);
             } else if (strcmp(strKeyword, "RESTART_FILE") == 0) {
                 sscanf(strLine, "%*s %s", strRestartFile);
             } else if (strcmp(strKeyword, "STRUCT_FILETYPE") == 0) {

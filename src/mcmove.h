@@ -17,9 +17,9 @@ int Move_Snake(int chainID, float MyTemp);
 
 int Move_Trans(int chainID, float MyTemp);
 
-int Move_Clus(float MyTemp);
+int Move_Clus_Network(float MyTemp);
 
-int Move_SmallClus(int chainID, float MyTemp);
+int Move_SmallClus_Network(int chainID, float MyTemp);
 
 int Move_DbPvt(int beadID);
 
@@ -30,6 +30,8 @@ int Move_MultiLocal(int beadID, float MyTemp);
 int Move_Pivot(int chainID, float MyTemp);
 
 int Move_BranchedRot(int chainID, float MyTemp);
+
+int Move_SmallClus_Proximity(int chainID);
 
 int Move_Local_Equil(int beadID, float MyTemp);
 

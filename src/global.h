@@ -26,19 +26,20 @@
 #define MAX_E   5 // just for counting; must be the last number of this list
 
 // MC move parameters
-#define MV_NULL     0 // index zero indicates null move
-#define MV_STROT    1
-#define MV_LOCAL    2
-#define MV_COLOCAL  3
-#define MV_MTLOCAL  4
-#define MV_SNAKE    5
-#define MV_TRANS    6
-#define MV_SMCLSTR  7
-#define MV_CLSTR    8
-#define MV_PIVOT    9
-#define MV_BRROT   10
-#define MV_DBPVT   11
-#define MAX_MV     12 // just for counting; must be the last number of this list
+#define MV_NULL         0 // index zero indicates null move
+#define MV_STROT        1
+#define MV_LOCAL        2
+#define MV_COLOCAL      3
+#define MV_MTLOCAL      4
+#define MV_SNAKE        5
+#define MV_TRANS        6
+#define MV_SMCLSTR      7
+#define MV_CLSTR        8
+#define MV_PIVOT        9
+#define MV_BRROT       10
+#define MV_DBPVT       11
+#define MV_PR_SMCLSTR  12
+#define MAX_MV         13 // just for counting; must be the last number of this list
 
 // report parameters
 #define REPORT_NULL    0 // index zero

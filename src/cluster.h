@@ -20,6 +20,8 @@ void Clus_MolWiseLargestCluster(void);
 
 int Clus_ChainProximity_ForTotal(int chainID);
 
-int Clus_LimitedProximityCluster(int chainID);
+int Clus_LimitedProximityCluster(int const chainID);
+
+int Clus_LimitedProximityCluster_Check(int const chainID, int const *OldList);
 
 #endif // _CLUSTER_H_
