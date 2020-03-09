@@ -97,4 +97,6 @@ void OP_NormalizeRotState(int beadVal, int CandNums);
 
 int OP_PickRotState(int CandNums);
 
+lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp);
+
 #endif // _MCMOVE_H_

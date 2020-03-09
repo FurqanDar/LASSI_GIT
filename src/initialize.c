@@ -32,7 +32,6 @@ void Memory_Initialization_AtStart(void) {
     nRadDen_TotComps = tot_chain_types * (tot_chain_types + 1);
     ldRadDen_Arr = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
     ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins) * sizeof(lLDub));
-
     Memory_VerifyMalloc();
     printf("Successfully allocated memory! Arrays initialized.\n");
 }
@@ -180,12 +179,13 @@ void Global_Array_Initialization_AtStart(void) {
     for (i = MV_NULL + 2; i < MAX_MV; i++) {
         fMCFreq[i] += fMCFreq[i - 1]; // Cumulative Frequencies
     }
-    if (RotBias_Mode == 1) {
-        fRot_Bias = expf(-fRot_Bias / fKT);
-    }
 
     for (i = 0; i < nTot_CycleNum; i++) {
         fKT_Cycle[i] = fKT + (float) i * fdelta_temp;
+    }
+
+    if (RotBias_Mode == 1) {
+        fRot_Bias = expf(-fRot_Bias / fKT_Cycle[0]);
     }
 
     if (nTemp_inv == 1){
@@ -193,6 +193,8 @@ void Global_Array_Initialization_AtStart(void) {
             fKT_Cycle[i] = 1./fKT_Cycle[i];
         }
     }
+
+    ld_SmallestProbLog = logl((lLDub) 1. / (lLDub) RAND_MAX);
 
     printf("All setup has been completed!\n");
 }
@@ -471,8 +473,10 @@ void Calculate_Rot_Bias(float CurrentTemp) {
     int i, j;
     for (i = 0; i < MAX_AA; i++) {
         for (j = 0; j < MAX_AA; j++) {
-            dbias_bolt_fac[i][j] = (lLDub) expf(-fEnergy[i][j][E_SC_SC] / CurrentTemp);
+            dbias_bolt_fac[i][j] = (lLDub) expl(-(lLDub )fEnergy[i][j][E_SC_SC] / (lLDub) CurrentTemp);
+            //printf("%LE; ", dbias_bolt_fac[i][j]);
         }
+        //printf("\n");
     }
     //TODO: Make sure that fRot_Bias can be used in the future to set a solvent 'anisotropy'
     fRot_Bias = expf(-f_globRotBias / CurrentTemp);
@@ -540,4 +544,3 @@ float Temperature_Function(int mode, long nGen) {
     return end_val;
 
 }
-
