@@ -127,12 +127,11 @@ int MC_Step_Equil(float fMCTemp) {
 
             // cluster translation: moves largest cluster to another spot.
         case MV_CLSTR:
-            nAccept = Move_Clus_Network(fMCTemp);
+            nAccept = 0;
             break;
 
         case MV_SMCLSTR:
-            i = rand() % tot_chains;//Pick a random chain
-            nAccept = Move_SmallClus_Network(i, fMCTemp);
+            nAccept = 0;
             break;
 
             // face change
