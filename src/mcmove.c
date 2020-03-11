@@ -2858,7 +2858,6 @@ lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp){
     lLDub MH_Value;
 
     MH_Value = fRos - bRos + Delta_En/Cur_Temp;
-    //printf("(%LE %LE %LE %LE %LE) -> ", fRos, bRos, Delta_En, Cur_Temp, MH_Value);
     if (MH_Value <= ld_SmallestProbLog){
         MH_Value = 0.;
     }
@@ -2868,6 +2867,5 @@ lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp){
     else {
         MH_Value = expl(MH_Value);
     }
-    //printf("%LE\n", MH_Value);
     return MH_Value;
 }
