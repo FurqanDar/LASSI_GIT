@@ -696,31 +696,36 @@ void Print_Data(long nGen, int run_it) {
 /// \param run_it
 void Copy_Data(int run_it) {
     int i, j;
-    for (i = 0; i < nRDF_TotComps; i++) {
-        for (j = 0; j < nRDF_TotBins; j++) {
-            ld_TOTRDF_Arr[RDFArr_Index(run_it, i, j)] =
-                    ldRDF_Arr[RDFArr_Index(0, i, j)] / (long double) nRDFCounter;
+    if (nReport[REPORT_RDFTOT] != 0) {
+        for (i = 0; i < nRDF_TotComps; i++) {
+            for (j = 0; j < nRDF_TotBins; j++) {
+                ld_TOTRDF_Arr[RDFArr_Index(run_it, i, j)] =
+                        ldRDF_Arr[RDFArr_Index(0, i, j)] / ( long double )nRDFCounter;
+
+            }
+        }
+    }
+    if (nReport[REPORT_COMDEN] != 0) {
+        for (i = 0; i < nRadDen_TotComps; i++) {
+            for (j = 0; j < nRDF_TotBins; j++) {
+                ld_TOTRadDen_Arr[RadDenArr_Index(run_it, i, j)] =
+                        ldRadDen_Arr[RadDenArr_Index(0, i, j)] / ( long double )nRadDenCounter;
+            }
 
         }
     }
-    for (i = 0; i < nRadDen_TotComps; i++) {
-        for (j = 0; j < nRDF_TotBins; j++) {
-            ld_TOTRadDen_Arr[RadDenArr_Index(run_it, i, j)] =
-                    ldRadDen_Arr[RadDenArr_Index(0, i, j)] / (long double) nRadDenCounter;
+    if (nReport[REPORT_NETWORK] != 0) {
+        ld_TOTCLUS_ARR[run_it][0] = ( long double )nLargestClusterRightNow / ( long double )nTotClusCounter;
+        for (i = 1; i <= tot_chains; i++) {
+            ld_TOTCLUS_ARR[run_it][i] = ( long double )naClusHistList[i] / ( long double )nTotClusCounter;
         }
-
-    }
-    ld_TOTCLUS_ARR[run_it][0] = (long double) nLargestClusterRightNow / (long double) nTotClusCounter;
-    for (i = 1; i <= tot_chains; i++) {
-        ld_TOTCLUS_ARR[run_it][i] = (long double) naClusHistList[i] / (long double) nTotClusCounter;
-    }
-    for(i=0; i<tot_chains; i++){
-        for(j=0; j<tot_chain_types; j++) {
-            ld_TOTMOLCLUS_ARR[MolClusArr_Index(run_it, j, i)] =
-                    ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] / (long double) nTotClusCounter;
+        for (i = 0; i < tot_chains; i++) {
+            for (j = 0; j < tot_chain_types; j++) {
+                ld_TOTMOLCLUS_ARR[MolClusArr_Index(run_it, j, i)] =
+                        ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] / ( long double )nTotClusCounter;
+            }
         }
+        ld_TOTGYRRAD_ARR[run_it][0] = ( long double )fSysGyrRad / ( long double )nTotGyrRadCounter;
+        ld_TOTGYRRAD_ARR[run_it][1] = ( long double )nBoxSize[0] / 2.;
     }
-
-    ld_TOTGYRRAD_ARR[run_it][0] = (long double) fSysGyrRad / (long double) nTotGyrRadCounter;
-    ld_TOTGYRRAD_ARR[run_it][1] = (long double) nBoxSize[0] / 2.;
 }
