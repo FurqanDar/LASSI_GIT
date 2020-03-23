@@ -3,23 +3,25 @@
 
 #include "global.h"
 
-int Lat_Ind_FromCoords(int i, int j, int k);
+int Lat_Ind_FromCoords(const int i, const int j, const int k);
 
-int Lat_Ind_FromVec(int *xArr);
+int Lat_Ind_FromVec(const int *xArr);
 
-int Lat_Ind_OfBead(int beadID);
+int Lat_Ind_OfBead(const int beadID);
 
-float Dist_BeadToBead(int bead1, int bead2);
+float Dist_BeadToBead(const int bead1, const int bead2);
 
-float Dist_PointTotPoint_Float(float *f1, float *f2);
+float Dist_BeadToPoint(const int bead1, const int *f1);
 
-float Dist_PointToPoint(int *f1, int *f2);
+float Dist_PointToPoint_Float(const float *f1, const float *f2);
+
+float Dist_PointToPoint(const int *f1, const int *f2);
 
 float Dist_VecMag(const int *f1);
 
-int Check_LinkerConstraint(int beadID, int *tmpR);
+int Check_LinkerConstraint(const int beadID, const int *tmpR);
 
-int Check_MTLinkerConstraint(int beadID, int (*tmpR)[POS_MAX]);
+int Check_MTLinkerConstraint(const int beadID, int (*tmpR)[POS_MAX]);
 
 int Check_System_Structure(void);
 
@@ -35,13 +37,13 @@ int RadDenArr_Index(const int run_cycle, const int rad_comp, const int x_pos);
 
 int MolClusArr_Index(const int run_cycle, const int chain_type, const int clus_size);
 
-void Calc_SystemCenterOfMass(int *tmpR);
+void Calc_SystemCenterOfMass(lDub *tmpR);
 
-void Calc_CenterOfMass_OfCluster(int *tmpR, int const cluster_size, int const *ClusList);
+void Calc_CenterOfMass_OfCluster(int *tmpR, const int cluster_size, const int *ClusList);
 
-void Calc_SystemCenterOfMass_OfMolType(int *tmpR, int const thisType);
+void Calc_SystemCenterOfMass_OfMolType(float *tmpR, const int thisType);
 
-void Calc_SystemCenterOfMass_WithoutMolType(int *tmpR, int const thisType);
+void Calc_SystemCenterOfMass_WithoutMolType(int *tmpR, const int thisType);
 
 void RadDen_Avg_MolTypeWise_FromSysCen(void);
 
