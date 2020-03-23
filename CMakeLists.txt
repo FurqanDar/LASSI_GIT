@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.10)
 project(LASSI_SRC C)
 
 set(CMAKE_C_STANDARD 11)
@@ -24,3 +24,5 @@ add_executable(lassi
         src/print.h
         src/structure.c
         src/structure.h)
+
+target_link_libraries(lassi m)
