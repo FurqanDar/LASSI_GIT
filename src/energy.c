@@ -21,7 +21,7 @@ float Energy_InitPotential(int beadID) {
     int j;
     float totEn = 0.;
     int tmpR[POS_MAX];
-    if (fCuTemp - fKT > 0.005) {
+    if (fCuTemp - fKT > -0.005) {
         switch (nThermalization_Mode) {
             case 1:
                 for (j = 0; j < POS_MAX; j++) {
@@ -29,7 +29,7 @@ float Energy_InitPotential(int beadID) {
                     tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
                     totEn += (float) (tmpR[j] * tmpR[j]);
                 }
-                totEn = (fCuTemp - fKT) * totEn;
+                totEn = (fCuTemp - fKT*0.) * totEn;
                 break;
 
             case 2:
@@ -43,6 +43,35 @@ float Energy_InitPotential(int beadID) {
                 } else if (totEn <= 600.) {
                     totEn = (fCuTemp - fKT) * ((float) tot_beads + 1. / (totEn + 0.02));
                 }
+                else{
+                    totEn=0.;
+                }
+                break;
+
+            case 3:
+                for (j = 0; j < POS_MAX; j++) {
+                    tmpR[j] = bead_info[beadID][j];
+                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                    totEn += (float) (tmpR[j] * tmpR[j]);
+                }
+                if (totEn >= 25*25) {
+                    totEn = (fCuTemp) * totEn;
+                }
+                else {
+                    totEn = 0.;
+                }
+                break;
+            case 4:
+                for (j = 0; j < POS_MAX; j++) {
+                    tmpR[j] = bead_info[beadID][j];
+                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                    totEn += (float) (tmpR[j] * tmpR[j]);
+                }
+                if (totEn <= 100.) {
+                    totEn = (fCuTemp - fKT*0) * (totEn+0.2);
+                } /*else if (totEn <= 2000.) {
+                    totEn = ;(fCuTemp - fKT*0.) * ((float) tot_beads + 1. / (totEn + 0.02));
+                }*/
                 else{
                     totEn=0.;
                 }

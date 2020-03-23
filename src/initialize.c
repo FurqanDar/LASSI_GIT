@@ -10,28 +10,33 @@ void Memory_Initialization_AtStart(void) {
     naChainCheckList = malloc((1 + tot_chains) * sizeof(lInt));
     fKT_Cycle = malloc((1 + nTot_CycleNum) * sizeof(float));
 
-    ld_TOTCLUS_ARR = (lLDub **) malloc((nTot_CycleNum) * sizeof(lLDub));
-    for (i = 0; i < nTot_CycleNum; i++) {
-        ld_TOTCLUS_ARR[i] = (lLDub *) malloc((1 + tot_chains) * sizeof(lLDub));
-        if (ld_TOTCLUS_ARR[i] == NULL) {
-            printf("Malloc Failed for Cluster! Crashing. Probably ran out of memory. Reduce number of chains.\n");
-            exit(1);
+    if (nReport[REPORT_NETWORK] != 0) {
+        ld_TOTCLUS_ARR = ( lLDub ** )malloc((nTot_CycleNum) * sizeof(lLDub));
+        for (i = 0; i < nTot_CycleNum; i++) {
+            ld_TOTCLUS_ARR[i] = ( lLDub * )malloc((1 + tot_chains) * sizeof(lLDub));
+            if (ld_TOTCLUS_ARR[i] == NULL) {
+                printf("Malloc Failed for Cluster! Crashing. Probably ran out of memory. Reduce number of chains.\n");
+                exit(1);
+            }
         }
-    }
-    ldMOLCLUS_ARR = malloc((tot_chain_types * tot_chains) * sizeof(lLDub));
-    ld_TOTMOLCLUS_ARR = malloc((nTot_CycleNum * tot_chain_types * tot_chains) * sizeof(lLDub));
-
-    ld_TOTGYRRAD_ARR = (lLDub **) malloc((nTot_CycleNum) * sizeof(lLDub));
-    for (i = 0; i < nTot_CycleNum; i++) {
-        ld_TOTGYRRAD_ARR[i] = (lLDub *) malloc((2) * sizeof(lLDub));
+        ldMOLCLUS_ARR = malloc((tot_chain_types * tot_chains) * sizeof(lLDub));
+        ld_TOTMOLCLUS_ARR = malloc((nTot_CycleNum * tot_chain_types * tot_chains) * sizeof(lLDub));
+        ld_TOTGYRRAD_ARR = ( lLDub ** )malloc((nTot_CycleNum) * sizeof(lLDub));
+        for (i = 0; i < nTot_CycleNum; i++) {
+            ld_TOTGYRRAD_ARR[i] = ( lLDub * )malloc((2) * sizeof(lLDub));
+        }
     }
     nRDF_TotComps = 2 + nBeadTypes + nBeadTypes * nBeadTypes;
     nRDF_TotComps /= 2;
-    ld_TOTRDF_Arr = malloc((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
-    ldRDF_Arr = malloc((nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
-    nRadDen_TotComps = tot_chain_types * (tot_chain_types + 1);
-    ldRadDen_Arr = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
-    ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins) * sizeof(lLDub));
+    if (nReport[REPORT_RDFTOT] != 0) {
+        ld_TOTRDF_Arr = malloc((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
+        ldRDF_Arr = malloc((nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
+    }
+    if (nReport[REPORT_COMDEN] != 0) {
+        nRadDen_TotComps = tot_chain_types * (tot_chain_types + 1);
+        ldRadDen_Arr = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
+        ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins) * sizeof(lLDub));
+    }
     Memory_VerifyMalloc();
     printf("Successfully allocated memory! Arrays initialized.\n");
 }
@@ -45,27 +50,27 @@ void Memory_VerifyMalloc(void){
         printf("naChainCheckList malloc failed\n");
         exit(1);
     }
-    if (ldRDF_Arr == NULL){
+    if (ldRDF_Arr == NULL && nReport[REPORT_RDFTOT] != 0){
         printf("ldRDF_Arr malloc failed\n");
         exit(1);
     }
-    if (ld_TOTRDF_Arr == NULL){
+    if (ld_TOTRDF_Arr == NULL && nReport[REPORT_RDFTOT] != 0){
         printf("ld_TOTRDF_Arr malloc failed\n");
         exit(1);
     }
-    if (ldRadDen_Arr == NULL){
+    if (ldRadDen_Arr == NULL && nReport[REPORT_COMDEN] != 0){
         printf("ldRadDen_Arr malloc failed\n");
         exit(1);
     }
-    if (ld_TOTRadDen_Arr == NULL){
+    if (ld_TOTRadDen_Arr == NULL && nReport[REPORT_COMDEN] != 0){
         printf("ld_TOTRadDen_Arr malloc failed\n");
         exit(1);
     }
-    if (ldMOLCLUS_ARR == NULL){
+    if (ldMOLCLUS_ARR == NULL && nReport[REPORT_NETWORK] != 0){
         printf("ldMOLCLUS_ARR malloc failed\n");
         exit(1);
     }
-    if (ld_TOTMOLCLUS_ARR == NULL){
+    if (ld_TOTMOLCLUS_ARR == NULL && nReport[REPORT_NETWORK] != 0){
         printf("ld_TOTMOLCLUS_ARR malloc failed\n");
         exit(1);
     }
@@ -112,40 +117,42 @@ void Global_Array_Initialization_AtStart(void) {
         }
     }
 
-    for (i = 0; i < tot_chains; i++) {//For MolWise Clus arrays
-        for (j = 0; j < tot_chain_types; j++) {
-            ldMOLCLUS_ARR[MolClusArr_Index(0, j,i)] = 0.;
-            for(k=0; k<nTot_CycleNum; k++){
-                ld_TOTMOLCLUS_ARR[MolClusArr_Index(k,j,i)] = 0.;
+    if (nReport[REPORT_NETWORK] != 0) {
+        for (i = 0; i < tot_chains; i++) {//For MolWise Clus arrays
+            for (j = 0; j < tot_chain_types; j++) {
+                ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] = 0.;
+                for (k = 0; k < nTot_CycleNum; k++) {
+                    ld_TOTMOLCLUS_ARR[MolClusArr_Index(k, j, i)] = 0.;
+                }
+            }
+        }
+        for (k = 0; k < nTot_CycleNum; k++) {//For GyrRad
+            ld_TOTGYRRAD_ARR[k][0] = 0.;
+            ld_TOTGYRRAD_ARR[k][1] = 0.;
+        }
+        for (k = 0; k < nTot_CycleNum; k++) {//For ClusterDists
+            for (i = 0; i <= tot_chains; i++) {
+                ld_TOTCLUS_ARR[k][i] = 0.;
             }
         }
     }
 
-
-    for(i=0; i< nRDF_TotBins; i++){//For Radial distributions
-        for(j=0; j<nRDF_TotComps; j++){//For RDFs
-            ld_TOTRDF_Arr[RDFArr_Index(0, j, i)] = 0.;
-            for(k=0; k<nTot_CycleNum; k++){
-                ld_TOTRDF_Arr[RDFArr_Index(k, j, i)] = 0.;
+    if (nReport[REPORT_RDFTOT] != 0) {
+        for (i = 0; i < nRDF_TotBins; i++) {//For Radial distributions
+            for (j = 0; j < nRDF_TotComps; j++) {//For RDFs
+                ld_TOTRDF_Arr[RDFArr_Index(0, j, i)] = 0.;
+                for (k = 0; k < nTot_CycleNum; k++) {
+                    ld_TOTRDF_Arr[RDFArr_Index(k, j, i)] = 0.;
+                }
             }
         }
-        for(j=0; j<nRadDen_TotComps; j++){//For Density Dists wrt COM
-            ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
-            for(k=0; k<nTot_CycleNum; k++){
-                ld_TOTRadDen_Arr[RadDenArr_Index(k, j, i)] = 0.;
+        if (nReport[REPORT_COMDEN] != 0) {
+            for (j = 0; j < nRadDen_TotComps; j++) {//For Density Dists wrt COM
+                ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
+                for (k = 0; k < nTot_CycleNum; k++) {
+                    ld_TOTRadDen_Arr[RadDenArr_Index(k, j, i)] = 0.;
+                }
             }
-        }
-    }
-
-
-    for (k = 0; k < nTot_CycleNum; k++) {//For GyrRad
-        ld_TOTGYRRAD_ARR[k][0] = 0.;
-        ld_TOTGYRRAD_ARR[k][1] = 0.;
-    }
-
-    for (k = 0; k < nTot_CycleNum; k++) {//For ClusterDists
-        for (i = 0; i <= tot_chains; i++) {
-            ld_TOTCLUS_ARR[k][i] = 0.;
         }
     }
     //Setting counters
@@ -209,20 +216,26 @@ void Reset_Global_Arrays(void) {
         for (j = 0; j <= tot_chains; j++) {
             naCluster[i][j] = -1;
         }
-        for (j=0; j < tot_chain_types; j++){
-            ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] = 0.;
+        if (nReport[REPORT_NETWORK] != 0) {
+            for (j = 0; j < tot_chain_types; j++) {
+                ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] = 0.;
+            }
         }
     }
     //Initializing arrays for pair-distribution calculations
-    for (j = 0; j < nRDF_TotComps; j++) {
-        for (i = 0; i < nRDF_TotBins; i++) {
-            ldRDF_Arr[RDFArr_Index(0, j, i)] = 0.;
+    if (nReport[REPORT_RDFTOT] != 0) {
+        for (j = 0; j < nRDF_TotComps; j++) {
+            for (i = 0; i < nRDF_TotBins; i++) {
+                ldRDF_Arr[RDFArr_Index(0, j, i)] = 0.;
+            }
         }
     }
-    //Initalizing for density histograms wrt to the COM
-    for (j = 0; j < nRadDen_TotComps; j++) {
-        for (i = 0; i < nRDF_TotBins; i++) {
-            ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
+    if (nReport[REPORT_COMDEN] != 0) {
+        //Initalizing for density histograms wrt to the COM
+        for (j = 0; j < nRadDen_TotComps; j++) {
+            for (i = 0; i < nRDF_TotBins; i++) {
+                ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
+            }
         }
     }
     //Setting counters
