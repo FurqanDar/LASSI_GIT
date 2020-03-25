@@ -465,6 +465,7 @@ int Clus_LimitedProximityCluster(int const chainID) {
     int fB, lB;//Indecies to track the first and last bead of chains.
     int chainPart;
     int tmpBead = 0;
+    int resi, resj; //Tracking the type of the bead to check if they are interacting via E_OVLP
     int tmpR[POS_MAX]  = {0};
     int tmpR2[POS_MAX] = {0};
     int IsUnique = 1;//Tracks if a chain is unique or not. 0 is non-unique, and 1 is unique.
@@ -494,6 +495,10 @@ int Clus_LimitedProximityCluster(int const chainID) {
                     return -1;
                 }
             }
+            resi = bead_info[i][BEAD_TYPE];
+            if (nBeadTypeCanOvlp[resi] == 0){
+                continue;
+            }
             for (k = 0; k < MAX_ROTSTATES - 1; k++) {
                 tmpBead = Rot_IndArr[k];
                 for (j = 0; j < POS_MAX; j++) {
@@ -502,6 +507,10 @@ int Clus_LimitedProximityCluster(int const chainID) {
                 tmpBead = Lat_Ind_FromVec(tmpR2);
                 tmpBead = naTotLattice[tmpBead];
                 if (tmpBead != -1) {
+                    resj = bead_info[tmpBead][BEAD_TYPE];
+                    if (fEnergy[resi][resj][E_OVLP] >= 0.) { //If not interacting, or repelling, it is not a bond
+                        continue;
+                    }
                     chainPart = bead_info[tmpBead][BEAD_CHAINID];
                     //Checking if this chain is unique
                     IsUnique = 1;
@@ -547,6 +556,7 @@ int Clus_LimitedProximityCluster_Check(int const chainID, int const *OldList) {
     naList[clusSize++] = curID;//The cluster contains chainID by definition, and ClusSize = 1
     int fB, lB;//Indecies to track the first and last bead of chains.
     int chainPart;
+    int resi, resj; //Tracking the type of the bead to check if they are interacting via E_OVLP
     int tmpBead = 0;
     int tmpR[POS_MAX]  = {0};
     int tmpR2[POS_MAX] = {0};
@@ -580,6 +590,10 @@ int Clus_LimitedProximityCluster_Check(int const chainID, int const *OldList) {
                     return -1;
                 }
             }
+            resi = bead_info[i][BEAD_TYPE];
+            if (nBeadTypeCanOvlp[resi] == 0){
+                continue;
+            }
             for (k = 0; k < MAX_ROTSTATES - 1; k++) {
                 tmpBead = Rot_IndArr[k];
                 for (j = 0; j < POS_MAX; j++) {
@@ -588,6 +602,10 @@ int Clus_LimitedProximityCluster_Check(int const chainID, int const *OldList) {
                 tmpBead = Lat_Ind_FromVec(tmpR2);
                 tmpBead = naTotLattice[tmpBead];
                 if (tmpBead != -1) {
+                    resj = bead_info[tmpBead][BEAD_TYPE];
+                    if (fEnergy[resi][resj][E_OVLP] >= 0.) { //If not interacting, or repelling, it is not a bond
+                        continue;
+                    }
                     chainPart = bead_info[tmpBead][BEAD_CHAINID];
                     //Checking if this chain is unique
                     IsUnique = 1;

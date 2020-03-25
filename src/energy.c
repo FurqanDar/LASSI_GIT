@@ -14,14 +14,14 @@ float Energy_Anisotropic(int beadID) {//Calculates the SC-SC energy of the bead 
 }
 
 /// Energy_InitPotential calculates the biasing potential used in the thermalization/equilibration
-/// The function calculates (T_current - T_final) and if < 0.005, sets nThermalization_Mode = 0.
+/// The function calculates (T_current - T_final) and if < 0.001, sets nThermalization_Mode = 0.
 /// \param beadID
 /// \return The energy, given the nThermalization_Mode
 float Energy_InitPotential(int beadID) {
     int j;
     float totEn = 0.;
     int tmpR[POS_MAX];
-    if (fCuTemp - fKT > -0.005) {
+    if (fCuTemp - fKT > 0.001) {
         switch (nThermalization_Mode) {
             case 1:
                 for (j = 0; j < POS_MAX; j++) {
@@ -107,7 +107,7 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
 
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0) {
         return totEn;
-    }//No need to do antying if there's no overlap cost.
+    }//No need to do anthying if there's no overlap cost.
 
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
 

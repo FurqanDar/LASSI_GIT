@@ -198,7 +198,7 @@ void Print_Key(void) { // should be output-dependent (stdout, stderr, other file
     printf("%s Energy Matrices %s\n", lBrace, rBrace);
     Print_Matrix("E_ovlp", nBeadTypes, fEnergy, E_OVLP);
     Print_Matrix("E_cont", nBeadTypes, fEnergy, E_CONT);
-    Print_Matrix("R_cont", nBeadTypes, fEnRad, E_CONT);
+    //Print_Matrix("R_cont", nBeadTypes, fEnRad, E_CONT);
     Print_Matrix("SC_SC", nBeadTypes, fEnergy, E_SC_SC);
     printf("\n");
 

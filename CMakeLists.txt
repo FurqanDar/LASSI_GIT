@@ -24,5 +24,4 @@ add_executable(lassi
         src/print.h
         src/structure.c
         src/structure.h)
-
 target_link_libraries(lassi m)
