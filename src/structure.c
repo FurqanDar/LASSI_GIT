@@ -756,18 +756,22 @@ void RadDen_Avg_MolTypeWise_FromSysCen(void){
 
 void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
 
-    int i;//Iterator for loop
+    int i;//Iterators for loop
     int thisType;//Tracks the type of the chain
-    int thisComp;//Tracks the
+    int thisComp;//Tracks which component of ldRadDen
     lDub typeCOM[POS_MAX] = {0};
     int myBin;
     float xDis = 0.;//Tracks the distance between the COM and the specific bead
     int cur_type = 0;
 
+    Calc_SystemCenterOfMass(typeCOM);
+    if (nRadDenCounter == 0) {
+        printf("%f %f %f\n", typeCOM[0], typeCOM[1], typeCOM[2]);
+    }
     for (i=0; i<POS_MAX; i++){
         typeCOM[i] =  (lLDub) nBoxSize[i] /2.;
     }
-    Calc_SystemCenterOfMass(typeCOM);
+    //Calc_SystemCenterOfMass(typeCOM);
     //printf("(%lf %lf %lf)\n", typeCOM[0], typeCOM[1], typeCOM[2]);
     /*for(i=0; i<tot_beads; i++){
         thisType = bead_info[i][BEAD_CHAINID];
@@ -799,7 +803,8 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
 
     }*/
 
-    for(i=0; i<tot_beads; i++){
+    /*
+    for(i=0; i<4000; i++){
         xDis     = Dist_BeadToPoint_Double(i, typeCOM);
         thisComp = -1;
         // dr=1
@@ -836,9 +841,52 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
         myBin    = (int) floorf(4.*xDis);
         ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
 
+    }*/
 
+    thisComp=-1;
+    thisComp++;
+    int j,k;//More iterators
+    int tmpBead;
+    int COM_int[POS_MAX] = {0.};
+    int cur_POS[POS_MAX] = {0.};
+    int tot_points = 0;
+    int den_beads  = 0;
+    int cur_DIS[POS_MAX] = {0.};
+
+    for(j=0; j<POS_MAX; j++){
+        COM_int[j] = (int)typeCOM[j];
     }
-
+    int radRange = 72;
+    for (i = -radRange; i <= radRange; i++) {
+        cur_POS[POS_X] = (COM_int[POS_X] + i + nBoxSize[POS_X] ) % nBoxSize[POS_X];
+        cur_DIS[POS_X] = i*i;
+        for (j = -radRange; j <= radRange; j++) {
+            cur_POS[POS_Y] = (COM_int[POS_Y] + j + nBoxSize[POS_Y] ) % nBoxSize[POS_Y];
+            cur_DIS[POS_Y] = cur_DIS[POS_X] + j*j;
+            for (k = -radRange; k <= radRange; k++) {
+                tot_points++;
+                cur_POS[POS_Z] = (COM_int[POS_Z] + j + nBoxSize[POS_Z] ) % nBoxSize[POS_Z];
+                //printf("%d %d %d\n", cur_POS[0], cur_POS[1], cur_POS[2]);
+                tmpBead = naTotLattice[Lat_Ind_FromVec(cur_POS)];
+                den_beads = tmpBead != -1 ? den_beads + 1 : den_beads;
+                cur_DIS[POS_Z] = cur_DIS[POS_Y] + k*k;
+                xDis = sqrtf((float)(cur_DIS[POS_Z]));
+                myBin = (int) (xDis);
+                ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
+                if (tmpBead != -1){
+                    ldRadDen_Arr[RadDenArr_Index(0, thisComp+1, myBin)] += 1.0;
+                }
+                xDis = sqrtf((float)(cur_DIS[POS_Z]));
+                myBin = (int) (4.*xDis);
+                ldRadDen_Arr[RadDenArr_Index(0, thisComp+2, myBin)] += 1.0;
+                if (tmpBead != -1){
+                    ldRadDen_Arr[RadDenArr_Index(0, thisComp+3, myBin)] += 1.0;
+                }
+            }
+        }
+    }
+    //printf("\n\n%d %d\n\n", tot_points, den_beads);
+    //exit(1);
     nRadDenCounter++;
 }
 
