@@ -856,7 +856,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
     for(j=0; j<POS_MAX; j++){
         COM_int[j] = (int)typeCOM[j];
     }
-    int radRange = 72;
+    int radRange = 75;
     for (i = -radRange; i <= radRange; i++) {
         cur_POS[POS_X] = (COM_int[POS_X] + i + nBoxSize[POS_X] ) % nBoxSize[POS_X];
         cur_DIS[POS_X] = i*i;
@@ -872,15 +872,15 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
                 cur_DIS[POS_Z] = cur_DIS[POS_Y] + k*k;
                 xDis = sqrtf((float)(cur_DIS[POS_Z]));
                 myBin = (int) (xDis);
-                ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
+                ldRadDen_Arr[RadDenArr_Index(0, 0, myBin)] += 1.0;
                 if (tmpBead != -1){
-                    ldRadDen_Arr[RadDenArr_Index(0, thisComp+1, myBin)] += 1.0;
+                    ldRadDen_Arr[RadDenArr_Index(0, 1, myBin)] += 1.0;
                 }
                 xDis = sqrtf((float)(cur_DIS[POS_Z]));
                 myBin = (int) (4.*xDis);
-                ldRadDen_Arr[RadDenArr_Index(0, thisComp+2, myBin)] += 1.0;
+                ldRadDen_Arr[RadDenArr_Index(0, 2, myBin)] += 1.0;
                 if (tmpBead != -1){
-                    ldRadDen_Arr[RadDenArr_Index(0, thisComp+3, myBin)] += 1.0;
+                    ldRadDen_Arr[RadDenArr_Index(0, 3, myBin)] += 1.0;
                 }
             }
         }
