@@ -232,6 +232,7 @@ void Print_Key(void) { // should be output-dependent (stdout, stderr, other file
     MoveName[MV_SNAKE]        = "Slithering Snake";
     MoveName[MV_TRANS]        = "Translation     ";
     MoveName[MV_PR_SMCLSTR]   = "Pr. Smal Cluster";
+    //MoveName[MV_PR_SMCLSTR]   = "Larger Cluster";
     float freqMin = 1e10;
     for (i = MV_NULL + 1; i < MAX_MV; i++) {
         if (freqMin >= fMCFreq[i] && fMCFreq[i] != 0.) {
@@ -463,7 +464,7 @@ void Write_TotalSysProp(char *filename, int run_it) {
 
         sprintf(filename, "%s_MolClus.dat", strReportPrefix);//Name Of the COM Density Distribution
         fp = fopen(filename, "w");
-        fprintf(fp, "#Density distribution from the COM outwards. Order is ChainType.\n");
+        fprintf(fp, "#Cluster Histograms: 1st column is largest cluster, and then clusters of size 1, 2, and so on. Each row is a different moltype\n");
         for (i = 0; i < run_it; i++) {
             fprintf(fp, "#Run_Cycle = %d\n", i);
             for (j = 0; j < tot_chain_types; j++) {
@@ -601,8 +602,9 @@ void Print_Data(long nGen, int run_it) {
         }
         if (nReport[REPORT_NETWORK] != 0) {//SysProp is printed outside of this function in main.c, lol
             if (nGen % nReport[REPORT_NETWORK] == 0 && nGen > nSteps / 2) {
-                //Clus_Distribution_Avg();
-                Clus_DistributionMolWise_Avg();
+                //Clus_Network_Distribution_Avg();
+                //Clus_Network_Distribution_MolWise_Avg();
+                Clus_Proximity_Distribution_MolWise_Avg();
                 GyrTensor_GyrRad_Avg();
             }
         }
@@ -676,8 +678,9 @@ void Print_Data(long nGen, int run_it) {
             }
             if (nReport[REPORT_NETWORK] != 0) {//SysProp is printed outside of this function in main.c, lol
                 if (nGen % nReport[REPORT_NETWORK] == 0 && nGen > nSteps / 2) {
-                    //Clus_Distribution_Avg();
-                    Clus_DistributionMolWise_Avg();
+                    //Clus_Network_Distribution_Avg();
+                    //Clus_Network_Distribution_MolWise_Avg();
+                    Clus_Proximity_Distribution_MolWise_Avg();
                     GyrTensor_GyrRad_Avg();
                 }
             }
