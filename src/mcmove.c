@@ -693,7 +693,7 @@ int Move_Clus_Network(float MyTemp) {
     oldEn = 0.0;
     newEn = 0.0;
 
-    ClusSize = Clus_SecondLargestCluster();//Second largest cluster;
+    ClusSize = Clus_Network_SecondLargestCluster();//Second largest cluster;
 
     if (ClusSize != -1) {
         //Radii for translation moves. All moves are L/2 radius
@@ -759,7 +759,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp) {
     oldEn = 0.0;
     newEn = 0.0;
     //printf("Beginning CLUS\n");
-    ClusSize = Clus_LimitedNetworkCluster(chainID);//Looking at everything that is connected to chainID
+    ClusSize = Clus_Network_LimitedCluster(chainID);//Looking at everything that is connected to chainID
     //Remember that naList[] contains the chainID's of the network chainID is part of from 0 - ClusSize-1.
     //printf("Done with network\t %d\n", ClusSize);
     if (ClusSize >= 1) {
@@ -1571,12 +1571,13 @@ int Move_SmallClus_Proximity(int chainID){
     oldEn = 0.0;
     newEn = 0.0;
     //printf("Beginning CLUS\n");
-    ClusSize = Clus_LimitedProximityCluster(chainID);//Looking at everything that is connected to chainID
+    ClusSize = Clus_Proximity_LimitedCluster(chainID);//Looking at everything that is connected to chainID
     //Remember that naList[] contains the chainID's of the network chainID is part of from 0 - ClusSize-1.
     //printf("Done with network\t %d\n", ClusSize);
-    if (ClusSize >= 1) {
+    if (ClusSize > 1) {
         //Radii for translation moves. All moves are L/4 radius
         //I guess moving single chains around as well is not a bad idea
+        //printf("YOP %d\n", ClusSize);
         lRadLow = nBoxSize[2] / 2;
         lRadUp = 2 * lRadLow + 1;
         for (j = 0; j < POS_MAX; j++) {
@@ -1596,10 +1597,10 @@ int Move_SmallClus_Proximity(int chainID){
             naClusList[i] = naList[i];
         }
         //Recalculating cluster to see if we have the same cluster or not. If so, we accept. If not, we reject.
-        ClusCheck = Clus_LimitedProximityCluster_Check(chainID, naClusList);
+        ClusCheck = Clus_Proximity_LimitedCluster_Check(chainID, naClusList);
         if (ClusCheck != -1) {
             bAccept = 1;//Accept the move
-            //printf("End pCLUS - Yes\n");
+            //printf("End pCLUS - Yes. ClusSize: %d\n", ClusSize);
         } else {
             bAccept = 0;   //Reject the move so I have to restore cluster back
             for (i = 0; i < ClusSize; i++) {

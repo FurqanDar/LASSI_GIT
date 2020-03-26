@@ -21,7 +21,7 @@ float Energy_InitPotential(int beadID) {
     int j;
     float totEn = 0.;
     int tmpR[POS_MAX];
-    if (fCuTemp - fKT > 0.001) {
+    if (fCuTemp - fKT > 0.005) {
         switch (nThermalization_Mode) {
             case 1:
                 for (j = 0; j < POS_MAX; j++) {
