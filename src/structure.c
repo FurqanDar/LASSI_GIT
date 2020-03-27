@@ -784,6 +784,9 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
 
     for (cur_type=0; cur_type<tot_chain_types; cur_type++){//Go through each molType's center
         Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type);
+        if (cur_type == 2){
+            continue;
+        }
         for(i=0; i<tot_beads; i++){
             thisType = bead_info[i][BEAD_CHAINID];
             thisType = chain_info[thisType][CHAIN_TYPE];
@@ -797,7 +800,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
     }
 
 
-    /*
+
     thisComp=-1;
     thisComp++;
     int j,k;//More iterators
@@ -807,7 +810,9 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
     int tot_points = 0;
     int den_beads  = 0;
     int cur_DIS[POS_MAX] = {0.};
-
+    int comp1, comp2;
+    comp1 = RadDen_ComponentIndex(-1,2);
+    comp2 = RadDen_ComponentIndex(2,2);
     for(j=0; j<POS_MAX; j++){
         COM_int[j] = (int)typeCOM[j];
     }
@@ -825,24 +830,24 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
                 tmpBead = naTotLattice[Lat_Ind_FromVec(cur_POS)];
                 den_beads = tmpBead != -1 ? den_beads + 1 : den_beads;
                 cur_DIS[POS_Z] = cur_DIS[POS_Y] + k*k;
-                xDis = sqrtf((float)(cur_DIS[POS_Z]));
+                /*xDis = sqrtf((float)(cur_DIS[POS_Z]));
                 myBin = (int) (xDis);
                 ldRadDen_Arr[RadDenArr_Index(0, 0, myBin)] += 1.0;
                 if (tmpBead != -1){
                     ldRadDen_Arr[RadDenArr_Index(0, 1, myBin)] += 1.0;
-                }
+                }*/
                 xDis = sqrtf((float)(cur_DIS[POS_Z]));
                 myBin = (int) (4.*xDis);
-                ldRadDen_Arr[RadDenArr_Index(0, 2, myBin)] += 1.0;
+                ldRadDen_Arr[RadDenArr_Index(0, comp1, myBin)] += 1.0;
                 if (tmpBead != -1){
-                    ldRadDen_Arr[RadDenArr_Index(0, 3, myBin)] += 1.0;
+                    ldRadDen_Arr[RadDenArr_Index(0, comp2, myBin)] += 1.0;
                 }
             }
         }
     }
     //printf("\n\n%d %d\n\n", tot_points, den_beads);
     //exit(1);
-    */
+
     nRadDenCounter++;
 }
 
