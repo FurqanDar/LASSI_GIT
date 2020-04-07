@@ -347,7 +347,7 @@ void GyrTensor_GyrRad_Avg(void) {
 
     for (i = 0; i < tot_beads; i++) {
         for (j = 0; j < POS_MAX; j++) {
-            dumArg[j] = bead_info[i][j] - tot_COM[j];
+            dumArg[j] = abs(bead_info[i][j] - (int) tot_COM[j]);
             dumArg[j] = dumArg[j] > nBoxSize[i] / 2 ? nBoxSize[i] - dumArg[j] : dumArg[j];
             fGyrTensor[j] += (float)(dumArg[j] * dumArg[j]);
         }
@@ -384,9 +384,6 @@ int RDFArr_Index(const int run_cycle, const int rdf_comp, const int x_pos) {
 int RadDen_ComponentIndex(const int i, const int j){
     if (i < 0){
         return j;
-    }
-    if (i > j){
-        return  RadDen_ComponentIndex(j,i);
     }
     else {
         return tot_chain_types + j + tot_chain_types * i;
@@ -804,7 +801,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
 
 
 
-    int tmpBead;
+    /*int tmpBead;
     int cur_POS[POS_MAX] = {0.};
     int cur_DIS[POS_MAX] = {0.};
     int radRange;
@@ -831,9 +828,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
             }
         }
     }
-
-    //printf("\n\n%d %d\n\n", tot_points, den_beads);
-    //exit(1);
+    */
 
     nRadDenCounter++;
 }
