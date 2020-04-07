@@ -520,5 +520,5 @@ void Parse_StructureFile(char *filename) {
         }
     }
     fclose(inFile);
-    tot_chain_types = 3 ;//nChainType + 1;
+    tot_chain_types = nChainType + 1;
 }
