@@ -117,7 +117,7 @@ float Dist_BeadToBead(const int n1, const int n2) {
     return sqrtf((float) (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
 }
 
-/// Check_System_Structure - performs a intensive and extensive sanity check.
+/// Check_System_Structure - performs a intensive and extensive sanity check. Check:
 /// 1. All distances between beads in a molecule are legal.
 /// 2. All bonds are symmetric.
 /// 3. Bonds are only between possibly interacting beads.
@@ -347,7 +347,7 @@ void GyrTensor_GyrRad_Avg(void) {
 
     for (i = 0; i < tot_beads; i++) {
         for (j = 0; j < POS_MAX; j++) {
-            dumArg[j] = bead_info[i][j] - tot_COM[j];
+            dumArg[j] = abs(bead_info[i][j] - (int) tot_COM[j]);
             dumArg[j] = dumArg[j] > nBoxSize[i] / 2 ? nBoxSize[i] - dumArg[j] : dumArg[j];
             fGyrTensor[j] += (float)(dumArg[j] * dumArg[j]);
         }
@@ -384,9 +384,6 @@ int RDFArr_Index(const int run_cycle, const int rdf_comp, const int x_pos) {
 int RadDen_ComponentIndex(const int i, const int j){
     if (i < 0){
         return j;
-    }
-    if (i > j){
-        return  RadDen_ComponentIndex(j,i);
     }
     else {
         return tot_chain_types + j + tot_chain_types * i;
@@ -496,7 +493,6 @@ int Check_MTLinkerConstraint(int beadID, int (*tmpR)[POS_MAX]) {
     return canI;
 }
 
-
 void Calc_SystemCenterOfMass(lDub *tmpR){
 
     int i, j; //Iterators
@@ -553,23 +549,23 @@ void Calc_SystemCenterOfMass(lDub *tmpR){
 
 }
 
-void Calc_CenterOfMass_OfCluster(int *tmpR, const int cluster_size, const int *ClusList){
+void Calc_CenterOfMass_OfCluster(lDub *tmpR, const int cluster_size, const int *ClusList){
     //This version measures the COM of a cluster of size c
     // cluster size, given the molecule ID's in naList.
     //The COM from this is not necessarily the COM of the system as a whole.
     int thisMol, i, j, k; //Iterators
     int fB, lB;//Keep track of first and last beads of a given molecule
-    float tot_COM[POS_MAX] = {0.}; //This is where the COM will be stored
+    lDub tot_COM[POS_MAX] = {0.}; //This is where the COM will be stored
     int bead_total_now=0;
 
-    float zeta[POS_MAX] = {0.};
-    float xi[POS_MAX]   = {0.};
-    float dumArg        = 0.;
+    lDub zeta[POS_MAX] = {0.};
+    lDub xi[POS_MAX]   = {0.};
+    lDub dumArg        =  0.;
 
 
     float dumConst[POS_MAX] = {0.};
     for (j=0; j<POS_MAX; j++){
-        dumConst[j] = 2.*PI/(float)nBoxSize[j];
+        dumConst[j] = 2.*M_PI/(float)nBoxSize[j];
     }
 
     for (k=0; k<cluster_size; k++) {
@@ -579,7 +575,7 @@ void Calc_CenterOfMass_OfCluster(int *tmpR, const int cluster_size, const int *C
         for (i = fB; i < lB; i++) {
             bead_total_now++;
             for (j = 0; j < POS_MAX; j++) {
-                dumArg = dumConst[j] * (float) bead_info[i][j];
+                dumArg = dumConst[j] * (lDub) bead_info[i][j];
                 zeta[j] += sin(dumArg);
                 xi[j] += cos(dumArg);
             }
@@ -600,33 +596,33 @@ void Calc_CenterOfMass_OfCluster(int *tmpR, const int cluster_size, const int *C
         if (nCheck[j] == 1){
             xi[j] /= (float)bead_total_now;
             zeta[j] /= (float)bead_total_now;
-            tot_COM[j] = atan2(-zeta[j], -xi[j])  + PI;
+            tot_COM[j] = atan2(-zeta[j], -xi[j])  + M_PI;
             tot_COM[j] /= dumConst[j];
         }
     }
 
     for (j=0; j<POS_MAX; j++){
-        tmpR[j] = ((int) tot_COM[j]);
+        tmpR[j] = tot_COM[j];
     }
 
 }
 
-void Calc_SystemCenterOfMass_OfMolType(float *tmpR, const int thisType){
+void Calc_SystemCenterOfMass_OfMolType(lDub *tmpR, const int thisType){
     //This version measures the COM of only type thisType
     //The COM from this is not necessarily the COM of the system as a whole.
     int thisMol, i, j, k; //Iterators
     int fB, lB;//Keep track of first and last beads of a given molecule
-    float tot_COM[POS_MAX] = {0.}; //This is where the COM will be stored
+    lDub tot_COM[POS_MAX] = {0.}; //This is where the COM will be stored
     int bead_total_now=0;
 
-    float zeta[POS_MAX] = {0.};
-    float xi[POS_MAX]   = {0.};
-    float dumArg        = 0.;
+    lDub zeta[POS_MAX] = {0.};
+    lDub xi[POS_MAX]   = {0.};
+    lDub dumArg        = 0.;
 
 
-    float dumConst[POS_MAX] = {0.};
+    lDub dumConst[POS_MAX] = {0.};
     for (j=0; j<POS_MAX; j++){
-        dumConst[j] = 2.*PI/(float)nBoxSize[j];
+        dumConst[j] = 2.*M_PI/(lDub)nBoxSize[j];
     }
 
     for (k=0; k<tot_chains; k++) {
@@ -639,7 +635,7 @@ void Calc_SystemCenterOfMass_OfMolType(float *tmpR, const int thisType){
         for (i=fB; i<lB; i++) {
             bead_total_now++;
             for (j = 0; j < POS_MAX; j++) {
-                dumArg   = dumConst[j] * (float) bead_info[i][j];
+                dumArg   = dumConst[j] * (lDub) bead_info[i][j];
                 zeta[j] += sin(dumArg);
                 xi[j]   += cos(dumArg);
             }
@@ -658,8 +654,8 @@ void Calc_SystemCenterOfMass_OfMolType(float *tmpR, const int thisType){
 
     for(j=0; j<POS_MAX; j++){
         if (nCheck[j] == 1){
-            xi[j] /= (float)bead_total_now;
-            zeta[j] /= (float)bead_total_now;
+            xi[j] /= (lDub) bead_total_now;
+            zeta[j] /= (lDub) bead_total_now;
             tot_COM[j] = atan2(-zeta[j], -xi[j])  + PI;
             tot_COM[j] /= dumConst[j];
         }
@@ -669,27 +665,27 @@ void Calc_SystemCenterOfMass_OfMolType(float *tmpR, const int thisType){
         tmpR[j] = ((int) tot_COM[j]);
     }*/
     for (j=0; j<POS_MAX; j++){
-        tmpR[j] = ( tot_COM[j]);
+        tmpR[j] = tot_COM[j];
     }
 
 }
 
-void Calc_SystemCenterOfMass_WithoutMolType(int *tmpR, const int thisType){
+void Calc_SystemCenterOfMass_WithoutMolType(lDub *tmpR, const int thisType){
     //This version measures the COM of everything except type thisType
     //The COM from this is not necessarily the COM of the system as a whole.
     int thisMol, i, j, k; //Iterators
     int fB, lB;//Keep track of first and last beads of a given molecule
-    float tot_COM[POS_MAX] = {0.}; //This is where the COM will be stored
+    lDub tot_COM[POS_MAX] = {0.}; //This is where the COM will be stored
     int bead_total_now=0;
 
-    float zeta[POS_MAX] = {0.};
-    float xi[POS_MAX]   = {0.};
-    float dumArg        = 0.;
+    lDub zeta[POS_MAX] = {0.};
+    lDub xi[POS_MAX]   = {0.};
+    lDub dumArg        = 0.;
 
 
-    float dumConst[POS_MAX] = {0.};
+    lDub dumConst[POS_MAX] = {0.};
     for (j=0; j<POS_MAX; j++){
-        dumConst[j] = 2.*PI/(float)nBoxSize[j];
+        dumConst[j] = 2.*M_PI/(lDub)nBoxSize[j];
     }
 
     for (k=0; k<tot_chains; k++) {
@@ -702,7 +698,7 @@ void Calc_SystemCenterOfMass_WithoutMolType(int *tmpR, const int thisType){
         for (i = fB; i < lB; i++) {
             bead_total_now++;
             for (j = 0; j < POS_MAX; j++) {
-                dumArg = dumConst[j] * (float) bead_info[i][j];
+                dumArg = dumConst[j] * (lDub) bead_info[i][j];
                 zeta[j] += sin(dumArg);
                 xi[j] += cos(dumArg);
             }
@@ -721,15 +717,15 @@ void Calc_SystemCenterOfMass_WithoutMolType(int *tmpR, const int thisType){
 
     for(j=0; j<POS_MAX; j++){
         if (nCheck[j] == 1){
-            xi[j] /= (float)bead_total_now;
-            zeta[j] /= (float)bead_total_now;
+            xi[j] /= (lDub)bead_total_now;
+            zeta[j] /= (lDub)bead_total_now;
             tot_COM[j] = atan2(-zeta[j], -xi[j])  + PI;
             tot_COM[j] /= dumConst[j];
         }
     }
 
     for (j=0; j<POS_MAX; j++){
-        tmpR[j] = ((int) tot_COM[j]);
+        tmpR[j] = tot_COM[j];
     }
 
 }
@@ -756,88 +752,83 @@ void RadDen_Avg_MolTypeWise_FromSysCen(void){
 
 void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
 
-    int i;//Iterator for loop
+    int i,j,k;//Iterators for loop
     int thisType;//Tracks the type of the chain
-    int thisComp;//Tracks the
+    int thisComp;//Tracks which component of ldRadDen
     lDub typeCOM[POS_MAX] = {0};
+    int COM_int[POS_MAX] = {0.};
     int myBin;
     float xDis = 0.;//Tracks the distance between the COM and the specific bead
     int cur_type = 0;
 
-    for (i=0; i<POS_MAX; i++){
-        typeCOM[i] =  (lLDub) nBoxSize[i] /2.;
-    }
     Calc_SystemCenterOfMass(typeCOM);
+    /*if (nRadDenCounter == 0) {
+        printf("%f %f %f\n", typeCOM[0], typeCOM[1], typeCOM[2]);
+    }*/
+    for(j=0; j<POS_MAX; j++){
+        COM_int[j] = (int) typeCOM[j];
+    }
     //printf("(%lf %lf %lf)\n", typeCOM[0], typeCOM[1], typeCOM[2]);
-    /*for(i=0; i<tot_beads; i++){
+    for(i=0; i<tot_beads; i++){
         thisType = bead_info[i][BEAD_CHAINID];
         thisType = chain_info[thisType][CHAIN_TYPE];
         thisComp = RadDen_ComponentIndex(-1, thisType);
-        xDis     = Dist_BeadToPoint_Double(i, typeCOM);
-        myBin    = (int) ceilf(4. * xDis);
-        //myBin    = (int) ceilf(xDis);
-        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 0.5;
-        myBin    = (int) floorf(4. * xDis);
-        //myBin    = (int) floorf(xDis);
-        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 0.5;
-    }*/
+        //xDis     = Dist_BeadToPoint_Double(i, typeCOM);
+        xDis     = Dist_BeadToPoint(i, COM_int);
+        myBin    = (int) (4. * xDis);
+        //myBin    = (int) (xDis);
+        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
+    }
 
-    /*for (cur_type=0; cur_type<tot_chain_types; cur_type++){//Go through each molType's center
+    for (cur_type=0; cur_type<2; cur_type++){//Go through each molType's center
         Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type);
+        for(j=0; j<POS_MAX; j++){
+            COM_int[j] = (int) typeCOM[j];
+        }
         for(i=0; i<tot_beads; i++){
             thisType = bead_info[i][BEAD_CHAINID];
             thisType = chain_info[thisType][CHAIN_TYPE];
             thisComp = RadDen_ComponentIndex(cur_type, thisType);
-            xDis     = Dist_BeadToPoint_Double(i, typeCOM);
-            myBin    = (int) ceilf(4. * xDis);
-            //myBin    = (int) ceilf(xDis);
-            ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 0.5;
-            myBin    = (int) floorf(4. * xDis);
-            //myBin    = (int) floorf(xDis);
-            ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 0.5;
+            //xDis     = Dist_BeadToPoint_Double(i, typeCOM);
+            xDis     = Dist_BeadToPoint(i, COM_int);
+            myBin    = (int) (4. * xDis);
+            //myBin    = (int) (xDis);
+            ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
         }
 
-    }*/
-
-    for(i=0; i<tot_beads; i++){
-        xDis     = Dist_BeadToPoint_Double(i, typeCOM);
-        thisComp = -1;
-        // dr=1
-        //Ceiling & Floor
-        thisComp++;
-        myBin    = (int) ceilf(xDis);
-        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 0.5;
-        myBin    = (int) floorf(xDis);
-        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 0.5;
-
-        //Ceiling
-        thisComp++;
-        myBin    = (int) ceilf(xDis);
-        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
-        //Floor
-        thisComp++;
-        myBin    = (int) floorf(xDis);
-        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
-
-        // dr=1/4
-        //Ceiling & Floor
-        thisComp++;
-        myBin    = (int) ceilf(4.*xDis);
-        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 0.5;
-        myBin    = (int) floorf(4.*xDis);
-        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 0.5;
-
-        //Ceiling
-        thisComp++;
-        myBin    = (int) ceilf(4.*xDis);
-        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
-        //Floor
-        thisComp++;
-        myBin    = (int) floorf(4.*xDis);
-        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
-
-
     }
+
+
+
+
+    /*int tmpBead;
+    int cur_POS[POS_MAX] = {0.};
+    int cur_DIS[POS_MAX] = {0.};
+    int radRange;
+    radRange = nBoxSize[0];
+    thisComp = RadDen_ComponentIndex(2,2);
+    for(j=0; j<POS_MAX; j++){
+        COM_int[j] = 0;
+    }
+    for (i = 0; i < radRange; i++) {
+        //cur_POS[POS_X] = (COM_int[POS_X] + i) % nBoxSize[POS_X];
+        cur_DIS[POS_X] = i > nBoxSize[0]/2 ? nBoxSize[0] - i: i;
+        cur_DIS[POS_X] *= cur_DIS[POS_X];
+        for (j = 0; j < radRange; j++) {
+            //cur_POS[POS_Y] = (COM_int[POS_Y] + j ) % nBoxSize[POS_Y];
+            cur_DIS[POS_Y] = j > nBoxSize[0]/2 ? nBoxSize[0] - j: j;
+            cur_DIS[POS_Y] *= cur_DIS[POS_Y];
+            for (k = 0; k < radRange; k++) {
+                //cur_POS[POS_Z] = (COM_int[POS_Z] + k) % nBoxSize[POS_Z];
+                cur_DIS[POS_Z] = k > nBoxSize[0]/2 ? nBoxSize[0] - k: k;
+                cur_DIS[POS_Z] *= cur_DIS[POS_Z];
+                xDis = sqrtf((float)(cur_DIS[POS_X]+cur_DIS[POS_Y]+cur_DIS[POS_Z] ));
+                myBin = (int) (4.*xDis);
+                ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
+            }
+        }
+    }
+    */
 
     nRadDenCounter++;
 }
