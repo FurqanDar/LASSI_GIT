@@ -378,7 +378,6 @@ void Write_TopFile(char *filename) {
 /// Also, TODO: update this to work with the new indexing
 /// \param filename
 void Write_SysProp(char *filename) {
-
     FILE *fp;
     int i, j;
     fp = fopen(filename, "w");
@@ -400,11 +399,7 @@ void Write_SysProp(char *filename) {
         fprintf(fp, "\n");
     }
     fprintf(fp, "\n#Done");
-
-    fclose(fp);
-
 }
-
 /// Write_TotalSysProp - writes the RDF, CLUS and GyrTen arrays to their respective files.
 /// These arrays store the data over the course of an ENTIRE run, or over all the temp cycles.
 /// \param filename
