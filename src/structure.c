@@ -752,7 +752,7 @@ void RadDen_Avg_MolTypeWise_FromSysCen(void){
 
 void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
 
-    int i,j,k;//Iterators for loop
+    int i,j;//Iterators for loop
     int thisType;//Tracks the type of the chain
     int thisComp;//Tracks which component of ldRadDen
     lDub typeCOM[POS_MAX] = {0};
@@ -762,21 +762,15 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
     int cur_type = 0;
 
     Calc_SystemCenterOfMass(typeCOM);
-    /*if (nRadDenCounter == 0) {
-        printf("%f %f %f\n", typeCOM[0], typeCOM[1], typeCOM[2]);
-    }*/
     for(j=0; j<POS_MAX; j++){
         COM_int[j] = (int) typeCOM[j];
     }
-    //printf("(%lf %lf %lf)\n", typeCOM[0], typeCOM[1], typeCOM[2]);
     for(i=0; i<tot_beads; i++){
         thisType = bead_info[i][BEAD_CHAINID];
         thisType = chain_info[thisType][CHAIN_TYPE];
         thisComp = RadDen_ComponentIndex(-1, thisType);
-        //xDis     = Dist_BeadToPoint_Double(i, typeCOM);
         xDis     = Dist_BeadToPoint(i, COM_int);
         myBin    = (int) (4. * xDis);
-        //myBin    = (int) (xDis);
         ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
     }
 
@@ -789,10 +783,8 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
             thisType = bead_info[i][BEAD_CHAINID];
             thisType = chain_info[thisType][CHAIN_TYPE];
             thisComp = RadDen_ComponentIndex(cur_type, thisType);
-            //xDis     = Dist_BeadToPoint_Double(i, typeCOM);
             xDis     = Dist_BeadToPoint(i, COM_int);
             myBin    = (int) (4. * xDis);
-            //myBin    = (int) (xDis);
             ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
         }
 
