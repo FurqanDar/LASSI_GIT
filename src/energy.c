@@ -21,7 +21,7 @@ float Energy_InitPotential(int beadID) {
     int j;
     float totEn = 0.;
     int tmpR[POS_MAX];
-    if (fCuTemp - fKT > -0.005) {
+    if (fCuTemp - fKT < 0.005) {
         switch (nThermalization_Mode) {
             case 1:
                 for (j = 0; j < POS_MAX; j++) {
@@ -29,7 +29,7 @@ float Energy_InitPotential(int beadID) {
                     tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
                     totEn += (float) (tmpR[j] * tmpR[j]);
                 }
-                totEn = (fCuTemp - fKT*0.) * totEn;
+                totEn = (fCuTemp - fKT) * totEn;
                 break;
 
             case 2:
@@ -68,10 +68,8 @@ float Energy_InitPotential(int beadID) {
                     totEn += (float) (tmpR[j] * tmpR[j]);
                 }
                 if (totEn <= 100.) {
-                    totEn = (fCuTemp - fKT*0) * (totEn+0.2);
-                } /*else if (totEn <= 2000.) {
-                    totEn = ;(fCuTemp - fKT*0.) * ((float) tot_beads + 1. / (totEn + 0.02));
-                }*/
+                    totEn = (fCuTemp - fKT) * (totEn+0.2);
+                }
                 else{
                     totEn=0.;
                 }
@@ -101,8 +99,7 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
     int secBi, resj;//Second bead index
     float xDis = 0.;//Distance between beads.
     int resi = bead_info[beadID][BEAD_TYPE];
-    totEn += nThermalization_Mode == 0 ? 0. : Energy_InitPotential(beadID);
-    //totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
+    totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
 
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0) {
