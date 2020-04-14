@@ -219,6 +219,8 @@ void Print_Key(void) { // should be output-dependent (stdout, stderr, other file
     printf("Thermalizing Temperature       = %.2f\n", fPreKT);
     printf("Number of Thermalizing Steps   = %e\n", (float) nPreSteps);
     printf("RNG Seed                       = %d\n", RNG_Seed);
+    printf("Clustering Mode                = %d\n", nClusteringMode);
+
     char *MoveName[MAX_MV];
     MoveName[MV_PIVOT]        = "Pivot           ";
     MoveName[MV_DBPVT]        = "Double Pivot    ";
@@ -596,15 +598,12 @@ void Print_Data(long nGen, int run_it) {
         }
         if (nReport[REPORT_COMDEN] != 0) {//SysProp is printed outside of this function in main.c, lol
             if (nGen % nReport[REPORT_COMDEN] == 0 && nGen > nSteps / 2) {
-                //RadDen_Avg_MolTypeWise_FromSysCen();
                 RadDen_Avg_MolTypeWise_FromMolTypeCen();
             }
         }
         if (nReport[REPORT_NETWORK] != 0) {//SysProp is printed outside of this function in main.c, lol
             if (nGen % nReport[REPORT_NETWORK] == 0 && nGen > nSteps / 2) {
-                //Clus_Network_Distribution_Avg();
-                //Clus_Network_Distribution_MolWise_Avg();
-                Clus_Proximity_Distribution_MolWise_Avg();
+                Clus_Perform_Analysis();
                 GyrTensor_GyrRad_Avg();
             }
         }
@@ -672,15 +671,12 @@ void Print_Data(long nGen, int run_it) {
             }
             if (nReport[REPORT_COMDEN] != 0) {//SysProp is printed outside of this function in main.c, lol
                 if (nGen % nReport[REPORT_COMDEN] == 0 && nGen > nSteps / 2) {
-                    //RadDen_Avg_MolTypeWise_FromSysCen();
                     RadDen_Avg_MolTypeWise_FromMolTypeCen();
                 }
             }
             if (nReport[REPORT_NETWORK] != 0) {//SysProp is printed outside of this function in main.c, lol
                 if (nGen % nReport[REPORT_NETWORK] == 0 && nGen > nSteps / 2) {
-                    //Clus_Network_Distribution_Avg();
-                    //Clus_Network_Distribution_MolWise_Avg();
-                    Clus_Proximity_Distribution_MolWise_Avg();
+                    Clus_Perform_Analysis();
                     GyrTensor_GyrRad_Avg();
                 }
             }

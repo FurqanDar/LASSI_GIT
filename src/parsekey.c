@@ -142,13 +142,14 @@ int Parse_Keyfile(char *filename) {
                 sscanf(strLine, "%*s %ld", &nReport[REPORT_RDFTOT]);
             } else if (strcmp(strKeyword, "REPORT_COMDEN_FREQ") == 0) {
                 sscanf(strLine, "%*s %ld", &nReport[REPORT_COMDEN]);
+            } else if (strcmp(strKeyword, "ANALYSIS_CLUSTER_MODE") == 0) {
+                sscanf(strLine, "%*s %d", &nClusteringMode);
             } else {
                 fprintf(stderr, "ERROR: unable to parse line %d in %s.\n%s", nLine, filename, strLine);
                 exit(1);
             }
         }
     }
-
 
     fclose(infile);
 

@@ -138,7 +138,8 @@ lLong nReport[MAX_REPORT];//Array to store report frequencies.
 lLong MCAccepMat[2][MAX_MV];
 
 
-// Cluster analysis and MCMoves
+// Cluster analysis
+lInt nClusteringMode;
 lInt naCluster[MAX_CHAINS][MAX_CHAINS];
 lInt naList[MAX_CHAINS];
 lLong *naClusHistList;
@@ -150,6 +151,7 @@ lLDub *ld_TOTMOLCLUS_ARR;
 lInt naTempR[POS_MAX];
 lInt nLargestClusterRightNow;
 
+// Radial Densities and PDFs
 lLDub *ld_TOTRDF_Arr;
 lLDub *ld_TOTRadDen_Arr;
 lLDub *ldRDF_Arr;
@@ -159,6 +161,8 @@ lInt nRDFCounter;//This counts how many times the RDF has been calculated for av
 lInt nRDF_TotBins;
 lInt nRadDen_TotComps;
 lInt nRadDenCounter;//This counts for the Radial Density histograms
+
+// Gyration tensor
 float fGyrTensor[7];//Gyration tensor
 float fSysGyrRad;//Gyration radius of the system.
 lLDub **ld_TOTGYRRAD_ARR;

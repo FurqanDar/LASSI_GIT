@@ -126,18 +126,20 @@ int MC_Step_Equil(float fMCTemp) {
             break;
 
             // cluster translation: moves largest cluster to another spot.
-        case MV_CLSTR:
-            nAccept = 0;
+        case MV_CLSTR: //In equil, just a translation of the chain
+            i = rand() % tot_chains; //Pick random chain
+            nAccept = Move_Trans_Equil(i, fMCTemp);
             break;
 
-        case MV_SMCLSTR:
-            nAccept = 0;
+        case MV_SMCLSTR: //In equil, just a translation of the chain
+            i = rand() % tot_chains; //Pick random chain
+            nAccept = Move_Trans_Equil(i, fMCTemp);
             break;
 
             // face change
-        case MV_STROT:
-            //  printf("FACE MOVE\n");
-            nAccept = 0;
+        case MV_STROT:// In equil, just a local move
+            i = rand() % tot_beads;
+            nAccept = Move_Local_Equil(i, fMCTemp);
             break;
 
             // local moves
@@ -159,8 +161,9 @@ int MC_Step_Equil(float fMCTemp) {
             break;
 
             // co-local
-        case MV_COLOCAL:
-            nAccept = 0;
+        case MV_COLOCAL:// In equil, just a local move
+            i = rand() % tot_beads;
+            nAccept = Move_Local_Equil(i, fMCTemp);
             break;
 
             // shake
@@ -180,6 +183,11 @@ int MC_Step_Equil(float fMCTemp) {
             i = rand() % tot_chains;
             nAccept = Move_BranchedRot_Equil(i, fMCTemp);
             break;
+
+        case MV_PR_SMCLSTR:
+            //In equil, just a translation of the chain
+            i = rand() % tot_chains; //Pick random chain
+            nAccept = Move_Trans_Equil(i, fMCTemp);
 
         default:
             nAccept = 0;

@@ -18,7 +18,9 @@ void Clus_Network_TotalAnalysis(void);
 
 void Clus_Network_MolWise_LargestCluster(void);
 
-int Clus_Proximity_ChainCluster_ForTotal(int chainID);
+int Clus_Proximity_ChainCluster_ForTotal_All(int chainID);
+
+int Clus_Proximity_ChainCluster_ForTotal_IntOnly(int chainID);
 
 void Clus_Proximity_TotalAnalysis(void);
 
@@ -30,8 +32,12 @@ int Clus_Proximity_LimitedCluster_Check(int const chainID, int const *OldList);
 
 void Clus_Proximity_Distribution_Avg(void);
 
-void Clus_Proximity_Distribution_MolWise_Avg(void);
+void Clus_Proximity_Distribution_IntOnly_MolWise_Avg(void);
+
+void Clus_Proximity_Distribution_All_MolWise_Avg(void);
 
 void Clus_Proximity_MolWise_LargestCluster(void);
+
+void Clus_Perform_Analysis(void);
 
 #endif // _CLUSTER_H_
