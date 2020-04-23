@@ -1579,7 +1579,7 @@ int Move_SmallClus_Proximity(int chainID){
     oldEn = 0.0;
     newEn = 0.0;
     //printf("Beginning CLUS\n");
-    ClusSize = Clus_Proximity_LimitedCluster(chainID);//Looking at everything that is connected to chainID
+    ClusSize = Clus_Proximity_LimitedCluster_IntOnly(chainID);//Looking at everything that is connected to chainID
     //Remember that naList[] contains the chainID's of the network chainID is part of from 0 - ClusSize-1.
     //printf("Done with network\t %d\n", ClusSize);
     if (ClusSize > 1) {
@@ -1605,7 +1605,7 @@ int Move_SmallClus_Proximity(int chainID){
             naClusList[i] = naList[i];
         }
         //Recalculating cluster to see if we have the same cluster or not. If so, we accept. If not, we reject.
-        ClusCheck = Clus_Proximity_LimitedCluster_Check(chainID, naClusList);
+        ClusCheck = Clus_Proximity_LimitedCluster_IntOnly_Check(chainID, naClusList);
         if (ClusCheck != -1) {
             bAccept = 1;//Accept the move
             //printf("End pCLUS - Yes. ClusSize: %d\n", ClusSize);

@@ -774,7 +774,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
         ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
     }
 
-    for (cur_type=0; cur_type<2; cur_type++){//Go through each molType's center
+    for (cur_type=0; cur_type<tot_chain_types; cur_type++){//Go through each molType's center
         Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type);
         for(j=0; j<POS_MAX; j++){
             COM_int[j] = (int) typeCOM[j];
