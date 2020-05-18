@@ -104,7 +104,7 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
     totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
 
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0) {
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0) {
         return totEn;
     }//No need to do anthying if there's no overlap cost.
 
@@ -135,17 +135,15 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
                   }
                 }
-                //TODO: Add option for solvent interactions in the parfile
-                /*if (secBi == -1 && fSolEnergy != 0.){
-                    totEn += fSolEnergy*(fCuTemp-fThetaTemp);
-                }*/
-                /*if (secBi == -1 ) {
-                    totEn = 0.05;//3. * (fKT - 1.1);
-                }*/
+                else{
+                    if (abs(x)<= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                        totEn += fEnergy[resi][resi][E_F_SOL];
+                        totEn += fEnergy[resi][resi][E_T_IND] * fCuTemp;
+                    }
+                }
             }
         }
     }
-
 
     return totEn;
 

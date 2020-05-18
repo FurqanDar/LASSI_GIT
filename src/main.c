@@ -7,7 +7,7 @@
 #include "mcmove.h"
 #include "cluster.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]){
     //Read in the system commands
     char keyfile[100];
     if (argc == 3 && strcmp(argv[1], "-k") == 0) {
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
         Initial_Conditions_Simple();
     } else if (bReadConf == 1) {
         Initial_Conditions_FromFile();
-        if (nPreSteps > 0) { //Remember that all thermalizing variants of MC moves cannot handle bonds.
+        if (nMCPreSteps > 0) { //Remember that all thermalizing variants of MC moves cannot handle bonds.
             Initial_Conditions_BreakBonds();
         }
     } else {
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     fCuTemp = fPreKT;
     Print_Data(-1, -1);//Initialization of files
     for (nGen = 0;
-         nGen < nPreSteps; nGen++) {//Intentionally not performing any data acquisition in the thermalizing phase.
+         nGen < nMCPreSteps; nGen++) {//Intentionally not performing any data acquisition in the thermalizing phase.
         nMCInfo = MC_Step_Equil(fCuTemp);
         //printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
         Print_Data(nGen, -1);
@@ -96,7 +96,7 @@ The system has thermalized!
         fKT = fKT_Cycle[run_cycle];
         Calculate_Rot_Bias(fKT);
         Print_Data(-1, run_cycle);
-        for (nGen = 0; nGen <= nSteps; nGen++) {
+        for (nGen = 0; nGen <= nMCStepsPerCycle; nGen++) {
             fCuTemp = Temperature_Function(Temp_Mode, nGen);
             nMCInfo = MC_Step(fCuTemp);
             //printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);

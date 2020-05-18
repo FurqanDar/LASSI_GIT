@@ -22,8 +22,10 @@
 #define E_OVLP  1
 #define E_CONT  2
 #define E_SC_SC 3
-#define E_STIFF 4
-#define MAX_E   5 // just for counting; must be the last number of this list
+#define E_F_SOL 4
+#define E_T_IND 5
+#define E_STIFF 6
+#define MAX_E   7 // just for counting; must be the last number of this list
 
 // MC move parameters
 #define MV_NULL         0 // index zero indicates null move
@@ -110,6 +112,7 @@ lInt nBeadTypeIsSticker[MAX_AA];//Used to track if that beadType interacts via r
 lInt nChainTypeIsLinear[MAX_CHAINTYPES];//Used to track if this chainType is linear.
 lInt nBeadTypeCanOvlp[MAX_AA];//Used to track if a certain beadType has an overlap cost.
 lInt nBeadTypeCanCont[MAX_AA];//Used to track if a certain beadType has contact interactions
+lInt nBeadTypeCanFSol[MAX_AA];//Used to track if a certain beadType has solvation energies
 
 float fLinkerLength;
 float fLinkerSprCon;
@@ -118,7 +121,7 @@ float fLinkerEqLen;
 // MC setup
 float fKT, fPreKT, fCuTemp, fRot_Bias, f_globRotBias, fdelta_temp;
 float *fKT_Cycle;
-lLong nSteps, nPreSteps;
+lLong nMCStepsPerCycle, nMCPreSteps;
 float fMCFreq[MAX_MV];
 lInt nMCMaxTrials, nTot_CycleNum;
 
@@ -133,6 +136,7 @@ char fileMCMove[100];
 char fileSysProp[100];
 char strRestartFile[500];
 lLong nReport[MAX_REPORT];//Array to store report frequencies.
+lLong nTrajMode;
 //Matrix to store acceptances and rejections 0: Rejected; 1: Accepted
 //TODO: Have a more extensive way to record also where/when a particular move fails -- not just if it fails.
 lLong MCAccepMat[2][MAX_MV];
@@ -167,6 +171,11 @@ float fGyrTensor[7];//Gyration tensor
 float fSysGyrRad;//Gyration radius of the system.
 lLDub **ld_TOTGYRRAD_ARR;
 lInt nTotGyrRadCounter;//Counter for total averaging
+
+// Trajectory Saving
+lInt *n_TOTTRAJ_ARR;
+lLong nTraj_FramesPerCycle;
+lInt nTrajCurFrame;
 
 //Lattice To Remember Things
 lInt *naTotLattice;

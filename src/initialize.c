@@ -37,8 +37,14 @@ void Memory_Initialization_AtStart(void) {
         ldRadDen_Arr = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
         ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins) * sizeof(lLDub));
     }
+    if (nTrajMode != 0){
+        nTraj_FramesPerCycle = nMCStepsPerCycle / nReport[REPORT_CONFIG];
+        n_TOTTRAJ_ARR = malloc(sizeof(lInt) * nTraj_FramesPerCycle * (lLong) tot_beads * BEADINFO_MAX);
+    }
     Memory_VerifyMalloc();
+    //printf("%ld frames per cycle. %ld\n", nTraj_FramesPerCycle, nTraj_FramesPerCycle * (lLong) tot_beads * BEADINFO_MAX);
     printf("Successfully allocated memory! Arrays initialized.\n");
+    //exit(1);
 }
 
 void Memory_VerifyMalloc(void){
@@ -72,6 +78,10 @@ void Memory_VerifyMalloc(void){
     }
     if (ld_TOTMOLCLUS_ARR == NULL && nReport[REPORT_NETWORK] != 0){
         printf("ld_TOTMOLCLUS_ARR malloc failed\n");
+        exit(1);
+    }
+    if (n_TOTTRAJ_ARR == NULL && nTrajMode != 0){
+        printf("n_TOTTRAJ_ARR malloc failed\n");
         exit(1);
     }
 }
@@ -162,12 +172,14 @@ void Global_Array_Initialization_AtStart(void) {
     nRadDenCounter = 0;
     nTotClusCounter = 0;
     nLargestClusterRightNow = 0;
+    nTrajCurFrame = 0;
 
     //Checking which bead types interact rotationally and via overlap, separately.
     for (i = 0; i < MAX_AA; i++) {
         nBeadTypeIsSticker[i] = 0;//Assume beads don't rotationally interact.
         nBeadTypeCanOvlp[i]   = 0;//Assume beads don't have an overlap cost
         nBeadTypeCanCont[i]   = 0;//Assume beads don't have contact costs.
+        nBeadTypeCanFSol[i]   = 0;
     }
 
     for (i = 0; i < MAX_AA; i++) {
@@ -180,6 +192,9 @@ void Global_Array_Initialization_AtStart(void) {
             }
             if (fEnergy[i][j][E_CONT] != 0.0) {//Seeing if this beadType interacts via contact
                 nBeadTypeCanCont[i] = 1;
+            }
+            if (fEnergy[i][j][E_F_SOL] != 0.0) {//Seeing if this beadType has solvation energy
+                nBeadTypeCanFSol[i] = 1;
             }
         }
     }
@@ -245,6 +260,7 @@ void Reset_Global_Arrays(void) {
     nRadDenCounter = 0;
     nTotClusCounter = 0;
     nLargestClusterRightNow = 0;
+    nTrajCurFrame = 0;
 }
 
 /// Initial_Conditions_Simple - randomly place all the molecules.
@@ -516,7 +532,7 @@ float Temperature_Function(int mode, long nGen) {
 
     switch (mode) {
         case 0:
-            x_val = (float) (nPreSteps - nGen);
+            x_val = (float) (nMCPreSteps - nGen);
             x_val = x_val / 1250. / fPreKT;
             x_val = fPreKT * (tanhf(x_val) + 1.);
             end_val = fKT + x_val;
@@ -524,7 +540,7 @@ float Temperature_Function(int mode, long nGen) {
             break;
 
         case 1:
-            x_val = (float) (nGen - nPreSteps) / (float) nPreSteps;
+            x_val = (float) (nGen - nMCPreSteps) / (float) nMCPreSteps;
             y_val = -x_val;
             x_val = fabsf(sinf(x_val));
             y_val = expf(y_val / 4.);
@@ -533,9 +549,9 @@ float Temperature_Function(int mode, long nGen) {
             break;
 
         case 2:
-            x_val = (float) (nGen - 10 * nPreSteps);
+            x_val = (float) (nGen - 10 * nMCPreSteps);
             x_val = x_val * x_val;
-            y_val = (float) (nPreSteps * nPreSteps) * 10.;
+            y_val = (float) (nMCPreSteps * nMCPreSteps) * 10.;
             end_val = fKT + expf(-x_val / y_val) / fKT / 10.;
 
             break;
@@ -543,7 +559,7 @@ float Temperature_Function(int mode, long nGen) {
         case 3:
             x_val = -(float) (nGen);
             x_val = 4. * x_val;
-            x_val = x_val / (float) (nPreSteps);
+            x_val = x_val / (float) (nMCPreSteps);
             end_val = fKT + expf(x_val);
 
             break;

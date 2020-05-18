@@ -72,9 +72,9 @@ int Parse_Keyfile(char *filename) {
             } else if (strcmp(strKeyword, "MC_TEMP") == 0) {
                 sscanf(strLine, "%*s %f", &fKT);
             } else if (strcmp(strKeyword, "N_STEPS") == 0) {
-                sscanf(strLine, "%*s %ld", &nSteps);
+                sscanf(strLine, "%*s %ld", &nMCStepsPerCycle);
             } else if (strcmp(strKeyword, "PREEQ_STEPS") == 0) {
-                sscanf(strLine, "%*s %ld", &nPreSteps);
+                sscanf(strLine, "%*s %ld", &nMCPreSteps);
             } else if (strcmp(strKeyword, "PREEQ_TEMP") == 0) {
                 sscanf(strLine, "%*s %f", &fPreKT);
             } else if (strcmp(strKeyword, "MC_TEMP_MODE") == 0) {
@@ -144,6 +144,8 @@ int Parse_Keyfile(char *filename) {
                 sscanf(strLine, "%*s %ld", &nReport[REPORT_COMDEN]);
             } else if (strcmp(strKeyword, "ANALYSIS_CLUSTER_MODE") == 0) {
                 sscanf(strLine, "%*s %d", &nClusteringMode);
+            } else if (strcmp(strKeyword, "REPORT_CONFIG_MODE") == 0) {
+                sscanf(strLine, "%*s %ld", &nTrajMode);
             } else {
                 fprintf(stderr, "ERROR: unable to parse line %d in %s.\n%s", nLine, filename, strLine);
                 exit(1);
@@ -247,6 +249,12 @@ int Parse_EnergyFile(char *strEnFile) {
                 } else if (strcmp(strKey, "SC_SC_POT") == 0) {
                     nFlag = 2 * (E_SC_SC);
                     bEnergy[E_SC_SC] = 1;
+                } else if (strcmp(strKey, "FSOL_POT") == 0) {
+                    nFlag = 2 * (E_F_SOL);
+                    bEnergy[E_F_SOL] = 1;
+                } else if (strcmp(strKey, "T_IND_POT") == 0) {
+                    nFlag = 2 * (E_T_IND);
+                    bEnergy[E_T_IND] = 1;
                 } else if (strcmp(strKey, "LINKER_LENGTH") == 0) {
                     nFlag = -3;
                 } else if (strcmp(strKey, "LINKER_SPRCON") == 0) {
