@@ -104,7 +104,8 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
     totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
 
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0) {
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 &&
+        nBeadTypeCanFSol[resi] == 0 && nBeadTypeCanTInd[resi] == 0) {
         return totEn;
     }//No need to do anthying if there's no overlap cost.
 
@@ -149,6 +150,7 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
 
 }
 
+//TODO: Change total energy calculation so that it properly decomposes the system energy into individual components.
 /// Energy_Total_System - calculates the total energy of the system using the functions above.
 /// Note the factor of 1/2 to account for double counting since all the energy contributions (for now)
 /// are pair-wise. Furthermore, faCurrEn[] stores the two energies separately as well.

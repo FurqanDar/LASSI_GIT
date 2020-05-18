@@ -113,6 +113,7 @@ lInt nChainTypeIsLinear[MAX_CHAINTYPES];//Used to track if this chainType is lin
 lInt nBeadTypeCanOvlp[MAX_AA];//Used to track if a certain beadType has an overlap cost.
 lInt nBeadTypeCanCont[MAX_AA];//Used to track if a certain beadType has contact interactions
 lInt nBeadTypeCanFSol[MAX_AA];//Used to track if a certain beadType has solvation energies
+lInt nBeadTypeCanTInd[MAX_AA];//Used to track if a certain beadType has temperature independent solvation
 
 float fLinkerLength;
 float fLinkerSprCon;

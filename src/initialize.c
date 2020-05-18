@@ -180,6 +180,7 @@ void Global_Array_Initialization_AtStart(void) {
         nBeadTypeCanOvlp[i]   = 0;//Assume beads don't have an overlap cost
         nBeadTypeCanCont[i]   = 0;//Assume beads don't have contact costs.
         nBeadTypeCanFSol[i]   = 0;
+        nBeadTypeCanTInd[i]   = 0;
     }
 
     for (i = 0; i < MAX_AA; i++) {
@@ -195,6 +196,9 @@ void Global_Array_Initialization_AtStart(void) {
             }
             if (fEnergy[i][j][E_F_SOL] != 0.0) {//Seeing if this beadType has solvation energy
                 nBeadTypeCanFSol[i] = 1;
+            }
+            if (fEnergy[i][j][E_F_SOL] != 0.0) {//Seeing if this beadType has solvation energy
+                nBeadTypeCanTInd[i] = 1;
             }
         }
     }
