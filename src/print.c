@@ -657,6 +657,7 @@ void Print_Data(long nGen, int run_it) {
                 Write_Trajectory(fileStruct, -1);//This opens a new trajectory file; each run_it will have its own
                 Write_Saved_Trajectory(fileStruct, -1);
                 nTrajCurFrame = 0;
+                HandleTrajectory(fileStruct, run_it, 0 );
             }
         }
     }
