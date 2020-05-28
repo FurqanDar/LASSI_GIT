@@ -93,7 +93,7 @@ float Energy_InitPotential(int beadID) {
 /// distance.
 /// \param beadID
 /// \return
-float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of bead i
+float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of bead beadID
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
     int tmpR[POS_MAX], tmpR2[POS_MAX];
@@ -107,7 +107,7 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 &&
         nBeadTypeCanFSol[resi] == 0 && nBeadTypeCanTInd[resi] == 0) {
         return totEn;
-    }//No need to do anthying if there's no overlap cost.
+    }//No need to do anything if there's no isotropic interactions.
 
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
 

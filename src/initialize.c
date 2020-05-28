@@ -220,7 +220,7 @@ void Global_Array_Initialization_AtStart(void) {
         }
     }
 
-    ld_SmallestProbLog = logl((lLDub) 1. / (lLDub) RAND_MAX);
+    ld_LogOfSmallestPossibleProb = logl((lLDub) 1. / (lLDub) RAND_MAX);
 
     printf("All setup has been completed!\n");
 }

@@ -286,8 +286,8 @@ int Move_Local(int beadID, float MyTemp) {//Performs a local translation MC-move
     }
     //Initialize the radii for the search of next trial location
     //For now just +-2, but could also use a linker length from the bead
-    //lRadLow = linker_len[beadID][0];
-    lRadLow = 2;
+    lRadLow = linker_len[beadID][0];
+    //lRadLow = 2;
     lRadUp = lRadLow * 2 + 1;//2*2+1
 
     xTemp = 0;
@@ -308,7 +308,7 @@ int Move_Local(int beadID, float MyTemp) {//Performs a local translation MC-move
         return bAccept;
     } else {//Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
         resi = bead_info[beadID][BEAD_TYPE];//I want to treat linker beads differently always because they have no rotational states
-        oldEn = Energy_Isotropic(beadID);
+        oldEn += Energy_Isotropic(beadID);
         if (nBeadTypeIsSticker[resi] == 1) {//Only non linkers can bond
             if (bead_info[beadID][BEAD_FACE] != -1) {
                 resj = bead_info[bead_info[beadID][BEAD_FACE]][BEAD_TYPE];//This is type of who I'm currently bonded to
@@ -612,7 +612,7 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
     for (i = firstB; i < lastB; i++) {//Rosenbluth in old location.
         resi = bead_info[i][BEAD_TYPE];
         oldEn += Energy_Isotropic(i);
-        if (nBeadTypeIsSticker[resi] != 1) {//Skip beads that cannot bond.
+        if (nBeadTypeIsSticker[resi] == 0) {//Skip beads that cannot bond.
             continue;
         }
 
@@ -637,9 +637,9 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
 
     yTemp = 0;
     for (i = firstB; i < lastB; i++) {//Rosenbluth in new location
-        resi = bead_info[i][BEAD_TYPE];
+        resi   = bead_info[i][BEAD_TYPE];
         newEn += Energy_Isotropic(i);
-        if (nBeadTypeIsSticker[resi] != 1) {//Because linkers don't have rotational states
+        if (nBeadTypeIsSticker[resi] == 0) {//Because linkers don't have rotational states
             continue;
         }
 
@@ -1121,7 +1121,7 @@ int Move_MultiLocal(int beadID, float MyTemp) {
     while (curID != -1) {
         resi = bead_info[curID][BEAD_TYPE];
         oldEn += (lLDub) Energy_Isotropic(curID);
-        if (nBeadTypeIsSticker[resi] != 1) {//Skip non-interactors
+        if (nBeadTypeIsSticker[resi] == 0) {//Skip non-interactors
             curID = topo_info[beadID][topIt++];
             continue;
         }
@@ -1166,7 +1166,7 @@ int Move_MultiLocal(int beadID, float MyTemp) {
     while (curID != -1) {
         resi = bead_info[curID][BEAD_TYPE];
         newEn += (lLDub) Energy_Isotropic(curID);
-        if (nBeadTypeIsSticker[resi] != 1) {//Skip non-interactors
+        if (nBeadTypeIsSticker[resi] == 0) {//Skip non-interactors
             curID = topo_info[beadID][topIt++];
             continue;
         }
@@ -1329,7 +1329,7 @@ int Move_Pivot(int chainID, float MyTemp) {
         i = tmpList[j];
         resi = bead_info[i][BEAD_TYPE];
         oldEn += (lLDub) Energy_Isotropic(i);
-        if (nBeadTypeIsSticker[resi] != 1) {//Skip beads that cannot bond.
+        if (nBeadTypeIsSticker[resi] == 0) {//Skip beads that cannot bond.
             continue;
         }
         if (bead_info[i][BEAD_FACE] != -1) {//I am bonded to something
@@ -1367,7 +1367,7 @@ int Move_Pivot(int chainID, float MyTemp) {
         i = tmpList[j];
         resi = bead_info[i][BEAD_TYPE];
         newEn += (lLDub) Energy_Isotropic(i);
-        if (nBeadTypeIsSticker[resi] != 1) {//Because linkers don't have rotational states
+        if (nBeadTypeIsSticker[resi] == 0) {//Because linkers don't have rotational states
             continue;
         }
         OP_ShuffleRotIndecies();
@@ -1487,7 +1487,7 @@ int Move_BranchedRot(int chainID, float MyTemp) {
     for (i = anchorBead + 1; i < lastB; i++) {
         resi = bead_info[i][BEAD_TYPE];
         oldEn += (lLDub) Energy_Isotropic(i);
-        if (nBeadTypeIsSticker[resi] != 1) {//Skip beads that cannot bond.
+        if (nBeadTypeIsSticker[resi] == 0) {//Skip beads that cannot bond.
             continue;
         }
         if (bead_info[i][BEAD_FACE] != -1) {//I am bonded to something
@@ -1520,7 +1520,7 @@ int Move_BranchedRot(int chainID, float MyTemp) {
     for (i = anchorBead + 1; i < lastB; i++) {//Counting states in the new location
         resi = bead_info[i][BEAD_TYPE];
         newEn += (lLDub) Energy_Isotropic(i);
-        if (nBeadTypeIsSticker[resi] != 1) {//Because linkers don't have rotational states
+        if (nBeadTypeIsSticker[resi] == 0) {//Because linkers don't have rotational states
             continue;
         }
         OP_ShuffleRotIndecies();
@@ -2866,7 +2866,7 @@ lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp){
     lLDub MH_Value;
 
     MH_Value = fRos - bRos + Delta_En/Cur_Temp;
-    if (MH_Value <= ld_SmallestProbLog){
+    if (MH_Value <= ld_LogOfSmallestPossibleProb){
         MH_Value = 0.;
     }
     else if (MH_Value >= 0.) {
