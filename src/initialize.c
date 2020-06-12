@@ -156,15 +156,18 @@ void Global_Array_Initialization_AtStart(void) {
                 }
             }
         }
-        if (nReport[REPORT_COMDEN] != 0) {
-            for (j = 0; j < nRadDen_TotComps; j++) {//For Density Dists wrt COM
+    }
+    if (nReport[REPORT_COMDEN] != 0) {
+        for (j = 0; j < nRadDen_TotComps; j++) {//For Density Dists wrt COM
+            for (i = 0; i < nRDF_TotBins; i++) {//For Radial distributions
                 ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
                 for (k = 0; k < nTot_CycleNum; k++) {
                     ld_TOTRadDen_Arr[RadDenArr_Index(k, j, i)] = 0.;
                 }
             }
         }
-    }
+        }
+
     //Setting counters
     fSysGyrRad = 0.;
     nTotGyrRadCounter = 0;
@@ -197,7 +200,7 @@ void Global_Array_Initialization_AtStart(void) {
             if (fEnergy[i][j][E_F_SOL] != 0.0) {//Seeing if this beadType has solvation energy
                 nBeadTypeCanFSol[i] = 1;
             }
-            if (fEnergy[i][j][E_F_SOL] != 0.0) {//Seeing if this beadType has solvation energy
+            if (fEnergy[i][j][E_T_IND] != 0.0) {//Seeing if this beadType has solvation energy
                 nBeadTypeCanTInd[i] = 1;
             }
         }

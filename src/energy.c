@@ -76,6 +76,14 @@ float Energy_InitPotential(int beadID) {
                     totEn=0.;
                 }
                 break;
+            case 5:
+                for (j = 0; j < 1; j++) {
+                    tmpR[j] = bead_info[beadID][j];
+                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                    totEn += (float) (tmpR[j] * tmpR[j]);
+                }
+                totEn = (fCuTemp - fKT) * totEn;
+                break;
             default:
                 totEn = 0.;
                 break;
@@ -93,6 +101,64 @@ float Energy_InitPotential(int beadID) {
 /// distance.
 /// \param beadID
 /// \return
+float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy of bead beadID
+    float totEn = 0.0; //Storing total overlap energy
+    int i, j;//Indecies
+    int tmpR[POS_MAX], tmpR2[POS_MAX];
+    int x, y, z; //Lattice indecies
+    int secBi, resj;//Second bead index
+    float xDis = 0.;//Distance between beads.
+    int resi = bead_info[beadID][BEAD_TYPE];
+    totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
+
+
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 &&
+        nBeadTypeCanFSol[resi] == 0 && nBeadTypeCanTInd[resi] == 0) {
+        return totEn;
+    }//No need to do anything if there's no isotropic interactions.
+
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
+
+    for (j = 0; j < POS_MAX; j++) {
+        tmpR[j] = bead_info[beadID][j];
+    }
+    for (x = -BoxRad; x <= BoxRad; x++) {
+        for (y = -BoxRad; y <= BoxRad; y++) {
+            for (z = -BoxRad; z <= BoxRad; z++) {
+                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
+                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
+                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
+                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
+                if (secBi != -1 && secBi != beadID) {
+                    resj = bead_info[secBi][BEAD_TYPE];
+                    totEn += fEnergy[resi][resj][E_OVLP];
+                    xDis = sqrtf((float)(x*x + y*y + z*z));
+                    //xDis = Dist_BeadToBead(beadID, secBi);
+                    if (xDis <= 1.0) {
+                        totEn += fEnergy[resi][resj][E_OVLP] / 2.0;
+                    } else if (xDis <= 1.42) { // sqrt(2)
+                        totEn += fEnergy[resi][resj][E_OVLP] / 4.0;
+                    } else if (xDis <= 1.74) { // sqrt(3)
+                        totEn += fEnergy[resi][resj][E_OVLP] / 8.0;
+                    }
+                    else {//This way, contact is only outside ovlp
+                        totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                  }
+                }
+                else if (secBi == -1){
+                    if (abs(x)<= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                        totEn += fEnergy[resi][resi][E_F_SOL];
+                        totEn += fEnergy[resi][resi][E_T_IND] * fCuTemp;
+                    }
+                }
+            }
+        }
+    }
+
+    return totEn;
+
+}
+
 float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of bead beadID
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
@@ -123,24 +189,13 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
                 secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
+                    totEn += fEnergy[resi][resj][E_OVLP];
                     xDis = sqrtf((float)(x*x + y*y + z*z));
-                    //xDis = Dist_BeadToBead(beadID, secBi);
-                    if (xDis <= 1.0) {
-                        totEn += fEnergy[resi][resj][E_OVLP] / 2.0;
-                    } else if (xDis <= 1.42) { // sqrt(2)
-                        totEn += fEnergy[resi][resj][E_OVLP] / 4.0;
-                    } else if (xDis <= 1.74) { // sqrt(3)
-                        totEn += fEnergy[resi][resj][E_OVLP] / 8.0;
+                    if (xDis <= 1.74) { // 1/r^3 potential
+                        totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis;
                     }
-                    else {//This way, contact is only outside ovlp
-                        totEn += fEnergy[resi][resj][E_CONT] / xDis;
-                  }
-                }
-                else{
-                    if (abs(x)<= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                        totEn += fEnergy[resi][resi][E_T_IND] * fCuTemp;
-                    }
+                    // 1/r potential that goes till cube three
+                    totEn += fEnergy[resi][resj][E_CONT] / xDis;
                 }
             }
         }
