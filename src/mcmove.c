@@ -456,13 +456,13 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
     yTemp = 0;
     for (i = firstB; i < lastB; i++) {
         resi = bead_info[i][BEAD_TYPE];
-        oldEn += Energy_Isotropic(i);
+        //oldEn += Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip beads that don't interact
             continue;
         }
         if (bead_info[i][BEAD_FACE] != -1) {//I am bonded to something
             resj = bead_info[bead_info[i][BEAD_FACE]][BEAD_TYPE];//Type of bead I'm bonded to
-            oldEn += fEnergy[resi][resj][E_SC_SC];
+            //oldEn += fEnergy[resi][resj][E_SC_SC];
         }
 
         //OP_ShuffleRotIndecies();
@@ -470,6 +470,8 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
         OP_NormalizeRotState(yTemp, BWWeight);
         yTemp++;
     }
+
+    oldEn = (lLDub ) Energy_Of_Chain(chainID);
     //Done with checking states in the old location. Take the sum.
     BSum = 0.;
     for (i = 0; i < yTemp; i++) {
@@ -525,7 +527,7 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
     yTemp = 0;
     for (i = firstB; i < lastB; i++) {//Counting states in the new location
         resi = bead_info[i][BEAD_TYPE];
-        newEn += (lLDub) Energy_Isotropic(i);
+        //newEn += (lLDub) Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip non-bonders
             continue;
         }
@@ -540,7 +542,7 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
                 resj = bead_info[xTemp][BEAD_TYPE];
                 bead_info[i][BEAD_FACE] = xTemp;
                 bead_info[xTemp][BEAD_FACE] = i;
-                newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
+                //newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
             }
         }
         yTemp++;//This keeps track of which residue*/
@@ -549,7 +551,7 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
     for (i = 0; i < yTemp; i++) {
         FSum += logl(bolt_norm[i]);
     }
-
+    newEn = (lLDub) Energy_Of_Chain(chainID);
     //Doing the Metropolis-Hastings thing
     MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub) MyTemp);
@@ -628,7 +630,7 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
         yTemp++;
     }
 
-    oldEn = Energy_Of_Chain(chainID);
+    oldEn = (lLDub) Energy_Of_Chain(chainID);
 
     BSum = 0.;
     for (i = 0; i < yTemp; i++) {
@@ -664,7 +666,7 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
         yTemp++;//This keeps track of which residue*/
     }
 
-    newEn = Energy_Of_Chain(chainID);
+    newEn = (lLDub) Energy_Of_Chain(chainID);
     FSum = 0.;
     for (i = 0; i < yTemp; i++) {
         FSum += logl(bolt_norm[i]);
