@@ -608,17 +608,18 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
     }
     //We now have a chain which when moved does not overlap.
 
+    //Idea is to separate the energy calculations from the Rosenbluth sampling.
     yTemp = 0;
     for (i = firstB; i < lastB; i++) {//Rosenbluth in old location.
         resi = bead_info[i][BEAD_TYPE];
-        oldEn += Energy_Isotropic(i);
+        //oldEn += Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip beads that cannot bond.
             continue;
         }
 
         if (bead_info[i][BEAD_FACE] != -1) {//I am bonded to something
             resj = bead_info[bead_info[i][BEAD_FACE]][BEAD_TYPE];//Type of bead I am bonded to
-            oldEn += (lLDub) fEnergy[resi][resj][E_SC_SC];//Adding the energy.
+            //oldEn += (lLDub) fEnergy[resi][resj][E_SC_SC];//Adding the energy.
         }
 
         //OP_ShuffleRotIndecies();
@@ -626,6 +627,8 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
         OP_NormalizeRotState(yTemp, BWWeight);
         yTemp++;
     }
+
+    oldEn = Energy_Of_Chain(chainID);
 
     BSum = 0.;
     for (i = 0; i < yTemp; i++) {
@@ -636,9 +639,10 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
     OP_DispChain_ForTrans(chainID, tmpR);//Moved the chain, broke bonds, and remembered stuff
 
     yTemp = 0;
+    //Again, separate the energy calculation from the Rosenbluth sampling
     for (i = firstB; i < lastB; i++) {//Rosenbluth in new location
         resi   = bead_info[i][BEAD_TYPE];
-        newEn += Energy_Isotropic(i);
+        //newEn += Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Because linkers don't have rotational states
             continue;
         }
@@ -654,12 +658,13 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
                 resj = bead_info[xTemp][BEAD_TYPE];
                 bead_info[i][BEAD_FACE] = xTemp;
                 bead_info[xTemp][BEAD_FACE] = i;
-                newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
+                //newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
             }
         }
         yTemp++;//This keeps track of which residue*/
     }
 
+    newEn = Energy_Of_Chain(chainID);
     FSum = 0.;
     for (i = 0; i < yTemp; i++) {
         FSum += logl(bolt_norm[i]);
