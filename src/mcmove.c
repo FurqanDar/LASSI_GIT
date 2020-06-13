@@ -1335,19 +1335,21 @@ int Move_Pivot(int chainID, float MyTemp) {
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
         resi = bead_info[i][BEAD_TYPE];
-        oldEn += (lLDub) Energy_Isotropic(i);
+        //oldEn += (lLDub) Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip beads that cannot bond.
             continue;
         }
         if (bead_info[i][BEAD_FACE] != -1) {//I am bonded to something
             resj = bead_info[bead_info[i][BEAD_FACE]][BEAD_TYPE];//Type of bead I am bonded to
-            oldEn += (lLDub) fEnergy[resi][resj][E_SC_SC];//Adding the energy.
+            //oldEn += (lLDub) fEnergy[resi][resj][E_SC_SC];//Adding the energy.
         }
         OP_ShuffleRotIndecies();
         BWWeight = Check_RotStatesOld(i, resi, MyTemp);
         OP_NormalizeRotState(yTemp, BWWeight);
         yTemp++;
     }
+
+    oldEn = (lLDub) Energy_Of_Chain(chainID);
 
     BSum = 0.;
     for (i = 0; i < yTemp; i++) {
@@ -1373,7 +1375,7 @@ int Move_Pivot(int chainID, float MyTemp) {
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
         resi = bead_info[i][BEAD_TYPE];
-        newEn += (lLDub) Energy_Isotropic(i);
+        //newEn += (lLDub) Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Because linkers don't have rotational states
             continue;
         }
@@ -1388,12 +1390,12 @@ int Move_Pivot(int chainID, float MyTemp) {
                 resj = bead_info[xTemp][BEAD_TYPE];
                 bead_info[i][BEAD_FACE] = xTemp;
                 bead_info[xTemp][BEAD_FACE] = i;
-                newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
+                //newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
             }
         }
         yTemp++;
     }
-
+    newEn = (lLDub) Energy_Of_Chain(chainID);
     FSum = 0.;
     for (i = 0; i < yTemp; i++) {
         FSum += logl(bolt_norm[i]);
@@ -1493,19 +1495,20 @@ int Move_BranchedRot(int chainID, float MyTemp) {
     yTemp = 0;
     for (i = anchorBead + 1; i < lastB; i++) {
         resi = bead_info[i][BEAD_TYPE];
-        oldEn += (lLDub) Energy_Isotropic(i);
+        //oldEn += (lLDub) Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip beads that cannot bond.
             continue;
         }
         if (bead_info[i][BEAD_FACE] != -1) {//I am bonded to something
             resj = bead_info[bead_info[i][BEAD_FACE]][BEAD_TYPE];//Type of bead I am bonded to
-            oldEn += fEnergy[resi][resj][E_SC_SC];//Adding the energy.
+            //oldEn += fEnergy[resi][resj][E_SC_SC];//Adding the energy.
         }
         OP_ShuffleRotIndecies();
         BWWeight = Check_RotStatesOld(i, resi, MyTemp);
         OP_NormalizeRotState(yTemp, BWWeight);
         yTemp++;
     }
+    oldEn = (lLDub) Energy_Of_Chain(chainID);
     BSum = 0.;
     for (i = 0; i < yTemp; i++) {
         BSum += logl(bolt_norm[i]);
@@ -1526,7 +1529,7 @@ int Move_BranchedRot(int chainID, float MyTemp) {
     yTemp = 0;
     for (i = anchorBead + 1; i < lastB; i++) {//Counting states in the new location
         resi = bead_info[i][BEAD_TYPE];
-        newEn += (lLDub) Energy_Isotropic(i);
+        //newEn += (lLDub) Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Because linkers don't have rotational states
             continue;
         }
@@ -1541,12 +1544,13 @@ int Move_BranchedRot(int chainID, float MyTemp) {
                 resj = bead_info[xTemp][BEAD_TYPE];
                 bead_info[i][BEAD_FACE] = xTemp;
                 bead_info[xTemp][BEAD_FACE] = i;
-                newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
+                //newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
             }
         }
         yTemp++;
     }
 
+    newEn = (lLDub) Energy_Of_Chain(chainID);
     FSum = 0.;
     for (i = 0; i < yTemp; i++) {
         FSum += logl(bolt_norm[i]);
@@ -1757,8 +1761,9 @@ int Move_Snake_Equil(int chainID, float MyTemp) {//Performs a slither MC-move on
     }
 
     for (i = firstB; i < lastB; i++) {//Counting states in the previous location
-        oldEn += (lLDub) Energy_Isotropic(i);
+        oldEn += (lLDub) Energy_Isotropic_For_Chain(i);
     }
+
 
     if (MCProb < 0.5) {
         //Slithering the chain forwards in ID-space
@@ -1800,8 +1805,9 @@ int Move_Snake_Equil(int chainID, float MyTemp) {//Performs a slither MC-move on
     }
 
     for (i = firstB; i < lastB; i++) {//Counting states in the new location
-        newEn += (lLDub) Energy_Isotropic(i);
+        newEn += (lLDub) Energy_Isotropic_For_Chain(i);
     }
+
     //Doing the Metropolis-Hastings thing
     MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
@@ -1850,11 +1856,11 @@ int Move_Trans_Equil(int chainID, float MyTemp) {//Performs a translation move w
     //Initialize the orientational-bias sums and vectors.
     //Counting states in the previous location
     for (i = firstB; i < lastB; i++) {
-        oldEn += (lLDub) Energy_Isotropic(i);
+        oldEn += (lLDub) Energy_Isotropic_For_Chain(i);
     }
     OP_DispChain_ForTrans(chainID, tmpR);//Moved the chain, broke bonds, and remembered stuff
     for (i = firstB; i < lastB; i++) {//Counting states in the new location
-        newEn += (lLDub) Energy_Isotropic(i);
+        newEn += (lLDub) Energy_Isotropic_For_Chain(i);
     }
     MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
@@ -2073,23 +2079,24 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
     lLDub MCProb;
 
     yTemp = 0;
+    /*
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
         oldEn += (lLDub) Energy_Isotropic(i);
-    }
-
+    }*/
+    oldEn = (lLDub) Energy_Of_Chain(chainID);
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
         OP_Rotation(PivotM, i, anchorPos);
         OP_MoveBeadTo(i, naTempR);
     }
 
-    yTemp = 0;
+    yTemp = 0;/*
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
         newEn += (lLDub) Energy_Isotropic(i);
-    }
-
+    }*/
+    newEn = (lLDub) Energy_Of_Chain(chainID);
     MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
     if (MCProb < MHAcc) {//Accept the move. Remember that the bonds were assigned above!
@@ -2164,17 +2171,20 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
     lLDub newEn = 0.;
     lLDub MCProb;
 
+    /*
     for (i = anchorBead + 1; i < lastB; i++) {
         oldEn += (lLDub) Energy_Isotropic(i);
-    }
+    }*/
+    oldEn = (lLDub) Energy_Of_Chain(chainID);
     for (i = anchorBead + 1; i < lastB; i++) {
         OP_Rotation(PivotM, i, anchorPos);
         OP_MoveBeadTo(i, naTempR);
     }
+    /*
     for (i = anchorBead + 1; i < lastB; i++) {//Counting states in the new location
         newEn += (lLDub) Energy_Isotropic(i);
-    }
-
+    }*/
+    newEn = (lLDub) Energy_Of_Chain(chainID);
     MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
     if (MCProb < MHAcc) {//Accept the move. Remember that the bonds were assigned above!
