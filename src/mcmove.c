@@ -947,9 +947,13 @@ int Move_DbPvt(int beadID) {//Performs a double-pivot move.
     }
     //Should have found all the candidates
     FoundMax_back:
+
+    if (nListLen_back == 0){//Since we found no backwards candidates, make it so we always accept
+        nListLen_back = 1;
+        nListLen++;
+    }
     MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
-    //
-    if (MCProb < (lLDub) (nListLen + 1.) / (lLDub) (nListLen_back + 1.)) {
+    if (MCProb < (lLDub) (nListLen) / (lLDub) (nListLen_back)) {
         //We can perform the swap
         j = 1;//Tracks the beads
         for (i = beadID + 1; i < PEnd; i++) {//Swapping from beadID+1 onwards
