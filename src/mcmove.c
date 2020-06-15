@@ -1125,20 +1125,21 @@ int Move_MultiLocal(int beadID, float MyTemp) {
     lLDub newEn = 0.;
     lLDub MCProb;
 
-
+    int bead_list[MAX_BONDS+1] = {0.};
+    int bead_num = 0;
     curID = beadID;
     topIt = 0;
     yTemp = 0;
     while (curID != -1) {
+        bead_list[topIt] = curID;
         resi = bead_info[curID][BEAD_TYPE];
-        oldEn += (lLDub) Energy_Isotropic(curID);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip non-interactors
             curID = topo_info[beadID][topIt++];
             continue;
         }
         if (bead_info[curID][BEAD_FACE] != -1) {//I am bonded to something
             resj = bead_info[bead_info[curID][BEAD_FACE]][BEAD_TYPE];//Type of bead I'm bonded to
-            oldEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
+            //oldEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
         }
 
         //OP_ShuffleRotIndecies();
@@ -1147,7 +1148,14 @@ int Move_MultiLocal(int beadID, float MyTemp) {
         curID = topo_info[beadID][topIt++];
         yTemp++;
     }
-
+    bead_num = topIt;
+    curID = beadID;
+    topIt = 0;
+    while(curID != -1){
+        oldEn += (lLDub) Energy_Anisotropic_With_List(curID, bead_list, bead_num);
+        oldEn += (lLDub) Energy_Isotropic_With_List(curID, bead_list, bead_num);
+        curID = topo_info[beadID][topIt++];
+    }
     BSum = 0.;
     for (i = 0; i < yTemp; i++) {
         BSum += logl(bolt_norm[i]);
@@ -1195,6 +1203,14 @@ int Move_MultiLocal(int beadID, float MyTemp) {
         }
         curID = topo_info[beadID][topIt++];
         yTemp++;
+    }
+
+    curID = beadID;
+    topIt = 0;
+    while(curID != -1){
+        newEn += (lLDub) Energy_Anisotropic_With_List(curID, bead_list, bead_num);
+        newEn += (lLDub) Energy_Isotropic_With_List(curID, bead_list, bead_num);
+        curID = topo_info[beadID][topIt++];
     }
 
     FSum = 0.;
@@ -1353,7 +1369,13 @@ int Move_Pivot(int chainID, float MyTemp) {
         yTemp++;
     }
 
-    oldEn = (lLDub) Energy_Of_Chain(chainID);
+    for (j = 0; j < listLen; j++) {
+        i = tmpList[j];
+        oldEn += (lLDub) Energy_Anisotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
+        oldEn += (lLDub) Energy_Isotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
+    }
+
+    //oldEn = (lLDub) Energy_Of_Chain(chainID);
 
     BSum = 0.;
     for (i = 0; i < yTemp; i++) {
@@ -1399,7 +1421,11 @@ int Move_Pivot(int chainID, float MyTemp) {
         }
         yTemp++;
     }
-    newEn = (lLDub) Energy_Of_Chain(chainID);
+    for (j = 0; j < listLen; j++) {
+        i = tmpList[j];
+        newEn += (lLDub) Energy_Anisotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
+        newEn += (lLDub) Energy_Isotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
+    }
     FSum = 0.;
     for (i = 0; i < yTemp; i++) {
         FSum += logl(bolt_norm[i]);
@@ -1950,11 +1976,21 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
     lLDub newEn = 0.;
     lLDub MCProb;
 
-    //printf("Starting BW\n");
+    int bead_list[MAX_BONDS+1] = {0.};
+    int bead_num = 0;
     curID = beadID;
     topIt = 0;
     while (curID != -1) {
-        oldEn += (lLDub) Energy_Isotropic(curID);
+        bead_list[topIt] = curID;
+        curID = topo_info[beadID][topIt++];
+    }
+
+    bead_num = topIt;
+
+    curID = beadID;
+    topIt = 0;
+    while (curID != -1) {
+        oldEn += (lLDub) Energy_Isotropic_With_List(curID, bead_list, bead_num);
         curID = topo_info[beadID][topIt++];
     }
 
@@ -1968,7 +2004,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
     curID = beadID;
     topIt = 0;
     while (curID != -1) {
-        newEn += (lLDub) Energy_Isotropic(curID);
+        newEn += (lLDub) Energy_Isotropic_With_List(curID, bead_list, bead_num);
         curID = topo_info[beadID][topIt++];
     }
 
@@ -2088,7 +2124,10 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
         i = tmpList[j];
         oldEn += (lLDub) Energy_Isotropic(i);
     }*/
-    oldEn = (lLDub) Energy_Of_Chain(chainID);
+    for (j = 0; j < listLen; j++) {
+        i = tmpList[j];
+        oldEn += (lLDub) Energy_Isotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
+    }
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
         OP_Rotation(PivotM, i, anchorPos);
@@ -2100,7 +2139,10 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
         i = tmpList[j];
         newEn += (lLDub) Energy_Isotropic(i);
     }*/
-    newEn = (lLDub) Energy_Of_Chain(chainID);
+    for (j = 0; j < listLen; j++) {
+        i = tmpList[j];
+        newEn += (lLDub) Energy_Isotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
+    }
     MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
     if (MCProb < MHAcc) {//Accept the move. Remember that the bonds were assigned above!

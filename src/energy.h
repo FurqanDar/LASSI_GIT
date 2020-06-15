@@ -12,11 +12,19 @@ float Energy_Anisotropic_Self(int beadID);
 
 float Energy_Anisotropic_For_Chain(int beadID);
 
+float Energy_Anisotropic_Contiguous_Range(int beadID, int smallest_bead, int largest_bead);
+
+float Energy_Anisotropic_With_List(const int beadID, const int *bead_list, const int list_size);
+
 float Energy_Isotropic(int beadID);
 
 float Energy_Isotropic_Self(int beadID);
 
 float Energy_Isotropic_For_Chain(int beadID);
+
+float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int largest_bead);
+
+float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const int list_size);
 
 float Energy_Of_Chain(int chainID);
 

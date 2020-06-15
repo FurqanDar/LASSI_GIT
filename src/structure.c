@@ -431,7 +431,7 @@ void RDF_ComponentWise_Avg(void) {
 /// \param beadID
 /// \param tmpR
 /// \return 1 means all is good, 0 means bad.
-int Check_LinkerConstraint(const int beadID, const  int *tmpR) {
+int Check_LinkerConstraint(const int beadID, const int *tmpR) {
     //Check if the proposed new location for beadID is such that all the linkers are unbroken.
     int idx;//Iterator to loop over bond Partners
     int bondPartner;//It is what it is.
