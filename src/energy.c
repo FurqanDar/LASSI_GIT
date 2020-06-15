@@ -283,7 +283,6 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
                 secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
-                    totEn += fEnergy[resi][resj][E_OVLP];
                     xDis = sqrtf((float)(x*x + y*y + z*z));
                     if (xDis <= 1.74) { // 1/r^3 potential
                         totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis;
@@ -335,7 +334,6 @@ float Energy_Isotropic_Self(int beadID) {//Calculate Contact and Overlap energy 
                 if (secBi != -1 && secBi != beadID) {
                     if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {
                         resj = bead_info[secBi][BEAD_TYPE];
-                        totEn += fEnergy[resi][resj][E_OVLP];
                         xDis = sqrtf((float) (x * x + y * y + z * z));
                         if (xDis <= 1.74) { // 1/r^3 potential
                             totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis;

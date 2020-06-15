@@ -1137,10 +1137,6 @@ int Move_MultiLocal(int beadID, float MyTemp) {
             curID = topo_info[beadID][topIt++];
             continue;
         }
-        if (bead_info[curID][BEAD_FACE] != -1) {//I am bonded to something
-            resj = bead_info[bead_info[curID][BEAD_FACE]][BEAD_TYPE];//Type of bead I'm bonded to
-            //oldEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
-        }
 
         //OP_ShuffleRotIndecies();
         BWWeight = Check_RotStatesOld(curID, resi, MyTemp);
@@ -1184,7 +1180,6 @@ int Move_MultiLocal(int beadID, float MyTemp) {
     yTemp = 0;
     while (curID != -1) {
         resi = bead_info[curID][BEAD_TYPE];
-        newEn += (lLDub) Energy_Isotropic(curID);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip non-interactors
             curID = topo_info[beadID][topIt++];
             continue;
@@ -1198,7 +1193,6 @@ int Move_MultiLocal(int beadID, float MyTemp) {
                 resj = bead_info[xTemp][BEAD_TYPE];
                 bead_info[curID][BEAD_FACE] = xTemp;
                 bead_info[xTemp][BEAD_FACE] = curID;
-                newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
             }
         }
         curID = topo_info[beadID][topIt++];
