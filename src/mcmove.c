@@ -585,16 +585,14 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
     lRadLow = nBoxSize[2] / 2;
     lRadUp = 2 * lRadLow + 1;
 
-    xTemp = 0;
     yTemp = 0;
-    while (xTemp < nMCMaxTrials && yTemp == 0) {
-        for (j = 0; j < POS_MAX; j++) {
-            tmpR[j] = (rand() % lRadUp) - lRadLow;//Random vector to move all beads within r=L/4
-        }
-        yTemp = Check_ChainDisp(chainID, tmpR);//yTemp=0 means clash
-        xTemp++;
+
+    for (j = 0; j < POS_MAX; j++) {
+        tmpR[j] = (rand() % lRadUp) - lRadLow;//Random vector to move all beads within r=L/4
     }
-    if (yTemp == 0 || xTemp == nMCMaxTrials) {//We have failed to find a good spot for this chain.
+    yTemp = Check_ChainDisp(chainID, tmpR);//yTemp=0 means clash
+
+    if (yTemp == 0) {//We have failed to find a good spot for this chain.
         bAccept = 0;
         return bAccept;
     }
@@ -604,14 +602,8 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
     yTemp = 0;
     for (i = firstB; i < lastB; i++) {//Rosenbluth in old location.
         resi = bead_info[i][BEAD_TYPE];
-        //oldEn += Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip beads that cannot bond.
             continue;
-        }
-
-        if (bead_info[i][BEAD_FACE] != -1) {//I am bonded to something
-            resj = bead_info[bead_info[i][BEAD_FACE]][BEAD_TYPE];//Type of bead I am bonded to
-            //oldEn += (lLDub) fEnergy[resi][resj][E_SC_SC];//Adding the energy.
         }
 
         //OP_ShuffleRotIndecies();
@@ -634,7 +626,6 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
     //Again, separate the energy calculation from the Rosenbluth sampling
     for (i = firstB; i < lastB; i++) {//Rosenbluth in new location
         resi   = bead_info[i][BEAD_TYPE];
-        //newEn += Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Because linkers don't have rotational states
             continue;
         }
@@ -647,10 +638,9 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
             //Let's assign a rotational state to this bead
             xTemp = OP_PickRotState(FWWeight);
             if (xTemp != -1) {//An appropriate partner has been selected. Form the bonds and add the energy
-                resj = bead_info[xTemp][BEAD_TYPE];
+                //resj = bead_info[xTemp][BEAD_TYPE];
                 bead_info[i][BEAD_FACE] = xTemp;
                 bead_info[xTemp][BEAD_FACE] = i;
-                //newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
             }
         }
         yTemp++;//This keeps track of which residue*/
@@ -664,7 +654,6 @@ int Move_Trans(int chainID, float MyTemp) {//Performs a translation move with or
 
     MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub) MyTemp);
-    //if (MCProb < (FSum / BSum) * expl((oldEn - newEn) / MyTemp)) {
     if (MCProb < MHAcc) {//Accept the move. Remember that the bonds were assigned above!
         bAccept = 1;
         return bAccept;
