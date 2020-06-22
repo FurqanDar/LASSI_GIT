@@ -757,7 +757,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp) {
     //Remember that naList[] contains the chainID's of the network chainID is part of from 0 - ClusSize-1.
     //printf("Done with network\t %d\n", ClusSize);
     if (ClusSize >= 1) {
-        //Radii for translation moves. All moves are L/4 radius
+        //Radii for translation moves. All moves are L/2 radius
         //I guess moving single chains around as well is not a bad idea
         lRadLow = nBoxSize[2] / 2;
         lRadUp = 2 * lRadLow + 1;
@@ -963,7 +963,6 @@ int Move_CoLocal(int beadID, float MyTemp) {
 
     if (bead_info[beadID][BEAD_FACE] == -1) {
         bAccept = 0;
-        //printf("Bead has no partner!\n");
         return bAccept;
     }
     int tmpR[POS_MAX];//Random translation vector.
@@ -979,23 +978,23 @@ int Move_CoLocal(int beadID, float MyTemp) {
     lRadLow = 2;
     lRadUp = lRadLow * 2 + 1;//2*2+1
 
-    xTemp = 0;
-    yTemp = 0;//Initialize these guys.
-    while (yTemp == 0 && xTemp < nMCMaxTrials) {
-        for (j = 0; j < POS_MAX; j++) {
-            tmpR[j] = (rand() % lRadUp) - lRadLow;
-            tmpR1[j] = (bead_info[beadID][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
-            tmpR2[j] = (bead_info[beadPart][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
-        }
 
-        yTemp = Check_MoveBeadTo(tmpR1) * Check_MoveBeadTo(tmpR2);
-        if (yTemp == 1) {//This means we found an empty lattice site. So let's check if the linkers are okay.
-            yTemp = Check_LinkerConstraint(beadID, tmpR1) * Check_LinkerConstraint(beadPart, tmpR2);
-        }
-        xTemp++;
+    yTemp = 0;//Initialize these guys.
+
+    for (j = 0; j < POS_MAX; j++) {
+        tmpR[j] = (rand() % lRadUp) - lRadLow;
+        tmpR1[j] = (bead_info[beadID][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
+        tmpR2[j] = (bead_info[beadPart][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
     }
-    if (xTemp == nMCMaxTrials || yTemp ==
-                                 0) {//This means that we have failed to find an appropriate spot for this bead to be moved to. Therefore, the move is rejected!
+
+    yTemp = Check_MoveBeadTo(tmpR1) * Check_MoveBeadTo(tmpR2);
+    if (yTemp == 1) {//This means we found an empty lattice site. So let's check if the linkers are okay.
+        yTemp = Check_LinkerConstraint(beadID, tmpR1) * Check_LinkerConstraint(beadPart, tmpR2);
+    }
+
+
+    if (yTemp ==0) {
+        //This means that we have failed to find an appropriate spot for this bead to be moved to. Therefore, the move is rejected!
         bAccept = 0;
         return bAccept;
     }
