@@ -202,7 +202,8 @@ int MC_Step_Equil(float fMCTemp) {
  * The following functions are sub-routines that perform the varios Monte-Carlo (MC) moves.
  */
 
-// Move_Rot - searches the 3^3-1=26 possible sites for forming a bond, and performs Metropolis-Hastings. Rejects move if beadID cannot forms bonds.
+/// Move_Rot - searches the 3^3-1=26 possible sites for forming a bond, and performs Metropolis-Hastings.
+/// Rejects move if beadID cannot forms bonds.
 /// \param beadID
 /// \param MyTemp
 /// \return 1 if accepted, 0 if rejected.
@@ -279,8 +280,8 @@ int Move_Local(int beadID, float MyTemp) {//Performs a local translation MC-move
     int tmpR[POS_MAX], tmpR2[POS_MAX];//Vectors to stores coordinates.
     int FWWeight, BWWeight;//Used to perform orientational bias MC
     lLDub FWRos, BWRos;//Forwards and backwards Rosenbluth Factors
-    FWRos = 1;
-    BWRos = 1;
+    FWRos = 1.;
+    BWRos = 1.;
     for (j = 0; j < POS_MAX; j++) {//Initializing the vectors to where this bead is.
         tmpR[j] = bead_info[beadID][j];
     }
@@ -290,74 +291,76 @@ int Move_Local(int beadID, float MyTemp) {//Performs a local translation MC-move
     //lRadLow = 2;
     lRadUp = lRadLow * 2 + 1;//2*2+1
 
-    xTemp = 0;
-    yTemp = 0;//Initialize these guys.
-    while (yTemp == 0 && xTemp < nMCMaxTrials) {//Attempt to find an empty lattice point.
-        for (j = 0; j < POS_MAX; j++) {
-            tmpR2[j] = (rand() % lRadUp) - lRadLow;//Generate number between -2 and 2
-            tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
-        }
-        yTemp = Check_MoveBeadTo(tmpR2);
-        if (yTemp == 1) {//This means we found an empty lattice site. So let's check if the linkers are okay.
-            yTemp = Check_LinkerConstraint(beadID, tmpR2);
-        }
-        xTemp++;
+
+    yTemp = 0;//Initialize
+    //Attempt to find an empty lattice point.
+    for (j = 0; j < POS_MAX; j++) {
+        tmpR2[j] = (rand() % lRadUp) - lRadLow;//Generate number between -L and L
+        tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
     }
-    if (xTemp == nMCMaxTrials || yTemp == 0) {//No space -- reject.
+    yTemp = Check_MoveBeadTo(tmpR2);
+    if (yTemp == 1) {//This means we found an empty lattice site. So let's check if the linkers are okay.
+        yTemp = Check_LinkerConstraint(beadID, tmpR2);
+    }
+
+    if (yTemp == 0) {//No space -- reject.
         bAccept = 0;
         return bAccept;
-    } else {//Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
-        resi = bead_info[beadID][BEAD_TYPE];//I want to treat linker beads differently always because they have no rotational states
-        oldEn += Energy_Isotropic(beadID);
-        if (nBeadTypeIsSticker[resi] == 1) {//Only non linkers can bond
-            if (bead_info[beadID][BEAD_FACE] != -1) {
-                resj = bead_info[bead_info[beadID][BEAD_FACE]][BEAD_TYPE];//This is type of who I'm currently bonded to
-                oldEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
-            }
+    }
 
-            //OP_ShuffleRotIndecies(); //No need to shuffle just to check.
-            BWWeight = Check_RotStatesOld(beadID, resi, MyTemp);
-            OP_NormalizeRotState(0, BWWeight);
-            BWRos = logl(bolt_norm[0]);
-
-            OP_MoveBeadTo(beadID, tmpR2);//Does not break bond
-
-            OP_ShuffleRotIndecies();//Need to shuffle because this also acts as selecting new partner
-            FWWeight = Check_RotStatesNew(beadID, resi, MyTemp);
-            OP_NormalizeRotState(0, FWWeight);
-            FWRos = logl(bolt_norm[0]);
-
-            yTemp = OP_PickRotState(FWWeight);
-
-            if (yTemp != -1) {//There is a bead at this position in the rot_trial, so let's add the energy.
-                resj = bead_info[yTemp][BEAD_TYPE];
-                newEn = (lLDub) fEnergy[resi][resj][E_SC_SC];
-            }
-        } else {//These beads have no rotational states.
-            yTemp = -1;
-            OP_MoveBeadTo(beadID, tmpR2);
+    //Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
+    resi = bead_info[beadID][BEAD_TYPE];//I want to treat linker beads differently always because they have no rotational states
+    oldEn += Energy_Isotropic(beadID);
+    if (nBeadTypeIsSticker[resi] == 1) {//Only non linkers can bond
+        if (bead_info[beadID][BEAD_FACE] != -1) {
+            resj = bead_info[bead_info[beadID][BEAD_FACE]][BEAD_TYPE];//This is type of who I'm currently bonded to
+            oldEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
         }
-        //Now let's calculate the energy of the new state. SC-SC energy is already done.
-        newEn += Energy_Isotropic(beadID);
-        MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
-        lLDub MHAcc = OP_GenMHValue(FWRos, BWRos, oldEn - newEn, (lLDub) MyTemp);
-        //if (MCProb < (FWRos / BWRos) * expl((oldEn - newEn) / MyTemp)) {//Accept this state
-        if (MCProb < MHAcc) {//Accept this state
-            if (bead_info[beadID][BEAD_FACE] != -1) {//Breaking old bond
-                bead_info[bead_info[beadID][BEAD_FACE]][BEAD_FACE] = -1;
-            }
-            bead_info[beadID][BEAD_FACE] = yTemp;
-            if (yTemp != -1) {//Making new bond
-                bead_info[yTemp][BEAD_FACE] = beadID;
-            }
-            bAccept = 1;
-            return bAccept;
-        } else {
-            OP_Inv_MoveBeadTo(beadID);
-            bAccept = 0;
-            return bAccept;
+
+        //OP_ShuffleRotIndecies(); //No need to shuffle just to check.
+        BWWeight = Check_RotStatesOld(beadID, resi, MyTemp);
+        OP_NormalizeRotState(0, BWWeight);
+        BWRos = logl(bolt_norm[0]);
+
+        OP_MoveBeadTo(beadID, tmpR2);//Does not break bond
+
+        OP_ShuffleRotIndecies();//Need to shuffle because this also acts as selecting new partner
+        FWWeight = Check_RotStatesNew(beadID, resi, MyTemp);
+        OP_NormalizeRotState(0, FWWeight);
+        FWRos = logl(bolt_norm[0]);
+
+        yTemp = OP_PickRotState(FWWeight);
+
+        if (yTemp != -1) {//There is a bead at this position in the rot_trial, so let's add the energy.
+            resj = bead_info[yTemp][BEAD_TYPE];
+            newEn = (lLDub) fEnergy[resi][resj][E_SC_SC];
         }
     }
+    else {//These beads have no rotational states.
+        yTemp = -1;
+        OP_MoveBeadTo(beadID, tmpR2);
+    }
+    //Now let's calculate the energy of the new state. SC-SC energy is already done.
+    newEn += Energy_Isotropic(beadID);
+    MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
+    lLDub MHAcc = OP_GenMHValue(FWRos, BWRos, oldEn - newEn, (lLDub) MyTemp);
+    //Accept or reject this state
+    if (MCProb < MHAcc) {//Accept this state
+        if (bead_info[beadID][BEAD_FACE] != -1) {//Breaking old bond
+            bead_info[bead_info[beadID][BEAD_FACE]][BEAD_FACE] = -1;
+        }
+        bead_info[beadID][BEAD_FACE] = yTemp;
+        if (yTemp != -1) {//Making new bond
+            bead_info[yTemp][BEAD_FACE] = beadID;
+        }
+        bAccept = 1;
+        return bAccept;
+    } else {
+        OP_Inv_MoveBeadTo(beadID);
+        bAccept = 0;
+        return bAccept;
+    }
+
 }
 
 /// Move_Snake - performs a biased reptation move on chainID by:
