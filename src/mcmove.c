@@ -1052,45 +1052,43 @@ int Move_MultiLocal(int beadID, float MyTemp) {
         curID = topo_info[beadID][topIt++];
     }
 
-    while (yTemp == 0 && xTemp < nMCMaxTrials) {
-        curID = beadID;
-        topIt = 0;
-        while (curID != -1) {
-            naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = -1;
-            curID = topo_info[beadID][topIt++];
+
+    curID = beadID;
+    topIt = 0;
+    while (curID != -1) {//Removing from where we were
+        naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = -1;
+        curID = topo_info[beadID][topIt++];
+    }
+    curID = beadID;
+    topIt = 0;
+    while (curID != -1) {
+        yTemp = 1;
+        for (j = 0; j < POS_MAX; j++) {
+            tmpR[topIt][j] = (rand() % lRadUp) - lRadLow;
+            tmpR[topIt][j] = (bead_info[curID][j] + tmpR[topIt][j] + nBoxSize[j]) % nBoxSize[j];
         }
-        curID = beadID;
-        topIt = 0;
-        while (curID != -1) {
-            yTemp = 1;
-            for (j = 0; j < POS_MAX; j++) {
-                tmpR[topIt][j] = (rand() % lRadUp) - lRadLow;
-                tmpR[topIt][j] = (bead_info[curID][j] + tmpR[topIt][j] + nBoxSize[j]) % nBoxSize[j];
-            }
-            if (naTotLattice[Lat_Ind_FromVec(tmpR[topIt])] != -1) {
-                yTemp = 0;
-                break;
-            }
-            naTotLattice[Lat_Ind_FromVec(tmpR[topIt])] = curID;
-            curID = topo_info[beadID][topIt++];
+        if (naTotLattice[Lat_Ind_FromVec(tmpR[topIt])] != -1) {
+            yTemp = 0;
+            break;
         }
-        if (yTemp == 1) {//No steric clash so check for topology constraint
-            yTemp = Check_MTLinkerConstraint(beadID, tmpR);
-        }
-        for (i = 0; i < topIt; i++) {
-            naTotLattice[Lat_Ind_FromVec(tmpR[i])] = -1;
-        }
-        xTemp++;
+        naTotLattice[Lat_Ind_FromVec(tmpR[topIt])] = curID;
+        curID = topo_info[beadID][topIt++];
+    }
+    if (yTemp == 1) {//No steric clash so check for topology constraint
+        yTemp = Check_MTLinkerConstraint(beadID, tmpR);
+    }
+    for (i = 0; i < topIt; i++) {//Removing from trial locations
+        naTotLattice[Lat_Ind_FromVec(tmpR[i])] = -1;
     }
 
-    if (xTemp == nMCMaxTrials || yTemp == 0) {//Linker or steric clash didn't work out
-        curID = beadID;
-        topIt = 0;
-        while (curID != -1) {
-            naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
-            curID = topo_info[beadID][topIt++];
-        }
-        //printf("No space!\n");
+
+    curID = beadID;
+    topIt = 0;
+    while (curID != -1) {//Putting us back, because rejection
+        naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
+        curID = topo_info[beadID][topIt++];
+    }
+    if (yTemp == 0) {//Linker or steric clash didn't work out
         bAccept = 0;
         return bAccept;
     }
@@ -1116,7 +1114,6 @@ int Move_MultiLocal(int beadID, float MyTemp) {
             continue;
         }
 
-        //OP_ShuffleRotIndecies();
         BWWeight = Check_RotStatesOld(curID, resi, MyTemp);
         OP_NormalizeRotState(yTemp, BWWeight);
         curID = topo_info[beadID][topIt++];
@@ -1168,7 +1165,6 @@ int Move_MultiLocal(int beadID, float MyTemp) {
         if (bead_info[curID][BEAD_FACE] == -1) {//Make sure this bead is unbonded!
             xTemp = OP_PickRotState(FWWeight);
             if (xTemp != -1) {//An appropriate partner has been selected. Form the bonds and add the energy
-                resj = bead_info[xTemp][BEAD_TYPE];
                 bead_info[curID][BEAD_FACE] = xTemp;
                 bead_info[xTemp][BEAD_FACE] = curID;
             }
