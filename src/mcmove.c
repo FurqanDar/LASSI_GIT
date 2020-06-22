@@ -1082,13 +1082,13 @@ int Move_MultiLocal(int beadID, float MyTemp) {
     }
 
 
-    curID = beadID;
-    topIt = 0;
-    while (curID != -1) {//Putting us back, because rejection
-        naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
-        curID = topo_info[beadID][topIt++];
-    }
     if (yTemp == 0) {//Linker or steric clash didn't work out
+        curID = beadID;
+        topIt = 0;
+        while (curID != -1) {//Putting us back, because rejection
+            naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
+            curID = topo_info[beadID][topIt++];
+        }
         bAccept = 0;
         return bAccept;
     }
@@ -1265,7 +1265,6 @@ int Move_Pivot(int chainID, float MyTemp) {
 
     int PivotM;
     PivotM = rand() % 10;
-    //printf("Move: %d\n", PivotM);
     if (PivotM == 0) {//Null move
         bAccept = 1;
         return bAccept;
@@ -1291,24 +1290,20 @@ int Move_Pivot(int chainID, float MyTemp) {
         anchorPos[j] = bead_info[anchorBead][j];
     }
 
-    xTemp = 0;
     yTemp = 0;
-    while (xTemp < nMCMaxTrials && yTemp == 0) {
-        for (j = 0; j < listLen; j++) {
-            i = tmpList[j];
-            OP_Rotation(PivotM, i, anchorPos);
-            yTemp = Check_MoveBeadTo(naTempR);
-            if (yTemp == 0) {
-                xTemp++;
-                break;
-            }
+
+    for (j = 0; j < listLen; j++) {
+        i = tmpList[j];
+        //Use anchorbead as origin, and check what happens after the rotation to every bead
+        OP_Rotation(PivotM, i, anchorPos);
+        yTemp = Check_MoveBeadTo(naTempR);
+        if (yTemp == 0) {
+            break;
         }
-        xTemp++;
     }
 
-    if (xTemp == nMCMaxTrials || yTemp == 0) {
+    if (yTemp == 0) {
         bAccept = 0;
-        //printf("P Clashout\n");
         return bAccept;
     }
 
@@ -1323,13 +1318,8 @@ int Move_Pivot(int chainID, float MyTemp) {
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
         resi = bead_info[i][BEAD_TYPE];
-        //oldEn += (lLDub) Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip beads that cannot bond.
             continue;
-        }
-        if (bead_info[i][BEAD_FACE] != -1) {//I am bonded to something
-            resj = bead_info[bead_info[i][BEAD_FACE]][BEAD_TYPE];//Type of bead I am bonded to
-            //oldEn += (lLDub) fEnergy[resi][resj][E_SC_SC];//Adding the energy.
         }
         OP_ShuffleRotIndecies();
         BWWeight = Check_RotStatesOld(i, resi, MyTemp);
@@ -1343,13 +1333,10 @@ int Move_Pivot(int chainID, float MyTemp) {
         oldEn += (lLDub) Energy_Isotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
     }
 
-    //oldEn = (lLDub) Energy_Of_Chain(chainID);
-
     BSum = 0.;
     for (i = 0; i < yTemp; i++) {
         BSum += logl(bolt_norm[i]);
     }
-
 
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
@@ -1357,7 +1344,7 @@ int Move_Pivot(int chainID, float MyTemp) {
         OP_MoveBeadTo(i, naTempR);
     }
 
-    for (j = 0; j < listLen; j++) {
+    for (j = 0; j < listLen; j++) {//Break all bonds for the list
         i = tmpList[j];
         if (bead_info[i][BEAD_FACE] != -1) {
             bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1;
@@ -1369,22 +1356,19 @@ int Move_Pivot(int chainID, float MyTemp) {
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
         resi = bead_info[i][BEAD_TYPE];
-        //newEn += (lLDub) Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Because linkers don't have rotational states
             continue;
         }
         OP_ShuffleRotIndecies();
         FWWeight = Check_RotStatesNew(i, resi, MyTemp);
         OP_NormalizeRotState(yTemp, FWWeight);
-        //Note that the bonds need to be formed in this loop so that we don't overcount!
+        //Note that the bonds need to be formed in this loop so that we don't over-bond
         if (bead_info[i][BEAD_FACE] == -1) {//Make sure this bead is unbonded!
             //Let's assign a rotational state to this bead
             xTemp = OP_PickRotState(FWWeight);
             if (xTemp != -1) {//An appropriate partner has been selected. Form the bonds and add the energy
-                resj = bead_info[xTemp][BEAD_TYPE];
                 bead_info[i][BEAD_FACE] = xTemp;
                 bead_info[xTemp][BEAD_FACE] = i;
-                //newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
             }
         }
         yTemp++;
@@ -1405,7 +1389,7 @@ int Move_Pivot(int chainID, float MyTemp) {
         bAccept = 1;
         return bAccept;
     } else {//Rejecting move
-        for (j = 0; j < listLen; j++) {
+        for (j = 0; j < listLen; j++) {//Break all newly proposed bonds
             i = tmpList[j];
             if (bead_info[i][BEAD_FACE] != -1) {
                 bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1;
@@ -2402,7 +2386,7 @@ void OP_MoveBeadTo(int beadID, const int *newPos) {//Updates position to new one
 
 /// OP_Inv_MoveBeadTo - performs the inverse of OP_MoveBeadTo to restore beadID using old_bead.
 /// \param beadID
-void OP_Inv_MoveBeadTo(int beadID) {//Undoes what the above function does
+void OP_Inv_MoveBeadTo(int beadID) {//Undoes what OP_MoveBeadTo does
     int i;
     int tmpR[POS_MAX], tmpR2[POS_MAX];
     for (i = 0; i < BEADINFO_MAX; i++) {
