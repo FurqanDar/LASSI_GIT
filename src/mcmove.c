@@ -396,14 +396,14 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
         bAccept = 0;
         return bAccept;
     } else {
-        if (nChainTypeIsLinear[chain_info[chainID][CHAIN_TYPE]] !=
-            1) {//If chain is not linear. Reject move because slithering will not work!
+        if (nChainTypeIsLinear[chain_info[chainID][CHAIN_TYPE]] !=1) {
+            //If chain is not linear. Reject move because slithering will not work!
             bAccept = 0;
             return bAccept;
         }
     }
-    //This chain is suitable to perform a slithering-snake move on.
 
+    //This chain is suitable to perform a slithering-snake move on.
     lLDub MCProb, oldEn, newEn; //For Metropolis Hastings
     oldEn = 0.;
     newEn = 0.;
@@ -417,34 +417,26 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
 
     MCProb = (lLDub) rand() / (lLDub) RAND_MAX;//To decide if we slither forwards or backwards
     if (MCProb < 0.5) {//Forwards slither, so lastB-1 (last bead) is anchor
-        lRadUp = 2 * linker_len[lastB - 1][0] + 1;//lastB-1 will be replaced by lastB-2
-        lRadLow = linker_len[lastB - 1][0];
+        lRadUp = (int) 2 * linker_len[lastB - 1][0] + 1;//lastB-1 will be replaced by lastB-2
+        lRadLow = (int) linker_len[lastB - 1][0];
         yTemp = 0;
-        xTemp = 0;//Using to track trials for placing beads
-        while (xTemp < nMCMaxTrials && yTemp == 0) {
-            for (j = 0; j < POS_MAX; j++) {
-                tmpR[j] = (rand() % lRadUp) - lRadLow;
-                tmpR[j] = (bead_info[lastB - 1][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
-            }
-            yTemp = Check_MoveBeadTo(tmpR);// 0: there is no space, 1: there is space
-            xTemp++;
+        for (j = 0; j < POS_MAX; j++) {
+            tmpR[j] = (rand() % lRadUp) - lRadLow;
+            tmpR[j] = (bead_info[lastB - 1][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
         }
+        yTemp = Check_MoveBeadTo(tmpR);// 0: there is no space, 1: there is space
     } else {//Backwards slither, so firstB is anchor
         lRadUp = (int) 2 * linker_len[firstB][0] + 1;//firstB will be replaced by firstB+1
         lRadLow = (int) linker_len[firstB][0];
         yTemp = 0;
-        xTemp = 0;//Using to track trials for placing beads
-        while (xTemp < nMCMaxTrials && yTemp == 0) {
-            for (j = 0; j < POS_MAX; j++) {
-                tmpR[j] = (rand() % lRadUp) - lRadLow;
-                tmpR[j] = (bead_info[firstB][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
-            }
-            yTemp = Check_MoveBeadTo(tmpR);// 0: there is no space, 1: there is space
-            xTemp++;
+        for (j = 0; j < POS_MAX; j++) {
+            tmpR[j] = (rand() % lRadUp) - lRadLow;
+            tmpR[j] = (bead_info[firstB][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
         }
+        yTemp = Check_MoveBeadTo(tmpR);// 0: there is no space, 1: there is space
     }
 
-    if (yTemp == 0 || xTemp == nMCMaxTrials) {//Couldn't find a spot, so reject the damn move
+    if (yTemp == 0) {//Couldn't find a spot, so reject the damn move
         bAccept = 0;
         return bAccept;
     }
@@ -459,13 +451,11 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
     yTemp = 0;
     for (i = firstB; i < lastB; i++) {
         resi = bead_info[i][BEAD_TYPE];
-        //oldEn += Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip beads that don't interact
             continue;
         }
         if (bead_info[i][BEAD_FACE] != -1) {//I am bonded to something
             resj = bead_info[bead_info[i][BEAD_FACE]][BEAD_TYPE];//Type of bead I'm bonded to
-            //oldEn += fEnergy[resi][resj][E_SC_SC];
         }
 
         //OP_ShuffleRotIndecies();
@@ -474,7 +464,7 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
         yTemp++;
     }
 
-    oldEn = (lLDub ) Energy_Of_Chain(chainID);
+    oldEn = (lLDub) Energy_Of_Chain(chainID);
     //Done with checking states in the old location. Take the sum.
     BSum = 0.;
     for (i = 0; i < yTemp; i++) {
@@ -530,7 +520,6 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
     yTemp = 0;
     for (i = firstB; i < lastB; i++) {//Counting states in the new location
         resi = bead_info[i][BEAD_TYPE];
-        //newEn += (lLDub) Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip non-bonders
             continue;
         }
@@ -542,10 +531,8 @@ int Move_Snake(int chainID, float MyTemp) {//Performs a slither MC-move on chain
             //Let's assign a rotational state to this bead
             xTemp = OP_PickRotState(FWWeight);
             if (xTemp != -1) {//An appropriate partner has been selected. Form the bonds and add the energy
-                resj = bead_info[xTemp][BEAD_TYPE];
                 bead_info[i][BEAD_FACE] = xTemp;
                 bead_info[xTemp][BEAD_FACE] = i;
-                //newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
             }
         }
         yTemp++;//This keeps track of which residue*/
