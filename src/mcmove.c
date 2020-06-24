@@ -1630,7 +1630,6 @@ int Move_Local_Equil(int beadID, float MyTemp) {//Performs a local translation M
     lRadLow = linker_len[beadID][0];
     lRadUp = lRadLow * 2 + 1;//2*2+1
 
-    xTemp = 0;
     yTemp = 0;//Initialize these guys.
     for (j = 0; j < POS_MAX; j++) {
         tmpR2[j] = (rand() % lRadUp) - lRadLow;//Generate number between -2 and 2
@@ -1698,30 +1697,26 @@ int Move_Snake_Equil(int chainID, float MyTemp) {//Performs a slither MC-move on
         lRadUp = (int) 2 * linker_len[lastB - 1][0] + 1;//lastB-1 will be replaced by lastB-2
         lRadLow = (int) linker_len[lastB - 1][0];
         yTemp = 0;
-        xTemp = 0;//Using to track trials for placing beads
-        while (xTemp < nMCMaxTrials && yTemp == 0) {
-            for (j = 0; j < POS_MAX; j++) {
-                tmpR[j] = (rand() % lRadUp) - lRadLow;
-                tmpR[j] = (bead_info[lastB - 1][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
-            }
-            yTemp = Check_MoveBeadTo(tmpR);// 0: there is no space, 1: there is space
-            xTemp++;
+
+        for (j = 0; j < POS_MAX; j++) {
+            tmpR[j] = (rand() % lRadUp) - lRadLow;
+            tmpR[j] = (bead_info[lastB - 1][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
         }
+        yTemp = Check_MoveBeadTo(tmpR);// 0: there is no space, 1: there is space
+
     } else {//Backwards slither, so firstB is anchor
         lRadUp = (int) 2 * linker_len[firstB][0] + 1;//firstB will be replaced by firstB+1
         lRadLow = (int) linker_len[firstB][0];
         yTemp = 0;
-        xTemp = 0;//Using to track trials for placing beads
-        while (xTemp < nMCMaxTrials && yTemp == 0) {
-            for (j = 0; j < POS_MAX; j++) {
-                tmpR[j] = (rand() % lRadUp) - lRadLow;
-                tmpR[j] = (bead_info[firstB][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
-            }
-            yTemp = Check_MoveBeadTo(tmpR);// 0: there is no space, 1: there is space
-            xTemp++;
+
+        for (j = 0; j < POS_MAX; j++) {
+            tmpR[j] = (rand() % lRadUp) - lRadLow;
+            tmpR[j] = (bead_info[firstB][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
         }
+        yTemp = Check_MoveBeadTo(tmpR);// 0: there is no space, 1: there is space
+
     }
-    if (yTemp == 0 || xTemp == nMCMaxTrials) {//Couldn't find a spot, so reject the damn move
+    if (yTemp == 0 ) {//Couldn't find a spot, so reject the damn move
         bAccept = 0;
         return bAccept;
     }
