@@ -1632,19 +1632,17 @@ int Move_Local_Equil(int beadID, float MyTemp) {//Performs a local translation M
 
     xTemp = 0;
     yTemp = 0;//Initialize these guys.
-    while (yTemp == 0 && xTemp < nMCMaxTrials) {//Attempt to find an empty lattice point.
-        for (j = 0; j < POS_MAX; j++) {
-            tmpR2[j] = (rand() % lRadUp) - lRadLow;//Generate number between -2 and 2
-            tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
-        }
-        yTemp = Check_MoveBeadTo(tmpR2);
-        if (yTemp == 1) {//This means we found an empty lattice site. So let's check if the linkers are okay.
-            yTemp = Check_LinkerConstraint(beadID, tmpR2);
-        }
-        xTemp++;
+    for (j = 0; j < POS_MAX; j++) {
+        tmpR2[j] = (rand() % lRadUp) - lRadLow;//Generate number between -2 and 2
+        tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
     }
-    if (xTemp == nMCMaxTrials || yTemp ==
-                                 0) {//This means that we have failed to find an appropriate spot for this bead to be moved to. Therefore, the move is rejected!
+    yTemp = Check_MoveBeadTo(tmpR2);
+    if (yTemp == 1) {//This means we found an empty lattice site. So let's check if the linkers are okay.
+        yTemp = Check_LinkerConstraint(beadID, tmpR2);
+    }
+    if (yTemp == 0) {
+        //This means that we have failed to find an appropriate spot for this bead to be moved to.
+        // Therefore, the move is rejected!
         bAccept = 0;
         //printf("End LOCAL - No space\n");
         return bAccept;
