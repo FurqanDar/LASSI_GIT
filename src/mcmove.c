@@ -1808,16 +1808,14 @@ int Move_Trans_Equil(int chainID, float MyTemp) {//Performs a translation move w
     lRadUp = 2 * lRadLow + 1;
     //Initialize these iterators.
     //printf("Beginning TRANS\n");
-    xTemp = 0;
+
     yTemp = 0;
-    while (xTemp < nMCMaxTrials && yTemp == 0) {
         for (j = 0; j < POS_MAX; j++) {
             tmpR[j] = (rand() % lRadUp) - lRadLow;//Random vector to move all beads within r=L/4
         }
         yTemp = Check_ChainDisp(chainID, tmpR);//yTemp=0 means clash
-        xTemp++;
-    }
-    if (yTemp == 0 || xTemp == nMCMaxTrials) {//We have failed to find a good spot for this chain.
+
+    if (yTemp == 0) {//We have failed to find a good spot for this chain.
         bAccept = 0;
         //printf("Ending TRANS no space\n");
         return bAccept;
