@@ -1867,7 +1867,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
         curID = topo_info[beadID][topIt++];
     }
 
-    while (yTemp == 0 && xTemp < nMCMaxTrials) {
+
         curID = beadID;
         topIt = 0;
         while (curID != -1) {
@@ -1895,10 +1895,9 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
         for (i = 0; i < topIt; i++) {
             naTotLattice[Lat_Ind_FromVec(tmpR[i])] = -1;
         }
-        xTemp++;
-    }
 
-    if (xTemp == nMCMaxTrials || yTemp == 0) {//Linker or steric clash didn't work out
+
+    if (yTemp == 0) {//Linker or steric clash didn't work out
         curID = beadID;
         topIt = 0;
         while (curID != -1) {
