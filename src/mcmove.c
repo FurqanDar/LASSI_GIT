@@ -1449,20 +1449,17 @@ int Move_BranchedRot(int chainID, float MyTemp) {
         anchorPos[j] = bead_info[anchorBead][j];
     }
 
-    xTemp = 0;
+
     yTemp = 0;
-    while (xTemp < nMCMaxTrials && yTemp == 0) {
-        for (i = anchorBead + 1; i < lastB; i++) {
-            OP_Rotation(PivotM, i, anchorPos);
-            yTemp = Check_MoveBeadTo(naTempR);
-            if (yTemp == 0) {
-                xTemp++;
-                break;
-            }
+    for (i = anchorBead + 1; i < lastB; i++) {
+        OP_Rotation(PivotM, i, anchorPos);
+        yTemp = Check_MoveBeadTo(naTempR);
+        if (yTemp == 0) {
+            break;
         }
-        xTemp++;
     }
-    if (xTemp == nMCMaxTrials || yTemp == 0) {
+
+    if (yTemp == 0) {
         bAccept = 0;
         return bAccept;
     }
@@ -1477,13 +1474,11 @@ int Move_BranchedRot(int chainID, float MyTemp) {
     yTemp = 0;
     for (i = anchorBead + 1; i < lastB; i++) {
         resi = bead_info[i][BEAD_TYPE];
-        //oldEn += (lLDub) Energy_Isotropic(i);
         if (nBeadTypeIsSticker[resi] == 0) {//Skip beads that cannot bond.
             continue;
         }
         if (bead_info[i][BEAD_FACE] != -1) {//I am bonded to something
             resj = bead_info[bead_info[i][BEAD_FACE]][BEAD_TYPE];//Type of bead I am bonded to
-            //oldEn += fEnergy[resi][resj][E_SC_SC];//Adding the energy.
         }
         OP_ShuffleRotIndecies();
         BWWeight = Check_RotStatesOld(i, resi, MyTemp);
