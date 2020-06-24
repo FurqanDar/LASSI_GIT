@@ -2031,22 +2031,20 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
         anchorPos[j] = bead_info[anchorBead][j];
     }
 
-    xTemp = 0;
     yTemp = 0;
-    while (xTemp < nMCMaxTrials && yTemp == 0) {
-        for (j = 0; j < listLen; j++) {
-            i = tmpList[j];
-            OP_Rotation(PivotM, i, anchorPos);
-            yTemp = Check_MoveBeadTo(naTempR);
-            if (yTemp == 0) {
-                xTemp++;
-                break;
-            }
+
+    for (j = 0; j < listLen; j++) {
+        i = tmpList[j];
+        OP_Rotation(PivotM, i, anchorPos);
+        yTemp = Check_MoveBeadTo(naTempR);
+        if (yTemp == 0) {
+            xTemp++;
+            break;
         }
-        xTemp++;
     }
 
-    if (xTemp == nMCMaxTrials || yTemp == 0) {
+
+    if (yTemp == 0) {
         bAccept = 0;
         return bAccept;
     }
