@@ -2130,9 +2130,8 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
         anchorPos[j] = bead_info[anchorBead][j];
     }
 
-    xTemp = 0;
+
     yTemp = 0;
-    while (xTemp < nMCMaxTrials && yTemp == 0) {
         for (i = anchorBead + 1; i < lastB; i++) {
             OP_Rotation(PivotM, i, anchorPos);
             yTemp = Check_MoveBeadTo(naTempR);
@@ -2141,9 +2140,8 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
                 break;
             }
         }
-        xTemp++;
-    }
-    if (xTemp == nMCMaxTrials || yTemp == 0) {
+
+    if (yTemp == 0) {
         bAccept = 0;
         return bAccept;
     }
