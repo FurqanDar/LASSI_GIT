@@ -336,7 +336,7 @@ float Energy_Isotropic_Self(int beadID) {//Calculate Contact and Overlap energy 
                         resj = bead_info[secBi][BEAD_TYPE];
                         xDis = sqrtf((float) (x * x + y * y + z * z));
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis;
+                            totEn += fEnergy[resi][resj][E_OVLP] ;/// xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
@@ -390,14 +390,14 @@ float Energy_Isotropic_For_Chain(int beadID) {//Calculate Contact and Overlap en
                     xDis = sqrtf((float) (x * x + y * y + z * z));
                     if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {//Intra-molecular
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis /2.;
+                            totEn += fEnergy[resi][resj][E_OVLP] /2.;// / xDis / xDis / xDis /2.;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis /2.;
                     }
                     else{//Inter-molecular
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis;
+                            totEn += fEnergy[resi][resj][E_OVLP] ;// xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
@@ -454,14 +454,14 @@ float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int large
                     if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {//Intra-molecular
                         if (secBi >= smallest_bead && secBi <= largest_bead) {//Within subset
                             if (xDis <= 1.74) { // 1/r^3 potential
-                                totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis / 2.;
+                                totEn += fEnergy[resi][resj][E_OVLP] /2.;// xDis / xDis / xDis / 2.;
                             }
                             // 1/r potential that goes till cube three
                             totEn += fEnergy[resi][resj][E_CONT] / xDis / 2.;
                         }
                         else{
                             if (xDis <= 1.74) { // 1/r^3 potential
-                                totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis;
+                                totEn += fEnergy[resi][resj][E_OVLP] ;// xDis / xDis / xDis;
                             }
                             // 1/r potential that goes till cube three
                             totEn += fEnergy[resi][resj][E_CONT] / xDis;
@@ -469,7 +469,7 @@ float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int large
                     }
                     else{//Inter-molecular
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis;
+                            totEn += fEnergy[resi][resj][E_OVLP]; // / xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
@@ -532,14 +532,14 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
                     }
                     if (bead_check == 1) {//Intra-list
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis /2.;
+                            totEn += fEnergy[resi][resj][E_OVLP] /2.;// / xDis / xDis / xDis /2.;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis /2.;
                     }
                     else{//Inter-list
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis;
+                            totEn += fEnergy[resi][resj][E_OVLP]; // / xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
