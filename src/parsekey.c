@@ -77,6 +77,8 @@ int Parse_Keyfile(char *filename) {
                 sscanf(strLine, "%*s %ld", &nMCPreSteps);
             } else if (strcmp(strKeyword, "PREEQ_TEMP") == 0) {
                 sscanf(strLine, "%*s %f", &fPreKT);
+            } else if (strcmp(strKeyword, "MC_TEMP_RATE") == 0) {
+                sscanf(strLine, "%*s %f", &fMC_Temp_Rate);
             } else if (strcmp(strKeyword, "MC_TEMP_MODE") == 0) {
                 sscanf(strLine, "%*s %d", &Temp_Mode);
             } else if (strcmp(strKeyword, "MC_DELTA_TEMP") == 0) {

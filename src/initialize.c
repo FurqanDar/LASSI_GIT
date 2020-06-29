@@ -571,6 +571,14 @@ float Temperature_Function(int mode, long nGen) {
 
             break;
 
+        case 4:
+            x_val = -(float) (nGen);
+            x_val = fMC_Temp_Rate * x_val;
+            x_val = x_val / (float) (nMCPreSteps);
+            end_val = fKT + expf(x_val);
+
+            break;
+
         default:
 
             end_val = fKT;
