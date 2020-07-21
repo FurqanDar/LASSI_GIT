@@ -2,6 +2,104 @@
 #include "energy.h"
 #include "structure.h"
 
+/// Energy_InitPotential calculates the biasing potential used in the thermalization/equilibration
+/// The function calculates (T_current - T_final) and if < 0.001, sets nThermalization_Mode = 0.
+/// \param beadID
+/// \return The energy, given the nThermalization_Mode
+float Energy_InitPotential(int beadID) {
+    int j;
+    float totEn = 0.;
+    int tmpR[POS_MAX];
+    if (fCuTemp - fKT > 0.005) {
+        switch (nThermalization_Mode) {
+            case 1:
+                for (j = 0; j < POS_MAX; j++) {
+                    tmpR[j] = bead_info[beadID][j];
+                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                    totEn += (float) (tmpR[j] * tmpR[j]);
+                }
+                totEn = (fCuTemp - fKT) * totEn;
+                break;
+
+            case 2:
+                for (j = 0; j < POS_MAX; j++) {
+                    tmpR[j] = bead_info[beadID][j];
+                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                    totEn += (float) (tmpR[j] * tmpR[j]);
+                }
+                if (totEn >= 250.) {
+                    totEn = (fCuTemp - fKT) * ( totEn);
+                } else if (totEn <= 600.) {
+                    totEn = (fCuTemp - fKT) * ((float) tot_beads + 1. / (totEn + 0.02));
+                }
+                else{
+                    totEn=0.;
+                }
+                break;
+
+            case 3:
+                for (j = 0; j < POS_MAX; j++) {
+                    tmpR[j] = bead_info[beadID][j];
+                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                    totEn += (float) (tmpR[j] * tmpR[j]);
+                }
+                if (totEn >= 25*25) {
+                    totEn = (fCuTemp) * totEn;
+                }
+                else {
+                    totEn = 0.;
+                }
+                break;
+            case 4:
+                for (j = 0; j < POS_MAX; j++) {
+                    tmpR[j] = bead_info[beadID][j];
+                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                    totEn += (float) (tmpR[j] * tmpR[j]);
+                }
+                if (totEn <= 100.) {
+                    totEn = (fCuTemp - fKT) * (totEn+0.2);
+                } /*else if (totEn <= 2000.) {
+                    totEn = ;(fCuTemp - fKT*0.) * ((float) tot_beads + 1. / (totEn + 0.02));
+                }*/
+                else{
+                    totEn=0.;
+                }
+                break;
+            case 5:
+                for (j = 0; j < 1; j++) {
+                    tmpR[j] = bead_info[beadID][j];
+                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                    totEn += (float) (tmpR[j] * tmpR[j]);
+                }
+                totEn = (fCuTemp - fKT) * totEn;
+                break;
+
+            case 6:
+
+                for (j = 0; j < POS_MAX; j++) {
+                    tmpR[j] = bead_info[beadID][j];
+                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                    totEn += (float) (tmpR[j] * tmpR[j]);
+                }
+                if (totEn > fSquishRad*fSquishRad) {
+                    totEn = (fCuTemp - fKT) * totEn;
+                }
+                else {
+                    totEn = 0.;
+                }
+                break;
+
+            default:
+                totEn = 0.;
+                break;
+        }
+    } else {
+        nThermalization_Mode = -1;
+    }
+
+    return totEn;
+}
+
 /// Energy_Anisotropic - returns the bond energy for beadID if it is bonded.
 /// \param beadID
 /// \return
@@ -98,88 +196,6 @@ float Energy_Anisotropic_With_List(const int beadID, const int *bead_list, const
             totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
         }
     }
-    return totEn;
-}
-
-/// Energy_InitPotential calculates the biasing potential used in the thermalization/equilibration
-/// The function calculates (T_current - T_final) and if < 0.001, sets nThermalization_Mode = 0.
-/// \param beadID
-/// \return The energy, given the nThermalization_Mode
-float Energy_InitPotential(int beadID) {
-    int j;
-    float totEn = 0.;
-    int tmpR[POS_MAX];
-    if (fCuTemp - fKT > 0.005) {
-        switch (nThermalization_Mode) {
-            case 1:
-                for (j = 0; j < POS_MAX; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                totEn = (fCuTemp - fKT) * totEn;
-                break;
-
-            case 2:
-                for (j = 0; j < POS_MAX; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if (totEn >= 250.) {
-                    totEn = (fCuTemp - fKT) * ( totEn);
-                } else if (totEn <= 600.) {
-                    totEn = (fCuTemp - fKT) * ((float) tot_beads + 1. / (totEn + 0.02));
-                }
-                else{
-                    totEn=0.;
-                }
-                break;
-
-            case 3:
-                for (j = 0; j < POS_MAX; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if (totEn >= 25*25) {
-                    totEn = (fCuTemp) * totEn;
-                }
-                else {
-                    totEn = 0.;
-                }
-                break;
-            case 4:
-                for (j = 0; j < POS_MAX; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if (totEn <= 100.) {
-                    totEn = (fCuTemp - fKT) * (totEn+0.2);
-                } /*else if (totEn <= 2000.) {
-                    totEn = ;(fCuTemp - fKT*0.) * ((float) tot_beads + 1. / (totEn + 0.02));
-                }*/
-                else{
-                    totEn=0.;
-                }
-                break;
-            case 5:
-                for (j = 0; j < 1; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                totEn = (fCuTemp - fKT) * totEn;
-                break;
-            default:
-                totEn = 0.;
-                break;
-        }
-    } else {
-        nThermalization_Mode = -1;
-    }
-
     return totEn;
 }
 

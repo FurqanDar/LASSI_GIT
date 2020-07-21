@@ -399,7 +399,6 @@ void Clus_Network_MolWise_LargestCluster(void) {
     free(largestClus_of_type);
 }
 
-
 int Clus_Proximity_ChainCluster_ForTotal_IntOnly(int chainID) {
     //Updates naList to have all proteins close to chainID
     //The idea is to check every bead and see if there is a unique chain in the (+-1,+-1) cube, and to add it to naList
