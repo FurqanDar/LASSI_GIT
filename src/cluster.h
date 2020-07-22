@@ -40,7 +40,7 @@ void Clus_Proximity_Distribution_IntOnly_MolWise_Avg(void);
 
 void Clus_Proximity_Distribution_All_MolWise_Avg(void);
 
-void Clus_Proximity_MolWise_LargestCluster(void);
+void Clus_Proximity_IntOnly_MolWise_LargestCluster(void);
 
 void Clus_Perform_Analysis(void);
 
