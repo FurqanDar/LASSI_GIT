@@ -2,11 +2,11 @@
 #define _CLUSTER_H_
 
 
-int Clus_Netwrok_ChainCluster_General(int chainID);
+int Clus_Netwrok_ChainCluster_General(int const chainID);
 
-int Clus_Network_ChainCluster_ForTotal(int chainID);
+int Clus_Network_ChainCluster_ForTotal(int const chainID);
 
-int Clus_Network_LimitedCluster(int chainID);
+int Clus_Network_LimitedCluster(int const chainID);
 
 void Clus_Network_Distribution_Avg(void);
 
@@ -18,9 +18,9 @@ void Clus_Network_TotalAnalysis(void);
 
 void Clus_Network_MolWise_LargestClusters(void);
 
-int Clus_Proximity_ChainCluster_ForTotal_All(int chainID);
+int Clus_Proximity_ChainCluster_ForTotal_All(int const chainID);
 
-int Clus_Proximity_ChainCluster_ForTotal_IntOnly(int chainID);
+int Clus_Proximity_ChainCluster_ForTotal_IntOnly(int const chainID);
 
 void Clus_Proximity_TotalAnalysis(void);
 
@@ -43,5 +43,11 @@ void Clus_Proximity_Distribution_All_MolWise_Avg(void);
 void Clus_Proximity_IntOnly_MolWise_LargestClusters(void);
 
 void Clus_Perform_Analysis(void);
+
+int Clus_Perform_ChainCluster_ForTotal(int const chainID);
+
+void Clus_Perform_MolWise_LargestClusters(void);
+
+void Clus_Find_LargestClusters(void);
 
 #endif // _CLUSTER_H_
