@@ -330,7 +330,7 @@ void Clus_Network_Distribution_MolWise_Avg(void) {
 /// Clus_MolWiseLargestCluster - performs a total clustering analysis of the system. Then finds out the largest cluster
 /// for each MolType, where redundancy is allowed. naList contains the cluster IDs of the chain types.
 ///
-void Clus_Network_MolWise_LargestCluster(void) {
+void Clus_Network_MolWise_LargestClusters(void) {
     int curID, Cluster_length, i;
     int ClusNum = 0;
     int IsUnique = 1;
@@ -1054,7 +1054,7 @@ void Clus_Proximity_Distribution_All_MolWise_Avg(void) {
     nLargestClusterRightNow += currentLargest;
 }
 
-void Clus_Proximity_IntOnly_MolWise_LargestCluster(void) {
+void Clus_Proximity_IntOnly_MolWise_LargestClusters(void) {
     int curID, Cluster_length, i;
     int ClusNum = 0;
     int IsUnique = 1;
@@ -1123,7 +1123,7 @@ void Clus_Proximity_IntOnly_MolWise_LargestCluster(void) {
     free(largestClus_of_type);
 }
 
-void Clus_Proximity_All_MolWise_LargestCluster(void) {
+void Clus_Proximity_All_MolWise_LargestClusters(void) {
     int curID, Cluster_length, i;
     int ClusNum = 0;
     int IsUnique = 1;
@@ -1208,4 +1208,20 @@ void Clus_Perform_Analysis(void){
     }
 
 
+}
+
+void Clus_Find_LargestClusters(void){
+    //Just a function that picks the right analysis routine given the clustering mode
+
+    switch (nClusteringMode) {
+        case 1:
+            Clus_Network_MolWise_LargestClusters();
+            break;
+        case 2:
+            Clus_Proximity_IntOnly_MolWise_LargestClusters();
+            break;
+        default:
+            Clus_Proximity_All_MolWise_LargestClusters();
+            break;
+    }
 }

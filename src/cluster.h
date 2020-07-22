@@ -16,7 +16,7 @@ int Clus_Network_SecondLargestCluster(void);
 
 void Clus_Network_TotalAnalysis(void);
 
-void Clus_Network_MolWise_LargestCluster(void);
+void Clus_Network_MolWise_LargestClusters(void);
 
 int Clus_Proximity_ChainCluster_ForTotal_All(int chainID);
 
@@ -40,7 +40,7 @@ void Clus_Proximity_Distribution_IntOnly_MolWise_Avg(void);
 
 void Clus_Proximity_Distribution_All_MolWise_Avg(void);
 
-void Clus_Proximity_IntOnly_MolWise_LargestCluster(void);
+void Clus_Proximity_IntOnly_MolWise_LargestClusters(void);
 
 void Clus_Perform_Analysis(void);
 
