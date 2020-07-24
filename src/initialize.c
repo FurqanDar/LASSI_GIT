@@ -223,7 +223,7 @@ void Global_Array_Initialization_AtStart(void) {
         }
     }
     float VolumeConst = 4./3.*M_PI;
-    float IntendedVol = 0.25;
+    float IntendedVol = 0.7;
     //fSquishRad =  (float) nBoxSize[0]/2.;
     fSquishRad = cbrtf((float) tot_beads / VolumeConst / IntendedVol );
     //fSquishRad =  fSquishRad*fSquishRad/4.;

@@ -1228,6 +1228,11 @@ int Clus_Perform_ChainCluster_ForTotal(int const chainID){
     return clus_size;
 }
 
+/// Clus_Perform_MolWise_LargestClusters - performs a total clustering analysis of the system. Then finds out the largest cluster
+/// for each MolType, where redundancy is allowed. naList contains the cluster IDs of the chain types.
+/// Note that naList[0] contains the system's overall largest cluster, naList[1] is for molType=0 and so on.
+/// Furthermore, naCluster[clusID][0] = Cluster size, and naCluster[1:ClusterSize] are all the chainID's that comprise
+/// the particular cluster.
 void Clus_Perform_MolWise_LargestClusters(void) {
     int curID, Cluster_length, i;
     int ClusNum = 0;
@@ -1291,10 +1296,8 @@ void Clus_Perform_MolWise_LargestClusters(void) {
     }
 
     for(i=0; i<=tot_chain_types; i++){
-        printf("(%d %d)\t", largestClus_of_type[i],clusID_of_type[i]);
         naList[i] = clusID_of_type[i];//Now naList contains the cluster ID's.
     }
-    printf("\n");
     free(clus_numof_MolType);
     free(clusID_of_type);
     free(largestClus_of_type);
