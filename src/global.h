@@ -165,6 +165,7 @@ lInt nRDF_TotComps;
 lInt nRDFCounter;//This counts how many times the RDF has been calculated for averaging at the end.
 lInt nRDF_TotBins;
 lInt nRadDen_TotComps;
+lInt nRadDen_CompShift;
 lInt nRadDenCounter;//This counts for the Radial Density histograms
 
 // Gyration tensor

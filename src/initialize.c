@@ -33,7 +33,8 @@ void Memory_Initialization_AtStart(void) {
         ldRDF_Arr = malloc((nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
     }
     if (nReport[REPORT_COMDEN] != 0) {
-        nRadDen_TotComps = tot_chain_types * (tot_chain_types + 1);
+        nRadDen_TotComps = 2*tot_chain_types * (tot_chain_types + 1);
+        nRadDen_CompShift= tot_chain_types * (tot_chain_types + 1);
         ldRadDen_Arr = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
         ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins) * sizeof(lLDub));
     }
@@ -42,9 +43,7 @@ void Memory_Initialization_AtStart(void) {
         n_TOTTRAJ_ARR = malloc(sizeof(lInt) * nTraj_FramesPerCycle * (lLong) tot_beads * BEADINFO_MAX);
     }
     Memory_VerifyMalloc();
-    //printf("%ld frames per cycle. %ld\n", nTraj_FramesPerCycle, nTraj_FramesPerCycle * (lLong) tot_beads * BEADINFO_MAX);
     printf("Successfully allocated memory! Arrays initialized.\n");
-    //exit(1);
 }
 
 void Memory_VerifyMalloc(void){

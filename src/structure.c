@@ -827,7 +827,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void){
 
 void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
 
-    int i,j;//Iterators for loop
+    int i,j,k;//Iterators for loop
     int thisType;//Tracks the type of the chain
     int thisComp;//Tracks which component of ldRadDen
     lDub typeCOM[POS_MAX] = {0};
@@ -835,7 +835,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
     int myBin;
     float xDis = 0.;//Tracks the distance between the COM and the specific bead
     int cur_type = 0;
-
+    int fB, lB;
     int clus_size =  0;
     int clus_id   = -1;
     int *clus_id_list;       //Tracks the cluster ID's after the clustering analysis.
@@ -864,14 +864,40 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
             COM_int[j] = (int) typeCOM[j];
         }
 
-        for(i=0; i<tot_beads; i++){
+        for(k=0; k<clus_size; k++) {
+            fB = chain_info[naList[k]][CHAIN_START];
+            lB = fB + chain_info[naList[k]][CHAIN_LENGTH];
+            for (i = fB; i < lB; i++) {
+                thisType = bead_info[i][BEAD_CHAINID];
+                thisType = chain_info[thisType][CHAIN_TYPE];
+                thisComp = RadDen_ComponentIndex(cur_type - 1, thisType);
+                xDis = Dist_BeadToPoint(i, COM_int);
+                myBin = (int) (4. * xDis);
+                ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
+            }
+        }
+    }
+
+    for (cur_type=0; cur_type<=tot_chain_types; cur_type++){
+        if (cur_type == 0){
+            Calc_SystemCenterOfMass(typeCOM);
+        }
+        else{
+            Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type-1);
+        }
+        for(j=0; j<POS_MAX; j++){
+            COM_int[j] = (int) typeCOM[j];
+        }
+
+        for (i = 0; i < tot_beads; i++) {
             thisType = bead_info[i][BEAD_CHAINID];
             thisType = chain_info[thisType][CHAIN_TYPE];
-            thisComp = RadDen_ComponentIndex(cur_type-1, thisType);
-            xDis     = Dist_BeadToPoint(i, COM_int);
-            myBin    = (int) (4. * xDis);
+            thisComp = nRadDen_CompShift+RadDen_ComponentIndex(cur_type - 1, thisType);
+            xDis = Dist_BeadToPoint(i, COM_int);
+            myBin = (int) (4. * xDis);
             ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
         }
+
     }
 
     //printf("\n");
