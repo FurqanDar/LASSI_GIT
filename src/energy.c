@@ -316,7 +316,7 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
                     resj = bead_info[secBi][BEAD_TYPE];
                     xDis = sqrtf((float)(x*x + y*y + z*z));
                     if (xDis <= 1.74) { // 1/r^3 potential
-                        totEn += fEnergy[resi][resj][E_OVLP] / xDis / xDis / xDis;
+                        totEn += fEnergy[resi][resj][E_OVLP] ;/// xDis / xDis / xDis;
                     }
                     // 1/r potential that goes till cube three
                     totEn += fEnergy[resi][resj][E_CONT] / xDis;

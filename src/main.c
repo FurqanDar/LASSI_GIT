@@ -47,7 +47,7 @@ int main(int argc, char *argv[]){
             Initial_Conditions_BreakBonds();
         }
     } else {
-        printf("Wrong initial conditions condition give. Crashing!\n");
+        printf("Wrong initial conditions condition given. Crashing!\n");
         exit(1);
     }
 
