@@ -265,7 +265,7 @@ float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy o
                   }
                 }
                 else if (secBi == -1){
-                    if (abs(x)<= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
                         totEn += fEnergy[resi][resi][E_F_SOL];
                         totEn += fEnergy[resi][resi][E_T_IND] * fCuTemp;
                     }
@@ -321,6 +321,11 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
                     // 1/r potential that goes till cube three
                     totEn += fEnergy[resi][resj][E_CONT] / xDis;
                 }
+                else if (secBi == -1){
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                        totEn += fEnergy[resi][resi][E_F_SOL];
+                    }
+                }
             }
         }
     }
@@ -367,10 +372,15 @@ float Energy_Isotropic_Self(int beadID) {//Calculate Contact and Overlap energy 
                         resj = bead_info[secBi][BEAD_TYPE];
                         xDis = sqrtf((float) (x * x + y * y + z * z));
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP] ;/// xDis / xDis / xDis;
+                            totEn += fEnergy[resi][resj][E_OVLP];/// xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                    }
+                }
+                else if (secBi == -1){
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                        totEn += fEnergy[resi][resi][E_F_SOL];
                     }
                 }
             }
@@ -432,6 +442,11 @@ float Energy_Isotropic_For_Chain(int beadID) {//Calculate Contact and Overlap en
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                    }
+                }
+                else if (secBi == -1){
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                        totEn += fEnergy[resi][resi][E_F_SOL];
                     }
                 }
             }
@@ -506,6 +521,11 @@ float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int large
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
                     }
                 }
+                else if (secBi == -1){
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                        totEn += fEnergy[resi][resi][E_F_SOL];
+                    }
+                }
             }
         }
     }
@@ -574,6 +594,11 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                    }
+                }
+                else if (secBi == -1){
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                        totEn += fEnergy[resi][resi][E_F_SOL];
                     }
                 }
             }
