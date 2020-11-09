@@ -105,6 +105,7 @@ The system has thermalized!
         Temp_Mode = -1;
         Copy_Data(run_cycle);
         Reset_Global_Arrays();
+
     }
 
     //Writing everything
