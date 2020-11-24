@@ -892,7 +892,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
         for (i = 0; i < tot_beads; i++) {
             thisType = bead_info[i][BEAD_CHAINID];
             thisType = chain_info[thisType][CHAIN_TYPE];
-            thisComp = nRadDen_CompShift+RadDen_ComponentIndex(cur_type - 1, thisType);
+            thisComp = nRadDen_CompShift + RadDen_ComponentIndex(cur_type - 1, thisType);
             xDis = Dist_BeadToPoint(i, COM_int);
             myBin = (int) (4. * xDis);
             ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
