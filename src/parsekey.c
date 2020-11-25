@@ -218,61 +218,61 @@ int Parse_EnergyFile(char *strEnFile) {
     char bOrder = 0;
     char strKey[100];
     int nRow;
-    float fTemp[MAX_AA];
-    int nTemp[MAX_AA];
+    float fTemp[MAX_AA] = {0.f};
     int i, j, k;
-    int nEntry;
-    char bEnergy[MAX_E], bRad[MAX_E];
-    for (i = 0; i < MAX_E; i++) { // initialization
-        bEnergy[i] = 0;
-        bRad[i] = 0;
-    }
+    int nEntry = 0;
 
     while (fgets(strLine, sizeof(strLine), infile) != NULL) {
-
-        if (strLine[0] == '#') {
+        if (strLine[0] == '#') {//All key-words start with '#'
             sscanf(&strLine[1], "%s", strKey);
-
-            if (strcmp(strKey, "STICKERS") == 0) nFlag = -1;
+            //STICKERS must be the first key-word
+            if (strcmp(strKey, "STICKERS") == 0) {
+                nFlag = -1;
+            }
             else if (bOrder == 0) {
                 fprintf(stderr, "ERROR: #STICKERS is not the first entry in %s.\n", strEnFile);
                 nRes = 1;
                 break;
-            } else {
+            } else { //Checking for all other keywords
                 if (strcmp(strKey, "OVERLAP_POT") == 0) {
                     nFlag = 2 * (E_OVLP);
-                    bEnergy[E_OVLP] = 1;
-                } else if (strcmp(strKey, "CONTACT_POT") == 0) {
+                }
+                else if (strcmp(strKey, "CONTACT_POT") == 0) {
                     nFlag = 2 * (E_CONT);
-                    bEnergy[E_CONT] = 1;
-                } else if (strcmp(strKey, "CONTACT_RAD") == 0) {
+                }
+                else if (strcmp(strKey, "CONTACT_RAD") == 0) {
                     nFlag = 2 * (E_CONT) + 1;
-                    bRad[E_CONT] = 1;
-                } else if (strcmp(strKey, "SC_SC_POT") == 0) {
+                }
+                else if (strcmp(strKey, "SC_SC_POT") == 0) {
                     nFlag = 2 * (E_SC_SC);
-                    bEnergy[E_SC_SC] = 1;
-                } else if (strcmp(strKey, "FSOL_POT") == 0) {
+                }
+                else if (strcmp(strKey, "FSOL_POT") == 0) {
                     nFlag = 2 * (E_F_SOL);
-                    bEnergy[E_F_SOL] = 1;
-                } else if (strcmp(strKey, "T_IND_POT") == 0) {
+                }
+                else if (strcmp(strKey, "T_IND_POT") == 0) {
                     nFlag = 2 * (E_T_IND);
-                    bEnergy[E_T_IND] = 1;
-                } else if (strcmp(strKey, "LINKER_LENGTH") == 0) {
+                }
+                else if (strcmp(strKey, "LINKER_LENGTH") == 0) {
                     nFlag = -3;
-                } else if (strcmp(strKey, "LINKER_SPRCON") == 0) {
+                }
+                else if (strcmp(strKey, "LINKER_SPRCON") == 0) {
                     nFlag = -4;
-                } else if (strcmp(strKey, "LINKER_EQLEN") == 0) {
+                }
+                else if (strcmp(strKey, "LINKER_EQLEN") == 0) {
                     nFlag = -5;
-                } else {
+                }
+                else {
                     fprintf(stderr, "ERROR: irregular expression in %s: %s\n", strEnFile, strKey);
                     nRes = 2;
                     break;
                 }
             }
-
+            //Should know which key-word we are dealing with.
+            //Next line should have numerical values. Either one number, or nBeadType numbers
             nRow = 0;
-        } else if (strcmp(strLine, "\n") != 0) { // ignore empty lines
-            if (nFlag == -1) { // sticker
+        } //The line did not contain a keyword. Either empty or has numbers.
+        else if (strcmp(strLine, "\r\n") != 0) { // ignore empty lines
+                if (nFlag == -1) { // sticker
                 sscanf(strLine, "%d", &nBeadTypes);
                 if (nBeadTypes > MAX_AA) {
                     fprintf(stderr, "ERROR: the number of AA types exceeds MAX_AA in %s.\n", strEnFile);
@@ -280,41 +280,49 @@ int Parse_EnergyFile(char *strEnFile) {
                     break;
                 }
                 bOrder = 1;
-            } else if (nFlag == -3) { // linker_length
-                sscanf(strLine, "%f", &fLinkerLength);
-            } else if (nFlag == -4) { // linker_sprcon
-                sscanf(strLine, "%f", &fLinkerSprCon);
-            } else if (nFlag == -5) { // linker_eqlen
-                sscanf(strLine, "%f", &fLinkerEqLen);
-            } else if (nFlag == 0) {
-                fprintf(stderr, "ERROR: nFlag is not assigned in %s.\n", strEnFile);
-                nRes = 4;
-                break;
-            } else {
-                nEntry = str2farr(strLine, fTemp);
-
-                if (nEntry != nBeadTypes) {
-                    if (nEntry == 1) {
-                        for (i = 0; i < nBeadTypes; i++) {
-                            for (j = 0; j < nBeadTypes; j++) {
-                                if (nFlag % 2 == 0) fEnergy[i][j][(int) (nFlag / 2)] = fTemp[0];
-                                else fEnRad[i][j][(int) (nFlag / 2)] = fTemp[0];
+                } else if (nFlag == -3) { // linker_length
+                    sscanf(strLine, "%f", &fLinkerLength);
+                } else if (nFlag == -4) { // linker_sprcon
+                    sscanf(strLine, "%f", &fLinkerSprCon);
+                } else if (nFlag == -5) { // linker_eqlen
+                    sscanf(strLine, "%f", &fLinkerEqLen);
+                } else if (nFlag == 0) {
+                    fprintf(stderr, "ERROR: nFlag is not assigned in %s.\n", strEnFile);
+                    nRes = 4;
+                    break;
+                }
+                else {//Saving energy and radius matrices
+                    nEntry = str2farr(strLine, fTemp); //Counting how many columns
+                    if (nEntry != nBeadTypes) {//If columns not the same as sticker number
+                        if (nEntry == 1) {//If only 1-value, all-values in  that matrix are this one
+                            for (i = 0; i < nBeadTypes; i++) {
+                                for (j = 0; j < nBeadTypes; j++) {
+                                    if (nFlag % 2 == 0) { //energy
+                                        fEnergy[i][j][(int) (nFlag / 2)] = fTemp[0];
+                                    }
+                                    else { //radius
+                                        fEnRad[i][j][(int) (nFlag / 2)] = fTemp[0];
+                                        }
+                                }
+                            }
+                        } else {
+                            fprintf(stderr, "ERROR: irregular expression in energy matrices of %s.\n", strEnFile);
+                            nRes = 4;
+                            break;
+                        }
+                    } else {//Column number same as sticker-number; save the matrix
+                        if (nFlag % 2 == 0) { // energy
+                            for (i = 0; i < nBeadTypes; i++) {
+                                fEnergy[nRow][i][(int) (nFlag / 2)] = fTemp[i];
+                            }
+                        } else { // radius
+                            for (i = 0; i < nBeadTypes; i++) {
+                                fEnRad[nRow][i][(int) (nFlag / 2)] = fTemp[i];
                             }
                         }
-                    } else {
-                        fprintf(stderr, "ERROR: irregular expression in energy matrices of %s.\n", strEnFile);
-                        nRes = 4;
-                        break;
+                        nRow++;
                     }
-                } else {
-                    if (nFlag % 2 == 0) { // energy
-                        for (i = 0; i < nBeadTypes; i++) fEnergy[nRow][i][(int) (nFlag / 2)] = fTemp[i];
-                    } else { // radius
-                        for (i = 0; i < nBeadTypes; i++) fEnRad[nRow][i][(int) (nFlag / 2)] = fTemp[i];
-                    }
-                    nRow++;
                 }
-            }
         }
     }
 
@@ -329,21 +337,18 @@ int Parse_EnergyFile(char *strEnFile) {
 /// \param fArray
 /// \return Changes fArray to include be the array in
 int str2farr(char strRaw[], float fArray[MAX_AA]) {
-    int i;
-    char *strTemp;
+    int i = 0;
+    char *strTemp = strRaw;
     char *token;
-    char *saveptr;
 
-    strTemp = strRaw;
-    token = "";
-
-    char *deli = "  \t"; // delimeter
-
-    for (i = 0; i < MAX_AA; i++, strTemp = NULL) {
-        token = strtok_r(strTemp, deli, &saveptr);
-
-        if (token == NULL) break;
-        fArray[i] = atof(token);
+    for (i = 0; i < MAX_AA; i++) {
+        token = strtok_r(strTemp, " \t", &strTemp);
+        if (token == NULL) {
+            break;
+        }
+        else {
+            fArray[i] = atof(token);
+        }
     }
 
     return i;
