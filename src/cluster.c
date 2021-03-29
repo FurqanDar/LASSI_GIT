@@ -8,7 +8,7 @@
 /// \param chainID
 /// \return ClusSize - the size of this cluster+1 (the +1 is for looping)
 /// This version isn't used yet, but was before when the Cluster move moved a cluster, rather than the two new moves.
-int Clus_Netwrok_ChainCluster_General(int const chainID) {
+int Clus_Network_ChainCluster_General(int const chainID) {
     //Updates naList to have all proteins bound to  chainID and it's cluster
     //The idea is to check every bead and see if there is a unique bonded chain, and to add it to naList
 

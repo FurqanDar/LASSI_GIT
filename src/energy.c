@@ -43,7 +43,7 @@ float Energy_InitPotential(int beadID) {
                     tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
                     totEn += (float) (tmpR[j] * tmpR[j]);
                 }
-                if (totEn >= 25*25) {
+                if (totEn >= 35*35) {
                     totEn = (fCuTemp) * totEn;
                 }
                 else {

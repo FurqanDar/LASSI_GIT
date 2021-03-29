@@ -2,7 +2,7 @@
 #define _CLUSTER_H_
 
 
-int Clus_Netwrok_ChainCluster_General(int const chainID);
+int Clus_Network_ChainCluster_General(int const chainID);
 
 int Clus_Network_ChainCluster_ForTotal(int const chainID);
 

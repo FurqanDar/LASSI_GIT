@@ -182,5 +182,4 @@ lInt nTrajCurFrame;
 //Lattice To Remember Things
 lInt *naTotLattice;
 
-
 #endif // _GLOBAL_H_
