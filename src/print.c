@@ -277,6 +277,7 @@ void Print_Key(void) { // should be output-dependent (stdout, stderr, other file
     printf("Number of Sticker Types = %d\n", nBeadTypes);
     printf("Number of Beads         = %d\n", tot_beads);
     printf("Number of Chains        = %d\n", tot_chains);
+    printf("Number of Components    = %d\n", tot_chain_types);
     printf("Box Size                = %d, %d, %d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]);
     printf("Monomer density         = %1.1e\n",
            (float) tot_beads / (float) nBoxSize[0] / (float) nBoxSize[1] / (float) nBoxSize[2]);
