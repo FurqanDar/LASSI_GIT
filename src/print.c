@@ -274,11 +274,11 @@ void Print_Key(void) { // should be output-dependent (stdout, stderr, other file
     char lBrace[] = "<======      ";
     char rBrace[] = "      ======>";
     printf("%s System Settings %s\n", lBrace, rBrace);
-    printf("Number of Components = %d\n", nBeadTypes);
-    printf("Number of Beads      = %d\n", tot_beads);
-    printf("Number of Chains     = %d\n", tot_chains);
-    printf("Box Size             = %d, %d, %d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]);
-    printf("Monomer density      = %1.1e\n",
+    printf("Number of Sticker Types = %d\n", nBeadTypes);
+    printf("Number of Beads         = %d\n", tot_beads);
+    printf("Number of Chains        = %d\n", tot_chains);
+    printf("Box Size                = %d, %d, %d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]);
+    printf("Monomer density         = %1.1e\n",
            (float) tot_beads / (float) nBoxSize[0] / (float) nBoxSize[1] / (float) nBoxSize[2]);
     printf("\n");
 
