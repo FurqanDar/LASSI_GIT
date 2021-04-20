@@ -537,6 +537,7 @@ void Write_TotalSysProp(char *filename, int run_it) {
         fprintf(fp, "#Done");
         fclose(fp);
         }
+
     if (nReport[REPORT_NETWORK] != 0) {
         sprintf(filename, "%s_CLUS.dat", strReportPrefix);//Name Of the ClusterHistogram Files
         fp = fopen(filename, "w");

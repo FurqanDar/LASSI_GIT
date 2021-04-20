@@ -79,8 +79,8 @@ typedef long double lLDub;
 
 // configurations and structural info
 lInt bead_info[MAX_BEADS][BEADINFO_MAX];
-lInt old_bead[MAX_BEADS][BEADINFO_MAX]; //Redundant copy for MCSteps
-lInt linker_len[MAX_BEADS][MAX_BONDS];//Remember that this one is an INT, not float
+lInt old_bead[MAX_BEADS][BEADINFO_MAX]; // Redundant copy for MCSteps
+lInt linker_len[MAX_BEADS][MAX_BONDS];  // Remember that this one is an INT, not float
 lInt topo_info[MAX_BEADS][MAX_BONDS];
 lInt chain_info[MAX_CHAINS][CHAININFO_MAX];
 
