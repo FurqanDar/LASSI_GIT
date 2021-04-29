@@ -199,7 +199,7 @@ int MC_Step_Equil(float fMCTemp) {
 }
 
 /*
- * The following functions are sub-routines that perform the varios Monte-Carlo (MC) moves.
+ * The following functions are sub-routines that perform the various Monte-Carlo (MC) moves.
  */
 
 /// Move_Rot - searches the 3^3-1=26 possible sites for forming a bond, and performs Metropolis-Hastings.
