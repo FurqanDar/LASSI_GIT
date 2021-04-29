@@ -213,10 +213,10 @@ int Parse_EnergyFile(char *strEnFile) {
     FILE *infile;
     infile = fopen(strEnFile, "r");
 
-    char strLine[100];
+    char strLine[1000];
     int nFlag = 0;
     char bOrder = 0;
-    char strKey[100];
+    char strKey[1000];
     int nRow;
     float fTemp[MAX_AA] = {0.f};
     int i, j, k;
