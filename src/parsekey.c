@@ -342,7 +342,7 @@ int str2farr(char strRaw[], float fArray[MAX_AA]) {
     char *token;
 
     for (i = 0; i < MAX_AA; i++) {
-        token = strtok_r(strTemp, " \t", &strTemp);
+        token = strtok_r(strTemp, " ", &strTemp);
         if (token == NULL) {
             break;
         }
@@ -350,7 +350,6 @@ int str2farr(char strRaw[], float fArray[MAX_AA]) {
             fArray[i] = atof(token);
         }
     }
-
     return i;
 }
 
