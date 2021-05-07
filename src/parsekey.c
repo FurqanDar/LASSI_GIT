@@ -271,7 +271,7 @@ int Parse_EnergyFile(char *strEnFile) {
             //Next line should have numerical values. Either one number, or nBeadType numbers
             nRow = 0;
         } //The line did not contain a keyword. Either empty or has numbers.
-        else if ((strcmp(strLine, "\r\n") != 0) || (strcmp(strLine, "\n") != 0)) { // ignore empty lines
+        else if ((strcmp(strLine, "\r\n") != 0) && (strcmp(strLine, "\n") != 0)) { // ignore empty lines
                 if (nFlag == -1) { // sticker
                 sscanf(strLine, "%d", &nBeadTypes);
                 if (nBeadTypes > MAX_AA) {
