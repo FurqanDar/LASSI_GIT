@@ -15,7 +15,7 @@
 #define MAX_CHAINS     20000
 #define MAX_CHAINLEN   1000
 #define MAX_BONDS      15
-#define MAX_VALENCY    1000
+#define MAX_VALENCY    500
 
 // energy parameters
 #define E_TOT   0 // index zero must be assigned for total energy
