@@ -339,7 +339,7 @@ void GyrTensor_GyrRad_Avg(void) {
     int i, j;//Loop indecies
     lDub tot_COM[POS_MAX] = {0.};
 
-    Calc_SystemCenterOfMass(tot_COM);
+    Calc_CenterOfMass_OfSystem(tot_COM);
     int dumArg[POS_MAX] = {0};
     for (i = 0; i < 7; i++) {//Initializing to 0
         fGyrTensor[i] = 0.;
@@ -493,7 +493,7 @@ int Check_MTLinkerConstraint(int beadID, int (*tmpR)[POS_MAX]) {
     return canI;
 }
 
-void Calc_SystemCenterOfMass(lDub *tmpR){
+void Calc_CenterOfMass_OfSystem(lDub *tmpR){
 
     int i, j; //Iterators
     lDub tot_COM[POS_MAX] = {0.}; //This is where the COM will be stored
@@ -607,7 +607,7 @@ void Calc_CenterOfMass_OfCluster(lDub *tmpR, const int cluster_size, const int *
 
 }
 
-void Calc_SystemCenterOfMass_OfMolType(lDub *tmpR, const int thisType){
+void Calc_CenterOfMass_OfSystem_OfMolType(lDub *tmpR, const int thisType){
     //This version measures the COM of only type thisType
     //The COM from this is not necessarily the COM of the system as a whole.
     int thisMol, i, j, k; //Iterators
@@ -670,7 +670,7 @@ void Calc_SystemCenterOfMass_OfMolType(lDub *tmpR, const int thisType){
 
 }
 
-void Calc_SystemCenterOfMass_WithoutMolType(lDub *tmpR, const int thisType){
+void Calc_CenterOfMass_OfSystem_WithoutMolType(lDub *tmpR, const int thisType){
     //This version measures the COM of everything except type thisType
     //The COM from this is not necessarily the COM of the system as a whole.
     int thisMol, i, j, k; //Iterators
@@ -738,7 +738,7 @@ void RadDen_Avg_MolTypeWise_FromSysCen(void){
     int myBin;
     float xDis = 0.;//Tracks the distance between the COM and the specific bead
 
-    Calc_SystemCenterOfMass(sysCOM);
+    Calc_CenterOfMass_OfSystem(sysCOM);
     //printf("SYS COM = (%d, %d, %d) \n", sysCOM[0], sysCOM[1], sysCOM[2]);
     for(i=0; i<tot_beads; i++){
         thisType = bead_info[i][BEAD_CHAINID];
@@ -761,7 +761,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void){
     float xDis = 0.;//Tracks the distance between the COM and the specific bead
     int cur_type = 0;
 
-    Calc_SystemCenterOfMass(typeCOM);
+    Calc_CenterOfMass_OfSystem(typeCOM);
     for(j=0; j<POS_MAX; j++){
         COM_int[j] = (int) typeCOM[j];
     }
@@ -775,7 +775,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void){
     }
 
     for (cur_type=0; cur_type<tot_chain_types; cur_type++){//Go through each molType's center
-        Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type);
+        Calc_CenterOfMass_OfSystem_OfMolType(typeCOM, cur_type);
         for(j=0; j<POS_MAX; j++){
             COM_int[j] = (int) typeCOM[j];
         }
@@ -831,7 +831,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
     int thisType;//Tracks the type of the chain
     int thisComp;//Tracks which component of ldRadDen
     lDub typeCOM[POS_MAX] = {0};
-    int COM_int[POS_MAX] = {0.};
+    int COM_int[POS_MAX]  = {0.};
     int myBin;
     float xDis = 0.;//Tracks the distance between the COM and the specific bead
     int cur_type = 0;
@@ -844,7 +844,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
         clus_id_list[i]        = -1;
     }
 
-    //Perform clusering analysis
+    //Perform clustering analysis
     Clus_Perform_MolWise_LargestClusters();
     //Remember the cluster ID's
     for (i=0; i<= tot_chain_types; i++){
@@ -880,10 +880,10 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
 
     for (cur_type=0; cur_type<=tot_chain_types; cur_type++){
         if (cur_type == 0){
-            Calc_SystemCenterOfMass(typeCOM);
+            Calc_CenterOfMass_OfSystem(typeCOM);
         }
         else{
-            Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type-1);
+            Calc_CenterOfMass_OfSystem_OfMolType(typeCOM, cur_type - 1);
         }
         for(j=0; j<POS_MAX; j++){
             COM_int[j] = (int) typeCOM[j];
