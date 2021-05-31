@@ -5,10 +5,10 @@
 /// Memory_Initialization_AtStart - allocates memory, and initializes the various global arrays.
 void Memory_Initialization_AtStart(void) {
     int i, j;
-    naTotLattice = malloc(nBoxSize[0] * nBoxSize[1] * nBoxSize[2] * sizeof(lInt));
-    naClusHistList = malloc((1 + tot_chains) * sizeof(lLong));
-    naChainCheckList = malloc((1 + tot_chains) * sizeof(lInt));
-    fKT_Cycle = malloc((1 + nTot_CycleNum) * sizeof(float));
+    naTotLattice = (lInt *) malloc(nBoxSize[0] * nBoxSize[1] * nBoxSize[2] * sizeof(lInt));
+    naClusHistList = (lLong *) malloc((1 + tot_chains) * sizeof(lLong));
+    naChainCheckList = (lInt *) malloc((1 + tot_chains) * sizeof(lInt));
+    fKT_Cycle = (float *) malloc((1 + nTot_CycleNum) * sizeof(float));
 
     if (nReport[REPORT_NETWORK] != 0) {
         ld_TOTCLUS_ARR = ( lLDub ** )malloc((nTot_CycleNum) * sizeof(lLDub));

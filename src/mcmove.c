@@ -295,7 +295,7 @@ int Move_Local(int beadID, float MyTemp) {//Performs a local translation MC-move
     yTemp = 0;//Initialize
     //Attempt to find an empty lattice point.
     for (j = 0; j < POS_MAX; j++) {
-        tmpR2[j] = (rand() % lRadUp) - lRadLow;//Generate number between -L and L
+        tmpR2[j] = (rand() % lRadUp) - lRadLow;//Generate number between -l and l
         tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
     }
     yTemp = Check_MoveBeadTo(tmpR2);
@@ -2031,6 +2031,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
         anchorPos[j] = bead_info[anchorBead][j];
     }
 
+    xTemp = 0;
     yTemp = 0;
 
     for (j = 0; j < listLen; j++) {
@@ -2130,7 +2131,7 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
         anchorPos[j] = bead_info[anchorBead][j];
     }
 
-
+    xTemp = 0;
     yTemp = 0;
         for (i = anchorBead + 1; i < lastB; i++) {
             OP_Rotation(PivotM, i, anchorPos);

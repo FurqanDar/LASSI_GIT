@@ -285,7 +285,7 @@ float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy o
 float Energy_OVLP(const float fEn, const float xDis){
     float totEn = 0.f;
 
-    totEn = fEn / xDis / xDis / xDis;
+    totEn = fEn ;/// xDis / xDis / xDis;
 
     return totEn;
 }
