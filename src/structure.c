@@ -907,3 +907,33 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
     free(clus_id_list);
 }
 
+
+int NeighborList_StoreNeighborsAndDistance(const int beadID, const int *startVec, const int searchRad, int *neighList, float *distList){
+
+    int neighborNum = 0;
+    int x, y, z;
+    int tmpR2[POS_MAX] = {0};
+    int neighID = -1;
+    float xDis = 0.f;
+
+    for (x = -searchRad; x <= searchRad; x++) {
+        for (y = -searchRad; y <= searchRad; y++) {
+            for (z = -searchRad; z <= searchRad; z++) {
+                tmpR2[0] = (startVec[0] + x + nBoxSize[0]) % nBoxSize[0];
+                tmpR2[1] = (startVec[1] + y + nBoxSize[1]) % nBoxSize[1];
+                tmpR2[2] = (startVec[2] + z + nBoxSize[2]) % nBoxSize[2];
+                neighID = naTotLattice[Lat_Ind_FromVec(tmpR2)];
+                if (neighID != -1 && neighID != beadID) {
+                    xDis = sqrtf((float)(x*x + y*y + z*z));
+                    distList[neighborNum] = xDis;
+                    neighList[neighborNum] = neighID;
+                    neighborNum++;
+                }
+            }
+        }
+    }
+
+    return neighborNum;
+}
+
+

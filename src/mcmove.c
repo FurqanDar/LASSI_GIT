@@ -104,98 +104,98 @@ int MC_Step(float fMCTemp) {
 /// \param fMCTemp
 /// \return bAccept - the acceptance state where MCMove=bAccept/12 and MCAccept=bAccept%2.
 int MC_Step_Equil(float fMCTemp) {
-    int mode = 0; //Which move to do
-    int nAccept; //Used in MC steps
-    float prob = (float) rand() / (float) RAND_MAX;
-    int i;//Internal iterator, and int.
-    for (i = 0; i < MAX_MV; i++) {
-        if (prob < fMCFreq[i]) {//Pick this move!
-            mode = i;
-            break;
-        }
+  int mode = 0; //Which move to do
+  int nAccept; //Used in MC steps
+  float prob = (float) rand() / (float) RAND_MAX;
+  int i;//Internal iterator, and int.
+  for (i = 0; i < MAX_MV; i++) {
+    if (prob < fMCFreq[i]) {//Pick this move!
+      mode = i;
+      break;
     }
-    //Start by assuming failure.
+  }
+  //Start by assuming failure.
+  nAccept = 0;
+
+  //Performing the appropriate move.
+  switch (mode) {
+    // translation of a random chain
+  case MV_TRANS:
+    i = rand() % tot_chains; //Pick random chain
+    nAccept = Move_Trans_Equil(i, fMCTemp);
+    break;
+
+    // cluster translation: moves largest cluster to another spot.
+  case MV_CLSTR: //In equil, just a translation of the chain
+    i = rand() % tot_chains; //Pick random chain
+    nAccept = Move_Trans_Equil(i, fMCTemp);
+    break;
+
+  case MV_SMCLSTR: //In equil, just a translation of the chain
+    i = rand() % tot_chains; //Pick random chain
+    nAccept = Move_Trans_Equil(i, fMCTemp);
+    break;
+
+    // face change
+  case MV_STROT:// In equil, just a local move
+    i = rand() % tot_beads;
+    nAccept = Move_Local_Equil(i, fMCTemp);
+    break;
+
+    // local moves
+  case MV_LOCAL:
+    i = rand() % tot_beads;
+    nAccept = Move_Local_Equil(i, fMCTemp);
+    break;
+
+    // slithering snake
+  case MV_SNAKE:
+    i = rand() % tot_chains;
+    nAccept = Move_Snake_Equil(i, fMCTemp);
+    break;
+
+    // double pivot
+  case MV_DBPVT:
+    i = rand() % tot_beads;//Pick a random bead
+    nAccept = Move_DbPvt(i);
+    break;
+
+    // co-local
+  case MV_COLOCAL:// In equil, just a local move
+    i = rand() % tot_beads;
+    nAccept = Move_Local_Equil(i, fMCTemp);
+    break;
+
+    // shake
+  case MV_MTLOCAL:
+    i = rand() % tot_beads;
+    nAccept = Move_MultiLocal_Equil(i, fMCTemp);
+    break;
+
+    // pivot
+  case MV_PIVOT:
+    i = rand() % tot_chains;
+    nAccept = Move_Pivot_Equil(i, fMCTemp);
+    break;
+
+    // branched rotate
+  case MV_BRROT:
+    i = rand() % tot_chains;
+    nAccept = Move_BranchedRot_Equil(i, fMCTemp);
+    break;
+
+  case MV_PR_SMCLSTR:
+    //In equil, just a translation of the chain
+    i = rand() % tot_chains; //Pick random chain
+    nAccept = Move_Trans_Equil(i, fMCTemp);
+
+  default:
     nAccept = 0;
+    break;
+  }
 
-    //Performing the appropriate move.
-    switch (mode) {
-        // translation of a random chain
-        case MV_TRANS:
-            i = rand() % tot_chains; //Pick random chain
-            nAccept = Move_Trans_Equil(i, fMCTemp);
-            break;
-
-            // cluster translation: moves largest cluster to another spot.
-        case MV_CLSTR: //In equil, just a translation of the chain
-            i = rand() % tot_chains; //Pick random chain
-            nAccept = Move_Trans_Equil(i, fMCTemp);
-            break;
-
-        case MV_SMCLSTR: //In equil, just a translation of the chain
-            i = rand() % tot_chains; //Pick random chain
-            nAccept = Move_Trans_Equil(i, fMCTemp);
-            break;
-
-            // face change
-        case MV_STROT:// In equil, just a local move
-            i = rand() % tot_beads;
-            nAccept = Move_Local_Equil(i, fMCTemp);
-            break;
-
-            // local moves
-        case MV_LOCAL:
-            i = rand() % tot_beads;
-            nAccept = Move_Local_Equil(i, fMCTemp);
-            break;
-
-            // slithering snake
-        case MV_SNAKE:
-            i = rand() % tot_chains;
-            nAccept = Move_Snake_Equil(i, fMCTemp);
-            break;
-
-            // double pivot
-        case MV_DBPVT:
-            i = rand() % tot_beads;//Pick a random bead
-            nAccept = Move_DbPvt(i);
-            break;
-
-            // co-local
-        case MV_COLOCAL:// In equil, just a local move
-            i = rand() % tot_beads;
-            nAccept = Move_Local_Equil(i, fMCTemp);
-            break;
-
-            // shake
-        case MV_MTLOCAL:
-            i = rand() % tot_beads;
-            nAccept = Move_MultiLocal_Equil(i, fMCTemp);
-            break;
-
-            // pivot
-        case MV_PIVOT:
-            i = rand() % tot_chains;
-            nAccept = Move_Pivot_Equil(i, fMCTemp);
-            break;
-
-            // branched rotate
-        case MV_BRROT:
-            i = rand() % tot_chains;
-            nAccept = Move_BranchedRot_Equil(i, fMCTemp);
-            break;
-
-        case MV_PR_SMCLSTR:
-            //In equil, just a translation of the chain
-            i = rand() % tot_chains; //Pick random chain
-            nAccept = Move_Trans_Equil(i, fMCTemp);
-
-        default:
-            nAccept = 0;
-            break;
-    }
-
-    MCAccepMat[nAccept][mode]++;//Just adding which move got accepted/rejected.
-    return mode * 12 + nAccept;
+  MCAccepMat[nAccept][mode]++;//Just adding which move got accepted/rejected.
+  return mode * 12 + nAccept;
 }
 
 /*
@@ -1101,7 +1101,7 @@ int Move_MultiLocal(int beadID, float MyTemp) {
     lLDub newEn = 0.;
     lLDub MCProb;
 
-    int bead_list[MAX_BONDS+1] = {0.};
+    int bead_list[MAX_BONDS] = {0};
     int bead_num = 0;
     curID = beadID;
     topIt = 0;
@@ -1277,11 +1277,11 @@ int Move_Pivot(int chainID, float MyTemp) {
     int listLen = 0;
 
     if (PivotDir == 1) {
-        for (i = anchorBead + 1; i < lastB; i++) {
+        for (i = anchorBead + 1; i < lastB; ++i) {
             tmpList[listLen++] = i;
         }
     } else {
-        for (i = firstB; i < anchorBead; i++) {
+        for (i = firstB; i < anchorBead; ++i) {
             tmpList[listLen++] = i;
         }
     }

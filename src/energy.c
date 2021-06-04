@@ -329,30 +329,35 @@ float Energy_Isotropic(const int beadID) {//Calculate Contact and Overlap energy
     for (j = 0; j < POS_MAX; j++) {
         tmpR[j] = bead_info[beadID][j];
     }
-    for (x = -BoxRad; x <= BoxRad; x++) {
-        for (y = -BoxRad; y <= BoxRad; y++) {
-            for (z = -BoxRad; z <= BoxRad; z++) {
-                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
-                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
-                if (secBi != -1 && secBi != beadID) {
-                    resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float)(x*x + y*y + z*z));
-                    if (xDis <= 1.74) { // 1/r^3 potential
-                        totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis);
-                    }
-                    // 1/r potential that goes till cube three
-                    totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis);
-                }
-                else if (secBi == -1){
-                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                    }
-                }
-            }
+
+    int neighborNum  = 0;
+//    int neighborSize = pow(2*BoxRad+1,3);
+//    int* neighborList = (int *) malloc(neighborSize * sizeof(int));
+//    float* neighborDist =  (float *) malloc(neighborSize * sizeof(float));
+//
+//    if (neighborList == NULL || neighborDist == NULL){
+//        exit(1);
+//    }
+
+    int neighborList[MAX_ROTSTATES];
+    float neighborDist[MAX_ROTSTATES];
+
+    neighborNum = NeighborList_StoreNeighborsAndDistance(beadID, tmpR, BoxRad, neighborList, neighborDist);
+
+    for(i=0; i<neighborNum; ++i){
+        xDis = neighborDist[i];
+        resj = bead_info[neighborList[i]][BEAD_TYPE];
+        if (xDis <= 1.74) {
+            totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis);
+        }
+        else {
+            totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis);
         }
     }
+
+
+//    free(neighborList);
+//    free(neighborDist);
 
     return totEn;
 
@@ -384,32 +389,37 @@ float Energy_Isotropic_Self(const int beadID) {//Calculate Contact and Overlap e
     for (j = 0; j < POS_MAX; j++) {
         tmpR[j] = bead_info[beadID][j];
     }
-    for (x = -BoxRad; x <= BoxRad; x++) {
-        for (y = -BoxRad; y <= BoxRad; y++) {
-            for (z = -BoxRad; z <= BoxRad; z++) {
-                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
-                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
-                if (secBi != -1 && secBi != beadID) {
-                    if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {
-                        resj = bead_info[secBi][BEAD_TYPE];
-                        xDis = sqrtf((float) (x * x + y * y + z * z));
-                        if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis);
-                        }
-                        // 1/r potential that goes till cube three
-                        totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis);
-                    }
-                }
-                else if (secBi == -1){
-                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                    }
-                }
+
+
+    int neighborNum  = 0;
+//    int neighborSize = pow(2*BoxRad+1,3);
+//    int* neighborList = (int *) malloc(neighborSize * sizeof(int));
+//    float* neighborDist =  (float *) malloc(neighborSize * sizeof(float));
+//
+//    if (neighborList == NULL || neighborDist == NULL){
+//        exit(1);
+//    }
+
+    int neighborList[MAX_ROTSTATES];
+    float neighborDist[MAX_ROTSTATES];
+
+    neighborNum = NeighborList_StoreNeighborsAndDistance(beadID, tmpR, BoxRad, neighborList, neighborDist);
+    int thisChainID = bead_info[beadID][BEAD_CHAINID];
+    for(i=0; i<neighborNum; ++i) {
+        if (bead_info[neighborList[i]][BEAD_CHAINID] == thisChainID) {
+            xDis = neighborDist[i];
+            resj = bead_info[neighborList[i]][BEAD_TYPE];
+            if (xDis <= 1.74) {
+                totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis);
+            } else {
+                totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis);
             }
         }
     }
+
+
+//    free(neighborList);
+//    free(neighborDist);
 
     return totEn;
 
@@ -426,8 +436,7 @@ float Energy_Isotropic_For_Chain(const int beadID) {//Calculate Contact and Over
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
     int tmpR[POS_MAX], tmpR2[POS_MAX];
-    int x, y, z; //Lattice indecies
-    int secBi, resj;//Second bead index
+    int resj;//Second bead index
     float xDis = 0.;//Distance between beads.
     int resi = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
@@ -443,39 +452,45 @@ float Energy_Isotropic_For_Chain(const int beadID) {//Calculate Contact and Over
     for (j = 0; j < POS_MAX; j++) {
         tmpR[j] = bead_info[beadID][j];
     }
-    for (x = -BoxRad; x <= BoxRad; x++) {
-        for (y = -BoxRad; y <= BoxRad; y++) {
-            for (z = -BoxRad; z <= BoxRad; z++) {
-                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
-                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
-                if (secBi != -1 && secBi != beadID) {
-                    resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float) (x * x + y * y + z * z));
-                    if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {//Intra-molecular
-                        if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis) / 2.;
-                        }
-                        // 1/r potential that goes till cube three
-                        totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis) / 2.;
-                    }
-                    else{//Inter-molecular
-                        if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis);
-                        }
-                        // 1/r potential that goes till cube three
-                        totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis);
-                    }
-                }
-                else if (secBi == -1){
-                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                    }
-                }
+
+
+    int neighborNum  = 0;
+//    int neighborSize = pow(2*BoxRad+1,3);
+//    int* neighborList = (int *) malloc(neighborSize * sizeof(int));
+//    float* neighborDist =  (float *) malloc(neighborSize * sizeof(float));
+//
+//    if (neighborList == NULL || neighborDist == NULL){
+//        exit(1);
+//    }
+
+    int neighborList[MAX_ROTSTATES];
+    float neighborDist[MAX_ROTSTATES];
+
+    neighborNum = NeighborList_StoreNeighborsAndDistance(beadID, tmpR, BoxRad, neighborList, neighborDist);
+    int thisChainID = bead_info[beadID][BEAD_CHAINID];
+    for(i=0; i<neighborNum; ++i) {
+        xDis = neighborDist[i];
+        resj = bead_info[neighborList[i]][BEAD_TYPE];
+        if (bead_info[neighborList[i]][BEAD_CHAINID] == thisChainID) {
+            if (xDis <= 1.74) {
+                totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis) / 2.;
+            } else {
+                totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis) / 2.;
+            }
+        }
+        else{
+            if (xDis <= 1.74) {
+                totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis);
+            } else {
+                totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis);
             }
         }
     }
+
+
+//    free(neighborList);
+//    free(neighborDist);
+
 
     return totEn;
 
@@ -511,48 +526,44 @@ float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bea
     for (j = 0; j < POS_MAX; j++) {
         tmpR[j] = bead_info[beadID][j];
     }
-    for (x = -BoxRad; x <= BoxRad; x++) {
-        for (y = -BoxRad; y <= BoxRad; y++) {
-            for (z = -BoxRad; z <= BoxRad; z++) {
-                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
-                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
-                if (secBi != -1 && secBi != beadID) {
-                    resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float) (x * x + y * y + z * z));
-                    if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {//Intra-molecular
-                        if (secBi >= smallest_bead && secBi <= largest_bead) {//Within subset
-                            if (xDis <= 1.74) { // 1/r^3 potential
-                                totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis) / 2.;
-                            }
-                            // 1/r potential that goes till cube three
-                            totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis) / 2.;
-                        }
-                        else{
-                            if (xDis <= 1.74) { // 1/r^3 potential
-                                totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis);
-                            }
-                            // 1/r potential that goes till cube three
-                            totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis);
-                        }
-                    }
-                    else{//Inter-molecular
-                        if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis);
-                        }
-                        // 1/r potential that goes till cube three
-                        totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis);
-                    }
-                }
-                else if (secBi == -1){
-                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                    }
-                }
+
+
+    int neighborNum  = 0;
+//    int neighborSize = pow(2*BoxRad+1,3);
+//    int* neighborList = (int *) malloc(neighborSize * sizeof(int));
+//    float* neighborDist =  (float *) malloc(neighborSize * sizeof(float));
+//
+//    if (neighborList == NULL || neighborDist == NULL){
+//        exit(1);
+//    }
+
+    int neighborList[MAX_ROTSTATES];
+    float neighborDist[MAX_ROTSTATES];
+
+    neighborNum = NeighborList_StoreNeighborsAndDistance(beadID, tmpR, BoxRad, neighborList, neighborDist);
+    for(i=0; i<neighborNum; ++i) {
+        j = neighborList[i];
+        xDis = neighborDist[i];
+        resj = bead_info[j][BEAD_TYPE];
+        if (j >= smallest_bead && j <= largest_bead) {
+            if (xDis <= 1.74) {
+                totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis) / 2.;
+            } else {
+                totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis) / 2.;
+            }
+        }
+        else{
+            if (xDis <= 1.74) {
+                totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis);
+            } else {
+                totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis);
             }
         }
     }
+
+
+//    free(neighborList);
+//    free(neighborDist);
 
     return totEn;
 
@@ -567,7 +578,7 @@ float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bea
 float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const int list_size) {//Calculate Contact and Overlap energy of beadID
     //Takes care of intra-molecular double counting
     float totEn = 0.0; //Storing total overlap energy
-    int i, j;//Indecies
+    int i, j, k;//Indecies
     int bead_check = 0;
     int tmpR[POS_MAX], tmpR2[POS_MAX];
     int x, y, z; //Lattice indecies
@@ -587,47 +598,53 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
     for (j = 0; j < POS_MAX; j++) {
         tmpR[j] = bead_info[beadID][j];
     }
-    for (x = -BoxRad; x <= BoxRad; x++) {
-        for (y = -BoxRad; y <= BoxRad; y++) {
-            for (z = -BoxRad; z <= BoxRad; z++) {
-                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
-                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
-                if (secBi != -1 && secBi != beadID) {
-                    resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float) (x * x + y * y + z * z));
 
-                    bead_check = 0;
-                    for (i=0; i<list_size; i++){
-                        if (secBi == bead_list[i]){
-                            bead_check = 1;
-                            break;
-                        }
-                    }
-                    if (bead_check == 1) {//Intra-list
-                        if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis) / 2.;
-                        }
-                        // 1/r potential that goes till cube three
-                        totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis) / 2.;
-                    }
-                    else{//Inter-list
-                        if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis);
-                        }
-                        // 1/r potential that goes till cube three
-                        totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis);
-                    }
-                }
-                else if (secBi == -1){
-                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                    }
-                }
+
+    int neighborNum  = 0;
+//    int neighborSize = pow(2*BoxRad+1,3);
+//    int* neighborList = (int *) malloc(neighborSize * sizeof(int));
+//    float* neighborDist =  (float *) malloc(neighborSize * sizeof(float));
+//
+//    if (neighborList == NULL || neighborDist == NULL){
+//        exit(1);
+//    }
+
+
+    int neighborList[MAX_ROTSTATES];
+    float neighborDist[MAX_ROTSTATES];
+
+    neighborNum = NeighborList_StoreNeighborsAndDistance(beadID, tmpR, BoxRad, neighborList, neighborDist);
+    for(i=0; i<neighborNum; ++i) {
+        j = neighborList[i];
+        bead_check = 0;
+        for (k=0; k<list_size; k++){
+            if (j == bead_list[k]){
+                bead_check = 1;
+                break;
+            }
+        }
+        xDis = neighborDist[i];
+        resj = bead_info[j][BEAD_TYPE];
+        if (bead_check == 1) {
+            if (xDis <= 1.74) {
+                totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis) / 2.;
+            } else {
+                totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis) / 2.;
+            }
+        }
+        else{
+            if (xDis <= 1.74) {
+                totEn += Energy_OVLP(fEnergy[resi][resj][E_OVLP], xDis);
+            } else {
+                totEn += Energy_CONT(fEnergy[resi][resj][E_CONT], xDis);
             }
         }
     }
+
+
+//    free(neighborList);
+//    free(neighborDist);
+
 
     return totEn;
 

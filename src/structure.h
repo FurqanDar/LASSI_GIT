@@ -51,4 +51,6 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void);
 
 void GyrTensor_GyrRad_Avg(void);
 
+int NeighborList_StoreNeighborsAndDistance(const int beadID, const int *startVec, const int searchRad, int *neighList, float *distList);
+
 #endif // _STRUCTURE_H_
