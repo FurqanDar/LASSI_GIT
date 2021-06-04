@@ -1,4 +1,4 @@
-#ifndef _ENERGY_H_   // include guard
+#ifndef _ENERGY_H_ // include guard
 #define _ENERGY_H_
 
 #include <stdio.h>
@@ -12,9 +12,12 @@ float Energy_Anisotropic_Self(const int beadID);
 
 float Energy_Anisotropic_For_Chain(const int beadID);
 
-float Energy_Anisotropic_Contiguous_Range(const int beadID, const int smallest_bead, const int largest_bead);
+float Energy_Anisotropic_Contiguous_Range(const int beadID,
+                                          const int smallest_bead,
+                                          const int largest_bead);
 
-float Energy_Anisotropic_With_List(const int beadID, const int *bead_list, const int list_size);
+float Energy_Anisotropic_With_List(const int beadID, const int *bead_list,
+                                   const int list_size);
 
 float Energy_OVLP(const float fEn, const float xDis);
 
@@ -26,9 +29,12 @@ float Energy_Isotropic_Self(const int beadID);
 
 float Energy_Isotropic_For_Chain(const int beadID);
 
-float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bead, const int largest_bead);
+float Energy_Isotropic_Contiguous_Range(const int beadID,
+                                        const int smallest_bead,
+                                        const int largest_bead);
 
-float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const int list_size);
+float Energy_Isotropic_With_List(const int beadID, const int *bead_list,
+                                 const int list_size);
 
 float Energy_Of_Chain(const int chainID);
 

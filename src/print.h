@@ -1,10 +1,11 @@
-#ifndef _PRINT_H_   // include guard
+#ifndef _PRINT_H_ // include guard
 #define _PRINT_H_
 
 #include <stdio.h>
 #include <stdlib.h>
 
-long TrajArr_Index(const int beadID, const int nFrameNumber, const int beadProp);
+long TrajArr_Index(const int beadID, const int nFrameNumber,
+                   const int beadProp);
 
 void Print_LogToScreen(long nGen, int run_it);
 
@@ -31,6 +32,5 @@ void Write_TotalSysProp(char *filename, int run_it);
 void Print_Data(long nGen, int run_it);
 
 void Copy_Data(int run_it);
-
 
 #endif // _PRINT_H_

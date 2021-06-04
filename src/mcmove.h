@@ -1,9 +1,9 @@
-#ifndef _MCMOVE_H_   // include guard
+#ifndef _MCMOVE_H_ // include guard
 #define _MCMOVE_H_
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 int MC_Step(float fMCTemp);
 

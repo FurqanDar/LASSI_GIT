@@ -1,6 +1,5 @@
-#ifndef _CLUSTER_H_   // include guard
+#ifndef _CLUSTER_H_ // include guard
 #define _CLUSTER_H_
-
 
 int Clus_Network_ChainCluster_General(int const chainID);
 
@@ -28,11 +27,13 @@ int Clus_Proximity_SecondLargestCluster(void);
 
 int Clus_Proximity_LimitedCluster_IntOnly(int const chainID);
 
-int Clus_Proximity_LimitedCluster_IntOnly_Check(int const chainID, int const *OldList);
+int Clus_Proximity_LimitedCluster_IntOnly_Check(int const chainID,
+                                                int const *OldList);
 
 int Clus_Proximity_LimitedCluster_All(int const chainID);
 
-int Clus_Proximity_LimitedCluster_All_Check(int const chainID, int const *OldList);
+int Clus_Proximity_LimitedCluster_All_Check(int const chainID,
+                                            int const *OldList);
 
 void Clus_Proximity_Distribution_Avg(void);
 

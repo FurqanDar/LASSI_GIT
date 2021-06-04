@@ -1,4 +1,4 @@
-#ifndef _INITIALIZE_H_   // include guard
+#ifndef _INITIALIZE_H_ // include guard
 #define _INITIALIZE_H_
 
 void Memory_Initialization_AtStart(void);
