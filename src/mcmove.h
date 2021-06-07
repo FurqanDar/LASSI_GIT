@@ -1,6 +1,7 @@
 #ifndef _MCMOVE_H_ // include guard
 #define _MCMOVE_H_
 
+#include "global.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

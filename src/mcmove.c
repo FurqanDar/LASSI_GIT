@@ -1,7 +1,6 @@
 #include "mcmove.h"
 #include "cluster.h"
 #include "energy.h"
-#include "global.h"
 #include "structure.h"
 
 /// MC_Step - given the MC move frequencies, picks which move to try.
