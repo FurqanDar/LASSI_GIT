@@ -188,6 +188,7 @@ int MC_Step_Equil(float fMCTemp) {
     // In equil, just a translation of the chain
     i = rand() % tot_chains; // Pick random chain
     nAccept = Move_Trans_Equil(i, fMCTemp);
+    break;
 
   default:
     nAccept = 0;
