@@ -17,7 +17,7 @@ long TrajArr_Index(const int beadID, const int nFrameNumber, const int beadProp)
 /// on \param filename \param nGen
 void Write_ClusterDist(char *filename, long nGen) {
     FILE *fp;
-    int i;
+    int   i;
     if (nGen == -1) {
         fp = fopen(filename, "w"); // overwrite
     } else {
@@ -44,7 +44,7 @@ void Write_ClusterDist(char *filename, long nGen) {
 /// and such as the runs went on \param filename \param nGen
 void Write_GyrTen(char *filename, long nGen) {
     FILE *fp;
-    int i;
+    int   i;
     if (nGen == -1) {
         fp = fopen(filename, "w"); // overwrite
     } else {
@@ -72,7 +72,7 @@ void Write_GyrTen(char *filename, long nGen) {
 /// 'dynamics' during a simulation. \param filename \param nGen \param fMCTemp
 void Write_MCMove(char *filename, long nGen, float fMCTemp) {
     FILE *fp;
-    int i; // Iterator
+    int   i; // Iterator
     if (nGen == -1) {
         fp = fopen(filename, "w"); // overwrite
     } else {
@@ -202,11 +202,11 @@ void Write_Trajectory(char *filename, long nGen) {
 /// \param curFrame
 void Save_Trajectory(const long nGen, const long curFrame) {
 
-    int i, j;
+    int  i, j;
     long ar_idx;
     for (i = 0; i < tot_beads; i++) {
         for (j = 0; j < BEADINFO_MAX; j++) {
-            ar_idx = TrajArr_Index(i, curFrame, j);
+            ar_idx                = TrajArr_Index(i, curFrame, j);
             n_TOTTRAJ_ARR[ar_idx] = bead_info[i][j];
         }
     }
@@ -268,7 +268,7 @@ void Write_Saved_Trajectory(char *filename, const int run_it) {
 /// Print_Key - print the keyfile that was read in to the screen
 void Print_Key(void) { // should be output-dependent (stdout, stderr, other files)
 
-    int i;
+    int  i;
     char lBrace[] = "<======      ";
     char rBrace[] = "      ======>";
     printf("%s System Settings %s\n", lBrace, rBrace);
@@ -308,17 +308,17 @@ void Print_Key(void) { // should be output-dependent (stdout, stderr, other file
     printf("Clustering Mode                = %d\n", nClusteringMode);
 
     char *MoveName[MAX_MV];
-    MoveName[MV_PIVOT] = "Pivot           ";
-    MoveName[MV_DBPVT] = "Double Pivot    ";
-    MoveName[MV_CLSTR] = "Larger Cluster  ";
-    MoveName[MV_SMCLSTR] = "Smaller Cluster ";
-    MoveName[MV_STROT] = "Face Change     ";
-    MoveName[MV_LOCAL] = "Local           ";
-    MoveName[MV_COLOCAL] = "Co-local        ";
-    MoveName[MV_MTLOCAL] = "Shake           ";
-    MoveName[MV_BRROT] = "Rotate Branched ";
-    MoveName[MV_SNAKE] = "Slithering Snake";
-    MoveName[MV_TRANS] = "Translation     ";
+    MoveName[MV_PIVOT]      = "Pivot           ";
+    MoveName[MV_DBPVT]      = "Double Pivot    ";
+    MoveName[MV_CLSTR]      = "Larger Cluster  ";
+    MoveName[MV_SMCLSTR]    = "Smaller Cluster ";
+    MoveName[MV_STROT]      = "Face Change     ";
+    MoveName[MV_LOCAL]      = "Local           ";
+    MoveName[MV_COLOCAL]    = "Co-local        ";
+    MoveName[MV_MTLOCAL]    = "Shake           ";
+    MoveName[MV_BRROT]      = "Rotate Branched ";
+    MoveName[MV_SNAKE]      = "Slithering Snake";
+    MoveName[MV_TRANS]      = "Translation     ";
     MoveName[MV_PR_SMCLSTR] = "Pr. Smal Cluster";
     // MoveName[MV_PR_SMCLSTR]   = "Larger Cluster";
     float freqMin = 1e10;
@@ -470,7 +470,7 @@ void Write_TopFile(char *filename) {
 /// with the new indexing \param filename
 void Write_SysProp(char *filename) {
     FILE *fp;
-    int i, j;
+    int   i, j;
     fp = fopen(filename, "w");
     fprintf(fp, "#Contains various averaged quatities.\n");
     // Gyration Radius
@@ -504,7 +504,7 @@ void Write_TotalSysProp(char *filename, int run_it) {
      * the style of Write_SysProp
      */
     FILE *fp;
-    int i, j, k;
+    int   i, j, k;
     if (nReport[REPORT_RDFTOT] != 0) {
         sprintf(filename, "%s_RDF.dat", strReportPrefix); // Name Of the RDF Files
         fp = fopen(filename, "w");

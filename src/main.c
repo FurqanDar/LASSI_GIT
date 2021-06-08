@@ -61,14 +61,14 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    clock_t tEnd = clock();
-    double elapsed_time = (tEnd - tStart) / (double)CLOCKS_PER_SEC;
+    clock_t tEnd         = clock();
+    double  elapsed_time = (tEnd - tStart) / (double)CLOCKS_PER_SEC;
     printf("Initialization done. %.2f sec elapsed.\n", elapsed_time);
 
     tStart = clock();
 
     long nGen;
-    int nMCInfo; // MC accept/reject
+    int  nMCInfo; // MC accept/reject
 
     printf("%s Beginning MC Simulation %s\n", lBrace, rBrace);
     printf("******************************************\n\n");
@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
     // Writing everything
     Write_TotalSysProp(fileSysProp, run_cycle);
 
-    tEnd = clock();
+    tEnd         = clock();
     elapsed_time = (tEnd - tStart) / (double)CLOCKS_PER_SEC;
     printf("____________________________________\n");
     printf("Simulation finished in %.2f minutes.\n", elapsed_time / 60.);

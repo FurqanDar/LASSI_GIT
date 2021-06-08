@@ -8,10 +8,10 @@
 /// \return bAccept - the acceptance state where MCMove=bAccept/12 and
 /// MCAccept=bAccept%2.
 int MC_Step(float fMCTemp) {
-    int mode = 0; // Which move to do
-    int nAccept;  // Used in MC steps
+    int   mode = 0; // Which move to do
+    int   nAccept;  // Used in MC steps
     float prob = (float)rand() / (float)RAND_MAX;
-    int i; // Internal iterator, and int.
+    int   i; // Internal iterator, and int.
     for (i = 0; i < MAX_MV; i++) {
         if (prob < fMCFreq[i]) { // Pick this move!
             mode = i;
@@ -24,7 +24,7 @@ int MC_Step(float fMCTemp) {
     switch (mode) {
         // Translation
     case MV_TRANS:
-        i = rand() % tot_chains; // Pick random chain
+        i       = rand() % tot_chains; // Pick random chain
         nAccept = Move_Trans(i, fMCTemp);
         break;
 
@@ -35,55 +35,55 @@ int MC_Step(float fMCTemp) {
 
         // Cluster translation iff ClusSize <= 5
     case MV_SMCLSTR:
-        i = rand() % tot_chains; // Pick a random chain
+        i       = rand() % tot_chains; // Pick a random chain
         nAccept = Move_SmallClus_Network(i, fMCTemp);
         break;
 
         // Change Rotational State
     case MV_STROT:
-        i = rand() % tot_beads;
+        i       = rand() % tot_beads;
         nAccept = Move_Rot(i, fMCTemp);
         break;
 
         // Local Move
     case MV_LOCAL:
-        i = rand() % tot_beads;
+        i       = rand() % tot_beads;
         nAccept = Move_Local(i, fMCTemp);
         break;
 
         // Slithering Snake
     case MV_SNAKE:
-        i = rand() % tot_chains;
+        i       = rand() % tot_chains;
         nAccept = Move_Snake(i, fMCTemp);
         break;
 
         // Double Pivot
     case MV_DBPVT:
-        i = rand() % tot_beads; // Pick a random bead
+        i       = rand() % tot_beads; // Pick a random bead
         nAccept = Move_DbPvt(i);
         break;
 
         // Co-Local
     case MV_COLOCAL:
-        i = rand() % tot_beads; // Pick a random bead
+        i       = rand() % tot_beads; // Pick a random bead
         nAccept = Move_CoLocal(i, fMCTemp);
         break;
 
         // Shake Move
     case MV_MTLOCAL:
-        i = rand() % tot_beads;
+        i       = rand() % tot_beads;
         nAccept = Move_MultiLocal(i, fMCTemp);
         break;
 
         // Pivot
     case MV_PIVOT:
-        i = rand() % tot_chains;
+        i       = rand() % tot_chains;
         nAccept = Move_Pivot(i, fMCTemp);
         break;
 
         // Branched Rotation
     case MV_BRROT:
-        i = rand() % tot_chains;
+        i       = rand() % tot_chains;
         nAccept = Move_BranchedRot(i, fMCTemp);
         break;
     case MV_PR_SMCLSTR:
@@ -104,10 +104,10 @@ int MC_Step(float fMCTemp) {
 /// variants of the moves. \param fMCTemp \return bAccept - the acceptance state
 /// where MCMove=bAccept/12 and MCAccept=bAccept%2.
 int MC_Step_Equil(float fMCTemp) {
-    int mode = 0; // Which move to do
-    int nAccept;  // Used in MC steps
+    int   mode = 0; // Which move to do
+    int   nAccept;  // Used in MC steps
     float prob = (float)rand() / (float)RAND_MAX;
-    int i; // Internal iterator, and int.
+    int   i; // Internal iterator, and int.
     for (i = 0; i < MAX_MV; i++) {
         if (prob < fMCFreq[i]) { // Pick this move!
             mode = i;
@@ -121,72 +121,72 @@ int MC_Step_Equil(float fMCTemp) {
     switch (mode) {
         // translation of a random chain
     case MV_TRANS:
-        i = rand() % tot_chains; // Pick random chain
+        i       = rand() % tot_chains; // Pick random chain
         nAccept = Move_Trans_Equil(i, fMCTemp);
         break;
 
         // cluster translation: moves largest cluster to another spot.
-    case MV_CLSTR:               // In equil, just a translation of the chain
-        i = rand() % tot_chains; // Pick random chain
+    case MV_CLSTR:                     // In equil, just a translation of the chain
+        i       = rand() % tot_chains; // Pick random chain
         nAccept = Move_Trans_Equil(i, fMCTemp);
         break;
 
-    case MV_SMCLSTR:             // In equil, just a translation of the chain
-        i = rand() % tot_chains; // Pick random chain
+    case MV_SMCLSTR:                   // In equil, just a translation of the chain
+        i       = rand() % tot_chains; // Pick random chain
         nAccept = Move_Trans_Equil(i, fMCTemp);
         break;
 
         // face change
     case MV_STROT: // In equil, just a local move
-        i = rand() % tot_beads;
+        i       = rand() % tot_beads;
         nAccept = Move_Local_Equil(i, fMCTemp);
         break;
 
         // local moves
     case MV_LOCAL:
-        i = rand() % tot_beads;
+        i       = rand() % tot_beads;
         nAccept = Move_Local_Equil(i, fMCTemp);
         break;
 
         // slithering snake
     case MV_SNAKE:
-        i = rand() % tot_chains;
+        i       = rand() % tot_chains;
         nAccept = Move_Snake_Equil(i, fMCTemp);
         break;
 
         // double pivot
     case MV_DBPVT:
-        i = rand() % tot_beads; // Pick a random bead
+        i       = rand() % tot_beads; // Pick a random bead
         nAccept = Move_DbPvt(i);
         break;
 
         // co-local
     case MV_COLOCAL: // In equil, just a local move
-        i = rand() % tot_beads;
+        i       = rand() % tot_beads;
         nAccept = Move_Local_Equil(i, fMCTemp);
         break;
 
         // shake
     case MV_MTLOCAL:
-        i = rand() % tot_beads;
+        i       = rand() % tot_beads;
         nAccept = Move_MultiLocal_Equil(i, fMCTemp);
         break;
 
         // pivot
     case MV_PIVOT:
-        i = rand() % tot_chains;
+        i       = rand() % tot_chains;
         nAccept = Move_Pivot_Equil(i, fMCTemp);
         break;
 
         // branched rotate
     case MV_BRROT:
-        i = rand() % tot_chains;
+        i       = rand() % tot_chains;
         nAccept = Move_BranchedRot_Equil(i, fMCTemp);
         break;
 
     case MV_PR_SMCLSTR:
         // In equil, just a translation of the chain
-        i = rand() % tot_chains; // Pick random chain
+        i       = rand() % tot_chains; // Pick random chain
         nAccept = Move_Trans_Equil(i, fMCTemp);
         break;
 
@@ -229,7 +229,7 @@ int Move_Rot(int beadID, float MyTemp) {
     int FWWeight;
 
     if (bead_info[beadID][BEAD_FACE] != -1) {
-        resj = bead_info[bead_info[beadID][BEAD_FACE]][BEAD_TYPE]; // This is who I'm currently bonded to
+        resj  = bead_info[bead_info[beadID][BEAD_FACE]][BEAD_TYPE]; // This is who I'm currently bonded to
         oldEn = (lLDub)fEnergy[resi][resj][E_SC_SC];
     }
     OP_ShuffleRotIndecies();
@@ -239,11 +239,11 @@ int Move_Rot(int beadID, float MyTemp) {
     yTemp = OP_PickRotState(FWWeight);
 
     if (yTemp != -1) { // There is a bead here
-        resj = bead_info[yTemp][BEAD_TYPE];
+        resj  = bead_info[yTemp][BEAD_TYPE];
         newEn = (lLDub)fEnergy[resi][resj][E_SC_SC];
     }
     // See if we can accept this move
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
     // if (MCProb < expl((oldEn - newEn) / MyTemp)) {//Accept this state
     if (MCProb < MHAcc) {                                            // Accept this state
@@ -270,19 +270,19 @@ int Move_Rot(int beadID, float MyTemp) {
 /// 3. Move the bead. Calculate the Rosenbluth weight, and energy. Propose a
 /// bond and perform Metropolis-Hastings \param beadID \param MyTemp \return 1
 /// if accepted, 0 if rejected.
-int Move_Local(int beadID,
+int Move_Local(int   beadID,
                float MyTemp) { // Performs a local translation MC-move on beadID
 
-    int bAccept = 0;            // Used in MC steps
+    int   bAccept = 0;          // Used in MC steps
     lLDub MCProb, oldEn, newEn; // For Metropolis Hastings
     oldEn = 0.;
     newEn = 0.;
-    int i, j; // Loop iterators
-    int resi, resj;
-    int xTemp, yTemp, lRadUp, lRadLow; // Random numbers to store things
-    int tmpR[POS_MAX], tmpR2[POS_MAX]; // Vectors to stores coordinates.
-    int FWWeight, BWWeight;            // Used to perform orientational bias MC
-    lLDub FWRos, BWRos;                // Forwards and backwards Rosenbluth Factors
+    int   i, j; // Loop iterators
+    int   resi, resj;
+    int   xTemp, yTemp, lRadUp, lRadLow; // Random numbers to store things
+    int   tmpR[POS_MAX], tmpR2[POS_MAX]; // Vectors to stores coordinates.
+    int   FWWeight, BWWeight;            // Used to perform orientational bias MC
+    lLDub FWRos, BWRos;                  // Forwards and backwards Rosenbluth Factors
     FWRos = 1.;
     BWRos = 1.;
     for (j = 0; j < POS_MAX; j++) { // Initializing the vectors to where this bead is.
@@ -339,7 +339,7 @@ int Move_Local(int beadID,
 
         if (yTemp != -1) { // There is a bead at this position in the rot_trial, so
                            // let's add the energy.
-            resj = bead_info[yTemp][BEAD_TYPE];
+            resj  = bead_info[yTemp][BEAD_TYPE];
             newEn = (lLDub)fEnergy[resi][resj][E_SC_SC];
         }
     } else { // These beads have no rotational states.
@@ -349,7 +349,7 @@ int Move_Local(int beadID,
     // Now let's calculate the energy of the new state. SC-SC energy is already
     // done.
     newEn += Energy_Isotropic(beadID);
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FWRos, BWRos, oldEn - newEn, (lLDub)MyTemp);
     // Accept or reject this state
     if (MCProb < MHAcc) {                         // Accept this state
@@ -390,7 +390,7 @@ int Move_Local(int beadID,
 /// TODO: Add a new snake move that reptates the smallest block of the polymer
 /// that is invariant under reptation. \param chainID \param MyTemp \return 1 if
 /// accepted, 0 if rejected.
-int Move_Snake(int chainID,
+int Move_Snake(int   chainID,
                float MyTemp) { // Performs a slither MC-move on chainID
 
     int firstB,
@@ -398,7 +398,7 @@ int Move_Snake(int chainID,
     int bAccept = 0; // Used in MC steps
     // Finding the bounds for looping over the molecule/chain
     firstB = chain_info[chainID][CHAIN_START];
-    lastB = firstB + chain_info[chainID][CHAIN_LENGTH];
+    lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
     if (lastB - firstB == 1) { // This means we have a monomer. Reject the move,
                                // because Local or Trans
         // moves should be the ones that move monomers.
@@ -420,24 +420,24 @@ int Move_Snake(int chainID,
     int resi, resj;
     int xTemp, yTemp, lRadUp, lRadLow; // Random numbers to store things
     int tmpR[POS_MAX], tmpR2[POS_MAX],
-        tmpR3[POS_MAX];     // Vectors to store positions.
-    int FWWeight, BWWeight; // Used to perform orientational bias MC
+        tmpR3[POS_MAX];       // Vectors to store positions.
+    int   FWWeight, BWWeight; // Used to perform orientational bias MC
     lLDub FSum, BSum, Ros_Offset;
 
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;           // To decide if we slither forwards or backwards
-    if (MCProb < 0.5) {                                 // Forwards slither, so lastB-1 (last bead) is anchor
-        lRadUp = (int)2 * linker_len[lastB - 1][0] + 1; // lastB-1 will be replaced by lastB-2
+    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;            // To decide if we slither forwards or backwards
+    if (MCProb < 0.5) {                                  // Forwards slither, so lastB-1 (last bead) is anchor
+        lRadUp  = (int)2 * linker_len[lastB - 1][0] + 1; // lastB-1 will be replaced by lastB-2
         lRadLow = (int)linker_len[lastB - 1][0];
-        yTemp = 0;
+        yTemp   = 0;
         for (j = 0; j < POS_MAX; j++) {
             tmpR[j] = (rand() % lRadUp) - lRadLow;
             tmpR[j] = (bead_info[lastB - 1][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
         }
-        yTemp = Check_MoveBeadTo(tmpR);              // 0: there is no space, 1: there is space
-    } else {                                         // Backwards slither, so firstB is anchor
-        lRadUp = (int)2 * linker_len[firstB][0] + 1; // firstB will be replaced by firstB+1
+        yTemp = Check_MoveBeadTo(tmpR);               // 0: there is no space, 1: there is space
+    } else {                                          // Backwards slither, so firstB is anchor
+        lRadUp  = (int)2 * linker_len[firstB][0] + 1; // firstB will be replaced by firstB+1
         lRadLow = (int)linker_len[firstB][0];
-        yTemp = 0;
+        yTemp   = 0;
         for (j = 0; j < POS_MAX; j++) {
             tmpR[j] = (rand() % lRadUp) - lRadLow;
             tmpR[j] = (bead_info[firstB][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
@@ -484,9 +484,9 @@ int Move_Snake(int chainID,
     if (MCProb < 0.5) { // Slithering the chain forwards in ID-space
         for (i = firstB; i < lastB - 1; i++) {
             for (j = 0; j < POS_MAX; j++) {
-                tmpR2[j] = bead_info[i][j];
+                tmpR2[j]        = bead_info[i][j];
                 bead_info[i][j] = old_bead[i + 1][j]; // Hopping over by one bead
-                tmpR3[j] = bead_info[i][j];
+                tmpR3[j]        = bead_info[i][j];
             }
             if (i == firstB) { // Only the firstB's location is empty
                 naTotLattice[Lat_Ind_FromVec(tmpR2)] = -1;
@@ -503,9 +503,9 @@ int Move_Snake(int chainID,
     } else { // Slithering backwards in ID-space
         for (i = firstB + 1; i < lastB; i++) {
             for (j = 0; j < POS_MAX; j++) {
-                tmpR2[j] = bead_info[i][j];
+                tmpR2[j]        = bead_info[i][j];
                 bead_info[i][j] = old_bead[i - 1][j]; // Hopping back by one bead
-                tmpR3[j] = bead_info[i][j];
+                tmpR3[j]        = bead_info[i][j];
             }
             if (i == lastB - 1) { // Only the lastB-1's location is empty
                 naTotLattice[Lat_Ind_FromVec(tmpR2)] = -1;
@@ -526,7 +526,7 @@ int Move_Snake(int chainID,
     for (i = firstB; i < lastB; i++) {       // Break the old bonds first!
         if (bead_info[i][BEAD_FACE] != -1) { // Need to break this bond
             bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1;
-            bead_info[i][BEAD_FACE] = -1;
+            bead_info[i][BEAD_FACE]                       = -1;
         }
     }
 
@@ -546,7 +546,7 @@ int Move_Snake(int chainID,
             xTemp = OP_PickRotState(FWWeight);
             if (xTemp != -1) { // An appropriate partner has been selected. Form the
                                // bonds and add the energy
-                bead_info[i][BEAD_FACE] = xTemp;
+                bead_info[i][BEAD_FACE]     = xTemp;
                 bead_info[xTemp][BEAD_FACE] = i;
             }
         }
@@ -558,7 +558,7 @@ int Move_Snake(int chainID,
     }
     newEn = (lLDub)Energy_Of_Chain(chainID);
     // Doing the Metropolis-Hastings thing
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub)MyTemp);
     // if (MCProb < (FSum / BSum) * expl((oldEn - newEn) / MyTemp)) {//Accept.
     // Bonds have been handled before!
@@ -581,25 +581,25 @@ int Move_Snake(int chainID,
 /// \param chainID
 /// \param MyTemp
 /// \return 1 if accepted, 0 if rejected.
-int Move_Trans(int chainID,
+int Move_Trans(int   chainID,
                float MyTemp) {  // Performs a translation move with orientational bias
-    int bAccept = 0;            // Used in MC steps
+    int   bAccept = 0;          // Used in MC steps
     lLDub MCProb, oldEn, newEn; // For Metropolis Hastings
     oldEn = 0.;
     newEn = 0.;
-    int i, j; // Loop iterators
-    int resi, resj, firstB, lastB;
-    int xTemp, yTemp, lRadUp, lRadLow; // Random numbers to store things
-    int tmpR[POS_MAX];                 // Vectors to store coordinates.
-    int FWWeight, BWWeight;            // Used to perform orientational bias MC
-    lLDub FSum, BSum;                  // Overall Rosenbluth sums
+    int   i, j; // Loop iterators
+    int   resi, resj, firstB, lastB;
+    int   xTemp, yTemp, lRadUp, lRadLow; // Random numbers to store things
+    int   tmpR[POS_MAX];                 // Vectors to store coordinates.
+    int   FWWeight, BWWeight;            // Used to perform orientational bias MC
+    lLDub FSum, BSum;                    // Overall Rosenbluth sums
 
     // Finding the bounds for looping over the molecule/chain
     firstB = chain_info[chainID][CHAIN_START];
-    lastB = firstB + chain_info[chainID][CHAIN_LENGTH];
+    lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
     // Radii for translation moves. All moves are L/2 radius
     lRadLow = nBoxSize[2] / 2;
-    lRadUp = 2 * lRadLow + 1;
+    lRadUp  = 2 * lRadLow + 1;
 
     yTemp = 0;
 
@@ -656,7 +656,7 @@ int Move_Trans(int chainID,
             if (xTemp != -1) { // An appropriate partner has been selected. Form the
                                // bonds and add the energy
                 // resj = bead_info[xTemp][BEAD_TYPE];
-                bead_info[i][BEAD_FACE] = xTemp;
+                bead_info[i][BEAD_FACE]     = xTemp;
                 bead_info[xTemp][BEAD_FACE] = i;
             }
         }
@@ -664,12 +664,12 @@ int Move_Trans(int chainID,
     }
 
     newEn = (lLDub)Energy_Of_Chain(chainID);
-    FSum = 0.;
+    FSum  = 0.;
     for (i = 0; i < yTemp; i++) {
         FSum += logl(bolt_norm[i]);
     }
 
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above!
         bAccept = 1;
@@ -697,11 +697,11 @@ int Move_Trans(int chainID,
 int Move_Clus_Network(float MyTemp) {
     // Attempts to move the second largest cluster
 
-    int bAccept = 0;    // Used in MC steps, assume that move fails initially.
-    int ClusSize, i, j; // Loop iterators
-    int yTemp;
-    int nTemp[POS_MAX];
-    int lRadLow, lRadUp; // Radii bounds.
+    int   bAccept = 0;    // Used in MC steps, assume that move fails initially.
+    int   ClusSize, i, j; // Loop iterators
+    int   yTemp;
+    int   nTemp[POS_MAX];
+    int   lRadLow, lRadUp; // Radii bounds.
     lLDub oldEn, newEn, MCProb;
     oldEn = 0.0;
     newEn = 0.0;
@@ -711,7 +711,7 @@ int Move_Clus_Network(float MyTemp) {
     if (ClusSize != -1) {
         // Radii for translation moves. All moves are L/2 radius
         lRadLow = nBoxSize[2] / 2;
-        lRadUp = 2 * lRadLow + 1;
+        lRadUp  = 2 * lRadLow + 1;
         for (j = 0; j < POS_MAX; j++) {
             nTemp[j] = (rand() % lRadUp) - lRadLow; // Random vector to displace the cluster
         }
@@ -733,7 +733,7 @@ int Move_Clus_Network(float MyTemp) {
         for (i = 0; i < ClusSize; i++) {
             newEn += (lLDub)Energy_Of_Chain(naList[i]); // New energy
         }
-        MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+        MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
         lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
         // if (MCProb < (FSum / BSum) * expl((oldEn - newEn) / MyTemp)) {//Accept.
         // Bonds have been handled before!
@@ -769,11 +769,11 @@ int Move_SmallClus_Network(int chainID, float MyTemp) {
     // Performs a cluster move where a given chain and it's cluster are moved. No
     // new 'bonds' are made so the move is reversible....
 
-    int bAccept = 0;    // Used in MC steps, assume that move fails initially.
-    int ClusSize, i, j; // Loop iterators
-    int yTemp;
-    int nTemp[POS_MAX];
-    int lRadLow, lRadUp; // Radii bounds.
+    int   bAccept = 0;    // Used in MC steps, assume that move fails initially.
+    int   ClusSize, i, j; // Loop iterators
+    int   yTemp;
+    int   nTemp[POS_MAX];
+    int   lRadLow, lRadUp; // Radii bounds.
     lLDub oldEn, newEn, MCProb;
     oldEn = 0.0;
     newEn = 0.0;
@@ -785,7 +785,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp) {
         // Radii for translation moves. All moves are L/2 radius
         // I guess moving single chains around as well is not a bad idea
         lRadLow = nBoxSize[2] / 2;
-        lRadUp = 2 * lRadLow + 1;
+        lRadUp  = 2 * lRadLow + 1;
         for (j = 0; j < POS_MAX; j++) {
             nTemp[j] = (rand() % lRadUp) - lRadLow; // Random vector to displace the cluster
         }
@@ -808,7 +808,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp) {
         for (i = 0; i < ClusSize; i++) {
             newEn += (lLDub)Energy_Of_Chain(naList[i]); // New energy
         }
-        MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+        MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
         lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
         if (MCProb < MHAcc) { // Accept this state
             bAccept = 1;      // Accept the move
@@ -846,11 +846,11 @@ int Move_DbPvt(int beadID) { // Performs a double-pivot move.
   decide. In other words, i'+1 becomes i+1, i'+2 becomes i+2 until N, and i+1
   become i'+1 and so on.
    */
-    int bAccept = 0;                                        // Move acceptance and such LEL
-    int PChainID = bead_info[beadID][BEAD_CHAINID];         // The proposed chainID
-    int PType = chain_info[PChainID][CHAIN_TYPE];           // Type of chain.
-    int PStart = chain_info[PChainID][CHAIN_START];         // Start of this chain.
-    int PEnd = PStart + chain_info[PChainID][CHAIN_LENGTH]; // LastBead+1 for this chain.
+    int bAccept  = 0;                                           // Move acceptance and such LEL
+    int PChainID = bead_info[beadID][BEAD_CHAINID];             // The proposed chainID
+    int PType    = chain_info[PChainID][CHAIN_TYPE];            // Type of chain.
+    int PStart   = chain_info[PChainID][CHAIN_START];           // Start of this chain.
+    int PEnd     = PStart + chain_info[PChainID][CHAIN_LENGTH]; // LastBead+1 for this chain.
     if (nChainTypeIsLinear[PType] == 0) {
         // Reject the move because the chain is not linear.
         return bAccept;
@@ -865,12 +865,12 @@ int Move_DbPvt(int beadID) { // Performs a double-pivot move.
     int thischain, mychain, thischaintype,
         thischainstart;       // Storing chainIDs for the eventual swapping
     int i, j, k;              // Loop iterators
-    int SrchLen = 2;          // The length of the box we'll be searching.
+    int SrchLen        = 2;   // The length of the box we'll be searching.
     int nTemp[POS_MAX] = {0}; // Storing the lattice position
-    int nListLen = 0;         // Tracks if there are any bead candidates
-    int nListLen_back = 0;    // Tracks the number of candidates for the reverse
+    int nListLen       = 0;   // Tracks if there are any bead candidates
+    int nListLen_back  = 0;   // Tracks the number of candidates for the reverse
                               // move.
-    int candList[MAX_ROTSTATES] = {0};
+    int   candList[MAX_ROTSTATES] = {0};
     lLDub MCProb;
 
     for (i = -SrchLen; i <= SrchLen; i++) {
@@ -879,7 +879,7 @@ int Move_DbPvt(int beadID) { // Performs a double-pivot move.
             nTemp[POS_Y] = (bead_info[beadID][POS_Y] + j + nBoxSize[POS_Y]) % nBoxSize[POS_Y];
             for (k = -SrchLen; k <= SrchLen; k++) {
                 nTemp[POS_Z] = (bead_info[beadID][POS_Z] + k + nBoxSize[POS_Z]) % nBoxSize[POS_Z];
-                thisbead = naTotLattice[Lat_Ind_FromVec(nTemp)]; // Seeing what is at that location
+                thisbead     = naTotLattice[Lat_Ind_FromVec(nTemp)]; // Seeing what is at that location
                 // thisbead is i'+1 from the above explanation
                 if (thisbead != beadID && thisbead != -1 && thisbead != beadID + 1) { // Different bead from me
                     if (PType == chain_info[bead_info[thisbead][BEAD_CHAINID]][CHAIN_TYPE] &&
@@ -917,8 +917,8 @@ FoundMax:
         return bAccept;
     }
 
-    thisbead = rand() % nListLen;                  // Randomly select a candidate
-    thisbead = candList[thisbead];                 // Pick the ID of the candidate
+    thisbead  = rand() % nListLen;                 // Randomly select a candidate
+    thisbead  = candList[thisbead];                // Pick the ID of the candidate
     thischain = bead_info[thisbead][BEAD_CHAINID]; // The chain ID of the
                                                    // candidate
     thischaintype = chain_info[thischain][CHAIN_TYPE];
@@ -931,7 +931,7 @@ FoundMax:
             nTemp[POS_Y] = (bead_info[thisbead - 1][POS_Y] + j + nBoxSize[POS_Y]) % nBoxSize[POS_Y];
             for (k = -SrchLen; k <= SrchLen; k++) {
                 nTemp[POS_Z] = (bead_info[thisbead - 1][POS_Z] + k + nBoxSize[POS_Z]) % nBoxSize[POS_Z];
-                otherbead = naTotLattice[Lat_Ind_FromVec(nTemp)]; // Seeing what is at that location
+                otherbead    = naTotLattice[Lat_Ind_FromVec(nTemp)]; // Seeing what is at that location
                 // otherbead is i'+1 from the above explanation
                 if (otherbead != thisbead - 1 && otherbead != -1 && otherbead != thisbead) { // Different bead from me
                     if (thischaintype == chain_info[bead_info[otherbead][BEAD_CHAINID]][CHAIN_TYPE] &&
@@ -1012,12 +1012,12 @@ int Move_CoLocal(int beadID, float MyTemp) {
     int xTemp, yTemp;
     int lRadLow, lRadUp;
     lRadLow = 2;
-    lRadUp = lRadLow * 2 + 1; // 2*2+1
+    lRadUp  = lRadLow * 2 + 1; // 2*2+1
 
     yTemp = 0; // Initialize these guys.
 
     for (j = 0; j < POS_MAX; j++) {
-        tmpR[j] = (rand() % lRadUp) - lRadLow;
+        tmpR[j]  = (rand() % lRadUp) - lRadLow;
         tmpR1[j] = (bead_info[beadID][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
         tmpR2[j] = (bead_info[beadPart][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
     }
@@ -1037,8 +1037,8 @@ int Move_CoLocal(int beadID, float MyTemp) {
     oldEn = Energy_Isotropic(beadID) + Energy_Isotropic(beadPart);
     OP_MoveBeadTo(beadID, tmpR1);
     OP_MoveBeadTo(beadPart, tmpR2);
-    newEn = Energy_Isotropic(beadID) + Energy_Isotropic(beadPart);
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    newEn       = Energy_Isotropic(beadID) + Energy_Isotropic(beadPart);
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept this state
         bAccept = 1;
@@ -1071,8 +1071,8 @@ int Move_MultiLocal(int beadID, float MyTemp) {
     int tmpR[MAX_VALENCY][POS_MAX]; // Storing temporary locations
     int bAccept;
     int lRadLow, lRadUp;
-    lRadLow = 2;
-    lRadUp = lRadLow * 2 + 1; // 2*2+1
+    lRadLow   = 2;
+    lRadUp    = lRadLow * 2 + 1; // 2*2+1
     int xTemp = 0;
     int yTemp = 0;
 
@@ -1092,7 +1092,7 @@ int Move_MultiLocal(int beadID, float MyTemp) {
     topIt = 0;
     while (curID != -1) { // Removing from where we were
         naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = -1;
-        curID = topo_info[beadID][topIt++];
+        curID                                           = topo_info[beadID][topIt++];
     }
     curID = beadID;
     topIt = 0;
@@ -1107,7 +1107,7 @@ int Move_MultiLocal(int beadID, float MyTemp) {
             break;
         }
         naTotLattice[Lat_Ind_FromVec(tmpR[topIt])] = curID;
-        curID = topo_info[beadID][topIt++];
+        curID                                      = topo_info[beadID][topIt++];
     }
     if (yTemp == 1) { // No steric clash so check for topology constraint
         yTemp = Check_MTLinkerConstraint(beadID, tmpR);
@@ -1121,28 +1121,28 @@ int Move_MultiLocal(int beadID, float MyTemp) {
         topIt = 0;
         while (curID != -1) { // Putting us back, because rejection
             naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
-            curID = topo_info[beadID][topIt++];
+            curID                                           = topo_info[beadID][topIt++];
         }
         bAccept = 0;
         return bAccept;
     }
 
-    int FWWeight, BWWeight; // Used to perform orientational bias MC
+    int   FWWeight, BWWeight; // Used to perform orientational bias MC
     lLDub FSum, BSum, Ros_Offset;
-    int resi, resj;
+    int   resi, resj;
     // int tmpR2[POS_MAX], tmpR3[POS_MAX];
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
     lLDub MCProb;
 
     int bead_list[MAX_BONDS] = {0};
-    int bead_num = 0;
-    curID = beadID;
-    topIt = 0;
-    yTemp = 0;
+    int bead_num             = 0;
+    curID                    = beadID;
+    topIt                    = 0;
+    yTemp                    = 0;
     while (curID != -1) {
         bead_list[topIt] = curID;
-        resi = bead_info[curID][BEAD_TYPE];
+        resi             = bead_info[curID][BEAD_TYPE];
         if (nBeadTypeIsSticker[resi] == 0) { // Skip non-interactors
             curID = topo_info[beadID][topIt++];
             continue;
@@ -1154,8 +1154,8 @@ int Move_MultiLocal(int beadID, float MyTemp) {
         yTemp++;
     }
     bead_num = topIt;
-    curID = beadID;
-    topIt = 0;
+    curID    = beadID;
+    topIt    = 0;
     while (curID != -1) {
         oldEn += (lLDub)Energy_Anisotropic_With_List(curID, bead_list, bead_num);
         oldEn += (lLDub)Energy_Isotropic_With_List(curID, bead_list, bead_num);
@@ -1221,7 +1221,7 @@ int Move_MultiLocal(int beadID, float MyTemp) {
         FSum += logl(bolt_norm[i]);
     }
 
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above
         bAccept = 1;
@@ -1232,7 +1232,7 @@ int Move_MultiLocal(int beadID, float MyTemp) {
         while (curID != -1) {
             i = bead_info[curID][BEAD_FACE];
             if (i != -1) {
-                bead_info[i][BEAD_FACE] = -1;
+                bead_info[i][BEAD_FACE]     = -1;
                 bead_info[curID][BEAD_FACE] = -1;
             }
             naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = -1;
@@ -1245,7 +1245,7 @@ int Move_MultiLocal(int beadID, float MyTemp) {
         topIt = 0;
         while (curID != -1) {
             naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
-            i = bead_info[curID][BEAD_FACE];
+            i                                               = bead_info[curID][BEAD_FACE];
             if (i != -1) {
                 bead_info[i][BEAD_FACE] = curID;
             }
@@ -1291,15 +1291,15 @@ int Move_Pivot(int chainID, float MyTemp) {
     int firstB, lastB;
     // Get the beadID's for the first and last bead
     firstB = chain_info[chainID][CHAIN_START];
-    lastB = firstB + chainLength;
+    lastB  = firstB + chainLength;
 
     // Randomly select a bead that is neither the first nor last
     int anchorBead = chainLength - 2;
-    anchorBead = 1 + (rand() % anchorBead);
+    anchorBead     = 1 + (rand() % anchorBead);
 
     int PivotDir; //-1 Means backwards, +1 means forwards. Always Pivot the
                   // smaller portion
-    PivotDir = anchorBead > chainLength / 2 ? 1 : -1;
+    PivotDir   = anchorBead > chainLength / 2 ? 1 : -1;
     anchorBead = firstB + anchorBead;
     // printf("Bead: %d\n", anchorBead);
 
@@ -1348,16 +1348,16 @@ int Move_Pivot(int chainID, float MyTemp) {
         return bAccept;
     }
 
-    int FWWeight, BWWeight; // Used to perform orientational bias MC
+    int   FWWeight, BWWeight; // Used to perform orientational bias MC
     lLDub FSum, BSum, Ros_Offset;
-    int resi, resj;
+    int   resi, resj;
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
     lLDub MCProb;
 
     yTemp = 0;
     for (j = 0; j < listLen; j++) {
-        i = tmpList[j];
+        i    = tmpList[j];
         resi = bead_info[i][BEAD_TYPE];
         if (nBeadTypeIsSticker[resi] == 0) { // Skip beads that cannot bond.
             continue;
@@ -1389,13 +1389,13 @@ int Move_Pivot(int chainID, float MyTemp) {
         i = tmpList[j];
         if (bead_info[i][BEAD_FACE] != -1) {
             bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1;
-            bead_info[i][BEAD_FACE] = -1;
+            bead_info[i][BEAD_FACE]                       = -1;
         }
     }
 
     yTemp = 0;
     for (j = 0; j < listLen; j++) {
-        i = tmpList[j];
+        i    = tmpList[j];
         resi = bead_info[i][BEAD_TYPE];
         if (nBeadTypeIsSticker[resi] == 0) { // Because linkers don't have rotational states
             continue;
@@ -1410,7 +1410,7 @@ int Move_Pivot(int chainID, float MyTemp) {
             xTemp = OP_PickRotState(FWWeight);
             if (xTemp != -1) { // An appropriate partner has been selected. Form the
                                // bonds and add the energy
-                bead_info[i][BEAD_FACE] = xTemp;
+                bead_info[i][BEAD_FACE]     = xTemp;
                 bead_info[xTemp][BEAD_FACE] = i;
             }
         }
@@ -1426,7 +1426,7 @@ int Move_Pivot(int chainID, float MyTemp) {
         FSum += logl(bolt_norm[i]);
     }
 
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above!
         bAccept = 1;
@@ -1436,7 +1436,7 @@ int Move_Pivot(int chainID, float MyTemp) {
             i = tmpList[j];
             if (bead_info[i][BEAD_FACE] != -1) {
                 bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1;
-                bead_info[i][BEAD_FACE] = -1;
+                bead_info[i][BEAD_FACE]                       = -1;
             }
         }
         for (j = 0; j < listLen; j++) {
@@ -1472,7 +1472,7 @@ int Move_BranchedRot(int chainID, float MyTemp) {
     int firstB, lastB;
     // Get the beadID's for the first and last bead
     firstB = chain_info[chainID][CHAIN_START];
-    lastB = firstB + chain_info[chainID][CHAIN_LENGTH];
+    lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
 
     // Pick the first bead as the center
     int anchorBead = firstB;
@@ -1508,9 +1508,9 @@ int Move_BranchedRot(int chainID, float MyTemp) {
         return bAccept;
     }
 
-    int FWWeight, BWWeight; // Used to perform orientational bias MC
+    int   FWWeight, BWWeight; // Used to perform orientational bias MC
     lLDub FSum, BSum, Ros_Offset;
-    int resi, resj;
+    int   resi, resj;
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
     lLDub MCProb;
@@ -1530,7 +1530,7 @@ int Move_BranchedRot(int chainID, float MyTemp) {
         yTemp++;
     }
     oldEn = (lLDub)Energy_Of_Chain(chainID);
-    BSum = 0.;
+    BSum  = 0.;
     for (i = 0; i < yTemp; i++) {
         BSum += logl(bolt_norm[i]);
     }
@@ -1543,7 +1543,7 @@ int Move_BranchedRot(int chainID, float MyTemp) {
     for (i = anchorBead + 1; i < lastB; i++) {
         if (bead_info[i][BEAD_FACE] != -1) {
             bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1;
-            bead_info[i][BEAD_FACE] = -1;
+            bead_info[i][BEAD_FACE]                       = -1;
         }
     }
 
@@ -1564,8 +1564,8 @@ int Move_BranchedRot(int chainID, float MyTemp) {
             xTemp = OP_PickRotState(FWWeight);
             if (xTemp != -1) { // An appropriate partner has been selected. Form the
                                // bonds and add the energy
-                resj = bead_info[xTemp][BEAD_TYPE];
-                bead_info[i][BEAD_FACE] = xTemp;
+                resj                        = bead_info[xTemp][BEAD_TYPE];
+                bead_info[i][BEAD_FACE]     = xTemp;
                 bead_info[xTemp][BEAD_FACE] = i;
                 // newEn += (lLDub) fEnergy[resi][resj][E_SC_SC];
             }
@@ -1574,12 +1574,12 @@ int Move_BranchedRot(int chainID, float MyTemp) {
     }
 
     newEn = (lLDub)Energy_Of_Chain(chainID);
-    FSum = 0.;
+    FSum  = 0.;
     for (i = 0; i < yTemp; i++) {
         FSum += logl(bolt_norm[i]);
     }
 
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above!
         bAccept = 1;
@@ -1588,7 +1588,7 @@ int Move_BranchedRot(int chainID, float MyTemp) {
         for (i = anchorBead + 1; i < lastB; i++) {
             if (bead_info[i][BEAD_FACE] != -1) {
                 bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1;
-                bead_info[i][BEAD_FACE] = -1;
+                bead_info[i][BEAD_FACE]                       = -1;
             }
         }
         for (i = anchorBead + 1; i < lastB; i++) {
@@ -1603,13 +1603,13 @@ int Move_SmallClus_Proximity(int chainID) {
     // Performs a cluster move where a given chain and it's cluster are moved. No
     // new 'bonds' are made so the move is reversible....
 
-    int bAccept = 0;    // Used in MC steps, assume that move fails initially.
-    int ClusSize, i, j; // Loop iterators
-    int naClusList[15] = {0};
-    int ClusCheck = -1;
-    int yTemp;
-    int nTemp[POS_MAX];
-    int lRadLow, lRadUp; // Radii bounds.
+    int   bAccept = 0;    // Used in MC steps, assume that move fails initially.
+    int   ClusSize, i, j; // Loop iterators
+    int   naClusList[15] = {0};
+    int   ClusCheck      = -1;
+    int   yTemp;
+    int   nTemp[POS_MAX];
+    int   lRadLow, lRadUp; // Radii bounds.
     float oldEn, newEn, MCProb;
     oldEn = 0.0;
     newEn = 0.0;
@@ -1622,7 +1622,7 @@ int Move_SmallClus_Proximity(int chainID) {
         // I guess moving single chains around as well is not a bad idea
         // printf("YOP %d\n", ClusSize);
         lRadLow = nBoxSize[2] / 2;
-        lRadUp = 2 * lRadLow + 1;
+        lRadUp  = 2 * lRadLow + 1;
         for (j = 0; j < POS_MAX; j++) {
             nTemp[j] = (rand() % lRadUp) - lRadLow; // Random vector to displace the cluster
         }
@@ -1661,10 +1661,10 @@ int Move_SmallClus_Proximity(int chainID) {
 // _Equil variants. The only difference is that the aniso-tropic interaction is
 // ignored, and thus no bias is applied.
 
-int Move_Local_Equil(int beadID,
+int Move_Local_Equil(int   beadID,
                      float MyTemp) { // Performs a local translation MC-move on beadID
 
-    int bAccept = 0;            // Used in MC steps
+    int   bAccept = 0;          // Used in MC steps
     lLDub MCProb, oldEn, newEn; // For Metropolis Hastings
     oldEn = 0.;
     newEn = 0.;
@@ -1677,7 +1677,7 @@ int Move_Local_Equil(int beadID,
     }
     // Initialize the radii for the search of next trial location
     lRadLow = linker_len[beadID][0];
-    lRadUp = lRadLow * 2 + 1; // 2*2+1
+    lRadUp  = lRadLow * 2 + 1; // 2*2+1
 
     yTemp = 0; // Initialize these guys.
     for (j = 0; j < POS_MAX; j++) {
@@ -1703,7 +1703,7 @@ int Move_Local_Equil(int beadID,
     // Now let's calculate the energy of the new state. SC-SC energy is already
     // done.
     newEn += (lLDub)Energy_Isotropic(beadID);
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept this state
         bAccept = 1;      // Accepting!
@@ -1717,7 +1717,7 @@ int Move_Local_Equil(int beadID,
     }
 }
 
-int Move_Snake_Equil(int chainID,
+int Move_Snake_Equil(int   chainID,
                      float MyTemp) { // Performs a slither MC-move on chainID
 
     int firstB,
@@ -1725,7 +1725,7 @@ int Move_Snake_Equil(int chainID,
     int bAccept = 0; // Used in MC steps
     // Finding the bounds for looping over the molecule/chain
     firstB = chain_info[chainID][CHAIN_START];
-    lastB = firstB + chain_info[chainID][CHAIN_LENGTH];
+    lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
     if (lastB - firstB == 1) { // This means we have a monomer. Reject the move,
                                // because Local or Trans
         // moves should be the ones that move monomers.
@@ -1748,11 +1748,11 @@ int Move_Snake_Equil(int chainID,
     int tmpR[POS_MAX], tmpR2[POS_MAX],
         tmpR3[POS_MAX]; // Vectors to store positions.
 
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;           // To decide if we slither forwards or backwards
-    if (MCProb < 0.5) {                                 // Forwards slither, so lastB-1 (last bead) is anchor
-        lRadUp = (int)2 * linker_len[lastB - 1][0] + 1; // lastB-1 will be replaced by lastB-2
+    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;            // To decide if we slither forwards or backwards
+    if (MCProb < 0.5) {                                  // Forwards slither, so lastB-1 (last bead) is anchor
+        lRadUp  = (int)2 * linker_len[lastB - 1][0] + 1; // lastB-1 will be replaced by lastB-2
         lRadLow = (int)linker_len[lastB - 1][0];
-        yTemp = 0;
+        yTemp   = 0;
 
         for (j = 0; j < POS_MAX; j++) {
             tmpR[j] = (rand() % lRadUp) - lRadLow;
@@ -1760,10 +1760,10 @@ int Move_Snake_Equil(int chainID,
         }
         yTemp = Check_MoveBeadTo(tmpR); // 0: there is no space, 1: there is space
 
-    } else {                                         // Backwards slither, so firstB is anchor
-        lRadUp = (int)2 * linker_len[firstB][0] + 1; // firstB will be replaced by firstB+1
+    } else {                                          // Backwards slither, so firstB is anchor
+        lRadUp  = (int)2 * linker_len[firstB][0] + 1; // firstB will be replaced by firstB+1
         lRadLow = (int)linker_len[firstB][0];
-        yTemp = 0;
+        yTemp   = 0;
 
         for (j = 0; j < POS_MAX; j++) {
             tmpR[j] = (rand() % lRadUp) - lRadLow;
@@ -1792,9 +1792,9 @@ int Move_Snake_Equil(int chainID,
         // Slithering the chain forwards in ID-space
         for (i = firstB; i < lastB - 1; i++) {
             for (j = 0; j < POS_MAX; j++) {
-                tmpR2[j] = bead_info[i][j];
+                tmpR2[j]        = bead_info[i][j];
                 bead_info[i][j] = old_bead[i + 1][j]; // Hopping over by one bead
-                tmpR3[j] = bead_info[i][j];
+                tmpR3[j]        = bead_info[i][j];
             }
             if (i == firstB) { // Only the firstB's location is empty
                 naTotLattice[Lat_Ind_FromVec(tmpR2)] = -1;
@@ -1811,9 +1811,9 @@ int Move_Snake_Equil(int chainID,
     } else { // Slithering backwards in ID-space
         for (i = firstB + 1; i < lastB; i++) {
             for (j = 0; j < POS_MAX; j++) {
-                tmpR2[j] = bead_info[i][j];
+                tmpR2[j]        = bead_info[i][j];
                 bead_info[i][j] = old_bead[i - 1][j]; // Hopping back by one bead
-                tmpR3[j] = bead_info[i][j];
+                tmpR3[j]        = bead_info[i][j];
             }
             if (i == lastB - 1) { // Only the lastB-1's location is empty
                 naTotLattice[Lat_Ind_FromVec(tmpR2)] = -1;
@@ -1834,7 +1834,7 @@ int Move_Snake_Equil(int chainID,
     }
 
     // Doing the Metropolis-Hastings thing
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned
                           // above!Accept. Bonds have been handled before!
@@ -1847,9 +1847,9 @@ int Move_Snake_Equil(int chainID,
     }
 }
 
-int Move_Trans_Equil(int chainID,
+int Move_Trans_Equil(int   chainID,
                      float MyTemp) { // Performs a translation move with orientational bias
-    int bAccept = 0;                 // Used in MC steps
+    int   bAccept = 0;               // Used in MC steps
     lLDub MCProb, oldEn, newEn;      // For Metropolis Hastings
     oldEn = 0.;
     newEn = 0.;
@@ -1859,10 +1859,10 @@ int Move_Trans_Equil(int chainID,
     int tmpR[POS_MAX];                 // Vectors to store coordinates.
     // Finding the bounds for looping over the molecule/chain
     firstB = chain_info[chainID][CHAIN_START];
-    lastB = firstB + chain_info[chainID][CHAIN_LENGTH];
+    lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
     // Radii for translation moves. All moves are L/4 radius
     lRadLow = nBoxSize[2] / 2;
-    lRadUp = 2 * lRadLow + 1;
+    lRadUp  = 2 * lRadLow + 1;
     // Initialize these iterators.
     // printf("Beginning TRANS\n");
 
@@ -1887,7 +1887,7 @@ int Move_Trans_Equil(int chainID,
     for (i = firstB; i < lastB; i++) {    // Counting states in the new location
         newEn += (lLDub)Energy_Isotropic_For_Chain(i);
     }
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above!
         bAccept = 1;
@@ -1907,12 +1907,12 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
     int tmpR[MAX_VALENCY][POS_MAX]; // Storing temporary locations
     int bAccept;
     int lRadLow, lRadUp;
-    lRadLow = 2;
-    lRadUp = lRadLow * 2 + 1; // 2*2+1
+    lRadLow   = 2;
+    lRadUp    = lRadLow * 2 + 1; // 2*2+1
     int xTemp = 0;
     int yTemp = 0;
-    curID = beadID;
-    topIt = 0;
+    curID     = beadID;
+    topIt     = 0;
     while (curID != -1) {
         for (j = 0; j < BEADINFO_MAX; j++) {
             old_bead[curID][j] = bead_info[curID][j]; // Remembering
@@ -1927,7 +1927,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
     topIt = 0;
     while (curID != -1) {
         naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = -1;
-        curID = topo_info[beadID][topIt++];
+        curID                                           = topo_info[beadID][topIt++];
     }
     curID = beadID;
     topIt = 0;
@@ -1942,7 +1942,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
             break;
         }
         naTotLattice[Lat_Ind_FromVec(tmpR[topIt])] = curID;
-        curID = topo_info[beadID][topIt++];
+        curID                                      = topo_info[beadID][topIt++];
     }
     if (yTemp == 1) { // No steric clash so check for topology constraint
         yTemp = Check_MTLinkerConstraint(beadID, tmpR);
@@ -1956,7 +1956,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
         topIt = 0;
         while (curID != -1) {
             naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
-            curID = topo_info[beadID][topIt++];
+            curID                                           = topo_info[beadID][topIt++];
         }
         // printf("No space!\n");
         bAccept = 0;
@@ -1968,12 +1968,12 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
     lLDub MCProb;
 
     int bead_list[MAX_BONDS + 1] = {0.};
-    int bead_num = 0;
-    curID = beadID;
-    topIt = 0;
+    int bead_num                 = 0;
+    curID                        = beadID;
+    topIt                        = 0;
     while (curID != -1) {
         bead_list[topIt] = curID;
-        curID = topo_info[beadID][topIt++];
+        curID            = topo_info[beadID][topIt++];
     }
 
     bead_num = topIt;
@@ -1999,7 +1999,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
         curID = topo_info[beadID][topIt++];
     }
 
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above!
         bAccept = 1;
@@ -2010,7 +2010,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
         topIt = 0;
         while (curID != -1) {
             naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = -1;
-            curID = topo_info[beadID][topIt++];
+            curID                                           = topo_info[beadID][topIt++];
         }
         curID = beadID;
         topIt = 0;
@@ -2019,7 +2019,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
                 bead_info[curID][i] = old_bead[curID][i];
             }
             naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
-            curID = topo_info[beadID][topIt++];
+            curID                                           = topo_info[beadID][topIt++];
         }
         // printf("fail\n");
         bAccept = 0;
@@ -2046,15 +2046,15 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
     int firstB, lastB;
     // Get the beadID's for the first and last bead
     firstB = chain_info[chainID][CHAIN_START];
-    lastB = firstB + chainLength;
+    lastB  = firstB + chainLength;
 
     // Randomly select a bead that is neither the first nor last
     int anchorBead = chainLength - 2;
-    anchorBead = 1 + (rand() % anchorBead);
+    anchorBead     = 1 + (rand() % anchorBead);
 
     int PivotDir; //-1 Means backwards, +1 means forwards. Always Pivot the
                   // smaller portion
-    PivotDir = anchorBead > chainLength / 2 ? 1 : -1;
+    PivotDir   = anchorBead > chainLength / 2 ? 1 : -1;
     anchorBead = firstB + anchorBead;
     // printf("Bead: %d\n", anchorBead);
 
@@ -2133,7 +2133,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
         i = tmpList[j];
         newEn += (lLDub)Energy_Isotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
     }
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above!
         bAccept = 1;
@@ -2167,7 +2167,7 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
     int firstB, lastB;
     // Get the beadID's for the first and last bead
     firstB = chain_info[chainID][CHAIN_START];
-    lastB = firstB + chain_info[chainID][CHAIN_LENGTH];
+    lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
 
     // Pick the first bead as the center
     int anchorBead = firstB;
@@ -2222,8 +2222,8 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
     for (i = anchorBead + 1; i < lastB; i++) {//Counting states in the new
     location newEn += (lLDub) Energy_Isotropic(i);
     }*/
-    newEn = (lLDub)Energy_Of_Chain(chainID);
-    MCProb = (lLDub)rand() / (lLDub)RAND_MAX;
+    newEn       = (lLDub)Energy_Of_Chain(chainID);
+    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above!
         bAccept = 1;
@@ -2239,7 +2239,7 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
 
 /// Check_ChainDisp - checks if moving chainID by tR[POS_MAX] will lead to
 /// sterix clash. \param chainID \param tR \return 0 if clash, 1 if no clash.
-int Check_ChainDisp(int chainID,
+int Check_ChainDisp(int        chainID,
                     const int *tR) { // Checks if chain can be displaced by tR
     int i, j;
     int canI = 1;
@@ -2274,12 +2274,12 @@ void OP_DispChain(int chainID, const int *movR) {
         for (l = 0; l < BEADINFO_MAX; l++) {
             old_bead[i][l] = bead_info[i][l];
             if (l < POS_MAX) {
-                tmpR[l] = old_bead[i][l]; // Where we were
+                tmpR[l]         = old_bead[i][l]; // Where we were
                 bead_info[i][l] = (tmpR[l] + movR[l] + nBoxSize[l]) % nBoxSize[l];
-                tmpR2[l] = bead_info[i][l]; // Where we are now
+                tmpR2[l]        = bead_info[i][l]; // Where we are now
             }
         }
-        naTotLattice[Lat_Ind_FromVec(tmpR)] = -1; // Removing from old place
+        naTotLattice[Lat_Ind_FromVec(tmpR)]  = -1; // Removing from old place
         naTotLattice[Lat_Ind_FromVec(tmpR2)] = i;
     }
 }
@@ -2301,18 +2301,18 @@ void OP_DispChain_ForTrans(int chainID, const int *movR) {
         for (l = 0; l < BEADINFO_MAX; l++) {
             old_bead[i][l] = bead_info[i][l];
             if (l < POS_MAX) {
-                tmpR[l] = old_bead[i][l]; // Where we were
+                tmpR[l]         = old_bead[i][l]; // Where we were
                 bead_info[i][l] = (tmpR[l] + movR[l] + nBoxSize[l]) % nBoxSize[l];
-                tmpR2[l] = bead_info[i][l]; // Where we are now
+                tmpR2[l]        = bead_info[i][l]; // Where we are now
             }
         }
-        naTotLattice[Lat_Ind_FromVec(tmpR)] = -1; // Removing from old place
-        naTotLattice[Lat_Ind_FromVec(tmpR2)] = i; // Adding to new place
+        naTotLattice[Lat_Ind_FromVec(tmpR)]  = -1; // Removing from old place
+        naTotLattice[Lat_Ind_FromVec(tmpR2)] = i;  // Adding to new place
     }
     for (i = fB; i < lB; i++) { // Delete bonds AFTER old_bead has remembered things
         if (old_bead[i][BEAD_FACE] != -1) {
             bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1; // Break old bond
-            bead_info[i][BEAD_FACE] = -1;                       // Breaking this bond
+            bead_info[i][BEAD_FACE]                       = -1; // Breaking this bond
         }
     }
 }
@@ -2327,12 +2327,12 @@ void OP_RestoreChain(int chainID) { // Uses old_bead to undo what OP_DispChain d
     for (i = fB; i < lB; i++) {
         for (l = 0; l < BEADINFO_MAX; l++) {
             if (l < POS_MAX) {
-                tmpR[l] = bead_info[i][l]; // Where we now are and must be removed from
-                tmpR2[l] = old_bead[i][l]; // Where we were and will be moved back to
+                tmpR[l]  = bead_info[i][l]; // Where we now are and must be removed from
+                tmpR2[l] = old_bead[i][l];  // Where we were and will be moved back to
             }
             bead_info[i][l] = old_bead[i][l]; // Moving back
         }
-        naTotLattice[Lat_Ind_FromVec(tmpR)] = -1; // Removing from old place
+        naTotLattice[Lat_Ind_FromVec(tmpR)]  = -1; // Removing from old place
         naTotLattice[Lat_Ind_FromVec(tmpR2)] = i;
     }
 }
@@ -2349,14 +2349,14 @@ void OP_RestoreChain_ForTrans(int chainID) { // Uses old_bead to undo what OP_Di
     for (i = fB; i < lB; i++) {              // Let's remove from the new state
         if (bead_info[i][BEAD_FACE] != -1) { // Destroying the newly proposed bond
             bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1;
-            bead_info[i][BEAD_FACE] = -1;
+            bead_info[i][BEAD_FACE]                       = -1;
         }
         for (l = 0; l < POS_MAX; l++) {
-            tmpR[l] = bead_info[i][l]; // Where we now are and must be removed from
-            tmpR2[l] = old_bead[i][l]; // This is where we should be
+            tmpR[l]  = bead_info[i][l]; // Where we now are and must be removed from
+            tmpR2[l] = old_bead[i][l];  // This is where we should be
         }
-        naTotLattice[Lat_Ind_FromVec(tmpR)] = -1; // Removing from old place
-        naTotLattice[Lat_Ind_FromVec(tmpR2)] = i; // Removing from old place
+        naTotLattice[Lat_Ind_FromVec(tmpR)]  = -1; // Removing from old place
+        naTotLattice[Lat_Ind_FromVec(tmpR2)] = i;  // Removing from old place
     }
     for (i = fB; i < lB; i++) {
         for (l = 0; l < BEADINFO_MAX; l++) {
@@ -2365,7 +2365,7 @@ void OP_RestoreChain_ForTrans(int chainID) { // Uses old_bead to undo what OP_Di
     }
     for (i = fB; i < lB; i++) {
         if (old_bead[i][BEAD_FACE] != -1) { // Restoring the old bond
-            bead_info[i][BEAD_FACE] = old_bead[i][BEAD_FACE];
+            bead_info[i][BEAD_FACE]                       = old_bead[i][BEAD_FACE];
             bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = i;
         }
     }
@@ -2407,19 +2407,19 @@ inline int Check_MoveBeadTo(int *newPos) { // Checks if I can move here
 
 /// OP_MoveBeadTo - move beadID to newPos[POS_MAX], while remebering the bead
 /// properties, and handling the lattice. \param beadID \param newPos
-void OP_MoveBeadTo(int beadID,
+void OP_MoveBeadTo(int        beadID,
                    const int *newPos) { // Updates position to new one and handles lattice
     int i;
     int tmpR[POS_MAX], tmpR2[POS_MAX];
     for (i = 0; i < BEADINFO_MAX; i++) {
         old_bead[beadID][i] = bead_info[beadID][i];
         if (i < POS_MAX) {
-            tmpR[i] = old_bead[beadID][i];
+            tmpR[i]              = old_bead[beadID][i];
             bead_info[beadID][i] = newPos[i];
-            tmpR2[i] = bead_info[beadID][i];
+            tmpR2[i]             = bead_info[beadID][i];
         }
     }
-    naTotLattice[Lat_Ind_FromVec(tmpR)] = -1; // Removing from old place
+    naTotLattice[Lat_Ind_FromVec(tmpR)]  = -1; // Removing from old place
     naTotLattice[Lat_Ind_FromVec(tmpR2)] = beadID;
 }
 
@@ -2430,13 +2430,13 @@ void OP_Inv_MoveBeadTo(int beadID) { // Undoes what OP_MoveBeadTo does
     int tmpR[POS_MAX], tmpR2[POS_MAX];
     for (i = 0; i < BEADINFO_MAX; i++) {
         if (i < POS_MAX) {
-            tmpR[i] = bead_info[beadID][i];
+            tmpR[i]  = bead_info[beadID][i];
             tmpR2[i] = old_bead[beadID][i];
         }
         bead_info[beadID][i] = old_bead[beadID][i];
     }
 
-    naTotLattice[Lat_Ind_FromVec(tmpR)] = -1;      // Removing from old place
+    naTotLattice[Lat_Ind_FromVec(tmpR)]  = -1;     // Removing from old place
     naTotLattice[Lat_Ind_FromVec(tmpR2)] = beadID; // Restoring
 
     if (bead_info[beadID][BEAD_FACE] != -1) {
@@ -2453,12 +2453,12 @@ void OP_MoveBeadTo_ForMTLocal(int beadID, const int *newPos) { // Updates positi
     int tmpR2[POS_MAX];
     for (i = 0; i < POS_MAX; i++) {
         bead_info[beadID][i] = newPos[i];
-        tmpR2[i] = bead_info[beadID][i];
+        tmpR2[i]             = bead_info[beadID][i];
     }
     naTotLattice[Lat_Ind_FromVec(tmpR2)] = beadID;
-    i = bead_info[beadID][BEAD_FACE];
+    i                                    = bead_info[beadID][BEAD_FACE];
     if (i != -1) {
-        bead_info[i][BEAD_FACE] = -1;
+        bead_info[i][BEAD_FACE]      = -1;
         bead_info[beadID][BEAD_FACE] = -1;
     }
 }
@@ -2472,8 +2472,8 @@ void OP_SwapBeads(int bead1, int bead2) {
     int tmpR[POS_MAX], tmpR2[POS_MAX];
     // First the coordinates
     for (i = 0; i < POS_MAX; i++) {
-        tmpR[i] = bead_info[bead1][i];
-        tmpR2[i] = bead_info[bead2][i];
+        tmpR[i]             = bead_info[bead1][i];
+        tmpR2[i]            = bead_info[bead2][i];
         bead_info[bead1][i] = tmpR2[i];
         bead_info[bead2][i] = tmpR[i];
     }
@@ -2493,7 +2493,7 @@ void OP_SwapBeads(int bead1, int bead2) {
         }
     }
     // Swap them on the lattice
-    naTotLattice[Lat_Ind_FromVec(tmpR)] = bead2;
+    naTotLattice[Lat_Ind_FromVec(tmpR)]  = bead2;
     naTotLattice[Lat_Ind_FromVec(tmpR2)] = bead1;
 }
 
@@ -2694,9 +2694,9 @@ void OP_ShuffleRotIndecies(void) {
     int i_val, j_val;
 
     for (i = MAX_ROTSTATES - 2; i > 0; i--) {
-        j = rand() % (i + 1);
-        i_val = Rot_IndArr[i];
-        j_val = Rot_IndArr[j];
+        j             = rand() % (i + 1);
+        i_val         = Rot_IndArr[i];
+        j_val         = Rot_IndArr[j];
         Rot_IndArr[i] = j_val;
         Rot_IndArr[j] = i_val;
     }
@@ -2765,7 +2765,7 @@ int Check_RotStatesOld(int beadID, int resi, float MyTemp) {
             j = bead_info[tmpBead][BEAD_TYPE];
             if (fEnergy[resi][j][E_SC_SC] != 0 &&
                 (bead_info[tmpBead][BEAD_FACE] == -1 || bead_info[tmpBead][BEAD_FACE] == beadID)) {
-                bolt_fac[CandNums] = dbias_bolt_fac[resi][j];
+                bolt_fac[CandNums]     = dbias_bolt_fac[resi][j];
                 rot_trial[0][CandNums] = tmpBead;
                 CandNums++;
             }
@@ -2841,7 +2841,7 @@ int Check_RotStatesNew(int beadID, int resi, float MyTemp) {
             j = bead_info[tmpBead][BEAD_TYPE];
             if (fEnergy[resi][j][E_SC_SC] != 0 &&
                 (bead_info[tmpBead][BEAD_FACE] == -1 || bead_info[tmpBead][BEAD_FACE] == beadID)) {
-                bolt_fac[CandNums] = dbias_bolt_fac[resi][j];
+                bolt_fac[CandNums]     = dbias_bolt_fac[resi][j];
                 rot_trial[0][CandNums] = tmpBead;
                 CandNums++;
             }
@@ -2884,11 +2884,11 @@ void OP_NormalizeRotState(int beadVal, int CandNums) {
 /// - the number of possible bonding candidates. \return The new proposed
 /// bonding partner.
 int OP_PickRotState(int CandNums) {
-    int newRot = -1;
-    int i;
+    int   newRot = -1;
+    int   i;
     lLDub fProb;
-    int nCheck = CandNums + 1;
-    nCheck = rand() % nCheck;
+    int   nCheck = CandNums + 1;
+    nCheck       = rand() % nCheck;
     if (nCheck == 0) {
         newRot = -1;
     } else {

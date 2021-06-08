@@ -6,10 +6,10 @@
 /// various global arrays.
 void Memory_Initialization_AtStart(void) {
     int i, j;
-    naTotLattice = (lInt *)malloc(nBoxSize[0] * nBoxSize[1] * nBoxSize[2] * sizeof(lInt));
-    naClusHistList = (lLong *)malloc((1 + tot_chains) * sizeof(lLong));
+    naTotLattice     = (lInt *)malloc(nBoxSize[0] * nBoxSize[1] * nBoxSize[2] * sizeof(lInt));
+    naClusHistList   = (lLong *)malloc((1 + tot_chains) * sizeof(lLong));
     naChainCheckList = (lInt *)malloc((1 + tot_chains) * sizeof(lInt));
-    fKT_Cycle = (float *)malloc((1 + nTot_CycleNum) * sizeof(float));
+    fKT_Cycle        = (float *)malloc((1 + nTot_CycleNum) * sizeof(float));
 
     if (nReport[REPORT_NETWORK] != 0) {
         ld_TOTCLUS_ARR = (lLDub **)malloc((nTot_CycleNum) * sizeof(lLDub));
@@ -21,9 +21,9 @@ void Memory_Initialization_AtStart(void) {
                 exit(1);
             }
         }
-        ldMOLCLUS_ARR = malloc((tot_chain_types * tot_chains) * sizeof(lLDub));
+        ldMOLCLUS_ARR     = malloc((tot_chain_types * tot_chains) * sizeof(lLDub));
         ld_TOTMOLCLUS_ARR = malloc((nTot_CycleNum * tot_chain_types * tot_chains) * sizeof(lLDub));
-        ld_TOTGYRRAD_ARR = (lLDub **)malloc((nTot_CycleNum) * sizeof(lLDub));
+        ld_TOTGYRRAD_ARR  = (lLDub **)malloc((nTot_CycleNum) * sizeof(lLDub));
         for (i = 0; i < nTot_CycleNum; i++) {
             ld_TOTGYRRAD_ARR[i] = (lLDub *)malloc((2) * sizeof(lLDub));
         }
@@ -32,17 +32,17 @@ void Memory_Initialization_AtStart(void) {
     nRDF_TotComps /= 2;
     if (nReport[REPORT_RDFTOT] != 0) {
         ld_TOTRDF_Arr = malloc((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
-        ldRDF_Arr = malloc((nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
+        ldRDF_Arr     = malloc((nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
     }
     if (nReport[REPORT_COMDEN] != 0) {
-        nRadDen_TotComps = 2 * tot_chain_types * (tot_chain_types + 1);
+        nRadDen_TotComps  = 2 * tot_chain_types * (tot_chain_types + 1);
         nRadDen_CompShift = tot_chain_types * (tot_chain_types + 1);
-        ldRadDen_Arr = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub)); // Same as RDF
-        ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins) * sizeof(lLDub));
+        ldRadDen_Arr      = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub)); // Same as RDF
+        ld_TOTRadDen_Arr  = malloc((nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins) * sizeof(lLDub));
     }
     if (nTrajMode != 0) {
         nTraj_FramesPerCycle = nMCStepsPerCycle / nReport[REPORT_CONFIG];
-        n_TOTTRAJ_ARR = malloc(sizeof(lInt) * nTraj_FramesPerCycle * (lLong)tot_beads * BEADINFO_MAX);
+        n_TOTTRAJ_ARR        = malloc(sizeof(lInt) * nTraj_FramesPerCycle * (lLong)tot_beads * BEADINFO_MAX);
     }
     Memory_VerifyMalloc();
     printf("Successfully allocated memory! Arrays initialized.\n");
@@ -122,7 +122,7 @@ void Global_Array_Initialization_AtStart(void) {
     // Initializing arrays required for cluster analyses.
     for (i = 0; i <= tot_chains; i++) {
         naChainCheckList[i] = 0;
-        naClusHistList[i] = 0;
+        naClusHistList[i]   = 0;
         for (j = 0; j <= tot_chains; j++) {
             naCluster[i][j] = -1;
         }
@@ -170,22 +170,22 @@ void Global_Array_Initialization_AtStart(void) {
     }
 
     // Setting counters
-    fSysGyrRad = 0.;
-    nTotGyrRadCounter = 0;
-    nRDFCounter = 0;
-    nRadDenCounter = 0;
-    nTotClusCounter = 0;
+    fSysGyrRad              = 0.;
+    nTotGyrRadCounter       = 0;
+    nRDFCounter             = 0;
+    nRadDenCounter          = 0;
+    nTotClusCounter         = 0;
     nLargestClusterRightNow = 0;
-    nTrajCurFrame = 0;
+    nTrajCurFrame           = 0;
 
     // Checking which bead types interact rotationally and via overlap,
     // separately.
     for (i = 0; i < MAX_AA; i++) {
         nBeadTypeIsSticker[i] = 0; // Assume beads don't rotationally interact.
-        nBeadTypeCanOvlp[i] = 0;   // Assume beads don't have an overlap cost
-        nBeadTypeCanCont[i] = 0;   // Assume beads don't have contact costs.
-        nBeadTypeCanFSol[i] = 0;
-        nBeadTypeCanTInd[i] = 0;
+        nBeadTypeCanOvlp[i]   = 0; // Assume beads don't have an overlap cost
+        nBeadTypeCanCont[i]   = 0; // Assume beads don't have contact costs.
+        nBeadTypeCanFSol[i]   = 0;
+        nBeadTypeCanTInd[i]   = 0;
     }
 
     for (i = 0; i < MAX_AA; i++) {
@@ -243,7 +243,7 @@ void Reset_Global_Arrays(void) {
     int i, j;
     for (i = 0; i <= tot_chains; i++) {
         naChainCheckList[i] = -1;
-        naClusHistList[i] = 0;
+        naClusHistList[i]   = 0;
         for (j = 0; j <= tot_chains; j++) {
             naCluster[i][j] = -1;
         }
@@ -270,13 +270,13 @@ void Reset_Global_Arrays(void) {
         }
     }
     // Setting counters
-    fSysGyrRad = 0.;
-    nTotGyrRadCounter = 0;
-    nRDFCounter = 0;
-    nRadDenCounter = 0;
-    nTotClusCounter = 0;
+    fSysGyrRad              = 0.;
+    nTotGyrRadCounter       = 0;
+    nRDFCounter             = 0;
+    nRadDenCounter          = 0;
+    nTotClusCounter         = 0;
     nLargestClusterRightNow = 0;
-    nTrajCurFrame = 0;
+    nTrajCurFrame           = 0;
 }
 
 /// Initial_Conditions_Simple - randomly place all the molecules.
@@ -310,7 +310,7 @@ void Initial_Conditions_Simple(void) {
         temp_list[i] = -1;
     }
     for (j = 0; j < POS_MAX; j++) { // Initialize the coordinate arrays to some numbers.
-        tmpR[j] = rand() % nBoxSize[j];
+        tmpR[j]  = rand() % nBoxSize[j];
         tmpR2[j] = tmpR[j];
     }
 
@@ -333,7 +333,7 @@ void Initial_Conditions_Simple(void) {
                 }
             }
             // If we have reached here, this bead has not been placed before.
-            idx = 0;
+            idx      = 0;
             bondPart = topo_info[i][idx]; // Re-initialize these two.
             // Let's go through the bonded partners for this bead and see if one can
             // be used as an anchor.
@@ -355,10 +355,10 @@ void Initial_Conditions_Simple(void) {
 
         FoundAnchor:
             if (bondPart != -1) { // We found an anchor.
-                radUp = 2 * linker_len[i][idx] + 1;
+                radUp  = 2 * linker_len[i][idx] + 1;
                 radLow = linker_len[i][idx];
                 for (j = 0; j < POS_MAX; j++) { // Using thisBead as anchor
-                    tmpR[j] = bead_info[bondPart][j];
+                    tmpR[j]  = bead_info[bondPart][j];
                     tmpR2[j] = tmpR[j];
                 }
                 TlCnt = 0; // Reset this counter.
@@ -379,7 +379,7 @@ void Initial_Conditions_Simple(void) {
                     bead_info[i][j] = tmpR2[j];
                 }                                         // Placing bead
                 naTotLattice[Lat_Ind_FromVec(tmpR2)] = i; // Putting on lattice
-                temp_list[list_it] = i;
+                temp_list[list_it]                   = i;
                 list_it++; // Remembering in hash list.
                            // The bead has been placed around an appropriate anchor.
             } else {       // There was no appropriate anchor. So we can put this bead
@@ -408,7 +408,7 @@ void Initial_Conditions_Simple(void) {
                     bead_info[i][j] = tmpR[j];
                 }
                 naTotLattice[Lat_Ind_FromVec(tmpR)] = i; // Placing on lattice!
-                temp_list[list_it] = i;
+                temp_list[list_it]                  = i;
                 list_it++; // Remembering that this bead has been placed.
             }
         SproutForth:
@@ -416,7 +416,7 @@ void Initial_Conditions_Simple(void) {
             for (j = 0; j < POS_MAX; j++) { // Making the current bead an anchor.
                 tmpR[j] = bead_info[i][j];
             }
-            idx = 0;                                             // Resets things!
+            idx      = 0;                                        // Resets things!
             bondPart = topo_info[i][idx];                        // Resets things!
             while (topo_info[i][idx] != -1 && idx < MAX_BONDS) { // Again, -1 signifies that no bonded bead exists.
                 bondPart = topo_info[i][idx];
@@ -428,7 +428,7 @@ void Initial_Conditions_Simple(void) {
                     }
                 }
                 // Get the radii for placing this bead around bead i
-                radUp = 2 * linker_len[i][idx] + 1;
+                radUp  = 2 * linker_len[i][idx] + 1;
                 radLow = linker_len[i][idx];
                 // Initializing new vector to be where bead i is.
                 for (j = 0; j < POS_MAX; j++) {
@@ -455,7 +455,7 @@ void Initial_Conditions_Simple(void) {
                 }
 
                 naTotLattice[Lat_Ind_FromVec(tmpR2)] = bondPart; // Putting on lattice
-                temp_list[list_it] = bondPart;
+                temp_list[list_it]                   = bondPart;
                 list_it++; // Remembering in hash list.
             SkipThisPartner:
                 idx++;
@@ -475,11 +475,11 @@ void Initial_Conditions_Simple(void) {
 /// conditions for the system
 void Initial_Conditions_FromFile(void) {
     printf("Reading file to generate initial configuration\n");
-    char strLine[1000];
-    int i, j;
-    int tmp_beadinfo[BEADINFO_MAX];
+    char  strLine[1000];
+    int   i, j;
+    int   tmp_beadinfo[BEADINFO_MAX];
     FILE *infile;
-    infile = fopen(strRestartFile, "r");
+    infile       = fopen(strRestartFile, "r");
     int tmpBeads = 0;
     while (fgets(strLine, sizeof(strLine), infile) != NULL) {
         tmpBeads++;
@@ -556,42 +556,42 @@ float Temperature_Function(int mode, long nGen) {
 
     switch (mode) {
     case 0:
-        x_val = (float)(nMCPreSteps - nGen);
-        x_val = x_val / 1250. / fPreKT;
-        x_val = fPreKT * (tanhf(x_val) + 1.);
+        x_val   = (float)(nMCPreSteps - nGen);
+        x_val   = x_val / 1250. / fPreKT;
+        x_val   = fPreKT * (tanhf(x_val) + 1.);
         end_val = fKT + x_val;
 
         break;
 
     case 1:
-        x_val = (float)(nGen - nMCPreSteps) / (float)nMCPreSteps;
-        y_val = -x_val;
-        x_val = fabsf(sinf(x_val));
-        y_val = expf(y_val / 4.);
+        x_val   = (float)(nGen - nMCPreSteps) / (float)nMCPreSteps;
+        y_val   = -x_val;
+        x_val   = fabsf(sinf(x_val));
+        y_val   = expf(y_val / 4.);
         end_val = fKT + 5. * fKT * x_val * y_val;
 
         break;
 
     case 2:
-        x_val = (float)(nGen - 10 * nMCPreSteps);
-        x_val = x_val * x_val;
-        y_val = (float)(nMCPreSteps * nMCPreSteps) * 10.;
+        x_val   = (float)(nGen - 10 * nMCPreSteps);
+        x_val   = x_val * x_val;
+        y_val   = (float)(nMCPreSteps * nMCPreSteps) * 10.;
         end_val = fKT + expf(-x_val / y_val) / fKT / 10.;
 
         break;
 
     case 3:
-        x_val = -(float)(nGen);
-        x_val = 4. * x_val;
-        x_val = x_val / (float)(nMCPreSteps);
+        x_val   = -(float)(nGen);
+        x_val   = 4. * x_val;
+        x_val   = x_val / (float)(nMCPreSteps);
         end_val = fKT + expf(x_val);
 
         break;
 
     case 4:
-        x_val = -(float)(nGen);
-        x_val = fMC_Temp_Rate * x_val;
-        x_val = x_val / (float)(nMCPreSteps);
+        x_val   = -(float)(nGen);
+        x_val   = fMC_Temp_Rate * x_val;
+        x_val   = x_val / (float)(nMCPreSteps);
         end_val = fKT + expf(x_val);
 
         break;

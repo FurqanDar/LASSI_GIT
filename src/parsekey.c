@@ -13,13 +13,13 @@ int str2farr(char *strRaw, float fArray[MAX_AA]);
 int Parse_Keyfile(char *filename) {
     FILE *infile;
     infile = fopen(filename, "r");
-    int i;
+    int  i;
     char strLine[1000];
     char strKeyword[1000];
     char strTemp[1000];
     char strEnergyFile[1000];
     char strStructFile[1000];
-    int nStructFiletype = 0;
+    int  nStructFiletype = 0;
     char strTempArr[3][1000];
     strEnergyFile[0] = '\0';
     strStructFile[0] = '\0';
@@ -32,7 +32,7 @@ int Parse_Keyfile(char *filename) {
         fMCFreq[i] = 0.0; // initialization; to be normalized
     }
     nThermalization_Mode = 0;
-    Temp_Mode = -1;
+    Temp_Mode            = -1;
     while (fgets(strLine, sizeof(strLine), infile) != NULL) {
         nLine++;
 
@@ -211,14 +211,14 @@ int Parse_EnergyFile(char *strEnFile) {
     FILE *infile;
     infile = fopen(strEnFile, "r");
 
-    char strLine[1000];
-    int nFlag = 0;
-    char bOrder = 0;
-    char strKey[1000];
-    int nRow;
+    char  strLine[1000];
+    int   nFlag  = 0;
+    char  bOrder = 0;
+    char  strKey[1000];
+    int   nRow;
     float fTemp[MAX_AA] = {0.f};
-    int i, j, k;
-    int nEntry = 0;
+    int   i, j, k;
+    int   nEntry = 0;
 
     while (fgets(strLine, sizeof(strLine), infile) != NULL) {
         if (strLine[0] == '#') { // All key-words start with '#'
@@ -323,7 +323,7 @@ int Parse_EnergyFile(char *strEnFile) {
 /// the energy file. \param strRaw \param fArray \return Changes fArray to
 /// include be the array in
 int str2farr(char strRaw[], float fArray[MAX_AA]) {
-    int i = 0;
+    int   i       = 0;
     char *strTemp = strRaw;
     char *token;
 
@@ -388,8 +388,8 @@ void Parse_StructureFile(char *filename) {
 
     char strLine[1000];    // Used to store each line from the input file.
     char strKeyword[1000]; // Used to convert strLine into specific keywords.
-    int curID;             // Used to track the current beadID
-    int curType, curLinker,
+    int  curID;            // Used to track the current beadID
+    int  curType, curLinker,
         curPartner;               // Used to track current
                                   // bead-type,linker-length(s),bond-partner.
     int nCopies;                  // Used to store how many copies to make.
@@ -407,7 +407,7 @@ void Parse_StructureFile(char *filename) {
             bead_info[i][j] = -1;
         }
         for (j = 0; j < MAX_BONDS; j++) {
-            topo_info[i][j] = -1;
+            topo_info[i][j]  = -1;
             linker_len[i][j] = -1;
         }
     }
@@ -418,17 +418,17 @@ void Parse_StructureFile(char *filename) {
     }
 
     // Initialization of the counters and iterators
-    nCursor = -1;
-    nCursor2 = -1;
-    nChainID = -1;
-    nChainType = -1;
-    nFlag = -1;
-    nTemp = -1;
-    tot_beads = 0;
-    tot_chains = 0;
-    nBEADS = 0;
+    nCursor     = -1;
+    nCursor2    = -1;
+    nChainID    = -1;
+    nChainType  = -1;
+    nFlag       = -1;
+    nTemp       = -1;
+    tot_beads   = 0;
+    tot_chains  = 0;
+    nBEADS      = 0;
     nChainStart = 0;
-    nCopies = 0;
+    nCopies     = 0;
     while (fgets(strLine, sizeof(strLine), inFile) != NULL && nFlag == -1) {
         // Keep reading the file until it ends or it's incorrectly formatted.
 
@@ -473,10 +473,10 @@ void Parse_StructureFile(char *filename) {
                                                          // even if it has many bonds.
                     tot_beads++;
                     nBEADS++;
-                    bead_info[curID][BEAD_TYPE] = curType;
+                    bead_info[curID][BEAD_TYPE]    = curType;
                     bead_info[curID][BEAD_CHAINID] = nChainID;
-                    nCursor = 0; // This is a counter for number of bonds, which should
-                                 // reset when you have a 'new' bead.
+                    nCursor                        = 0; // This is a counter for number of bonds, which should
+                                                        // reset when you have a 'new' bead.
                 }
 
                 if (curPartner != -1) { // This bead has a bonded partner
@@ -491,24 +491,24 @@ void Parse_StructureFile(char *filename) {
                     nCursor++;
                 }
             }
-            chain_info[nChainID][CHAIN_START] = nChainStart;
+            chain_info[nChainID][CHAIN_START]  = nChainStart;
             chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
-            chain_info[nChainID][CHAIN_TYPE] = nChainType;
+            chain_info[nChainID][CHAIN_TYPE]   = nChainType;
             // We just fully store the first chain 'manually'. Now we just copy the
             // chain nCopies times. printf("%d\n", nBEADS)
             for (k = 1; k < nCopies; k++) { // Now we just copy this molecule nMOL-1 times
                 nChainStart += nBEADS;      // This accounts for chain lengths.
                 nChainID++;                 // Going to the next chainID
                 tot_chains++;               // Add a chain
-                chain_info[nChainID][CHAIN_START] = nChainStart;
+                chain_info[nChainID][CHAIN_START]  = nChainStart;
                 chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
-                chain_info[nChainID][CHAIN_TYPE] = nChainType;
+                chain_info[nChainID][CHAIN_TYPE]   = nChainType;
 
                 for (i = 0; i < nBEADS; i++) {
                     tot_beads++;
-                    curID = i + nChainStart;
-                    nTemp = curID - nBEADS;
-                    bead_info[curID][BEAD_TYPE] = bead_info[nTemp][BEAD_TYPE];
+                    curID                          = i + nChainStart;
+                    nTemp                          = curID - nBEADS;
+                    bead_info[curID][BEAD_TYPE]    = bead_info[nTemp][BEAD_TYPE];
                     bead_info[curID][BEAD_CHAINID] = nChainID;
                     for (j = 0; j < MAX_BONDS; j++) {
                         linker_len[curID][j] = linker_len[nTemp][j];

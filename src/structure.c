@@ -32,7 +32,7 @@ int Lat_Ind_OfBead(const int beadID) {
 /// f1 and f2 where f1 and f2 are floats. \param f1 \param f2 \return
 float Dist_PointToPoint_Float(const float *f1, const float *f2) {
     float d[POS_MAX];
-    int i;
+    int   i;
     for (i = 0; i < POS_MAX; i++) {
         d[i] = fabsf(f1[i] - f2[i]);
         d[i] = d[i] > (float)nBoxSize[i] / 2. ? (float)nBoxSize[i] - d[i] : d[i];
@@ -72,7 +72,7 @@ float Dist_BeadToPoint(const int beadID, const int *f1) {
 /// array f1. \param beadID \param f1 \return
 float Dist_BeadToPoint_Double(const int beadID, const lDub *f1) {
     lDub d[POS_MAX];
-    int i;
+    int  i;
     for (i = 0; i < POS_MAX; i++) {
         d[i] = fabs((lDub)bead_info[beadID][i] - f1[i]);
         d[i] = d[i] > (lDub)nBoxSize[i] / 2. ? (lDub)nBoxSize[i] - d[i] : d[i];
@@ -84,7 +84,7 @@ float Dist_BeadToPoint_Double(const int beadID, const lDub *f1) {
 /// array f1. \param beadID \param f1 \return
 float Dist_BeadToPoint_Float(const int beadID, const float *f1) {
     float d[POS_MAX];
-    int i;
+    int   i;
     for (i = 0; i < POS_MAX; i++) {
         d[i] = fabsf((float)bead_info[beadID][i] - f1[i]);
         d[i] = d[i] > (float)nBoxSize[i] / 2. ? (float)nBoxSize[i] - d[i] : d[i];
@@ -122,7 +122,7 @@ int Check_System_Structure(void) {
     int tmpR[POS_MAX]; // Just a vector to store coordinates
     int bondPart;
     for (i = 0; i < tot_beads; i++) {
-        idx = 0;
+        idx      = 0;
         bondPart = topo_info[i][idx];
         for (j = 0; j < POS_MAX; j++) {
             tmpR[j] = bead_info[i][j];
@@ -206,22 +206,22 @@ void GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex) {
     for (i = 0; i < 7; i++) {
         fGyrTensor[i] = 0.;
     }                              // Initializing
-    int firstB, lastB;             // Tracks the first and last bead of the given chain
+    int   firstB, lastB;           // Tracks the first and last bead of the given chain
     float tot_COM[POS_MAX] = {0.}; // This is where we shall store the COM of the cluster.
-    int NumRes = 0;                // Tracks how many residues are in this cluster
+    int   NumRes           = 0;    // Tracks how many residues are in this cluster
 
     // The only thing one needs to be careful about is to take PBC into account;
     // the rest is tedium. Use good old differential geometry to map each
     // coordinate to two new coordinates, and unpack at the end.
     float theta[POS_MAX] = {0.};
-    float zeta[POS_MAX] = {0.}; // Extra coordinates for goodness
-    float dumArg = 0.;          // Just a dummy variable to be more efficient
-    float dumArg2 = 0.;         // Another one
+    float zeta[POS_MAX]  = {0.}; // Extra coordinates for goodness
+    float dumArg         = 0.;   // Just a dummy variable to be more efficient
+    float dumArg2        = 0.;   // Another one
     // printf("Starting with COM\n");
     // Calculating the COM
     for (i = 0; i < ClusSize; i++) {
         firstB = chain_info[naCluster[ClusIndex][i]][CHAIN_START];
-        lastB = firstB + chain_info[naCluster[ClusIndex][i]][CHAIN_LENGTH];
+        lastB  = firstB + chain_info[naCluster[ClusIndex][i]][CHAIN_LENGTH];
         // printf("%d %d\n", firstB, lastB);
         // Just easier to track each chain like this
         for (k = firstB; k < lastB; k++) {
@@ -237,8 +237,8 @@ void GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex) {
     // printf("Done with COM\n");
     // Calculating average, and then COM
     for (j = 0; j < POS_MAX; j++) {
-        theta[j] = theta[j] / (float)NumRes;
-        zeta[j] = zeta[j] / (float)NumRes;
+        theta[j]   = theta[j] / (float)NumRes;
+        zeta[j]    = zeta[j] / (float)NumRes;
         tot_COM[j] = atan2f(-theta[j], -zeta[j]) + PI;
         tot_COM[j] = nBoxSize[j] * (tot_COM[j] / 2. / PI);
     }
@@ -248,15 +248,15 @@ void GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex) {
     //  divide at the end
     for (i = 0; i < ClusSize; i++) {
         firstB = chain_info[naCluster[ClusIndex][i]][CHAIN_START];
-        lastB = firstB + chain_info[naCluster[ClusIndex][i]][CHAIN_LENGTH];
+        lastB  = firstB + chain_info[naCluster[ClusIndex][i]][CHAIN_LENGTH];
         // Just easier to track each chain like this
         for (k = firstB; k < lastB; k++) {
             for (j = 0; j < POS_MAX; j++) {
                 for (j2 = j; j2 < POS_MAX; j2++) {
-                    dumArg = fabsf((float)bead_info[k][j] - tot_COM[j]) <
+                    dumArg  = fabsf((float)bead_info[k][j] - tot_COM[j]) <
                                      (float)nBoxSize[j] - fabsf((float)bead_info[k][j] - tot_COM[j])
-                                 ? fabsf((float)bead_info[k][j] - tot_COM[j])
-                                 : (float)nBoxSize[j] - fabsf((float)bead_info[k][j] - tot_COM[j]);
+                                  ? fabsf((float)bead_info[k][j] - tot_COM[j])
+                                  : (float)nBoxSize[j] - fabsf((float)bead_info[k][j] - tot_COM[j]);
                     dumArg2 = fabsf((float)bead_info[k][j2] - tot_COM[j2]) <
                                       (float)nBoxSize[j2] - fabsf((float)bead_info[k][j2] - tot_COM[j2])
                                   ? fabsf((float)bead_info[k][j2] - tot_COM[j2])
@@ -293,9 +293,9 @@ void GyrTensor_GyrRad(void) { // Calculates the gyration tensor for the whole sy
     // the rest is tedium. Use good old differential geometry to map each
     // coordinate to two new coordinates, and unpack at the end.
     float theta[POS_MAX] = {0.};
-    float zeta[POS_MAX] = {0.}; // Extra coordinates for goodness
-    float dumArg = 0.;          // Just a dummy variable to be more efficient
-    float dumArg2 = 0.;         // Another one
+    float zeta[POS_MAX]  = {0.}; // Extra coordinates for goodness
+    float dumArg         = 0.;   // Just a dummy variable to be more efficient
+    float dumArg2        = 0.;   // Another one
 
     for (i = 0; i < tot_beads; i++) {
         for (j = 0; j < POS_MAX; j++) {
@@ -341,7 +341,7 @@ void GyrTensor_GyrRad_Avg(void) {
     the diagonals, and then then sum. I shall borrow most of the code from above,
     and so read GyrTensor_ClusterSpecific for what's happening here.
     */
-    int i, j; // Loop indecies
+    int  i, j; // Loop indecies
     lDub tot_COM[POS_MAX] = {0.};
 
     Calc_CenterOfMass_OfSystem(tot_COM);
@@ -411,8 +411,8 @@ void RDF_ComponentWise_Avg(void) {
     end of the run.
     */
     float x; // For distance
-    int i, j, k;
-    int resi, resj;
+    int   i, j, k;
+    int   resi, resj;
     // int chaini, chainj;
     int myBin = 0;
     int array_pos;
@@ -422,7 +422,7 @@ void RDF_ComponentWise_Avg(void) {
         resi = bead_info[i][BEAD_TYPE];
         for (j = i + 1; j < tot_beads; j++) {
             resj = bead_info[j][BEAD_TYPE];
-            x = Dist_BeadToBead(i, j);
+            x    = Dist_BeadToBead(i, j);
             // Note that Dist_BeadToBead(i,j) automatically ensures no distance is
             // greater than (L/2)*sqrt(3)
             myBin = (int)floor(4. * x);                  // I am assuming for now that dr=1/4
@@ -442,7 +442,7 @@ int Check_LinkerConstraint(const int beadID, const int *tmpR) {
     // are unbroken.
     int idx;         // Iterator to loop over bond Partners
     int bondPartner; // It is what it is.
-    idx = 0;
+    idx         = 0;
     bondPartner = topo_info[beadID][idx];                     // Initializing the two.
     while (idx < MAX_BONDS && topo_info[beadID][idx] != -1) { // Keep going till we run out of partners
         bondPartner = topo_info[beadID][idx];
@@ -463,7 +463,7 @@ int Check_MTLinkerConstraint(int beadID, int (*tmpR)[POS_MAX]) {
     int idx, bPart;
     int j;
     int topIt = 0;
-    int canI = 1;
+    int canI  = 1;
 
     while (curID != -1) {
         for (j = 0; j < POS_MAX; j++) {
@@ -475,7 +475,7 @@ int Check_MTLinkerConstraint(int beadID, int (*tmpR)[POS_MAX]) {
     curID = beadID;
     topIt = 0;
     while (curID != -1 && canI == 1) {
-        idx = 0;
+        idx   = 0;
         bPart = topo_info[curID][idx];
         while (bPart != -1 && idx < MAX_BONDS) {
             if (Dist_BeadToBead(curID, bPart) > 1.74 * (float)linker_len[curID][idx]) {
@@ -500,12 +500,12 @@ int Check_MTLinkerConstraint(int beadID, int (*tmpR)[POS_MAX]) {
 
 void Calc_CenterOfMass_OfSystem(lDub *tmpR) {
 
-    int i, j;                     // Iterators
+    int  i, j;                    // Iterators
     lDub tot_COM[POS_MAX] = {0.}; // This is where the COM will be stored
 
     lDub zeta[POS_MAX] = {0.};
-    lDub xi[POS_MAX] = {0.};
-    lDub dumArg = 0.;
+    lDub xi[POS_MAX]   = {0.};
+    lDub dumArg        = 0.;
 
     lDub dumConst[POS_MAX] = {0.};
     for (j = 0; j < POS_MAX; j++) {
@@ -553,14 +553,14 @@ void Calc_CenterOfMass_OfCluster(lDub *tmpR, const int cluster_size, const int *
     // This version measures the COM of a cluster of size c
     //  cluster size, given the molecule ID's in naList.
     // The COM from this is not necessarily the COM of the system as a whole.
-    int thisMol, i, j, k;         // Iterators
-    int fB, lB;                   // Keep track of first and last beads of a given molecule
+    int  thisMol, i, j, k;        // Iterators
+    int  fB, lB;                  // Keep track of first and last beads of a given molecule
     lDub tot_COM[POS_MAX] = {0.}; // This is where the COM will be stored
-    int bead_total_now = 0;
+    int  bead_total_now   = 0;
 
     lDub zeta[POS_MAX] = {0.};
-    lDub xi[POS_MAX] = {0.};
-    lDub dumArg = 0.;
+    lDub xi[POS_MAX]   = {0.};
+    lDub dumArg        = 0.;
 
     lLDub dumConst[POS_MAX] = {0.};
     for (j = 0; j < POS_MAX; j++) {
@@ -569,8 +569,8 @@ void Calc_CenterOfMass_OfCluster(lDub *tmpR, const int cluster_size, const int *
 
     for (k = 0; k < cluster_size; k++) {
         thisMol = ClusList[k];
-        fB = chain_info[thisMol][CHAIN_START];
-        lB = fB + chain_info[thisMol][CHAIN_LENGTH];
+        fB      = chain_info[thisMol][CHAIN_START];
+        lB      = fB + chain_info[thisMol][CHAIN_LENGTH];
         for (i = fB; i < lB; i++) {
             bead_total_now++;
             for (j = 0; j < POS_MAX; j++) {
@@ -607,14 +607,14 @@ void Calc_CenterOfMass_OfCluster(lDub *tmpR, const int cluster_size, const int *
 void Calc_CenterOfMass_OfSystem_OfMolType(lDub *tmpR, const int thisType) {
     // This version measures the COM of only type thisType
     // The COM from this is not necessarily the COM of the system as a whole.
-    int thisMol, i, j, k;         // Iterators
-    int fB, lB;                   // Keep track of first and last beads of a given molecule
+    int  thisMol, i, j, k;        // Iterators
+    int  fB, lB;                  // Keep track of first and last beads of a given molecule
     lDub tot_COM[POS_MAX] = {0.}; // This is where the COM will be stored
-    int bead_total_now = 0;
+    int  bead_total_now   = 0;
 
     lDub zeta[POS_MAX] = {0.};
-    lDub xi[POS_MAX] = {0.};
-    lDub dumArg = 0.;
+    lDub xi[POS_MAX]   = {0.};
+    lDub dumArg        = 0.;
 
     lDub dumConst[POS_MAX] = {0.};
     for (j = 0; j < POS_MAX; j++) {
@@ -667,14 +667,14 @@ void Calc_CenterOfMass_OfSystem_OfMolType(lDub *tmpR, const int thisType) {
 void Calc_CenterOfMass_OfSystem_WithoutMolType(lDub *tmpR, const int thisType) {
     // This version measures the COM of everything except type thisType
     // The COM from this is not necessarily the COM of the system as a whole.
-    int thisMol, i, j, k;         // Iterators
-    int fB, lB;                   // Keep track of first and last beads of a given molecule
+    int  thisMol, i, j, k;        // Iterators
+    int  fB, lB;                  // Keep track of first and last beads of a given molecule
     lDub tot_COM[POS_MAX] = {0.}; // This is where the COM will be stored
-    int bead_total_now = 0;
+    int  bead_total_now   = 0;
 
     lDub zeta[POS_MAX] = {0.};
-    lDub xi[POS_MAX] = {0.};
-    lDub dumArg = 0.;
+    lDub xi[POS_MAX]   = {0.};
+    lDub dumArg        = 0.;
 
     lDub dumConst[POS_MAX] = {0.};
     for (j = 0; j < POS_MAX; j++) {
@@ -723,10 +723,10 @@ void Calc_CenterOfMass_OfSystem_WithoutMolType(lDub *tmpR, const int thisType) {
 
 void RadDen_Avg_MolTypeWise_FromSysCen(void) {
 
-    int i;        // Iterator for loop
-    int thisType; // Tracks the type of the chain
-    lDub sysCOM[POS_MAX] = {0.};
-    int myBin;
+    int   i;        // Iterator for loop
+    int   thisType; // Tracks the type of the chain
+    lDub  sysCOM[POS_MAX] = {0.};
+    int   myBin;
     float xDis = 0.; // Tracks the distance between the COM and the specific bead
 
     Calc_CenterOfMass_OfSystem(sysCOM);
@@ -734,8 +734,8 @@ void RadDen_Avg_MolTypeWise_FromSysCen(void) {
     for (i = 0; i < tot_beads; i++) {
         thisType = bead_info[i][BEAD_CHAINID];
         thisType = chain_info[thisType][CHAIN_TYPE];
-        xDis = Dist_BeadToPoint_Double(i, sysCOM);
-        myBin = (int)floor(4. * xDis);
+        xDis     = Dist_BeadToPoint_Double(i, sysCOM);
+        myBin    = (int)floor(4. * xDis);
         ldRadDen_Arr[RadDenArr_Index(0, thisType, myBin)] += 1.0;
     }
     nRadDenCounter++;
@@ -743,14 +743,14 @@ void RadDen_Avg_MolTypeWise_FromSysCen(void) {
 
 void RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void) {
 
-    int i, j;     // Iterators for loop
-    int thisType; // Tracks the type of the chain
-    int thisComp; // Tracks which component of ldRadDen
-    lDub typeCOM[POS_MAX] = {0};
-    int COM_int[POS_MAX] = {0.};
-    int myBin;
-    float xDis = 0.; // Tracks the distance between the COM and the specific bead
-    int cur_type = 0;
+    int   i, j;     // Iterators for loop
+    int   thisType; // Tracks the type of the chain
+    int   thisComp; // Tracks which component of ldRadDen
+    lDub  typeCOM[POS_MAX] = {0};
+    int   COM_int[POS_MAX] = {0.};
+    int   myBin;
+    float xDis     = 0.; // Tracks the distance between the COM and the specific bead
+    int   cur_type = 0;
 
     Calc_CenterOfMass_OfSystem(typeCOM);
     for (j = 0; j < POS_MAX; j++) {
@@ -760,8 +760,8 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void) {
         thisType = bead_info[i][BEAD_CHAINID];
         thisType = chain_info[thisType][CHAIN_TYPE];
         thisComp = RadDen_ComponentIndex(-1, thisType);
-        xDis = Dist_BeadToPoint(i, COM_int);
-        myBin = (int)(4. * xDis);
+        xDis     = Dist_BeadToPoint(i, COM_int);
+        myBin    = (int)(4. * xDis);
         ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
     }
 
@@ -774,8 +774,8 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void) {
             thisType = bead_info[i][BEAD_CHAINID];
             thisType = chain_info[thisType][CHAIN_TYPE];
             thisComp = RadDen_ComponentIndex(cur_type, thisType);
-            xDis = Dist_BeadToPoint(i, COM_int);
-            myBin = (int)(4. * xDis);
+            xDis     = Dist_BeadToPoint(i, COM_int);
+            myBin    = (int)(4. * xDis);
             ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
         }
     }
@@ -814,18 +814,18 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void) {
 
 void RadDen_Avg_MolTypeWise_FromMolTypeCen(void) {
 
-    int i, j, k;  // Iterators for loop
-    int thisType; // Tracks the type of the chain
-    int thisComp; // Tracks which component of ldRadDen
-    lDub typeCOM[POS_MAX] = {0};
-    int COM_int[POS_MAX] = {0.};
-    int myBin;
-    float xDis = 0.; // Tracks the distance between the COM and the specific bead
-    int cur_type = 0;
-    int fB, lB;
-    int clus_size = 0;
-    int clus_id = -1;
-    int *clus_id_list; // Tracks the cluster ID's after the clustering analysis.
+    int   i, j, k;  // Iterators for loop
+    int   thisType; // Tracks the type of the chain
+    int   thisComp; // Tracks which component of ldRadDen
+    lDub  typeCOM[POS_MAX] = {0};
+    int   COM_int[POS_MAX] = {0.};
+    int   myBin;
+    float xDis     = 0.; // Tracks the distance between the COM and the specific bead
+    int   cur_type = 0;
+    int   fB, lB;
+    int   clus_size = 0;
+    int   clus_id   = -1;
+    int * clus_id_list; // Tracks the cluster ID's after the clustering analysis.
     clus_id_list = malloc((tot_chain_types + 1) * sizeof(lInt));
     for (i = 0; i <= tot_chain_types; i++) {
         clus_id_list[i] = -1;
@@ -839,7 +839,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void) {
     }
 
     for (cur_type = 0; cur_type <= tot_chain_types; cur_type++) {
-        clus_id = clus_id_list[cur_type];
+        clus_id   = clus_id_list[cur_type];
         clus_size = naCluster[clus_id][0];
         // printf("(%d %d) ", clus_id, clus_size);
         for (i = 0; i < clus_size; i++) {
@@ -858,8 +858,8 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void) {
                 thisType = bead_info[i][BEAD_CHAINID];
                 thisType = chain_info[thisType][CHAIN_TYPE];
                 thisComp = RadDen_ComponentIndex(cur_type - 1, thisType);
-                xDis = Dist_BeadToPoint(i, COM_int);
-                myBin = (int)(4. * xDis);
+                xDis     = Dist_BeadToPoint(i, COM_int);
+                myBin    = (int)(4. * xDis);
                 ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
             }
         }
@@ -879,8 +879,8 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void) {
             thisType = bead_info[i][BEAD_CHAINID];
             thisType = chain_info[thisType][CHAIN_TYPE];
             thisComp = nRadDen_CompShift + RadDen_ComponentIndex(cur_type - 1, thisType);
-            xDis = Dist_BeadToPoint(i, COM_int);
-            myBin = (int)(4. * xDis);
+            xDis     = Dist_BeadToPoint(i, COM_int);
+            myBin    = (int)(4. * xDis);
             ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
         }
     }
@@ -895,11 +895,11 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void) {
 int NeighborList_StoreNeighborsAndDistance(const int beadID, const int *startVec, const int searchRad, int *neighList,
                                            float *distList) {
 
-    int neighborNum = 0;
-    int x, y, z;
-    int tmpR2[POS_MAX] = {0};
-    int neighID = -1;
-    float xDis = 0.f;
+    int   neighborNum = 0;
+    int   x, y, z;
+    int   tmpR2[POS_MAX] = {0};
+    int   neighID        = -1;
+    float xDis           = 0.f;
 
     for (x = -searchRad; x <= searchRad; x++) {
         for (y = -searchRad; y <= searchRad; y++) {
@@ -907,10 +907,10 @@ int NeighborList_StoreNeighborsAndDistance(const int beadID, const int *startVec
                 tmpR2[0] = (startVec[0] + x + nBoxSize[0]) % nBoxSize[0];
                 tmpR2[1] = (startVec[1] + y + nBoxSize[1]) % nBoxSize[1];
                 tmpR2[2] = (startVec[2] + z + nBoxSize[2]) % nBoxSize[2];
-                neighID = naTotLattice[Lat_Ind_FromVec(tmpR2)];
+                neighID  = naTotLattice[Lat_Ind_FromVec(tmpR2)];
                 if (neighID != -1 && neighID != beadID) {
-                    xDis = sqrtf((float)(x * x + y * y + z * z));
-                    distList[neighborNum] = xDis;
+                    xDis                   = sqrtf((float)(x * x + y * y + z * z));
+                    distList[neighborNum]  = xDis;
                     neighList[neighborNum] = neighID;
                     neighborNum++;
                 }
