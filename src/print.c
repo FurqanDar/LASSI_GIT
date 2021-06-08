@@ -460,7 +460,7 @@ void Write_TopFile(char *filename) {
       fp,
       "1\t1.0\n2\t1.0\n3\t1.0\n4\t1.0\n5\t1.0\n6\t1.0\n"); // Dummy masses for
                                                            // the 6 types.
-  fprintf(fp, "\n");      // Empty line.
+  fprintf(fp, "\n");                                       // Empty line.
   fprintf(fp, "Atoms\n"); // Signifying the beginning of atom coordinates.
   fprintf(fp, "\n");      // Empty line.
   for (i = 0; i < tot_beads; i++) {

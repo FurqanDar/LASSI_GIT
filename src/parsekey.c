@@ -403,8 +403,8 @@ void Parse_StructureFile(char *filename) {
   char strKeyword[1000]; // Used to convert strLine into specific keywords.
   int curID;             // Used to track the current beadID
   int curType, curLinker,
-      curPartner; // Used to track current
-                  // bead-type,linker-length(s),bond-partner.
+      curPartner;               // Used to track current
+                                // bead-type,linker-length(s),bond-partner.
   int nCopies;                  // Used to store how many copies to make.
   int nChainStart;              // Tracking which beadID each chain starts from.
   int i, j, k;                  // Just some iterators for looping

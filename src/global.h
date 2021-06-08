@@ -108,8 +108,8 @@ lLDub bolt_fac[MAX_ROTSTATES - 1]; // Used in orientational-bias
 lLDub bolt_norm[MAX_VALENCY];
 lLDub dbias_bolt_fac[MAX_AA][MAX_AA]; // For pre-calculating the factors.
 lLDub ld_LogOfSmallestPossibleProb;   // Smallest probability possible
-                                    // logl(1/RAND_MAX)
-float faCurrEn[MAX_E]; // Vector for current energy
+                                      // logl(1/RAND_MAX)
+float faCurrEn[MAX_E];                // Vector for current energy
 
 // Arrays to track certain topology and interaction information
 lInt nBeadTypeIsSticker[MAX_AA]; // Used to track if that beadType interacts via
