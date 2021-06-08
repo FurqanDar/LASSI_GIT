@@ -4,8 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-long TrajArr_Index(const int beadID, const int nFrameNumber,
-                   const int beadProp);
+long TrajArr_Index(const int beadID, const int nFrameNumber, const int beadProp);
 
 void Print_LogToScreen(long nGen, int run_it);
 

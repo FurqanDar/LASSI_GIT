@@ -80,8 +80,7 @@ typedef long double lLDub;
 // configurations and structural info
 lInt bead_info[MAX_BEADS][BEADINFO_MAX];
 lInt old_bead[MAX_BEADS][BEADINFO_MAX]; // Redundant copy for MCSteps
-lInt linker_len[MAX_BEADS]
-               [MAX_BONDS]; // Remember that this one is an INT, not float
+lInt linker_len[MAX_BEADS][MAX_BONDS];  // Remember that this one is an INT, not float
 lInt topo_info[MAX_BEADS][MAX_BONDS];
 lInt chain_info[MAX_CHAINS][CHAININFO_MAX];
 
@@ -93,8 +92,7 @@ lInt nThermalization_Mode, RotBias_Mode;
 
 // system setup
 lInt nBoxSize[POS_MAX];
-lInt LocalArr[MAX_ROTSTATES - 1]
-             [3]; // Used to quickly iterate over nearby points in an R-cube
+lInt LocalArr[MAX_ROTSTATES - 1][3]; // Used to quickly iterate over nearby points in an R-cube
 lInt Rot_IndArr[MAX_ROTSTATES - 1];
 char bReadConf;
 
@@ -102,9 +100,8 @@ char bReadConf;
 lInt nBeadTypes;
 float fEnergy[MAX_AA][MAX_AA][MAX_E];
 float fEnRad[MAX_AA][MAX_AA][MAX_E];
-lInt rot_trial[MAX_VALENCY]
-              [MAX_ROTSTATES];     // Used in orientational-bias MC moves
-lLDub bolt_fac[MAX_ROTSTATES - 1]; // Used in orientational-bias
+lInt rot_trial[MAX_VALENCY][MAX_ROTSTATES]; // Used in orientational-bias MC moves
+lLDub bolt_fac[MAX_ROTSTATES - 1];          // Used in orientational-bias
 lLDub bolt_norm[MAX_VALENCY];
 lLDub dbias_bolt_fac[MAX_AA][MAX_AA]; // For pre-calculating the factors.
 lLDub ld_LogOfSmallestPossibleProb;   // Smallest probability possible
@@ -112,26 +109,25 @@ lLDub ld_LogOfSmallestPossibleProb;   // Smallest probability possible
 float faCurrEn[MAX_E];                // Vector for current energy
 
 // Arrays to track certain topology and interaction information
-lInt nBeadTypeIsSticker[MAX_AA]; // Used to track if that beadType interacts via
-                                 // rotations.
+lInt nBeadTypeIsSticker[MAX_AA];         // Used to track if that beadType interacts via
+                                         // rotations.
 lInt nChainTypeIsLinear[MAX_CHAINTYPES]; // Used to track if this chainType is
                                          // linear.
-lInt nBeadTypeCanOvlp[MAX_AA]; // Used to track if a certain beadType has an
-                               // overlap cost.
-lInt nBeadTypeCanCont[MAX_AA]; // Used to track if a certain beadType has
-                               // contact interactions
-lInt nBeadTypeCanFSol[MAX_AA]; // Used to track if a certain beadType has
-                               // solvation energies
-lInt nBeadTypeCanTInd[MAX_AA]; // Used to track if a certain beadType has
-                               // temperature independent solvation
+lInt nBeadTypeCanOvlp[MAX_AA];           // Used to track if a certain beadType has an
+                                         // overlap cost.
+lInt nBeadTypeCanCont[MAX_AA];           // Used to track if a certain beadType has
+                                         // contact interactions
+lInt nBeadTypeCanFSol[MAX_AA];           // Used to track if a certain beadType has
+                                         // solvation energies
+lInt nBeadTypeCanTInd[MAX_AA];           // Used to track if a certain beadType has
+                                         // temperature independent solvation
 
 float fLinkerLength;
 float fLinkerSprCon;
 float fLinkerEqLen;
 
 // MC setup
-float fKT, fPreKT, fCuTemp, fRot_Bias, f_globRotBias, fdelta_temp,
-    fMC_Temp_Rate, fSquishRad;
+float fKT, fPreKT, fCuTemp, fRot_Bias, f_globRotBias, fdelta_temp, fMC_Temp_Rate, fSquishRad;
 float *fKT_Cycle;
 lLong nMCStepsPerCycle, nMCPreSteps;
 float fMCFreq[MAX_MV];
