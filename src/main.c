@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]) {
     // Read in the system commands
-    char keyfile[100];
+    char keyfile[1000];
     if (argc == 3 && strcmp(argv[1], "-k") == 0) {
         strcpy(keyfile, argv[2]);
     } else {

@@ -263,9 +263,10 @@ float Energy_Isotropic_Old(int beadID) { // Calculate Contact and Overlap energy
 }
 
 /// Energy_OVLP serves as the base function for energy calculations depending on
-/// the distance. \param fEn: The interaction energy. Should be
-/// fEnergy[i][j][E_OVLP] \param xDis: The distance on the lattice. \return
-/// totEn = fEn / (xDis^3)
+/// the distance.
+/// \param fEn: The interaction energy. Should be fEnergy[i][j][E_OVLP]
+/// \param xDis: The distance on the lattice.
+/// \return totEn = fEn / (xDis^3)
 float Energy_OVLP(const float fEn, const float xDis) {
     float totEn = 0.f;
 

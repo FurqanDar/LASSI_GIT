@@ -301,8 +301,7 @@ int Move_Local(int   beadID,
         tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
     }
     yTemp = Check_MoveBeadTo(tmpR2);
-    if (yTemp == 1) { // This means we found an empty lattice site. So let's check
-                      // if the linkers are okay.
+    if (yTemp == 1) { // This means we found an empty lattice site. So let's check if the linkers are okay.
         yTemp = Check_LinkerConstraint(beadID, tmpR2);
     }
 
@@ -311,10 +310,15 @@ int Move_Local(int   beadID,
         return bAccept;
     }
 
-    // Have successfully found a good lattice spot. Let's perform the usual
-    // Metropolis-Hastings shenanigans.
+    // Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
     resi = bead_info[beadID][BEAD_TYPE]; // I want to treat linker beads differently
                                          // always because they have no rotational states
+
+    /* Somewhere here is when we should calculate all the neighbors for this bead. We should only record the ID's of the
+     * beads. That list can then be used to calculate the isotropic energy and Rosenbluth weights. Note that all of this
+     * should be skipped for beads that never interact in the first place.
+     */
+
     oldEn += Energy_Isotropic(beadID);
     if (nBeadTypeIsSticker[resi] == 1) { // Only non linkers can bond
         if (bead_info[beadID][BEAD_FACE] != -1) {
@@ -329,16 +333,16 @@ int Move_Local(int   beadID,
 
         OP_MoveBeadTo(beadID, tmpR2); // Does not break bond
 
-        OP_ShuffleRotIndecies(); // Need to shuffle because this also acts as
-                                 // selecting new partner
+
+
+        OP_ShuffleRotIndecies(); // Need to shuffle because this also acts as selecting new partner
         FWWeight = Check_RotStatesNew(beadID, resi, MyTemp);
         OP_NormalizeRotState(0, FWWeight);
         FWRos = logl(bolt_norm[0]);
 
         yTemp = OP_PickRotState(FWWeight);
 
-        if (yTemp != -1) { // There is a bead at this position in the rot_trial, so
-                           // let's add the energy.
+        if (yTemp != -1) { // There is a bead at this position in the rot_trial, so let's add the energy.
             resj  = bead_info[yTemp][BEAD_TYPE];
             newEn = (lLDub)fEnergy[resi][resj][E_SC_SC];
         }
