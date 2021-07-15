@@ -2,9 +2,6 @@
 #define _MCMOVE_H_
 
 #include "global.h"
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 int MC_Step(float fMCTemp);
 

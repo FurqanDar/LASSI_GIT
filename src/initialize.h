@@ -1,6 +1,8 @@
 #ifndef _INITIALIZE_H_ // include guard
 #define _INITIALIZE_H_
 
+#include "global.h"
+
 void Memory_Initialization_AtStart(void);
 
 void Memory_VerifyMalloc(void);

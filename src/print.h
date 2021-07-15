@@ -1,8 +1,7 @@
 #ifndef _PRINT_H_ // include guard
 #define _PRINT_H_
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "global.h"
 
 long TrajArr_Index(const int beadID, const int nFrameNumber, const int beadProp);
 

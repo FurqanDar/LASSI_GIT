@@ -1,5 +1,4 @@
 #include "initialize.h"
-#include "global.h"
 #include "structure.h"
 
 /// Memory_Initialization_AtStart - allocates memory, and initializes the

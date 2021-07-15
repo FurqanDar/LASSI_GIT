@@ -1,6 +1,9 @@
 #ifndef _CLUSTER_H_ // include guard
 #define _CLUSTER_H_
 
+#include "global.h"
+
+
 int Clus_Network_ChainCluster_General(int const chainID);
 
 int Clus_Network_ChainCluster_ForTotal(int const chainID);

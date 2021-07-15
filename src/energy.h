@@ -1,8 +1,8 @@
 #ifndef _ENERGY_H_ // include guard
 #define _ENERGY_H_
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "global.h"
+
 
 void Energy_Total_System(void);
 

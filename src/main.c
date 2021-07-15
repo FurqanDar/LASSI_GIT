@@ -1,11 +1,11 @@
-#include "cluster.h"
-#include "energy.h"
 #include "global.h"
-#include "initialize.h"
-#include "mcmove.h"
 #include "parsekey.h"
 #include "print.h"
+#include "initialize.h"
 #include "structure.h"
+#include "mcmove.h"
+#include "cluster.h"
+#include "energy.h"
 
 int main(int argc, char *argv[]) {
     // Read in the system commands

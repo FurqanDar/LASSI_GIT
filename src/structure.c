@@ -1,6 +1,6 @@
 #include "structure.h"
 #include "cluster.h"
-#include "global.h"
+#include "mcmove.h"
 
 /// Lat_Ind_FromCoords - helper function to get the correct 1D index of this
 /// position \param i \param j \param k \return the 1D index location for

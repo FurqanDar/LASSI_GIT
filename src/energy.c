@@ -1,5 +1,4 @@
 #include "energy.h"
-#include "global.h"
 #include "structure.h"
 
 /// Energy_InitPotential calculates the biasing potential used in the

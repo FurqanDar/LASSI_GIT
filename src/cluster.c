@@ -1,5 +1,4 @@
 #include "cluster.h"
-#include "global.h"
 #include "structure.h"
 
 /// Clus_ChainNetwork_General - calculates the cluster chainID is a part of.
