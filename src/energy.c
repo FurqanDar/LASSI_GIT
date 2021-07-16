@@ -214,6 +214,13 @@ float Energy_Anisotropic_With_List(const int beadID, const int *bead_list, const
     return totEn;
 }
 
+/// Energy_Iso_Ovlp - calculate the OVLP interaction between two beads of types beadType1 and beadType2,
+/// respectively. \param beadType1: Type of first bead. \param beadType2: Type of second bead.
+/// \param xDis: Distance between the two beads.
+float Energy_Iso_Ovlp(int const beadType1, int const beadType2, float const xDis){
+    return fEnergy[beadType1][beadType2][E_OVLP];
+}
+
 /// Energy_Isotroptic_Old calculates the isotropic contribution to the energy by searching the 3^3-1 = 26 'neighbors'
 /// The energy function  is like the BFM, where \f$\epislon$\f represents the overlap cost for total overlap, which is
 /// forbidden explicitly in LASSI, so we have \f$\epislon/2$\f,\f$\epislon/4$\f and \f$\epislon/8$\f with increasing
@@ -250,15 +257,15 @@ float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy o
                 secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
-                    totEn += fEnergy[resi][resj][E_OVLP];
+                    totEn += Energy_Iso_Ovlp(resi, resj, xDis);
                     xDis = sqrtf((float)(x*x + y*y + z*z));
                     //xDis = Dist_BeadToBead(beadID, secBi);
                     if (xDis <= 1.0) {
-                        totEn += fEnergy[resi][resj][E_OVLP] / 2.0;
+                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.0;
                     } else if (xDis <= 1.42) { // sqrt(2)
-                        totEn += fEnergy[resi][resj][E_OVLP] / 4.0;
+                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 4.0;
                     } else if (xDis <= 1.74) { // sqrt(3)
-                        totEn += fEnergy[resi][resj][E_OVLP] / 8.0;
+                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 8.0;
                     }
                     else {//This way, contact is only outside ovlp
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
@@ -316,7 +323,7 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
                     resj = bead_info[secBi][BEAD_TYPE];
                     xDis = sqrtf((float)(x*x + y*y + z*z));
                     if (xDis <= 1.74) { // 1/r^3 potential
-                        totEn += fEnergy[resi][resj][E_OVLP] ;/// xDis / xDis / xDis;
+                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) ;/// xDis / xDis / xDis;
                     }
                     // 1/r potential that goes till cube three
                     totEn += fEnergy[resi][resj][E_CONT] / xDis;
@@ -372,7 +379,7 @@ float Energy_Isotropic_Self(int beadID) {//Calculate Contact and Overlap energy 
                         resj = bead_info[secBi][BEAD_TYPE];
                         xDis = sqrtf((float) (x * x + y * y + z * z));
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP];/// xDis / xDis / xDis;
+                            totEn += Energy_Iso_Ovlp(resi, resj, xDis);/// xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
@@ -431,14 +438,14 @@ float Energy_Isotropic_For_Chain(int beadID) {//Calculate Contact and Overlap en
                     xDis = sqrtf((float) (x * x + y * y + z * z));
                     if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {//Intra-molecular
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP] /2.;// / xDis / xDis / xDis /2.;
+                            totEn += Energy_Iso_Ovlp(resi, resj, xDis) /2.;// / xDis / xDis / xDis /2.;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis /2.;
                     }
                     else{//Inter-molecular
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP] ;// xDis / xDis / xDis;
+                            totEn += Energy_Iso_Ovlp(resi, resj, xDis) ;// xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
@@ -500,14 +507,14 @@ float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int large
                     if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {//Intra-molecular
                         if (secBi >= smallest_bead && secBi <= largest_bead) {//Within subset
                             if (xDis <= 1.74) { // 1/r^3 potential
-                                totEn += fEnergy[resi][resj][E_OVLP] /2.;// xDis / xDis / xDis / 2.;
+                                totEn += Energy_Iso_Ovlp(resi, resj, xDis) /2.;// xDis / xDis / xDis / 2.;
                             }
                             // 1/r potential that goes till cube three
                             totEn += fEnergy[resi][resj][E_CONT] / xDis / 2.;
                         }
                         else{
                             if (xDis <= 1.74) { // 1/r^3 potential
-                                totEn += fEnergy[resi][resj][E_OVLP] ;// xDis / xDis / xDis;
+                                totEn += Energy_Iso_Ovlp(resi, resj, xDis) ;// xDis / xDis / xDis;
                             }
                             // 1/r potential that goes till cube three
                             totEn += fEnergy[resi][resj][E_CONT] / xDis;
@@ -515,7 +522,7 @@ float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int large
                     }
                     else{//Inter-molecular
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP]; // / xDis / xDis / xDis;
+                            totEn += Energy_Iso_Ovlp(resi, resj, xDis); // / xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;
@@ -583,14 +590,14 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
                     }
                     if (bead_check == 1) {//Intra-list
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP] /2.;// / xDis / xDis / xDis /2.;
+                            totEn += Energy_Iso_Ovlp(resi, resj, xDis) /2.;// / xDis / xDis / xDis /2.;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis /2.;
                     }
                     else{//Inter-list
                         if (xDis <= 1.74) { // 1/r^3 potential
-                            totEn += fEnergy[resi][resj][E_OVLP]; // / xDis / xDis / xDis;
+                            totEn += Energy_Iso_Ovlp(resi, resj, xDis); // / xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
                         totEn += fEnergy[resi][resj][E_CONT] / xDis;

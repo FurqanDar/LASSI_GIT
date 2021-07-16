@@ -16,6 +16,8 @@ float Energy_Anisotropic_Contiguous_Range(int beadID, int smallest_bead, int lar
 
 float Energy_Anisotropic_With_List(const int beadID, const int *bead_list, const int list_size);
 
+float Energy_Iso_Ovlp(int const beadType1, int const beadType2, float const xDis);
+
 float Energy_Isotropic(int beadID);
 
 float Energy_Isotropic_Self(int beadID);
