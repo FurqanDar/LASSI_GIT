@@ -17,7 +17,9 @@ float Dist_PointToPoint_Float(const float *f1, const float *f2);
 
 float Dist_PointToPoint(const int *f1, const int *f2);
 
-float Dist_VecMag(const int *f1);
+float Dist_nVecMag(const int *f1);
+
+float Dist_fVecMag(const float *f1);
 
 int Check_LinkerConstraint(const int beadID, const int *tmpR);
 

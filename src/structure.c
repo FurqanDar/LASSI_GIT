@@ -11,11 +11,11 @@ int Lat_Ind_FromCoords(const int i, const int j,
 }
 
 /// Lat_Ind_FromVec - returns the 1D index given the array xArr
-/// \param xArr
+/// Vector form of Lat_Ind_FromCoords.
+/// \param xArr: N-vector where first three components are coordinates. E.g (0,1,2,...)
 /// \return
-int Lat_Ind_FromVec(const int *xArr) { // Just the vector form of the above
-                                       // function. Easier to read sometimes.
-    return xArr[POS_X] + nBoxSize[POS_X] * (xArr[POS_Y] + nBoxSize[POS_Y] * xArr[POS_Z]);
+int Lat_Ind_FromVec(const int *xArr) {
+    return xArr[0] + nBoxSize[0] * (xArr[1] + nBoxSize[1] * xArr[2]);
 }
 
 /// Lat_Ind_OfBead - returns the 1D index of this bead's location
@@ -183,10 +183,17 @@ int Check_System_Structure(void) {
     return 0;
 }
 
-/// Dist_VecMag - non periodic boundary euclidean magnitude of vector
-/// \param f1
-/// \return
-float Dist_VecMag(const int *f1) { // Outputs the magnitude of the vector
+/// Non periodic boundary euclidean magnitude of vector of ints.
+/// \param f1: Vector where first three indicies are integer positions.
+/// \return Mag: sqrt(f[0]^2 + f[1]^2 + f[3]^2)
+float Dist_nVecMag(const int *f1) { // Outputs the magnitude of the vector
+    return sqrtf((float)(f1[0] * f1[0] + f1[1] * f1[1] + f1[2] * f1[2]));
+}
+
+/// Non periodic boundary euclidean magnitude of vector of floats.
+/// \param f1: Vector where first three indicies are floats positions.
+/// \return Mag: sqrt(f[0]^2 + f[1]^2 + f[3]^2)
+float Dist_fVecMag(const float *f1) { // Outputs the magnitude of the vector
     return sqrtf((float)(f1[0] * f1[0] + f1[1] * f1[1] + f1[2] * f1[2]));
 }
 
@@ -365,7 +372,7 @@ void GyrTensor_GyrRad_Avg(void) {
                          // will be used to average the final value.
 }
 
-/// RDF_ComponentIndex - 1D index for the symmetric g_{ij} matrix given i and j.
+/// 1D index for the symmetric g_{ij} matrix given i and j.
 /// \param i
 /// \param j
 /// \return The index of the array
@@ -379,13 +386,19 @@ int RDF_ComponentIndex(const int i, const int j) {
     }
 }
 
-/// RDFArr_Inde - 1D index for ld_TOTRDF_Arr which is used to globally store the
+/// 1D index for ld_TOTRDF_Arr which is used to globally store the
 /// different RDFs \param run_cycle \param rdf_comp \param x_pos \return 1D
 /// index for the totalRDFArray
 int RDFArr_Index(const int run_cycle, const int rdf_comp, const int x_pos) {
     return x_pos + nRDF_TotBins * (rdf_comp + nRDF_TotComps * run_cycle);
 }
 
+/// 1D index for ldRadDen_Arr. This is a 2-D symmetric matrix. Used to store the per-cycle bead density of each bead-type.
+/// If i=-1, we are using the system COM as the reference.
+/// Therefore, the indicies are like: COM-0, COM-1, ..., 0-0, 0-1, ..., N-M
+/// \param i: chain of type i.
+/// \param chain of type j.
+/// \return 1D index for the RadDen_Arr. tot_chain_types + j + tot_chain_types * i.
 int RadDen_ComponentIndex(const int i, const int j) {
     if (i < 0) {
         return j;
@@ -394,10 +407,25 @@ int RadDen_ComponentIndex(const int i, const int j) {
     }
 }
 
+
+/// 1D-array index for ld_TOTRadDen_Arr. Supposed to mimic a 3D array which has the structure
+/// [cycle_num][rad_comp][x_pos].
+/// \param run_cycle: Which temperature cycle we are on.
+/// \param rad_comp: Which specific component are we looking at.
+/// \param x_pos: The radial poisition or bin-number.
+/// \return index: x_pos + nRDF_TotBins * (rad_comp + nRadDen_TotComps * run_cycle)
 int RadDenArr_Index(const int run_cycle, const int rad_comp, const int x_pos) {
     return x_pos + nRDF_TotBins * (rad_comp + nRadDen_TotComps * run_cycle);
 }
 
+
+/// Indexing function to generate 1D-index from 3 numbers.
+/// Specifically for ldMOLCLUS_ARR which is a per-molecule-type histogram of cluster-sizes.
+/// Is supposed to mimic a 3D-array which has the structure [run_cycle][chain_type][clus_size]
+/// \param run_cycle: Which temperature cycle we are on. Always >= 0.
+/// \param chain_type: Which molecule-type we are looking at. In [0,tot_chain_types)
+/// \param clus_size: What size cluster is this.
+/// \return idx = clus_size + tot_chains * (chain_type + tot_chain_types * run_cycle)
 int MolClusArr_Index(const int run_cycle, const int chain_type, const int clus_size) {
     return clus_size + tot_chains * (chain_type + tot_chain_types * run_cycle);
 }
@@ -497,6 +525,7 @@ int Check_MTLinkerConstraint(int beadID, int (*tmpR)[POS_MAX]) {
 
     return canI;
 }
+
 
 void Calc_CenterOfMass_OfSystem(lDub *tmpR) {
 
@@ -892,24 +921,29 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void) {
     free(clus_id_list);
 }
 
-int NeighborList_StoreNeighborsAndDistance(const int beadID, const int *startVec, const int searchRad, int *neighList,
+int NeighborList_StoreNeighborsAndDistance(const int beadID, const int *startVec,
+                                           const int searchRad, int *neighList,
                                            float *distList) {
 
     int   neighborNum = 0;
-    int   x, y, z;
+    int   j;
+    int   dispVec[POS_MAX] = {0};
     int   tmpR2[POS_MAX] = {0};
     int   neighID        = -1;
     float xDis           = 0.f;
 
-    for (x = -searchRad; x <= searchRad; x++) {
-        for (y = -searchRad; y <= searchRad; y++) {
-            for (z = -searchRad; z <= searchRad; z++) {
-                tmpR2[0] = (startVec[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (startVec[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (startVec[2] + z + nBoxSize[2]) % nBoxSize[2];
+
+    for (dispVec[0] = -searchRad; dispVec[0] <= searchRad; dispVec[0]++) {
+        for (dispVec[1] = -searchRad; dispVec[1] <= searchRad; dispVec[1]++) {
+            for (dispVec[2] = -searchRad; dispVec[2] <= searchRad; dispVec[2]++) {
+                for (j=0; j<POS_MAX; j++){
+                    tmpR2[j] = startVec[j] + dispVec[j] + nBoxSize[j];
+                    tmpR2[j] = tmpR2[j] >= nBoxSize[j] ? tmpR2[j] - nBoxSize[j] : tmpR2[j];
+                }
                 neighID  = naTotLattice[Lat_Ind_FromVec(tmpR2)];
                 if (neighID != -1 && neighID != beadID) {
-                    xDis                   = sqrtf((float)(x * x + y * y + z * z));
+                    xDis                   = Dist_nVecMag(dispVec);
+//                    xDis                   = sqrtf((float)(x * x + y * y + z * z));
                     distList[neighborNum]  = xDis;
                     neighList[neighborNum] = neighID;
                     neighborNum++;
@@ -917,6 +951,23 @@ int NeighborList_StoreNeighborsAndDistance(const int beadID, const int *startVec
             }
         }
     }
+
+//    for (x = -searchRad; x <= searchRad; x++) {
+//        for (y = -searchRad; y <= searchRad; y++) {
+//            for (z = -searchRad; z <= searchRad; z++) {
+//                tmpR2[0] = (startVec[0] + x + nBoxSize[0]) % nBoxSize[0];
+//                tmpR2[1] = (startVec[1] + y + nBoxSize[1]) % nBoxSize[1];
+//                tmpR2[2] = (startVec[2] + z + nBoxSize[2]) % nBoxSize[2];
+//                neighID  = naTotLattice[Lat_Ind_FromVec(tmpR2)];
+//                if (neighID != -1 && neighID != beadID) {
+//                    xDis                   = sqrtf((float)(x * x + y * y + z * z));
+//                    distList[neighborNum]  = xDis;
+//                    neighList[neighborNum] = neighID;
+//                    neighborNum++;
+//                }
+//            }
+//        }
+//    }
 
     return neighborNum;
 }

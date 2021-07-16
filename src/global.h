@@ -154,12 +154,12 @@ lLong MCAccepMat[2][MAX_MV];
 lInt    nClusteringMode;
 lInt    naCluster[MAX_CHAINS][MAX_CHAINS];
 lInt    naList[MAX_CHAINS];
-lLong * naClusHistList;
-lInt *  naChainCheckList;
+lLong  *naClusHistList;
+lInt   *naChainCheckList;
 lInt    nTotClusCounter;
 lLDub **ld_TOTCLUS_ARR;
-lLDub * ldMOLCLUS_ARR;
-lLDub * ld_TOTMOLCLUS_ARR;
+lLDub   *ldMOLCLUS_ARR;
+lLDub   *ld_TOTMOLCLUS_ARR;
 lInt    naTempR[POS_MAX];
 lInt    nLargestClusterRightNow;
 

@@ -1,7 +1,7 @@
 #include "cluster.h"
 #include "structure.h"
 
-/// Clus_ChainNetwork_General - calculates the cluster chainID is a part of.
+/// Clus_Network_ChainCluster_General - calculates the cluster chainID is a part of.
 /// In summary generate a tree diagram of the bonding chains, and then keep
 /// going down the branches to generate more sub-branches iteratively. Gets the
 /// exhaustive list of the tota network chainID is part of. \param chainID
@@ -50,7 +50,7 @@ int Clus_Network_ChainCluster_General(int const chainID) {
     return clusSize;
 }
 
-/// Clus_ChainNetwork_ForTotal - cluster colculation, specifically for
+/// Clus_Networkl_ChainCluster_ForTotal - cluster calculation, specifically for
 /// Clus_SecondLargestCluster and Clus_TotalAnalysis. Note that this variant of
 /// the clustering does not reset naList and is meant to only be used with total
 /// clustering analyses. For systems with a lot of molecules, just the
@@ -95,7 +95,7 @@ int Clus_Network_ChainCluster_ForTotal(int const chainID) {
     return clusSize;
 }
 
-/// Clus_TotalAnalysis - calculates the total networking/clustering of the
+/// Clus_Network_TotalAnalysis - calculates the total networking/clustering of the
 /// system and stores cluster information in naCluster[][]
 void Clus_Network_TotalAnalysis(void) {
     int curID, Cluster_length, currentLargest, i, j;
@@ -299,7 +299,7 @@ void Clus_Network_Distribution_Avg(void) {
     nLargestClusterRightNow += currentLargest;
 }
 
-/// Clus_DistributionMolWise_Avg - do what Clus_TotalAnalysis does but instead
+/// Clus_DistributionMolWise_Avg - does what Clus_TotalAnalysis does but instead
 /// of remembering clusters in naCluster, update naClusHistList[] and keep
 /// making the total cluster histogram for the system.
 void Clus_Network_Distribution_MolWise_Avg(void) {
@@ -348,7 +348,6 @@ void Clus_Network_Distribution_MolWise_Avg(void) {
 /// redundancy is allowed. naList contains the cluster IDs of the chain types.
 /// Note that naList[0] contains the system's overall largest cluster, naList[1]
 /// is for molType=0 and so on.
-///
 void Clus_Network_MolWise_LargestClusters(void) {
     int curID, Cluster_length, i;
     int ClusNum  = 0;
@@ -417,6 +416,15 @@ void Clus_Network_MolWise_LargestClusters(void) {
     free(largestClus_of_type);
 }
 
+
+/// Clus_Proximity_ChainCluster_ForTotal_IntOnly - cluster calculation based on isotropic/proximity
+/// defined clusters. In this case, only the beads that are interacting (and thus molecules) are
+/// considered part of the cluster. This is specifically for
+/// Clus_Proximity_SecondLargestCluster and Clus_Proximity_TotalAnalysis. Note that this variant of
+/// the clustering does not reset naList and is meant to only be used with total
+/// clustering analyses. For systems with a lot of molecules, just the
+/// initialization of naList can take too long, so it is only done once before
+/// this function is used repeatedly. \param chainID \return clusterSize
 int Clus_Proximity_ChainCluster_ForTotal_IntOnly(int const chainID) {
     // Updates naList to have all proteins close to chainID
     // The idea is to check every bead and see if there is a unique chain in the
@@ -489,6 +497,14 @@ int Clus_Proximity_ChainCluster_ForTotal_IntOnly(int const chainID) {
     return clusSize;
 }
 
+
+/// Clus_Proximity_ChainCluster_ForTotal_All - cluster calculation based on isotropic/proximity
+/// defined clusters. In this case, any beads in the +-1 cube are included. This is specifically for
+/// Clus_Proximity_SecondLargestCluster and Clus_Proximity_TotalAnalysis. Note that this variant of
+/// the clustering does not reset naList and is meant to only be used with total
+/// clustering analyses. For systems with a lot of molecules, just the
+/// initialization of naList can take too long, so it is only done once before
+/// this function is used repeatedly. \param chainID \return clusterSize
 int Clus_Proximity_ChainCluster_ForTotal_All(int const chainID) {
     // Updates naList to have all proteins close to chainID
     // The idea is to check every bead and see if there is a unique chain in the
@@ -838,6 +854,9 @@ int Clus_Proximity_LimitedCluster_IntOnly_Check(int const chainID, int const *Ol
     return clusSize;
 }
 
+/// Checks what cluster chainID is part of. If larger than 15, we stop checking and return -1.
+/// @param chainID: Start clustering analysis on this chain.
+/// @return clusSize: Size of this cluster. -1 if bigger than 15.
 int Clus_Proximity_LimitedCluster_All(int const chainID) {
     // Updates naList to have all proteins bound to  chainID and it's cluster
     // The idea is to check every bead and see if there is a unique bonded chain,
@@ -910,6 +929,11 @@ int Clus_Proximity_LimitedCluster_All(int const chainID) {
     return clusSize;
 }
 
+/// Checks what cluster chainID is part of. If larger than 15, we stop checking and return -1.
+/// We also check if the new naList is the same as OldList. If not, we return -1 at the first mismatch.
+/// This means that the new cluster is different than the older, and breaks micro-reversibility.
+/// @param chainID: Start clustering analysis on this chain.
+/// @return clusSize: Size of this cluster. -1 if bigger than 15.
 int Clus_Proximity_LimitedCluster_All_Check(int const chainID, int const *OldList) {
     // Updates naList to have all proteins bound to  chainID and it's cluster
     // The idea is to check every bead and see if there is a unique bonded chain,
@@ -1023,12 +1047,12 @@ void Clus_Proximity_Distribution_Avg(void) {
     nLargestClusterRightNow += currentLargest;
 }
 
+/// Calculates the cluster distribution of the whole system using IntOnly framework.
+/// Adds to naClusHistList for total averaging at the end.
+/// naClusListHist[] is the per-cycle cluster histogram.
+/// For each cluster, we count how many of each molecule-type is in the cluster.
+/// That is recorded in ldMOLCLUS_ARR[][], which is the full molecule-type cluster distribution.
 void Clus_Proximity_Distribution_IntOnly_MolWise_Avg(void) {
-    /*
-    Calculates the cluster distribution using total_network_analysis framework,
-    but keeps adding to naClusHistList for total averaging at the end. Read
-    total_network_analysis() for what's happening here LOL
-    */
     int curID, Cluster_length, currentLargest, i;
     int IsUnique = 1;
     int thisType = 0;
