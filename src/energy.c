@@ -215,10 +215,23 @@ float Energy_Anisotropic_With_List(const int beadID, const int *bead_list, const
 }
 
 /// Energy_Iso_Ovlp - calculate the OVLP interaction between two beads of types beadType1 and beadType2,
-/// respectively. \param beadType1: Type of first bead. \param beadType2: Type of second bead.
+/// respectively.
+/// \param beadType1: Type of first bead.
+/// \param beadType2: Type of second bead.
 /// \param xDis: Distance between the two beads.
+/// \return fEnergy[beadType1][beadType2][E_OVLP].
 float Energy_Iso_Ovlp(int const beadType1, int const beadType2, float const xDis){
     return fEnergy[beadType1][beadType2][E_OVLP];
+}
+
+/// Energy_Iso_Cont - calculate the CONT interaction between two beads of types beadType1 and beadType2,
+/// respectively.
+/// \param beadType1: Type of first bead.
+/// \param beadType2: Type of second bead.
+/// \param xDis: Distance between the two beads.
+/// \return fEnergy[beadType1][beadType2][E_CONT]/xDis.
+float Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis){
+    return fEnergy[beadType1][beadType2][E_CONT] / xDis;
 }
 
 /// Energy_Isotroptic_Old calculates the isotropic contribution to the energy by searching the 3^3-1 = 26 'neighbors'
@@ -268,7 +281,7 @@ float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy o
                         totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 8.0;
                     }
                     else {//This way, contact is only outside ovlp
-                        totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                        totEn += Energy_Iso_Cont(resi, resj, xDis);
                   }
                 }
                 else if (secBi == -1){
@@ -326,7 +339,7 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
                         totEn += Energy_Iso_Ovlp(resi, resj, xDis) ;/// xDis / xDis / xDis;
                     }
                     // 1/r potential that goes till cube three
-                    totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                    totEn += Energy_Iso_Cont(resi, resj, xDis);
                 }
                 else if (secBi == -1){
                     if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
@@ -382,7 +395,7 @@ float Energy_Isotropic_Self(int beadID) {//Calculate Contact and Overlap energy 
                             totEn += Energy_Iso_Ovlp(resi, resj, xDis);/// xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
-                        totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                        totEn += Energy_Iso_Cont(resi, resj, xDis);
                     }
                 }
                 else if (secBi == -1){
@@ -441,14 +454,14 @@ float Energy_Isotropic_For_Chain(int beadID) {//Calculate Contact and Overlap en
                             totEn += Energy_Iso_Ovlp(resi, resj, xDis) /2.;// / xDis / xDis / xDis /2.;
                         }
                         // 1/r potential that goes till cube three
-                        totEn += fEnergy[resi][resj][E_CONT] / xDis /2.;
+                        totEn += Energy_Iso_Cont(resi, resj, xDis) /2.;
                     }
                     else{//Inter-molecular
                         if (xDis <= 1.74) { // 1/r^3 potential
                             totEn += Energy_Iso_Ovlp(resi, resj, xDis) ;// xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
-                        totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                        totEn += Energy_Iso_Cont(resi, resj, xDis);
                     }
                 }
                 else if (secBi == -1){
@@ -510,14 +523,14 @@ float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int large
                                 totEn += Energy_Iso_Ovlp(resi, resj, xDis) /2.;// xDis / xDis / xDis / 2.;
                             }
                             // 1/r potential that goes till cube three
-                            totEn += fEnergy[resi][resj][E_CONT] / xDis / 2.;
+                            totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.;
                         }
                         else{
                             if (xDis <= 1.74) { // 1/r^3 potential
                                 totEn += Energy_Iso_Ovlp(resi, resj, xDis) ;// xDis / xDis / xDis;
                             }
                             // 1/r potential that goes till cube three
-                            totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                            totEn += Energy_Iso_Cont(resi, resj, xDis);
                         }
                     }
                     else{//Inter-molecular
@@ -525,7 +538,7 @@ float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int large
                             totEn += Energy_Iso_Ovlp(resi, resj, xDis); // / xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
-                        totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                        totEn += Energy_Iso_Cont(resi, resj, xDis);
                     }
                 }
                 else if (secBi == -1){
@@ -593,14 +606,14 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
                             totEn += Energy_Iso_Ovlp(resi, resj, xDis) /2.;// / xDis / xDis / xDis /2.;
                         }
                         // 1/r potential that goes till cube three
-                        totEn += fEnergy[resi][resj][E_CONT] / xDis /2.;
+                        totEn += Energy_Iso_Cont(resi, resj, xDis) /2.;
                     }
                     else{//Inter-list
                         if (xDis <= 1.74) { // 1/r^3 potential
                             totEn += Energy_Iso_Ovlp(resi, resj, xDis); // / xDis / xDis / xDis;
                         }
                         // 1/r potential that goes till cube three
-                        totEn += fEnergy[resi][resj][E_CONT] / xDis;
+                        totEn += Energy_Iso_Cont(resi, resj, xDis);
                     }
                 }
                 else if (secBi == -1){
