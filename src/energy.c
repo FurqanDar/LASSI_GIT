@@ -243,7 +243,7 @@ float Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis
 float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy of bead beadID
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
-    int tmpR[POS_MAX], tmpR2[POS_MAX];
+    int   r_pos_0[POS_MAX], r_chck[POS_MAX];
     int x, y, z; //Lattice indecies
     int secBi, resj;//Second bead index
     float xDis = 0.;//Distance between beads.
@@ -259,15 +259,15 @@ float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy o
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
-        tmpR[j] = bead_info[beadID][j];
+        r_pos_0[j] = bead_info[beadID][j];
     }
     for (x = -BoxRad; x <= BoxRad; x++) {
         for (y = -BoxRad; y <= BoxRad; y++) {
             for (z = -BoxRad; z <= BoxRad; z++) {
-                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
-                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
+                r_chck[0] = (r_pos_0[0] + x + nBoxSize[0]) % nBoxSize[0];
+                r_chck[1] = (r_pos_0[1] + y + nBoxSize[1]) % nBoxSize[1];
+                r_chck[2] = (r_pos_0[2] + z + nBoxSize[2]) % nBoxSize[2];
+                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
                     totEn += Energy_Iso_Ovlp(resi, resj, xDis);
@@ -307,7 +307,7 @@ float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy o
 float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of bead beadID
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
-    int tmpR[POS_MAX], tmpR2[POS_MAX];
+    int   r_pos_0[POS_MAX], r_chck[POS_MAX];
     int x, y, z; //Lattice indecies
     int secBi, resj;//Second bead index
     float xDis = 0.;//Distance between beads.
@@ -323,15 +323,15 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
-        tmpR[j] = bead_info[beadID][j];
+        r_pos_0[j] = bead_info[beadID][j];
     }
     for (x = -BoxRad; x <= BoxRad; x++) {
         for (y = -BoxRad; y <= BoxRad; y++) {
             for (z = -BoxRad; z <= BoxRad; z++) {
-                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
-                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
+                r_chck[0] = (r_pos_0[0] + x + nBoxSize[0]) % nBoxSize[0];
+                r_chck[1] = (r_pos_0[1] + y + nBoxSize[1]) % nBoxSize[1];
+                r_chck[2] = (r_pos_0[2] + z + nBoxSize[2]) % nBoxSize[2];
+                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
                     xDis = sqrtf((float)(x*x + y*y + z*z));
@@ -360,7 +360,7 @@ float Energy_Isotropic_Self(int beadID) {//Calculate Contact and Overlap energy 
     //interactions
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
-    int tmpR[POS_MAX], tmpR2[POS_MAX];
+    int   r_pos_0[POS_MAX], r_chck[POS_MAX];
     int x, y, z; //Lattice indecies
     int secBi, resj;//Second bead index
     float xDis = 0.;//Distance between beads.
@@ -376,15 +376,15 @@ float Energy_Isotropic_Self(int beadID) {//Calculate Contact and Overlap energy 
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
-        tmpR[j] = bead_info[beadID][j];
+        r_pos_0[j] = bead_info[beadID][j];
     }
     for (x = -BoxRad; x <= BoxRad; x++) {
         for (y = -BoxRad; y <= BoxRad; y++) {
             for (z = -BoxRad; z <= BoxRad; z++) {
-                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
-                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
+                r_chck[0] = (r_pos_0[0] + x + nBoxSize[0]) % nBoxSize[0];
+                r_chck[1] = (r_pos_0[1] + y + nBoxSize[1]) % nBoxSize[1];
+                r_chck[2] = (r_pos_0[2] + z + nBoxSize[2]) % nBoxSize[2];
+                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {
                         resj = bead_info[secBi][BEAD_TYPE];
@@ -417,7 +417,7 @@ float Energy_Isotropic_For_Chain(int beadID) {//Calculate Contact and Overlap en
     //Takes care of intra-molecular double counting
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
-    int tmpR[POS_MAX], tmpR2[POS_MAX];
+    int   r_pos_0[POS_MAX], r_chck[POS_MAX];
     int x, y, z; //Lattice indecies
     int secBi, resj;//Second bead index
     float xDis = 0.;//Distance between beads.
@@ -433,15 +433,15 @@ float Energy_Isotropic_For_Chain(int beadID) {//Calculate Contact and Overlap en
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
-        tmpR[j] = bead_info[beadID][j];
+        r_pos_0[j] = bead_info[beadID][j];
     }
     for (x = -BoxRad; x <= BoxRad; x++) {
         for (y = -BoxRad; y <= BoxRad; y++) {
             for (z = -BoxRad; z <= BoxRad; z++) {
-                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
-                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
+                r_chck[0] = (r_pos_0[0] + x + nBoxSize[0]) % nBoxSize[0];
+                r_chck[1] = (r_pos_0[1] + y + nBoxSize[1]) % nBoxSize[1];
+                r_chck[2] = (r_pos_0[2] + z + nBoxSize[2]) % nBoxSize[2];
+                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
                     xDis = sqrtf((float) (x * x + y * y + z * z));
@@ -481,7 +481,7 @@ float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int large
     //This assumes that every bead between smallest_bead and largest_bead will be looped over
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
-    int tmpR[POS_MAX], tmpR2[POS_MAX];
+    int   r_pos_0[POS_MAX], r_chck[POS_MAX];
     int x, y, z; //Lattice indecies
     int secBi, resj;//Second bead index
     float xDis = 0.;//Distance between beads.
@@ -497,15 +497,15 @@ float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int large
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
-        tmpR[j] = bead_info[beadID][j];
+        r_pos_0[j] = bead_info[beadID][j];
     }
     for (x = -BoxRad; x <= BoxRad; x++) {
         for (y = -BoxRad; y <= BoxRad; y++) {
             for (z = -BoxRad; z <= BoxRad; z++) {
-                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
-                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
+                r_chck[0] = (r_pos_0[0] + x + nBoxSize[0]) % nBoxSize[0];
+                r_chck[1] = (r_pos_0[1] + y + nBoxSize[1]) % nBoxSize[1];
+                r_chck[2] = (r_pos_0[2] + z + nBoxSize[2]) % nBoxSize[2];
+                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
                     xDis = sqrtf((float) (x * x + y * y + z * z));
@@ -551,7 +551,7 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
     int bead_check = 0;
-    int tmpR[POS_MAX], tmpR2[POS_MAX];
+    int   r_pos_0[POS_MAX], r_chck[POS_MAX];
     int x, y, z; //Lattice indecies
     int secBi, resj;//Second bead index
     float xDis = 0.;//Distance between beads.
@@ -567,15 +567,15 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
-        tmpR[j] = bead_info[beadID][j];
+        r_pos_0[j] = bead_info[beadID][j];
     }
     for (x = -BoxRad; x <= BoxRad; x++) {
         for (y = -BoxRad; y <= BoxRad; y++) {
             for (z = -BoxRad; z <= BoxRad; z++) {
-                tmpR2[0] = (tmpR[0] + x + nBoxSize[0]) % nBoxSize[0];
-                tmpR2[1] = (tmpR[1] + y + nBoxSize[1]) % nBoxSize[1];
-                tmpR2[2] = (tmpR[2] + z + nBoxSize[2]) % nBoxSize[2];
-                secBi = naTotLattice[Lat_Ind_FromVec(tmpR2)];
+                r_chck[0] = (r_pos_0[0] + x + nBoxSize[0]) % nBoxSize[0];
+                r_chck[1] = (r_pos_0[1] + y + nBoxSize[1]) % nBoxSize[1];
+                r_chck[2] = (r_pos_0[2] + z + nBoxSize[2]) % nBoxSize[2];
+                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
                     xDis = sqrtf((float) (x * x + y * y + z * z));
