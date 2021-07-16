@@ -268,7 +268,8 @@ float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy o
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
                 for (j = 0; j < POS_MAX; j++){
-                    r_chck[j] = r_pos_0[j] + r_disp[j] + nBoxSize[j];
+                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck;
                     r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
                 }
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
@@ -336,7 +337,8 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
                 for (j = 0; j < POS_MAX; j++){
-                    r_chck[j] = r_pos_0[j] + r_disp[j] + nBoxSize[j];
+                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck;
                     r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
                 }
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
@@ -393,7 +395,8 @@ float Energy_Isotropic_Self(int beadID) {//Calculate Contact and Overlap energy 
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
                 for (j = 0; j < POS_MAX; j++){
-                    r_chck[j] = r_pos_0[j] + r_disp[j] + nBoxSize[j];
+                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck;
                     r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
                 }
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
@@ -454,7 +457,8 @@ float Energy_Isotropic_For_Chain(int beadID) {//Calculate Contact and Overlap en
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
                 for (j = 0; j < POS_MAX; j++){
-                    r_chck[j] = r_pos_0[j] + r_disp[j] + nBoxSize[j];
+                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck;
                     r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
                 }
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
@@ -522,7 +526,8 @@ float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int large
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
                 for (j = 0; j < POS_MAX; j++){
-                    r_chck[j] = r_pos_0[j] + r_disp[j] + nBoxSize[j];
+                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck;
                     r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
                 }
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
@@ -596,7 +601,8 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
                 for (j = 0; j < POS_MAX; j++){
-                    r_chck[j] = r_pos_0[j] + r_disp[j] + nBoxSize[j];
+                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck;
                     r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
                 }
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
