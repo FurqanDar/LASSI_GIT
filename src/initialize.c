@@ -591,3 +591,36 @@ float Temperature_Function(int mode, long nGen) {
     return end_val;
 
 }
+
+/// Array_Create_2D_int creates a 2D array or arbitrary size of dimensions [y, x], in C-style.
+/// We first allocate an array of pointers which have size yDim. Call this yArr[]
+/// Using the first pointer, we then allocate a new array of size xDim*yDim. Call this totAr[];
+/// Then for each of the pointers in yArr, we point to different chunks of totAr; converting 2D indicies
+/// to 1D indicies.
+/// \param xDim: Size of second index
+/// \param yDim: Size of first index
+/// \return Pointer to array-of-pointers, or a 2D array.
+int **Array_Create_2D_int(const size_t xDim, const size_t yDim) {
+
+    int **dumPtr;
+    dumPtr = (int **)malloc(yDim * sizeof(int *));
+
+    if (dumPtr == NULL) {
+        printf("Not enough memory\n");
+        exit(1);
+    }
+
+    dumPtr[0] = (int *)malloc(xDim * yDim * sizeof(int));
+
+    if (dumPtr[0] == NULL) {
+        printf("Not enough memory\n");
+        exit(1);
+    }
+
+    uint i;
+    for (i = 1; i < yDim; i++) {
+        dumPtr[i] = &dumPtr[0][i * xDim];
+    }
+
+    return dumPtr;
+}

@@ -19,4 +19,6 @@ float Temperature_Function(int mode, long nGen);
 
 void Calculate_Rot_Bias(float CurrentTemp);
 
+int **Array_Create_2D_int(const size_t xDim, const size_t yDim);
+
 #endif // _INITIALIZE_H_

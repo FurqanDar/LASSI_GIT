@@ -2032,7 +2032,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
     }
 
     yTemp = 0;
-
+    xTemp = 0;
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
         OP_Rotation(PivotM, i, anchorPos);
@@ -2132,14 +2132,15 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
 
 
     yTemp = 0;
-        for (i = anchorBead + 1; i < lastB; i++) {
-            OP_Rotation(PivotM, i, anchorPos);
-            yTemp = Check_MoveBeadTo(naTempR);
-            if (yTemp == 0) {
-                xTemp++;
-                break;
-            }
+    xTemp = 0;
+    for (i = anchorBead + 1; i < lastB; i++) {
+        OP_Rotation(PivotM, i, anchorPos);
+        yTemp = Check_MoveBeadTo(naTempR);
+        if (yTemp == 0) {
+            xTemp++;
+            break;
         }
+    }
 
     if (yTemp == 0) {
         bAccept = 0;
@@ -2847,16 +2848,18 @@ int OP_PickRotState(int CandNums) {
 /// OP_GenMHValue - calculates the acceptance ratio for a given state.
 /// In this implementation, it is assumed that all the inputs to the function
 /// correspond to the logl() of the values (to keep the numbers small)
-/// If the total value {x}, in log space, is larger than 0, it means that expl({x}) > 1.
+/// If the total value x, in log space, is larger than 0, it means that expl(x) > 1.
 /// Therefore the move will be accepted regardless, so the function shall return 2 (a value
 /// larger than 1).
-/// Similarly, if {x} < -21.5, expl({x}) ~\f\$1\times 10^{-10}\f$ which is smaller
+/// Similarly, if x < -21.5, expl(x) ~1x10^{-10} which is smaller
 /// than 1/RAND_MAX; so it is essentially 0 -- thus the function returns 0.
-/// In all other cases, the function returns expl({x}), which is then compared to a number
+/// In all other cases, the function returns expl(x), which is then compared to a number
 /// between 0 and 1.
 /// Remember that log(exp(a)) = a, so log(exp((old_en-new_en)/myTemp)) = (old_en-new_en)/myTemp
-/// \param The total backwards and forwards Rosenbluth weights, bRos and fRos respectively.
-/// The difference in energy, and the temperature.
+/// \param fRos: Forward Rosenbluth weight.
+/// \param bRos: Backwards Rosenbluth weight.
+/// \param Delta_En: Difference in energy.
+/// \param Cur_Temp: Current temperature.
 /// \return The new proposed bonding partner.
 lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp){
     lLDub MH_Value;

@@ -177,10 +177,16 @@ int Parse_Keyfile(char *filename) {
     }
 
     if (strStructFile[0] != '\0') {
-        Parse_StructureFile_CalcBeadsAndChains(strStructFile, tot_beads, tot_chains, nBeadTypes);
+        Parse_StructureFile_CalcBeadsAndChains(strStructFile, &tot_beads, &tot_chains, &tot_chain_types);
+        printf("\n%d %d %d\n", tot_beads, tot_chains, tot_chain_types);
+        tot_chains=0; tot_beads=0; tot_chain_types=0;
+
+
+
+        Parse_StructureFile(strStructFile);
+        printf("\n%d %d %d\n", tot_beads, tot_chains, tot_chain_types);
 
         exit(1);
-        Parse_StructureFile(strStructFile);
         if (nStructFiletype == 0) {
             bReadConf = 0;
         } else if (nStructFiletype == 1) {
@@ -549,21 +555,97 @@ void Parse_StructureFile(char *filename) {
 /// \param filename: Full path of the file, or name of file if in the same directory.
 /// \param n_bead_num: Stores how many total beads are in the structure file.
 /// \param n_chain_num: Stores how many total chains are in the structure file.
-/// \param n_bead_types: Stores how many different bead types are in the file.
 /// \param n_chain_types: Stores how many different chain-types are in the file.
-void Parse_StructureFile_CalcBeadsAndChains(const char* filename,
-                                            int* n_bead_num, int* n_chain_num,
-                                            int* n_bead_types, int* n_chain_types){
+void Parse_StructureFile_CalcBeadsAndChains(char *filename, int* n_bead_num,
+                                            int* n_chain_num, int* n_chain_types){
+    int dum_beads  = 0;
+    int dum_chains = 0;
+    int dum_chain_types = 0;
+    int per_chain_num;
+    int per_ch_bd_num = 0;
+    int errCode = 0;
+    int nFlag   = -1;
+    char strLine[1000];
+    char strKey[1000];
+
+    int n_old_bd_id, n_new_bd_id;
+
+    //So that this function always sets the values to 0.
+    *n_chain_types = 0;
+    *n_bead_num    = 0;
+    *n_chain_num   = 0;
 
     FILE *inFile;
+    inFile = fopen(filename, "r");
 
-    inFile = fopen(filename, 'r');
 
-    *n_chain_types++;
-    *n_bead_types++;
 
-    *n_bead_num++;
-    *n_chain_num++;
+    while (fgets(strLine, sizeof(strLine), inFile) != NULL && errCode == 0) {
+
+        sscanf(strLine, "%s", strKey);
+
+        if (strKey[0] == '#'){//Ignore comments
+            continue;
+        }
+
+
+        if (strcmp(strKey, "NEW{") == 0){
+            per_ch_bd_num = 0;
+            fgets(strLine, sizeof(strLine), inFile);
+            sscanf(strLine, "%s", strKey);
+            if (strKey[0] == '#'){
+                errCode = 1;
+                break;
+            }
+
+            sscanf(strLine, "%d", &per_chain_num);
+
+            dum_chain_types++;
+            dum_chains += per_chain_num;
+
+            n_new_bd_id   = 0;
+            n_old_bd_id   = -1;
+            per_ch_bd_num = 0;
+            while((fgets(strLine, sizeof(strLine), inFile) != NULL) && (errCode == 0)){
+
+                sscanf(strLine, "%s", strKey);
+                if (strKey[0] == '#'){
+                    errCode = 1;
+                    break;
+                }
+                if (strcmp(strKey, "}END") == 0){
+                    dum_beads += per_ch_bd_num * per_chain_num;
+                    break;
+                }
+
+                nFlag = sscanf(strLine, "%d", &n_new_bd_id);
+                if (nFlag != 1){
+                    errCode = 1;
+                    break;
+                }
+
+                if (n_new_bd_id != n_old_bd_id){
+                    per_ch_bd_num++;
+                }
+                n_old_bd_id = n_new_bd_id;
+            }
+
+        }
+
+
+
+    }
+
+
+
+    *n_bead_num    = dum_beads;
+    *n_chain_num   = dum_chains;
+    *n_chain_types = dum_chain_types;
 
     fclose(inFile);
+}
+
+int Parse_ReadStrucFileLines(struct _IO_FILE opFile){
+
+    return -1;
 }
