@@ -10,8 +10,7 @@ int Parse_EnergyFile(char *strEnFile);
 
 void Parse_StructureFile(char *filename);
 
-void Parse_StructureFile_CalcBeadsAndChains(const char* filename,
-                                            int* n_bead_num, int* n_chain_num,
-                                            int* n_bead_types, int* n_chain_types);
+void Parse_StructureFile_CalcBeadsAndChains(const char* filename, int* n_chain_types,
+                                            int* n_bead_num, int* n_chain_num);
 
 #endif // _PARSEKEY_H_

@@ -177,6 +177,9 @@ int Parse_Keyfile(char *filename) {
     }
 
     if (strStructFile[0] != '\0') {
+        Parse_StructureFile_CalcBeadsAndChains(strStructFile, tot_beads, tot_chains, nBeadTypes);
+
+        exit(1);
         Parse_StructureFile(strStructFile);
         if (nStructFiletype == 0) {
             bReadConf = 0;
