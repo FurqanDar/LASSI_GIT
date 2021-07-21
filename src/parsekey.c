@@ -538,3 +538,29 @@ void Parse_StructureFile(char *filename) {
     fclose(inFile);
     tot_chain_types = nChainType + 1;
 }
+
+
+
+/// Parse_StructureFile_CalcBeadsAndChains - reads the structure-file filename, and records
+/// the total number of beads, chains, bead-types, and chain-types.
+/// \param filename: Full path of the file, or name of file if in the same directory.
+/// \param n_bead_num: Stores how many total beads are in the structure file.
+/// \param n_chain_num: Stores how many total chains are in the structure file.
+/// \param n_bead_types: Stores how many different bead types are in the file.
+/// \param n_chain_types: Stores how many different chain-types are in the file.
+void Parse_StructureFile_CalcBeadsAndChains(const char* filename,
+                                            int* n_bead_num, int* n_chain_num,
+                                            int* n_bead_types, int* n_chain_types){
+
+    FILE *inFile;
+
+    inFile = fopen(filename, 'r');
+
+    *n_chain_types++;
+    *n_bead_types++;
+
+    *n_bead_num++;
+    *n_chain_num++;
+
+    fclose(inFile);
+}
