@@ -1,2 +1,3 @@
-/cmake*
-.idea/*
+/cmake-build-wsl_profile/
+/cmake-build-debug/
+/.idea/

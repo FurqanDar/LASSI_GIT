@@ -1,25 +1,26 @@
+#include "global.h"
 #include "parsekey.h"
 #include "cluster.h"
-#include "global.h"
 #include "initialize.h"
 
 int str2farr(char *strRaw, float fArray[MAX_AA]);
 
-/// Parse_KeyFile - reads the parameter keyfile. I recommend using the Python
-/// scripts to generate key files that are used in actual runs. Have to
-/// painstakingly go through every different keyword that exists in the keyfile.
-/// Everytime you want to add something to the keyfile, do it here and also the
-/// python scripts so that everything is consistent. \param filename \return
+/// Parse_KeyFile - reads the parameter keyfile. I recommend using the Python scripts to generate key files that
+/// are used in actual runs.
+/// Have to painstakingly go through every different keyword that exists in the keyfile. Everytime you want to add something
+/// to the keyfile, do it here and also the python scripts so that everything is consistent.
+/// \param filename
+/// \return
 int Parse_Keyfile(char *filename) {
     FILE *infile;
     infile = fopen(filename, "r");
-    int  i;
+    int i;
     char strLine[1000];
     char strKeyword[1000];
     char strTemp[1000];
     char strEnergyFile[1000];
     char strStructFile[1000];
-    int  nStructFiletype = 0;
+    int nStructFiletype = 0;
     char strTempArr[3][1000];
     strEnergyFile[0] = '\0';
     strStructFile[0] = '\0';
@@ -32,7 +33,7 @@ int Parse_Keyfile(char *filename) {
         fMCFreq[i] = 0.0; // initialization; to be normalized
     }
     nThermalization_Mode = 0;
-    Temp_Mode            = -1;
+    Temp_Mode = -1;
     while (fgets(strLine, sizeof(strLine), infile) != NULL) {
         nLine++;
 
@@ -40,7 +41,7 @@ int Parse_Keyfile(char *filename) {
         sscanf(strLine, "%s", strKeyword);
 
         if (strKeyword[0] == '#') { // if the first character is #,
-                                    // ignore the line
+            // ignore the line
         } else {
             for (i = 0; strLine[i] != '\0'; i++) {
                 if (strLine[i] == '#') {
@@ -67,7 +68,7 @@ int Parse_Keyfile(char *filename) {
                     }
                 }
                 nRDF_TotBins = nBoxSize[0] * 4;
-                // nRDF_TotBins   = (lInt)sqrtf((float))
+                //nRDF_TotBins   = (lInt)sqrtf((float))
             } else if (strcmp(strKeyword, "MC_TEMP") == 0) {
                 sscanf(strLine, "%*s %f", &fKT);
             } else if (strcmp(strKeyword, "N_STEPS") == 0) {
@@ -163,7 +164,7 @@ int Parse_Keyfile(char *filename) {
 
     if (freq_tot == 0) {
         for (i = MV_NULL + 1; i < MAX_MV; i++) {
-            fMCFreq[i] = 1.0 / (float)(MAX_MV - 1);
+            fMCFreq[i] = 1.0f / (float) (MAX_MV - 1);
         }
     } else {
         for (i = MV_NULL + 1; i < MAX_MV; i++) {
@@ -176,7 +177,14 @@ int Parse_Keyfile(char *filename) {
     }
 
     if (strStructFile[0] != '\0') {
+
+        Parse_StructureFile_CalcBeadsAndChains(strStructFile, &tot_beads,
+                                               &tot_chains, &tot_chain_types);
+
+        CreateBeadsAndChains(tot_beads, tot_chains);
+
         Parse_StructureFile(strStructFile);
+
         if (nStructFiletype == 0) {
             bReadConf = 0;
         } else if (nStructFiletype == 1) {
@@ -196,72 +204,81 @@ int Parse_Keyfile(char *filename) {
             nErr = 5;
             printf("No restart file provided.\n");
         }
-        // exit(1);
     }
 
     return nErr;
 }
 
 /// Parse_EnergyFile - reads the energy file
-/// Have to painstakingly go through every different keyword that exists in the
-/// energy file. Reads all the matrices \param strEnFile \return
+/// Have to painstakingly go through every different keyword that exists in the energy file. Reads all the matrices
+/// \param strEnFile
+/// \return
 int Parse_EnergyFile(char *strEnFile) {
     int nRes = 0;
 
     FILE *infile;
     infile = fopen(strEnFile, "r");
 
-    char  strLine[1000];
-    int   nFlag  = 0;
-    char  bOrder = 0;
-    char  strKey[1000];
-    int   nRow;
+    char strLine[100];
+    int nFlag = 0;
+    char bOrder = 0;
+    char strKey[100];
+    int nRow;
     float fTemp[MAX_AA] = {0.f};
-    int   i, j, k;
-    int   nEntry = 0;
+    int i, j, k;
+    int nEntry = 0;
 
     while (fgets(strLine, sizeof(strLine), infile) != NULL) {
-        if (strLine[0] == '#') { // All key-words start with '#'
+        if (strLine[0] == '#') {//All key-words start with '#'
             sscanf(&strLine[1], "%s", strKey);
-            // STICKERS must be the first key-word
+            //STICKERS must be the first key-word
             if (strcmp(strKey, "STICKERS") == 0) {
                 nFlag = -1;
-            } else if (bOrder == 0) {
+            }
+            else if (bOrder == 0) {
                 fprintf(stderr, "ERROR: #STICKERS is not the first entry in %s.\n", strEnFile);
                 nRes = 1;
                 break;
-            } else { // Checking for all other keywords
+            } else { //Checking for all other keywords
                 if (strcmp(strKey, "OVERLAP_POT") == 0) {
                     nFlag = 2 * (E_OVLP);
-                } else if (strcmp(strKey, "CONTACT_POT") == 0) {
+                }
+                else if (strcmp(strKey, "CONTACT_POT") == 0) {
                     nFlag = 2 * (E_CONT);
-                } else if (strcmp(strKey, "CONTACT_RAD") == 0) {
+                }
+                else if (strcmp(strKey, "CONTACT_RAD") == 0) {
                     nFlag = 2 * (E_CONT) + 1;
-                } else if (strcmp(strKey, "SC_SC_POT") == 0) {
+                }
+                else if (strcmp(strKey, "SC_SC_POT") == 0) {
                     nFlag = 2 * (E_SC_SC);
-                } else if (strcmp(strKey, "FSOL_POT") == 0) {
+                }
+                else if (strcmp(strKey, "FSOL_POT") == 0) {
                     nFlag = 2 * (E_F_SOL);
-                } else if (strcmp(strKey, "T_IND_POT") == 0) {
+                }
+                else if (strcmp(strKey, "T_IND_POT") == 0) {
                     nFlag = 2 * (E_T_IND);
-                } else if (strcmp(strKey, "LINKER_LENGTH") == 0) {
+                }
+                else if (strcmp(strKey, "LINKER_LENGTH") == 0) {
                     nFlag = -3;
-                } else if (strcmp(strKey, "LINKER_SPRCON") == 0) {
+                }
+                else if (strcmp(strKey, "LINKER_SPRCON") == 0) {
                     nFlag = -4;
-                } else if (strcmp(strKey, "LINKER_EQLEN") == 0) {
+                }
+                else if (strcmp(strKey, "LINKER_EQLEN") == 0) {
                     nFlag = -5;
-                } else {
+                }
+                else {
                     fprintf(stderr, "ERROR: irregular expression in %s: %s\n", strEnFile, strKey);
                     nRes = 2;
                     break;
                 }
             }
-            // Should know which key-word we are dealing with.
-            // Next line should have numerical values. Either one number, or nBeadType
-            // numbers
+            //Should know which key-word we are dealing with.
+            //Next line should have numerical values. Either one number, or nBeadType numbers
             nRow = 0;
-        } // The line did not contain a keyword. Either empty or has numbers.
-        else if ((strcmp(strLine, "\r\n") != 0) && (strcmp(strLine, "\n") != 0)) { // ignore empty lines
-            if (nFlag == -1) {                                                     // sticker
+        } //The line did not contain a keyword. Either empty or has numbers.
+        else if (strcmp(strLine, "\r\n") != 0) { // ignore empty lines
+                if (nFlag == -1) { // sticker
                 sscanf(strLine, "%d", &nBeadTypes);
                 if (nBeadTypes > MAX_AA) {
                     fprintf(stderr, "ERROR: the number of AA types exceeds MAX_AA in %s.\n", strEnFile);
@@ -269,47 +286,49 @@ int Parse_EnergyFile(char *strEnFile) {
                     break;
                 }
                 bOrder = 1;
-            } else if (nFlag == -3) { // linker_length
-                sscanf(strLine, "%f", &fLinkerLength);
-            } else if (nFlag == -4) { // linker_sprcon
-                sscanf(strLine, "%f", &fLinkerSprCon);
-            } else if (nFlag == -5) { // linker_eqlen
-                sscanf(strLine, "%f", &fLinkerEqLen);
-            } else if (nFlag == 0) {
-                fprintf(stderr, "ERROR: nFlag is not assigned in %s.\n", strEnFile);
-                nRes = 4;
-                break;
-            } else {                               // Saving energy and radius matrices
-                nEntry = str2farr(strLine, fTemp); // Counting how many columns
-                if (nEntry != nBeadTypes) {        // If columns not the same as sticker number
-                    if (nEntry == 1) {             // If only 1-value, all-values in  that matrix are this one
-                        for (i = 0; i < nBeadTypes; i++) {
-                            for (j = 0; j < nBeadTypes; j++) {
-                                if (nFlag % 2 == 0) { // energy
-                                    fEnergy[i][j][(int)(nFlag / 2)] = fTemp[0];
-                                } else { // radius
-                                    fEnRad[i][j][(int)(nFlag / 2)] = fTemp[0];
+                } else if (nFlag == -3) { // linker_length
+                    sscanf(strLine, "%f", &fLinkerLength);
+                } else if (nFlag == -4) { // linker_sprcon
+                    sscanf(strLine, "%f", &fLinkerSprCon);
+                } else if (nFlag == -5) { // linker_eqlen
+                    sscanf(strLine, "%f", &fLinkerEqLen);
+                } else if (nFlag == 0) {
+                    fprintf(stderr, "ERROR: nFlag is not assigned in %s.\n", strEnFile);
+                    nRes = 4;
+                    break;
+                }
+                else {//Saving energy and radius matrices
+                    nEntry = str2farr(strLine, fTemp); //Counting how many columns
+                    if (nEntry != nBeadTypes) {//If columns not the same as sticker number
+                        if (nEntry == 1) {//If only 1-value, all-values in  that matrix are this one
+                            for (i = 0; i < nBeadTypes; i++) {
+                                for (j = 0; j < nBeadTypes; j++) {
+                                    if (nFlag % 2 == 0) { //energy
+                                        fEnergy[i][j][(int) (nFlag / 2)] = fTemp[0];
+                                    }
+                                    else { //radius
+                                        fEnRad[i][j][(int) (nFlag / 2)] = fTemp[0];
+                                        }
                                 }
                             }
+                        } else {
+                            fprintf(stderr, "ERROR: irregular expression in energy matrices of %s.\n", strEnFile);
+                            nRes = 4;
+                            break;
                         }
-                    } else {
-                        fprintf(stderr, "ERROR: irregular expression in energy matrices of %s.\n", strEnFile);
-                        nRes = 4;
-                        break;
+                    } else {//Column number same as sticker-number; save the matrix
+                        if (nFlag % 2 == 0) { // energy
+                            for (i = 0; i < nBeadTypes; i++) {
+                                fEnergy[nRow][i][(int) (nFlag / 2)] = fTemp[i];
+                            }
+                        } else { // radius
+                            for (i = 0; i < nBeadTypes; i++) {
+                                fEnRad[nRow][i][(int) (nFlag / 2)] = fTemp[i];
+                            }
+                        }
+                        nRow++;
                     }
-                } else {                  // Column number same as sticker-number; save the matrix
-                    if (nFlag % 2 == 0) { // energy
-                        for (i = 0; i < nBeadTypes; i++) {
-                            fEnergy[nRow][i][(int)(nFlag / 2)] = fTemp[i];
-                        }
-                    } else { // radius
-                        for (i = 0; i < nBeadTypes; i++) {
-                            fEnRad[nRow][i][(int)(nFlag / 2)] = fTemp[i];
-                        }
-                    }
-                    nRow++;
                 }
-            }
         }
     }
 
@@ -318,41 +337,43 @@ int Parse_EnergyFile(char *strEnFile) {
     return nRes;
 }
 
-/// str2farr - converts the string array to an array of floats. The nice thing
-/// about C is the ease of string manipulation. used to generate matrices from
-/// the energy file. \param strRaw \param fArray \return Changes fArray to
-/// include be the array in
+/// str2farr - converts the string array to an array of floats. The nice thing about C is the ease of string manipulation.
+/// used to generate matrices from the energy file.
+/// \param strRaw
+/// \param fArray
+/// \return Changes fArray to include be the array in
 int str2farr(char strRaw[], float fArray[MAX_AA]) {
-    int   i       = 0;
+    int i = 0;
     char *strTemp = strRaw;
     char *token;
 
     for (i = 0; i < MAX_AA; i++) {
-        token = strtok_r(strTemp, " ", &strTemp);
+        token = strtok_r(strTemp, " \t", &strTemp);
         if (token == NULL) {
             break;
-        } else {
+        }
+        else {
             fArray[i] = atof(token);
         }
     }
+
     return i;
 }
 
 /// Parse_StructureFile - reads the structure file filename.
-/// The format of the structure file is in the function below. Should be easier
-/// to use Python to generate the files, usually. \param filename
+/// The format of the structure file is in the function below. Should be easier to use Python to generate the files,
+/// usually.
+/// \param filename
 void Parse_StructureFile(char *filename) {
     /*
-    This function reads in a structure file that also includes topology
-    information. The format is: # The '#' is the commenting character. NEW{
+    This function reads in a structure file that also includes topology information. The format is:
+    # The '#' is the commenting character.
+    NEW{
     nCopiesOfMolecule
     #AtomID AtomType LinkerLengths BondedPartner
     }END
-    Each molecule is within NEW{\0 ... \0}END which act as keywords. After NEW{,
-    the next line contains the number of copies to be made of this molecule. It is
-    also expected that whenever a bead is listed, ALL of its bonds follow in the
-    next lines. E.G A molecule with 5 branches where each branch has 2 beads would
-    be:
+    Each molecule is within NEW{\0 ... \0}END which act as keywords. After NEW{, the next line contains the number of copies to be made of this molecule. It is also expected that whenever a bead is listed, ALL of its bonds follow in the next lines.
+    E.G A molecule with 5 branches where each branch has 2 beads would be:
     ###
     NEW{
     nCopies
@@ -379,30 +400,26 @@ void Parse_StructureFile(char *filename) {
     }END
     ####
     As such, each molecule is independent and all molecule beads start from 0!
-    For each listed bead, linker_len[i][j] corresponds to the linker constraint
-    between bead i, and bead (topo_info[i][j]). After each molecule is read,
-    nCopies copies are made, and THEN, the next line in the file is read.
+    For each listed bead, linker_len[i][j] corresponds to the linker constraint between bead i, and
+    bead (topo_info[i][j]). After each molecule is read, nCopies copies are made, and THEN, the next line in the file is read.
     */
     FILE *inFile;
-    inFile = fopen(filename, "r"); // Opening the file!
+    inFile = fopen(filename, "r");//Opening the file!
 
-    char strLine[1000];    // Used to store each line from the input file.
-    char strKeyword[1000]; // Used to convert strLine into specific keywords.
-    int  curID;            // Used to track the current beadID
-    int  curType, curLinker,
-        curPartner;               // Used to track current
-                                  // bead-type,linker-length(s),bond-partner.
-    int nCopies;                  // Used to store how many copies to make.
-    int nChainStart;              // Tracking which beadID each chain starts from.
-    int i, j, k;                  // Just some iterators for looping
-    int nCursor, nCursor2, nTemp; // Internal iterators to make sure beads and
-                                  // their partners are not double counted.
-    int nChainID,
-        nChainType; // Internal iterator to count which chainID the chain is.
-    int nFlag;      // Internal flag used to see which keyword is being read!
-    int nBEADS;     // Internal counter to count unique beads in each chain!
-    // Initialize the bead_info and chain_info
-    for (i = 0; i < MAX_BEADS; i++) {
+    char strLine[1000];//Used to store each line from the input file.
+    char strKeyword[1000];//Used to convert strLine into specific keywords.
+    int curID;//Used to track the current beadID
+    int curType, curLinker, curPartner;//Used to track current bead-type,linker-length(s),bond-partner.
+    int nCopies;//Used to store how many copies to make.
+    int nChainStart;//Tracking which beadID each chain starts from.
+    int i, j, k;//Just some iterators for looping
+    int nCursor, nCursor2, nTemp; //Internal iterators to make sure beads and their partners are not double counted.
+    int nChainID, nChainType;//Internal iterator to count which chainID the chain is.
+    int nFlag;//Internal flag used to see which keyword is being read!
+    int nBEADS;//Internal counter to count unique beads in each chain!
+
+    //Initialize the bead_info and chain_info
+    for (i = 0; i < tot_beads; i++) {
         for (j = 0; j < BEADINFO_MAX; j++) {
             bead_info[i][j] = -1;
         }
@@ -411,123 +428,227 @@ void Parse_StructureFile(char *filename) {
             linker_len[i][j] = -1;
         }
     }
-    for (i = 0; i < MAX_CHAINS; i++) {
+
+    for (i = 0; i < tot_chains; i++) {
         for (j = 0; j < CHAININFO_MAX; j++) {
             chain_info[i][j] = -1;
         }
     }
 
-    // Initialization of the counters and iterators
-    nCursor     = -1;
-    nCursor2    = -1;
-    nChainID    = -1;
-    nChainType  = -1;
-    nFlag       = -1;
-    nTemp       = -1;
-    tot_beads   = 0;
-    tot_chains  = 0;
-    nBEADS      = 0;
+
+    //Initialization of the counters and iterators
+    nCursor = -1;
+    nCursor2 = -1;
+    nChainID = -1;
+    nChainType = -1;
+    nFlag = -1;
+    nTemp = -1;
+    nBEADS = 0;
     nChainStart = 0;
-    nCopies     = 0;
+    nCopies = 0;
     while (fgets(strLine, sizeof(strLine), inFile) != NULL && nFlag == -1) {
-        // Keep reading the file until it ends or it's incorrectly formatted.
+        //Keep reading the file until it ends or it's incorrectly formatted.
 
-        strKeyword[0] = '#';               // This is the commenting character in all input files.
-        sscanf(strLine, "%s", strKeyword); // Plain old read the line.
+        strKeyword[0] = '#';//This is the commenting character in all input files.
+        sscanf(strLine, "%s", strKeyword);//Plain old read the line.
 
-        if (strKeyword[0] != '#') {                // If the line is not a comment, see what keyword it is
-            for (i = 0; strLine[i] != '\0'; i++) { // Keep reading till end of that line
-                if (strLine[i] == '#') {           // This line now has a comment, so stop reading further
-                    strLine[i] = '\0';             // Just assume we have reached the end of the line
+        if (strKeyword[0] != '#') {//If the line is not a comment, see what keyword it is
+            for (i = 0; strLine[i] != '\0'; i++) {//Keep reading till end of that line
+                if (strLine[i] == '#') {//This line now has a comment, so stop reading further
+                    strLine[i] = '\0';//Just assume we have reached the end of the line
                     break;
                 }
             }
-            if (strcmp(strKeyword, "NEW{") == 0) { // This signifies a new molecule type has been started
+            if (strcmp(strKeyword, "NEW{") == 0) {//This signifies a new molecule type has been started
                 nFlag = 1;
             }
-            if (strcmp(strKeyword, "}END") == 0) { // This signifies a new molecule type has been started
+            if (strcmp(strKeyword, "}END") == 0) {//This signifies a new molecule type has been started
                 nFlag = -1;
             }
         }
-        if (nFlag == 1) { // This signifies that a new molecule has started
-            // It's assumed that the next line contains the number of copies for this
-            // molecule.
+
+        if (nFlag == 1) {//This signifies that a new molecule has started
+            //It's assumed that the next line contains the number of copies for this molecule.
             nChainType++;
-            nChainTypeIsLinear[nChainType] = 1; // Assume all chains are linear to begin with.
+            nChainTypeIsLinear[nChainType] = 1;//Assume all chains are linear to begin with.
             nChainStart += nBEADS;
             nChainID++;
-            tot_chains++;
             nBEADS = 0;
-            fgets(strLine, sizeof(strLine),
-                  inFile);                   // Reading the next line, which has nMOLS
-            sscanf(strLine, "%d", &nCopies); // Remembering how many copies top make.
+            fgets(strLine, sizeof(strLine), inFile);//Reading the next line, which has nMOLS
+            sscanf(strLine, "%d", &nCopies);//Remembering how many copies top make.
             while (fgets(strLine, sizeof(strLine), inFile) != NULL && nFlag == 1) {
-                sscanf(strLine, "%s", strKeyword);     // Just reading as a string
-                if (strcmp(strKeyword, "}END") == 0) { // End of this molecule
+                sscanf(strLine, "%s", strKeyword);//Just reading as a string
+                if (strcmp(strKeyword, "}END") == 0) {//End of this molecule
                     nFlag = -1;
                     break;
                 }
                 sscanf(strLine, "%d %d %d %d", &curID, &curType, &curLinker, &curPartner);
-                curID += nChainStart;                    // Accounting for previously defined beads
-                if (bead_info[curID][BEAD_TYPE] == -1) { // This is to make sure that each bead is counted once only
-                                                         // even if it has many bonds.
-                    tot_beads++;
+                curID += nChainStart;//Accounting for previously defined beads
+                if (bead_info[curID][BEAD_TYPE] ==
+                    -1) {//This is to make sure that each bead is counted once only even if it has many bonds.
                     nBEADS++;
-                    bead_info[curID][BEAD_TYPE]    = curType;
+                    bead_info[curID][BEAD_TYPE] = curType;
                     bead_info[curID][BEAD_CHAINID] = nChainID;
-                    nCursor                        = 0; // This is a counter for number of bonds, which should
-                                                        // reset when you have a 'new' bead.
+                    nCursor = 0;//This is a counter for number of bonds, which should reset when you have a 'new' bead.
                 }
 
-                if (curPartner != -1) { // This bead has a bonded partner
-                    if (nCursor > 1) {  // This signifies that the chain is not linear because a bead
-                                        // has more than two bonds because indecies start at 0
+                if (curPartner != -1){// This bead has a bonded partner
+                    if (nCursor > 1) {// This signifies that the chain is not
+                                      // linear because a bead has more than two bonds because
+                                      // indicies start at 0.
                         nChainTypeIsLinear[nChainType] = 0;
                     }
-                    curPartner += nChainStart;              // Accounts for all beads before, like above.
-                    topo_info[curID][nCursor] = curPartner; // Adding the ID of the
-                                                            // partner
-                    linker_len[curID][nCursor] = curLinker * (int)fLinkerLength; // Adding the linker constraint.
+                    curPartner += nChainStart;//Accounts for all beads before, like above.
+                    topo_info[curID][nCursor] = curPartner;//Adding the ID of the partner
+                    linker_len[curID][nCursor] = curLinker * (int) fLinkerLength;//Adding the linker constraint.
                     nCursor++;
+
                 }
             }
             chain_info[nChainID][CHAIN_START]  = nChainStart;
             chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
             chain_info[nChainID][CHAIN_TYPE]   = nChainType;
-            // We just fully store the first chain 'manually'. Now we just copy the
-            // chain nCopies times. printf("%d\n", nBEADS)
-            for (k = 1; k < nCopies; k++) { // Now we just copy this molecule nMOL-1 times
-                nChainStart += nBEADS;      // This accounts for chain lengths.
-                nChainID++;                 // Going to the next chainID
-                tot_chains++;               // Add a chain
+            //We just fully store the first chain 'manually'. Now we just copy the chain nCopies times.
+            for (k = 1; k < nCopies; k++) {//Now we just copy this molecule nMOL-1 times
+                nChainStart += nBEADS;//This accounts for chain lengths.
+                nChainID++;//Going to the next chainID
                 chain_info[nChainID][CHAIN_START]  = nChainStart;
                 chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
                 chain_info[nChainID][CHAIN_TYPE]   = nChainType;
 
                 for (i = 0; i < nBEADS; i++) {
-                    tot_beads++;
-                    curID                          = i + nChainStart;
-                    nTemp                          = curID - nBEADS;
+                    curID = i + nChainStart;
+                    nTemp = curID - nBEADS;
                     bead_info[curID][BEAD_TYPE]    = bead_info[nTemp][BEAD_TYPE];
                     bead_info[curID][BEAD_CHAINID] = nChainID;
                     for (j = 0; j < MAX_BONDS; j++) {
                         linker_len[curID][j] = linker_len[nTemp][j];
                         if (topo_info[nTemp][j] != -1) {
                             topo_info[curID][j] =
-                                topo_info[nTemp][j] + nBEADS; // Because we must account for chain lengths
+                                    topo_info[nTemp][j] + nBEADS;//Because we must account for chain lengths
                         }
                     }
                 }
             }
-            nFlag = -1; // Resetting the flag.
+            nFlag = -1;//Resetting the flag.
         }
 
-        // This is to make sure that the reading was done correctly.
+        //This is to make sure that the reading was done correctly.
         if (nFlag != -1) {
             printf("Incorrectly formatted input structure file. I must crash :(\n\n");
             exit(1);
         }
     }
     fclose(inFile);
-    tot_chain_types = nChainType + 1;
+}
+
+
+/// Parse_StructureFile_CalcBeadsAndChains - reads the structure-file filename, and records
+/// the total number of beads, chains, bead-types, and chain-types.
+/// \param filename: Full path of the file, or name of file if in the same directory.
+/// \param n_bead_num: Stores how many total beads are in the structure file.
+/// \param n_chain_num: Stores how many total chains are in the structure file.
+/// \param n_chain_types: Stores how many different chain-types are in the file.
+void Parse_StructureFile_CalcBeadsAndChains(char *filename, size_t* n_bead_num,
+                                            size_t* n_chain_num, size_t* n_chain_types){
+    size_t dum_beads  = 0;
+    size_t dum_chains = 0;
+    size_t dum_chain_types = 0;
+    int per_chain_num = 0;
+    int per_ch_bd_num = 0;
+    int errCode = 0;
+    int nFlag   = -1;
+    char strLine[1000];
+    char strKey[1000];
+
+    int n_old_bd_id, n_new_bd_id;
+
+    //So that this function always sets the values to 0.
+    *n_chain_types = 0;
+    *n_bead_num    = 0;
+    *n_chain_num   = 0;
+
+    FILE *inFile;
+    inFile = fopen(filename, "r");
+
+    while (fgets(strLine, sizeof(strLine), inFile) != NULL && errCode == 0) {
+        sscanf(strLine, "%s", strKey);
+        if (strKey[0] == '#'){//Ignore comments
+            continue;
+        }
+
+        if (strcmp(strKey, "NEW{") == 0){//New molecule is starting
+            per_ch_bd_num = 0;
+            fgets(strLine, sizeof(strLine), inFile);
+            sscanf(strLine, "%s", strKey);
+            if (strKey[0] == '#'){
+                errCode = 1;
+                break;
+            }
+
+            nFlag = sscanf(strLine, "%d", &per_chain_num);
+            if (nFlag != 1){
+                errCode = 1;
+                break;
+            }
+
+            dum_chain_types++;
+            dum_chains += per_chain_num;
+
+            n_new_bd_id   = 0;
+            n_old_bd_id   = -1;
+            per_ch_bd_num = 0;
+            while((fgets(strLine, sizeof(strLine), inFile) != NULL) && (errCode == 0)){
+                sscanf(strLine, "%s", strKey);
+                if (strKey[0] == '#'){
+                    errCode = 1;
+                    break;
+                }
+                if (strcmp(strKey, "}END") == 0){//Molecule has ended
+                    dum_beads += per_ch_bd_num * per_chain_num;
+                    break;
+                }
+
+                nFlag = sscanf(strLine, "%d", &n_new_bd_id);
+                if (nFlag != 1){
+                    errCode = 1;
+                    break;
+                }
+
+                if (n_new_bd_id != n_old_bd_id){
+                    per_ch_bd_num++;
+                }
+                n_old_bd_id = n_new_bd_id;
+            }
+        }
+    }
+
+    *n_bead_num    = dum_beads;
+    *n_chain_num   = dum_chains;
+    *n_chain_types = dum_chain_types;
+
+    fclose(inFile);
+}
+
+/// CreateBeadsAndChains. Allocate memory for the given number of beads, chains, and chain-types.
+/// \param n_bead_num
+/// \param n_chain_types
+/// \param n_chain_num
+void CreateBeadsAndChains(size_t n_bead_num, size_t n_chain_num){
+    char strTemp[100];
+
+    strcpy(strTemp, "Chain Info.");
+    chain_info = Create2DInt(CHAININFO_MAX, n_chain_num, strTemp);
+
+    strcpy(strTemp, "Topo Info.");
+    topo_info  = Create2DInt(MAX_BONDS, n_bead_num, strTemp);
+
+    strcpy(strTemp, "Linker Len.");
+    linker_len = Create2DInt(MAX_BONDS, n_bead_num, strTemp);
+
+    strcpy(strTemp, "Bead Info.");
+    bead_info  = Create2DInt(BEADINFO_MAX, n_bead_num, strTemp);
+
+    strcpy(strTemp, "Old Bead.");
+    old_bead   = Create2DInt(BEADINFO_MAX, n_bead_num, strTemp);
 }
