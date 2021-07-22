@@ -129,12 +129,12 @@ lInt nMCMaxTrials, nTot_CycleNum;
 lInt RNG_Seed;
 
 // report-related
-char strReportPrefix[500];
-char fileEnergy[500];
-char fileStruct[500];
-char fileMCMove[500];
-char fileSysProp[500];
-char strRestartFile[500];
+char strReportPrefix[524];
+char fileEnergy[524];
+char fileStruct[524];
+char fileMCMove[524];
+char fileSysProp[524];
+char strRestartFile[524];
 lLong nReport[MAX_REPORT];//Array to store report frequencies.
 lLong nTrajMode;
 //Matrix to store acceptances and rejections 0: Rejected; 1: Accepted
