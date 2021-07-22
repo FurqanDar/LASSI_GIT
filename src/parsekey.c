@@ -164,7 +164,7 @@ int Parse_Keyfile(char *filename) {
 
     if (freq_tot == 0) {
         for (i = MV_NULL + 1; i < MAX_MV; i++) {
-            fMCFreq[i] = 1.0 / (float) (MAX_MV - 1);
+            fMCFreq[i] = 1.0f / (float) (MAX_MV - 1);
         }
     } else {
         for (i = MV_NULL + 1; i < MAX_MV; i++) {
@@ -177,16 +177,27 @@ int Parse_Keyfile(char *filename) {
     }
 
     if (strStructFile[0] != '\0') {
-        Parse_StructureFile_CalcBeadsAndChains(strStructFile, &tot_beads, &tot_chains, &tot_chain_types);
-        printf("\n%d %d %d\n", tot_beads, tot_chains, tot_chain_types);
-        tot_chains=0; tot_beads=0; tot_chain_types=0;
 
+        Parse_StructureFile_CalcBeadsAndChains(strStructFile, &tot_beads,
+                                               &tot_chains, &tot_chain_types);
+        strcpy(strTemp, "Chain Info.");
+        chain_info = Array_Create_2D_int(CHAININFO_MAX, tot_chains, strTemp);
 
+        strcpy(strTemp, "Topo Info.");
+        topo_info  = Array_Create_2D_int(MAX_BONDS, tot_beads, strTemp);
+
+        strcpy(strTemp, "Linker Len.");
+        linker_len = Array_Create_2D_int(MAX_BONDS, tot_beads, strTemp);
+
+        strcpy(strTemp, "Bead Info.");
+        bead_info  = Array_Create_2D_int(BEADINFO_MAX, tot_beads, strTemp);
+
+        strcpy(strTemp, "Old Bead.");
+        old_bead   = Array_Create_2D_int(BEADINFO_MAX, tot_beads, strTemp);
 
         Parse_StructureFile(strStructFile);
-        printf("\n%d %d %d\n", tot_beads, tot_chains, tot_chain_types);
+//        exit(1);
 
-        exit(1);
         if (nStructFiletype == 0) {
             bReadConf = 0;
         } else if (nStructFiletype == 1) {
@@ -420,8 +431,9 @@ void Parse_StructureFile(char *filename) {
     int nChainID, nChainType;//Internal iterator to count which chainID the chain is.
     int nFlag;//Internal flag used to see which keyword is being read!
     int nBEADS;//Internal counter to count unique beads in each chain!
+
     //Initialize the bead_info and chain_info
-    for (i = 0; i < MAX_BEADS; i++) {
+    for (i = 0; i < tot_beads; i++) {
         for (j = 0; j < BEADINFO_MAX; j++) {
             bead_info[i][j] = -1;
         }
@@ -430,11 +442,13 @@ void Parse_StructureFile(char *filename) {
             linker_len[i][j] = -1;
         }
     }
-    for (i = 0; i < MAX_CHAINS; i++) {
+
+    for (i = 0; i < tot_chains; i++) {
         for (j = 0; j < CHAININFO_MAX; j++) {
             chain_info[i][j] = -1;
         }
     }
+
 
     //Initialization of the counters and iterators
     nCursor = -1;
@@ -443,8 +457,6 @@ void Parse_StructureFile(char *filename) {
     nChainType = -1;
     nFlag = -1;
     nTemp = -1;
-    tot_beads = 0;
-    tot_chains = 0;
     nBEADS = 0;
     nChainStart = 0;
     nCopies = 0;
@@ -468,13 +480,13 @@ void Parse_StructureFile(char *filename) {
                 nFlag = -1;
             }
         }
+
         if (nFlag == 1) {//This signifies that a new molecule has started
             //It's assumed that the next line contains the number of copies for this molecule.
             nChainType++;
             nChainTypeIsLinear[nChainType] = 1;//Assume all chains are linear to begin with.
             nChainStart += nBEADS;
             nChainID++;
-            tot_chains++;
             nBEADS = 0;
             fgets(strLine, sizeof(strLine), inFile);//Reading the next line, which has nMOLS
             sscanf(strLine, "%d", &nCopies);//Remembering how many copies top make.
@@ -488,16 +500,16 @@ void Parse_StructureFile(char *filename) {
                 curID += nChainStart;//Accounting for previously defined beads
                 if (bead_info[curID][BEAD_TYPE] ==
                     -1) {//This is to make sure that each bead is counted once only even if it has many bonds.
-                    tot_beads++;
                     nBEADS++;
                     bead_info[curID][BEAD_TYPE] = curType;
                     bead_info[curID][BEAD_CHAINID] = nChainID;
                     nCursor = 0;//This is a counter for number of bonds, which should reset when you have a 'new' bead.
                 }
 
-                if (curPartner != -1){//This bead has a bonded partner
-                    if (nCursor >
-                        1) {//This signifies that the chain is not linear because a bead has more than two bonds because indecies start at 0
+                if (curPartner != -1){// This bead has a bonded partner
+                    if (nCursor > 1) {// This signifies that the chain is not
+                                      // linear because a bead has more than two bonds because
+                                      // indicies start at 0.
                         nChainTypeIsLinear[nChainType] = 0;
                     }
                     curPartner += nChainStart;//Accounts for all beads before, like above.
@@ -511,17 +523,14 @@ void Parse_StructureFile(char *filename) {
             chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
             chain_info[nChainID][CHAIN_TYPE]   = nChainType;
             //We just fully store the first chain 'manually'. Now we just copy the chain nCopies times.
-            //printf("%d\n", nBEADS)
             for (k = 1; k < nCopies; k++) {//Now we just copy this molecule nMOL-1 times
                 nChainStart += nBEADS;//This accounts for chain lengths.
                 nChainID++;//Going to the next chainID
-                tot_chains++;//Add a chain
                 chain_info[nChainID][CHAIN_START]  = nChainStart;
                 chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
                 chain_info[nChainID][CHAIN_TYPE]   = nChainType;
 
                 for (i = 0; i < nBEADS; i++) {
-                    tot_beads++;
                     curID = i + nChainStart;
                     nTemp = curID - nBEADS;
                     bead_info[curID][BEAD_TYPE]    = bead_info[nTemp][BEAD_TYPE];
@@ -545,7 +554,6 @@ void Parse_StructureFile(char *filename) {
         }
     }
     fclose(inFile);
-    tot_chain_types = nChainType + 1;
 }
 
 
@@ -581,13 +589,10 @@ void Parse_StructureFile_CalcBeadsAndChains(char *filename, int* n_bead_num,
 
 
     while (fgets(strLine, sizeof(strLine), inFile) != NULL && errCode == 0) {
-
         sscanf(strLine, "%s", strKey);
-
         if (strKey[0] == '#'){//Ignore comments
             continue;
         }
-
 
         if (strcmp(strKey, "NEW{") == 0){
             per_ch_bd_num = 0;
@@ -598,7 +603,11 @@ void Parse_StructureFile_CalcBeadsAndChains(char *filename, int* n_bead_num,
                 break;
             }
 
-            sscanf(strLine, "%d", &per_chain_num);
+            nFlag = sscanf(strLine, "%d", &per_chain_num);
+            if (nFlag != 1){
+                errCode = 1;
+                break;
+            }
 
             dum_chain_types++;
             dum_chains += per_chain_num;
@@ -607,7 +616,6 @@ void Parse_StructureFile_CalcBeadsAndChains(char *filename, int* n_bead_num,
             n_old_bd_id   = -1;
             per_ch_bd_num = 0;
             while((fgets(strLine, sizeof(strLine), inFile) != NULL) && (errCode == 0)){
-
                 sscanf(strLine, "%s", strKey);
                 if (strKey[0] == '#'){
                     errCode = 1;
@@ -629,23 +637,12 @@ void Parse_StructureFile_CalcBeadsAndChains(char *filename, int* n_bead_num,
                 }
                 n_old_bd_id = n_new_bd_id;
             }
-
         }
-
-
-
     }
-
-
 
     *n_bead_num    = dum_beads;
     *n_chain_num   = dum_chains;
     *n_chain_types = dum_chain_types;
 
     fclose(inFile);
-}
-
-int Parse_ReadStrucFileLines(struct _IO_FILE opFile){
-
-    return -1;
 }

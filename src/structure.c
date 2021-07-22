@@ -407,7 +407,6 @@ void RDF_ComponentWise_Avg(void) {
     float x;  //For distance
     int i, j, k;
     int resi, resj;
-    //int chaini, chainj;
     int myBin = 0;
     int array_pos;
 

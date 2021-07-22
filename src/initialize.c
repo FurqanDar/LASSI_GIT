@@ -5,45 +5,92 @@
 /// Memory_Initialization_AtStart - allocates memory, and initializes the various global arrays.
 void Memory_Initialization_AtStart(void) {
     int i, j;
-    naTotLattice = malloc(nBoxSize[0] * nBoxSize[1] * nBoxSize[2] * sizeof(lInt));
-    naClusHistList = malloc((1 + tot_chains) * sizeof(lLong));
-    naChainCheckList = malloc((1 + tot_chains) * sizeof(lInt));
-    fKT_Cycle = malloc((1 + nTot_CycleNum) * sizeof(float));
+    char arrNames[100];
+
+    strcpy(arrNames, "naTotLattice");
+    naTotLattice = Array_Create_1D_int(nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arrNames);
+//    naTotLattice = malloc(nBoxSize[0] * nBoxSize[1] * nBoxSize[2] * sizeof(lInt));
+
+    strcpy(arrNames, "naClusHistList");
+    naClusHistList = Array_Create_1D_long((1+tot_chains), arrNames);
+//    naClusHistList = malloc((1 + tot_chains) * sizeof(lLong));
+
+    strcpy(arrNames, "naChainCheckList");
+    naChainCheckList = Array_Create_1D_int(1+tot_chains, arrNames);
+//    naChainCheckList = malloc((1 + tot_chains) * sizeof(lInt));
+
+    strcpy(arrNames, "fKTCycle");
+    fKT_Cycle = Array_Create_1D_float(1+nTot_CycleNum, arrNames);
+//    fKT_Cycle = malloc((1 + nTot_CycleNum) * sizeof(float));
+
+    strcpy(arrNames, "naList");
+    naList = Array_Create_1D_int(1+tot_chains, arrNames);
+//    naList = malloc( (1+tot_chains) * sizeof(lInt));
+
+    strcpy(arrNames, "naCluster");
+    naCluster = Array_Create_2D_int(tot_chains+1, tot_chains+1, arrNames);
 
     if (nReport[REPORT_NETWORK] != 0) {
-        ld_TOTCLUS_ARR = ( lLDub ** )malloc((nTot_CycleNum) * sizeof(lLDub));
-        for (i = 0; i < nTot_CycleNum; i++) {
-            ld_TOTCLUS_ARR[i] = ( lLDub * )malloc((1 + tot_chains) * sizeof(lLDub));
-            if (ld_TOTCLUS_ARR[i] == NULL) {
-                printf("Malloc Failed for Cluster! Crashing. Probably ran out of memory. Reduce number of chains.\n");
-                exit(1);
-            }
-        }
-        ldMOLCLUS_ARR = malloc((tot_chain_types * tot_chains) * sizeof(lLDub));
-        ld_TOTMOLCLUS_ARR = malloc((nTot_CycleNum * tot_chain_types * tot_chains) * sizeof(lLDub));
-        ld_TOTGYRRAD_ARR = ( lLDub ** )malloc((nTot_CycleNum) * sizeof(lLDub));
-        for (i = 0; i < nTot_CycleNum; i++) {
-            ld_TOTGYRRAD_ARR[i] = ( lLDub * )malloc((2) * sizeof(lLDub));
-        }
+        strcpy(arrNames, "ldTotClusArr");
+        ld_TOTCLUS_ARR = Array_Create_2D_longdouble(1+tot_chains, nTot_CycleNum, arrNames);
+
+//        ld_TOTCLUS_ARR = ( lLDub ** )malloc((nTot_CycleNum) * sizeof(lLDub));
+//        for (i = 0; i < nTot_CycleNum; i++) {
+//            ld_TOTCLUS_ARR[i] = ( lLDub * )malloc((1 + tot_chains) * sizeof(lLDub));
+//            if (ld_TOTCLUS_ARR[i] == NULL) {
+//                printf("Malloc Failed for Cluster! Crashing. Probably ran out of memory. Reduce number of chains.\n");
+//                exit(1);
+//            }
+//        }
+
+        strcpy(arrNames, "ldMolClusArr");
+        ldMOLCLUS_ARR = Array_Create_1D_longdouble((tot_chains * tot_chain_types), arrNames);
+//        ldMOLCLUS_ARR = malloc((tot_chain_types * tot_chains) * sizeof(lLDub));
+
+        strcpy(arrNames, "ldTotMolClusArr");
+        ld_TOTMOLCLUS_ARR = Array_Create_1D_longdouble((tot_chains * tot_chain_types * nTot_CycleNum), arrNames);
+//        ld_TOTMOLCLUS_ARR = malloc((nTot_CycleNum * tot_chain_types * tot_chains) * sizeof(lLDub));
+
+        strcpy(arrNames, "ldTotGyrRad");
+        ld_TOTGYRRAD_ARR = Array_Create_2D_longdouble(2, nTot_CycleNum, arrNames);
+
+//        ld_TOTGYRRAD_ARR = ( lLDub ** )malloc((nTot_CycleNum) * sizeof(lLDub));
+//        for (i = 0; i < nTot_CycleNum; i++) {
+//            ld_TOTGYRRAD_ARR[i] = ( lLDub * )malloc((2) * sizeof(lLDub));
+//        }
     }
     nRDF_TotComps = 2 + nBeadTypes + nBeadTypes * nBeadTypes;
     nRDF_TotComps /= 2;
     if (nReport[REPORT_RDFTOT] != 0) {
-        ld_TOTRDF_Arr = malloc((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
-        ldRDF_Arr = malloc((nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
+
+        strcpy(arrNames, "ldTotRDFArr");
+        ld_TOTRDF_Arr = Array_Create_1D_longdouble((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins), arrNames);
+
+//        ld_TOTRDF_Arr = malloc((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
+        strcpy(arrNames, "ldRDFArr");
+        ldRDF_Arr = Array_Create_1D_longdouble((nRDF_TotComps * nRDF_TotBins), arrNames);
+//        ldRDF_Arr = malloc((nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
     }
+
     if (nReport[REPORT_COMDEN] != 0) {
         nRadDen_TotComps = 2*tot_chain_types * (tot_chain_types + 1);
         nRadDen_CompShift= tot_chain_types * (tot_chain_types + 1);
-        ldRadDen_Arr = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
-        ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins) * sizeof(lLDub));
+
+        strcpy(arrNames, "ldRadDenArr");
+        ldRadDen_Arr = Array_Create_1D_longdouble(nRadDen_TotComps * nRDF_TotBins, arrNames);
+//        ldRadDen_Arr = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
+
+        strcpy(arrNames, "ldTotRadDenArr");
+        ld_TOTRadDen_Arr = Array_Create_1D_longdouble(nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins, arrNames);
+//        ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins) * sizeof(lLDub));
     }
     if (nTrajMode != 0){
         nTraj_FramesPerCycle = nMCStepsPerCycle / nReport[REPORT_CONFIG];
         n_TOTTRAJ_ARR = malloc(sizeof(lInt) * nTraj_FramesPerCycle * (lLong) tot_beads * BEADINFO_MAX);
     }
-    Memory_VerifyMalloc();
+//    Memory_VerifyMalloc();
     printf("Successfully allocated memory! Arrays initialized.\n");
+//    exit(1);
 }
 
 void Memory_VerifyMalloc(void){
@@ -108,6 +155,7 @@ void Global_Array_Initialization_AtStart(void) {
             }
         }
     }
+
     //Initializing rotational orientational bias arrays.
     for (i = 0; i < MAX_VALENCY; i++) {
         for (j = 0; j < MAX_ROTSTATES; j++) {
@@ -207,7 +255,8 @@ void Global_Array_Initialization_AtStart(void) {
     for (i = MV_NULL + 2; i < MAX_MV; i++) {
         fMCFreq[i] += fMCFreq[i - 1]; // Cumulative Frequencies
     }
-
+//    printf("%d %d %d\n", tot_beads, tot_chains, tot_chain_types);
+//    exit(1);
     for (i = 0; i < nTot_CycleNum; i++) {
         fKT_Cycle[i] = fKT + (float) i * fdelta_temp;
     }
@@ -592,35 +641,168 @@ float Temperature_Function(int mode, long nGen) {
 
 }
 
-/// Array_Create_2D_int creates a 2D array or arbitrary size of dimensions [y, x], in C-style.
-/// We first allocate an array of pointers which have size yDim. Call this yArr[]
-/// Using the first pointer, we then allocate a new array of size xDim*yDim. Call this totAr[];
-/// Then for each of the pointers in yArr, we point to different chunks of totAr; converting 2D indicies
-/// to 1D indicies.
-/// \param xDim: Size of second index
-/// \param yDim: Size of first index
-/// \return Pointer to array-of-pointers, or a 2D array.
-int **Array_Create_2D_int(const size_t xDim, const size_t yDim) {
 
-    int **dumPtr;
-    dumPtr = (int **)malloc(yDim * sizeof(int *));
+/// Array_Create_1D_int create an array of ints of size of xDim.
+/// \param xDim Length of array.
+/// \param ArrName Dummy name of the array for debugging.
+/// \return The pointer to the array.
+int *Array_Create_1D_int(const int xDim, const char* ArrName){
+    int *dumPtr;
+#if DEBUG
+    printf("%s is being allocated ... ", ArrName);
+#endif
+    dumPtr = malloc(xDim * sizeof (int));
 
     if (dumPtr == NULL) {
-        printf("Not enough memory\n");
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
         exit(1);
     }
+#if DEBUG
+    printf(" ... and allocated!\n");
+#endif
+    return dumPtr;
+}
 
+
+/// Array_Create_1D_long create an array of ints of size of xDim.
+/// \param xDim Length of array.
+/// \param ArrName Dummy name of the array for debugging.
+/// \return The pointer to the array.
+long *Array_Create_1D_long(const int xDim, const char* ArrName){
+    long *dumPtr;
+#if DEBUG
+    printf("%s is being allocated ... ", ArrName);
+#endif
+    dumPtr = malloc(xDim * sizeof (long));
+
+    if (dumPtr == NULL) {
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
+    }
+#if DEBUG
+    printf(" ... and allocated!\n");
+#endif
+    return dumPtr;
+}
+
+
+/// Array_Create_1D_long create an array of ints of size of xDim.
+/// \param xDim Length of array.
+/// \param ArrName Dummy name of the array for debugging.
+/// \return The pointer to the array.
+float *Array_Create_1D_float(const int xDim, const char* ArrName){
+    float *dumPtr;
+#if DEBUG
+    printf("%s is being allocated ... ", ArrName);
+#endif
+    dumPtr = malloc(xDim * sizeof (float));
+
+    if (dumPtr == NULL) {
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
+    }
+#if DEBUG
+    printf(" ... and allocated!\n");
+#endif
+    return dumPtr;
+}
+
+
+/// Array_Create_1D_long create an array of ints of size of xDim.
+/// \param xDim Length of array.
+/// \param ArrName Dummy name of the array for debugging.
+/// \return The pointer to the array.
+long double *Array_Create_1D_longdouble(const int xDim, const char* ArrName){
+    long double *dumPtr;
+#if DEBUG
+    printf("%s is being allocated ... ", ArrName);
+#endif
+    dumPtr = malloc(xDim * sizeof (long double));
+
+    if (dumPtr == NULL) {
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
+    }
+#if DEBUG
+    printf(" ... and allocated!\n");
+#endif
+    return dumPtr;
+}
+
+
+/// Array_Create_2D_int creates a 2D array or arbitrary size of dimensions [yDim][xDim], in C-style.
+/// We first allocate an array of pointers which have size yDim. Call this yArr[]
+/// Using the first pointer, we then allocate a new array of size xDim*yDim.
+/// Then for each of the pointers in yArr, we point to different chunks of totAr;
+/// converting 2D indicies to 1D indicies.
+/// \param xDim: Size of second index
+/// \param yDim: Size of first index
+/// \param ArrName: Dummy name for the array, for debugging.
+/// \return Pointer to array-of-pointers, or a 2D array.
+int **Array_Create_2D_int(const int xDim, const int yDim, const char* ArrName) {
+#if DEBUG
+    printf("%s is being allocated ... ", ArrName);
+#endif
+    int **dumPtr;
+    dumPtr = (int **)malloc(yDim * sizeof(int *));
+    if (dumPtr == NULL) {
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
+    }
+#
     dumPtr[0] = (int *)malloc(xDim * yDim * sizeof(int));
-
     if (dumPtr[0] == NULL) {
-        printf("Not enough memory\n");
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
         exit(1);
     }
 
-    uint i;
+    int i;
     for (i = 1; i < yDim; i++) {
         dumPtr[i] = &dumPtr[0][i * xDim];
     }
-
+#if DEBUG
+    printf(" ... and allocated!\n");
+#endif
     return dumPtr;
 }
+
+
+/// Array_Create_2D_int creates a 2D array of arbitrary size of dimensions [yDim][xDim], in C-style.
+/// The array is for long doubles
+/// We first allocate an array of pointers which have size yDim. Call this yArr[]
+/// Using the first pointer, we then allocate a new array of size xDim*yDim.
+/// Then for each of the pointers in yArr, we point to different chunks of totAr;
+/// converting 2D indicies to 1D indicies.
+/// \param xDim: Size of second index
+/// \param yDim: Size of first index
+/// \param ArrName: Dummy name for the array, for debugging.
+/// \return Pointer to array-of-pointers, or a 2D array.
+long double **Array_Create_2D_longdouble(const int xDim, const int yDim, const char* ArrName) {
+#if DEBUG
+    printf("%s is being allocated ... ", ArrName);
+#endif
+    long double **dumPtr;
+    dumPtr = (long double **)malloc(yDim * sizeof(long double *));
+    if (dumPtr == NULL) {
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
+    }
+#
+    dumPtr[0] = (long double *)malloc(xDim * yDim * sizeof(long double));
+    if (dumPtr[0] == NULL) {
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
+    }
+
+    int i;
+    for (i = 1; i < yDim; i++) {
+        dumPtr[i] = &dumPtr[0][i * xDim];
+    }
+#if DEBUG
+    printf(" ... and allocated!\n");
+#endif
+    return dumPtr;
+}
+
+
+
