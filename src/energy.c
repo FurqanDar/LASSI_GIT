@@ -6,7 +6,7 @@
 /// The function calculates (T_current - T_final) and if < 0.001, sets nThermalization_Mode = 0.
 /// \param beadID
 /// \return The energy, given the nThermalization_Mode
-float Energy_InitPotential(int beadID) {
+float Energy_InitPotential(const int beadID) {
     int j;
     float totEn = 0.;
     int tmpR[POS_MAX];
@@ -118,7 +118,7 @@ float Energy_InitPotential(int beadID) {
 /// Energy_Anisotropic - returns the bond energy for beadID if it is bonded.
 /// \param beadID
 /// \return
-float Energy_Anisotropic(int beadID) {//Calculates the SC-SC energy of the bead in question.
+float Energy_Anisotropic(const int beadID) {//Calculates the SC-SC energy of the bead in question.
     float totEn = 0.0; //Storing total overlap energy
     if (bead_info[beadID][BEAD_FACE] != -1) {
         totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bead_info[beadID][BEAD_FACE]][BEAD_TYPE]][E_SC_SC];
@@ -130,7 +130,7 @@ float Energy_Anisotropic(int beadID) {//Calculates the SC-SC energy of the bead 
 /// to a bead in the same chain. Note that this does not account for double counting
 /// \param beadID
 /// \return
-float Energy_Anisotropic_Self(int beadID) {//Calculates the SC-SC energy of the bead in question.
+float Energy_Anisotropic_Self(const int beadID) {//Calculates the SC-SC energy of the bead in question.
     float totEn = 0.0; //Storing total overlap energy
     int bP = bead_info[beadID][BEAD_FACE];
     if (bP != -1) {//This bead does have a bond
@@ -146,7 +146,7 @@ float Energy_Anisotropic_Self(int beadID) {//Calculates the SC-SC energy of the 
 /// This should only be used when calculating the energy of an entire chain!
 /// \param beadID
 /// \return
-float Energy_Anisotropic_For_Chain(int beadID) {//Calculates the SC-SC energy of the bead in question.
+float Energy_Anisotropic_For_Chain(const int beadID) {//Calculates the SC-SC energy of the bead in question.
     float totEn = 0.0; //Storing total overlap energy
     int bP = bead_info[beadID][BEAD_FACE];
     if (bP != -1) {//This bead does have a bond
@@ -167,7 +167,7 @@ float Energy_Anisotropic_For_Chain(int beadID) {//Calculates the SC-SC energy of
 /// we divide by 2 to account for double counting.
 /// \param beadID
 /// \return
-float Energy_Anisotropic_Contiguous_Range(int beadID, int smallest_bead, int largest_bead){
+float Energy_Anisotropic_Contiguous_Range(const int beadID, const int smallest_bead, const int largest_bead){
     float totEn = 0.0; //Storing total overlap energy
     int bP = bead_info[beadID][BEAD_FACE];
     if (bP != -1) {//This bead does have a bond
@@ -240,7 +240,7 @@ float Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis
 /// distance.
 /// \param beadID
 /// \return
-float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy of bead beadID
+float Energy_Isotropic_Old(const int beadID) {//Calculate Contact and Overlap energy of bead beadID
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
     int   r_pos_0[POS_MAX], r_chck[POS_MAX], r_disp[POS_MAX];
@@ -309,7 +309,7 @@ float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy o
 /// distance.
 /// \param beadID
 /// \return
-float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of bead beadID
+float Energy_Isotropic(const int beadID) {//Calculate Contact and Overlap energy of bead beadID
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
     int   r_pos_0[POS_MAX], r_chck[POS_MAX], r_disp[POS_MAX];
@@ -366,7 +366,7 @@ float Energy_Isotropic(int beadID) {//Calculate Contact and Overlap energy of be
 /// molecule. Note that it does not account for double counting
 /// \param beadID
 /// \return
-float Energy_Isotropic_Self(int beadID) {//Calculate Contact and Overlap energy of beadID but only intra-molecular
+float Energy_Isotropic_Self(const int beadID) {//Calculate Contact and Overlap energy of beadID but only intra-molecular
     //interactions
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
@@ -428,7 +428,7 @@ float Energy_Isotropic_Self(int beadID) {//Calculate Contact and Overlap energy 
 /// This should only be used when calculating the energy of an entire chain!
 /// \param beadID
 /// \return
-float Energy_Isotropic_For_Chain(int beadID) {//Calculate Contact and Overlap energy of beadID
+float Energy_Isotropic_For_Chain(const int beadID) {//Calculate Contact and Overlap energy of beadID
     //Takes care of intra-molecular double counting
     float totEn = 0.0; //Storing total overlap energy
     int i, j;//Indecies
@@ -495,7 +495,7 @@ float Energy_Isotropic_For_Chain(int beadID) {//Calculate Contact and Overlap en
 /// we divide by 2 to account for double counting.
 /// \param beadID
 /// \return
-float Energy_Isotropic_Contiguous_Range(int beadID, int smallest_bead, int largest_bead) {//Calculate Contact and Overlap energy of beadID
+float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bead, const int largest_bead) {//Calculate Contact and Overlap energy of beadID
     //Takes care of intra-molecular double counting
     //If the bead is between smallest_bead and largest_bead, we divide by two.
     //This assumes that every bead between smallest_bead and largest_bead will be looped over
@@ -666,7 +666,7 @@ void Energy_Total_System(void) {
 /// Energy_Of_Chain - calculates the total energy of a molecule. Takes care of double-counting intra interactions
 /// \param chainID - ID of the molecule to calculate the energy.
 /// \return The total aniso + isotropic energy of this chain.
-float Energy_Of_Chain(int chainID) {//Calculates the energy of the given chain.
+float Energy_Of_Chain(const int chainID) {//Calculates the energy of the given chain.
     float totEn = 0.0;
     int i;//Looping index
     int fB = chain_info[chainID][CHAIN_START];
@@ -681,7 +681,7 @@ float Energy_Of_Chain(int chainID) {//Calculates the energy of the given chain.
 /// Energy_Of_Chain_Self - only calculates the intra-molecular energy of this molecule
 /// \param chainID - ID of the molecule to calculate the energy.
 /// \return The total aniso + isotropic energy of this chain.
-float Energy_Of_Chain_Self(int chainID) {//Calculates only intra-molecular interactions
+float Energy_Of_Chain_Self(const int chainID) {//Calculates only intra-molecular interactions
     float totEn = 0.0;
     int i;//Looping index
     int fB = chain_info[chainID][CHAIN_START];
@@ -699,7 +699,7 @@ float Energy_Of_Chain_Self(int chainID) {//Calculates only intra-molecular inter
 /// Note that this sub-routine is dumb and does not account for double counting within the same chain.
 /// As such, this function should be used in both the old and new energy calculations so that the energy difference
 /// is still correct.
-float Energy_Of_Chain_OLD(int chainID) {//Calculates the energy of the given chain
+float Energy_Of_Chain_OLD(const int chainID) {//Calculates the energy of the given chain
     float totEn = 0.0;
     int i;//Looping index
 
