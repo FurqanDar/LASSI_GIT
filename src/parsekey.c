@@ -204,7 +204,6 @@ int Parse_Keyfile(char *filename) {
             nErr = 5;
             printf("No restart file provided.\n");
         }
-        //exit(1);
     }
 
     return nErr;
@@ -636,7 +635,7 @@ void Parse_StructureFile_CalcBeadsAndChains(char *filename, int* n_bead_num,
 /// \param n_chain_types
 /// \param n_chain_num
 void CreateBeadsAndChains(int n_bead_num, int n_chain_types, int n_chain_num){
-    char* strTemp[100];
+    char strTemp[100];
 
     strcpy(strTemp, "Chain Info.");
     chain_info = Create2DInt(CHAININFO_MAX, tot_chains, strTemp);
