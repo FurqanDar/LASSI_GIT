@@ -5,88 +5,68 @@
 /// Memory_Initialization_AtStart - allocates memory, and initializes the various global arrays.
 void Memory_Initialization_AtStart(void) {
     int i, j;
-    char arrNames[100];
+    char arr_name[100];
 
-    strcpy(arrNames, "naTotLattice");
-    naTotLattice = Array_Create_1D_int(nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arrNames);
-//    naTotLattice = malloc(nBoxSize[0] * nBoxSize[1] * nBoxSize[2] * sizeof(lInt));
+    strcpy(arr_name, "naTotLattice");
+    naTotLattice = Array_Create_1D_int(nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arr_name);
 
-    strcpy(arrNames, "naClusHistList");
-    naClusHistList = Array_Create_1D_long((1+tot_chains), arrNames);
-//    naClusHistList = malloc((1 + tot_chains) * sizeof(lLong));
+    strcpy(arr_name, "naClusHistList");
+    naClusHistList = Array_Create_1D_long((1+tot_chains), arr_name);
 
-    strcpy(arrNames, "naChainCheckList");
-    naChainCheckList = Array_Create_1D_int(1+tot_chains, arrNames);
-//    naChainCheckList = malloc((1 + tot_chains) * sizeof(lInt));
+    strcpy(arr_name, "naChainCheckList");
+    naChainCheckList = Array_Create_1D_int(1+tot_chains, arr_name);
 
-    strcpy(arrNames, "fKTCycle");
-    fKT_Cycle = Array_Create_1D_float(1+nTot_CycleNum, arrNames);
-//    fKT_Cycle = malloc((1 + nTot_CycleNum) * sizeof(float));
+    strcpy(arr_name, "fKTCycle");
+    fKT_Cycle = Array_Create_1D_float(1+nTot_CycleNum, arr_name);
 
-    strcpy(arrNames, "naList");
-    naList = Array_Create_1D_int(1+tot_chains, arrNames);
-//    naList = malloc( (1+tot_chains) * sizeof(lInt));
+    strcpy(arr_name, "naList");
+    naList = Array_Create_1D_int(1+tot_chains, arr_name);
 
-    strcpy(arrNames, "naCluster");
-    naCluster = Array_Create_2D_int(tot_chains+1, tot_chains+1, arrNames);
+    strcpy(arr_name, "naCluster");
+    naCluster = Array_Create_2D_int(tot_chains+1, tot_chains+1, arr_name);
 
     if (nReport[REPORT_NETWORK] != 0) {
-        strcpy(arrNames, "ldTotClusArr");
-        ld_TOTCLUS_ARR = Array_Create_2D_longdouble(1+tot_chains, nTot_CycleNum, arrNames);
+        strcpy(arr_name, "ldTotClusArr");
+        ld_TOTCLUS_ARR = Array_Create_2D_longdouble(1+tot_chains, nTot_CycleNum, arr_name);
 
-//        ld_TOTCLUS_ARR = ( lLDub ** )malloc((nTot_CycleNum) * sizeof(lLDub));
-//        for (i = 0; i < nTot_CycleNum; i++) {
-//            ld_TOTCLUS_ARR[i] = ( lLDub * )malloc((1 + tot_chains) * sizeof(lLDub));
-//            if (ld_TOTCLUS_ARR[i] == NULL) {
-//                printf("Malloc Failed for Cluster! Crashing. Probably ran out of memory. Reduce number of chains.\n");
-//                exit(1);
-//            }
-//        }
+        strcpy(arr_name, "ldMolClusArr");
+        ldMOLCLUS_ARR = Array_Create_1D_longdouble((tot_chains * tot_chain_types), arr_name);
 
-        strcpy(arrNames, "ldMolClusArr");
-        ldMOLCLUS_ARR = Array_Create_1D_longdouble((tot_chains * tot_chain_types), arrNames);
-//        ldMOLCLUS_ARR = malloc((tot_chain_types * tot_chains) * sizeof(lLDub));
+        strcpy(arr_name, "ldTotMolClusArr");
+        ld_TOTMOLCLUS_ARR = Array_Create_1D_longdouble((tot_chains * tot_chain_types * nTot_CycleNum), arr_name);
 
-        strcpy(arrNames, "ldTotMolClusArr");
-        ld_TOTMOLCLUS_ARR = Array_Create_1D_longdouble((tot_chains * tot_chain_types * nTot_CycleNum), arrNames);
-//        ld_TOTMOLCLUS_ARR = malloc((nTot_CycleNum * tot_chain_types * tot_chains) * sizeof(lLDub));
-
-        strcpy(arrNames, "ldTotGyrRad");
-        ld_TOTGYRRAD_ARR = Array_Create_2D_longdouble(2, nTot_CycleNum, arrNames);
-
-//        ld_TOTGYRRAD_ARR = ( lLDub ** )malloc((nTot_CycleNum) * sizeof(lLDub));
-//        for (i = 0; i < nTot_CycleNum; i++) {
-//            ld_TOTGYRRAD_ARR[i] = ( lLDub * )malloc((2) * sizeof(lLDub));
-//        }
+        strcpy(arr_name, "ldTotGyrRad");
+        ld_TOTGYRRAD_ARR = Array_Create_2D_longdouble(2, nTot_CycleNum, arr_name);
     }
     nRDF_TotComps = 2 + nBeadTypes + nBeadTypes * nBeadTypes;
     nRDF_TotComps /= 2;
     if (nReport[REPORT_RDFTOT] != 0) {
 
-        strcpy(arrNames, "ldTotRDFArr");
-        ld_TOTRDF_Arr = Array_Create_1D_longdouble((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins), arrNames);
+        strcpy(arr_name, "ldTotRDFArr");
+        ld_TOTRDF_Arr = Array_Create_1D_longdouble((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins), arr_name);
 
-//        ld_TOTRDF_Arr = malloc((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
-        strcpy(arrNames, "ldRDFArr");
-        ldRDF_Arr = Array_Create_1D_longdouble((nRDF_TotComps * nRDF_TotBins), arrNames);
-//        ldRDF_Arr = malloc((nRDF_TotComps * nRDF_TotBins) * sizeof(lLDub));
+        strcpy(arr_name, "ldRDFArr");
+        ldRDF_Arr = Array_Create_1D_longdouble((nRDF_TotComps * nRDF_TotBins), arr_name);
     }
 
     if (nReport[REPORT_COMDEN] != 0) {
         nRadDen_TotComps = 2*tot_chain_types * (tot_chain_types + 1);
         nRadDen_CompShift= tot_chain_types * (tot_chain_types + 1);
 
-        strcpy(arrNames, "ldRadDenArr");
-        ldRadDen_Arr = Array_Create_1D_longdouble(nRadDen_TotComps * nRDF_TotBins, arrNames);
-//        ldRadDen_Arr = malloc((nRadDen_TotComps * nRDF_TotBins) * sizeof(lLDub));//Same as RDF
+        strcpy(arr_name, "ldRadDenArr");
+        ldRadDen_Arr = Array_Create_1D_longdouble(nRadDen_TotComps * nRDF_TotBins, arr_name);
 
-        strcpy(arrNames, "ldTotRadDenArr");
-        ld_TOTRadDen_Arr = Array_Create_1D_longdouble(nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins, arrNames);
-//        ld_TOTRadDen_Arr = malloc((nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins) * sizeof(lLDub));
+        strcpy(arr_name, "ldTotRadDenArr");
+        ld_TOTRadDen_Arr = Array_Create_1D_longdouble(nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins, arr_name);
     }
     if (nTrajMode != 0){
         nTraj_FramesPerCycle = nMCStepsPerCycle / nReport[REPORT_CONFIG];
-        n_TOTTRAJ_ARR = malloc(sizeof(lInt) * nTraj_FramesPerCycle * (lLong) tot_beads * BEADINFO_MAX);
+        printf("\n***********************************************\n");
+        printf("This feature is still experimental!\n");
+        printf("\n***********************************************\n");
+
+        strcpy(arr_name, "nTotTrajArr");
+        n_TOTTRAJ_ARR = Array_Create_1D_int(nTraj_FramesPerCycle * tot_beads * BEADINFO_MAX, arr_name);
     }
 //    Memory_VerifyMalloc();
     printf("Successfully allocated memory! Arrays initialized.\n");
