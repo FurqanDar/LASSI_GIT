@@ -8,45 +8,45 @@ void Memory_Initialization_AtStart(void) {
     char arr_name[100];
 
     strcpy(arr_name, "naTotLattice");
-    naTotLattice = Array_Create_1D_int(nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arr_name);
+    naTotLattice = Create1DInt(nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arr_name);
 
     strcpy(arr_name, "naClusHistList");
-    naClusHistList = Array_Create_1D_long((1+tot_chains), arr_name);
+    naClusHistList = Create1DLong((1 + tot_chains), arr_name);
 
     strcpy(arr_name, "naChainCheckList");
-    naChainCheckList = Array_Create_1D_int(1+tot_chains, arr_name);
+    naChainCheckList = Create1DInt(1 + tot_chains, arr_name);
 
     strcpy(arr_name, "fKTCycle");
-    fKT_Cycle = Array_Create_1D_float(1+nTot_CycleNum, arr_name);
+    fKT_Cycle = Create1DFloat(1 + nTot_CycleNum, arr_name);
 
     strcpy(arr_name, "naList");
-    naList = Array_Create_1D_int(1+tot_chains, arr_name);
+    naList = Create1DInt(1 + tot_chains, arr_name);
 
     strcpy(arr_name, "naCluster");
-    naCluster = Array_Create_2D_int(tot_chains+1, tot_chains+1, arr_name);
+    naCluster = Create2DInt(tot_chains + 1, tot_chains + 1, arr_name);
 
     if (nReport[REPORT_NETWORK] != 0) {
         strcpy(arr_name, "ldTotClusArr");
-        ld_TOTCLUS_ARR = Array_Create_2D_longdouble(1+tot_chains, nTot_CycleNum, arr_name);
+        ld_TOTCLUS_ARR = Create2DLongdouble(1 + tot_chains, nTot_CycleNum, arr_name);
 
         strcpy(arr_name, "ldMolClusArr");
-        ldMOLCLUS_ARR = Array_Create_1D_longdouble((tot_chains * tot_chain_types), arr_name);
+        ldMOLCLUS_ARR = Create1DLongdouble((tot_chains * tot_chain_types), arr_name);
 
         strcpy(arr_name, "ldTotMolClusArr");
-        ld_TOTMOLCLUS_ARR = Array_Create_1D_longdouble((tot_chains * tot_chain_types * nTot_CycleNum), arr_name);
+        ld_TOTMOLCLUS_ARR = Create1DLongdouble((tot_chains * tot_chain_types * nTot_CycleNum), arr_name);
 
         strcpy(arr_name, "ldTotGyrRad");
-        ld_TOTGYRRAD_ARR = Array_Create_2D_longdouble(2, nTot_CycleNum, arr_name);
+        ld_TOTGYRRAD_ARR = Create2DLongdouble(2, nTot_CycleNum, arr_name);
     }
     nRDF_TotComps = 2 + nBeadTypes + nBeadTypes * nBeadTypes;
     nRDF_TotComps /= 2;
     if (nReport[REPORT_RDFTOT] != 0) {
 
         strcpy(arr_name, "ldTotRDFArr");
-        ld_TOTRDF_Arr = Array_Create_1D_longdouble((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins), arr_name);
+        ld_TOTRDF_Arr = Create1DLongdouble((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins), arr_name);
 
         strcpy(arr_name, "ldRDFArr");
-        ldRDF_Arr = Array_Create_1D_longdouble((nRDF_TotComps * nRDF_TotBins), arr_name);
+        ldRDF_Arr = Create1DLongdouble((nRDF_TotComps * nRDF_TotBins), arr_name);
     }
 
     if (nReport[REPORT_COMDEN] != 0) {
@@ -54,10 +54,10 @@ void Memory_Initialization_AtStart(void) {
         nRadDen_CompShift= tot_chain_types * (tot_chain_types + 1);
 
         strcpy(arr_name, "ldRadDenArr");
-        ldRadDen_Arr = Array_Create_1D_longdouble(nRadDen_TotComps * nRDF_TotBins, arr_name);
+        ldRadDen_Arr = Create1DLongdouble(nRadDen_TotComps * nRDF_TotBins, arr_name);
 
         strcpy(arr_name, "ldTotRadDenArr");
-        ld_TOTRadDen_Arr = Array_Create_1D_longdouble(nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins, arr_name);
+        ld_TOTRadDen_Arr = Create1DLongdouble(nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins, arr_name);
     }
     if (nTrajMode != 0){
         nTraj_FramesPerCycle = nMCStepsPerCycle / nReport[REPORT_CONFIG];
@@ -66,11 +66,10 @@ void Memory_Initialization_AtStart(void) {
         printf("\n***********************************************\n");
 
         strcpy(arr_name, "nTotTrajArr");
-        n_TOTTRAJ_ARR = Array_Create_1D_int(nTraj_FramesPerCycle * tot_beads * BEADINFO_MAX, arr_name);
+        n_TOTTRAJ_ARR = Create1DInt(nTraj_FramesPerCycle * tot_beads * BEADINFO_MAX, arr_name);
     }
 //    Memory_VerifyMalloc();
     printf("Successfully allocated memory! Arrays initialized.\n");
-//    exit(1);
 }
 
 void Memory_VerifyMalloc(void){
@@ -622,11 +621,11 @@ float Temperature_Function(int mode, long nGen) {
 }
 
 
-/// Array_Create_1D_int create an array of ints of size of xDim.
+/// Create1DInt create an array of ints of size of xDim.
 /// \param xDim Length of array.
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
-int *Array_Create_1D_int(const int xDim, const char* ArrName){
+int *Create1DInt(const int xDim, const char* ArrName){
     int *dumPtr;
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
@@ -644,11 +643,11 @@ int *Array_Create_1D_int(const int xDim, const char* ArrName){
 }
 
 
-/// Array_Create_1D_long create an array of ints of size of xDim.
+/// Create1DLong create an array of ints of size of xDim.
 /// \param xDim Length of array.
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
-long *Array_Create_1D_long(const int xDim, const char* ArrName){
+long *Create1DLong(const int xDim, const char* ArrName){
     long *dumPtr;
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
@@ -666,11 +665,11 @@ long *Array_Create_1D_long(const int xDim, const char* ArrName){
 }
 
 
-/// Array_Create_1D_long create an array of ints of size of xDim.
+/// Create1DLong create an array of ints of size of xDim.
 /// \param xDim Length of array.
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
-float *Array_Create_1D_float(const int xDim, const char* ArrName){
+float *Create1DFloat(const int xDim, const char* ArrName){
     float *dumPtr;
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
@@ -688,11 +687,11 @@ float *Array_Create_1D_float(const int xDim, const char* ArrName){
 }
 
 
-/// Array_Create_1D_long create an array of ints of size of xDim.
+/// Create1DLong create an array of ints of size of xDim.
 /// \param xDim Length of array.
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
-long double *Array_Create_1D_longdouble(const int xDim, const char* ArrName){
+long double *Create1DLongdouble(const int xDim, const char* ArrName){
     long double *dumPtr;
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
@@ -710,7 +709,7 @@ long double *Array_Create_1D_longdouble(const int xDim, const char* ArrName){
 }
 
 
-/// Array_Create_2D_int creates a 2D array or arbitrary size of dimensions [yDim][xDim], in C-style.
+/// Create2DInt creates a 2D array or arbitrary size of dimensions [yDim][xDim], in C-style.
 /// We first allocate an array of pointers which have size yDim. Call this yArr[]
 /// Using the first pointer, we then allocate a new array of size xDim*yDim.
 /// Then for each of the pointers in yArr, we point to different chunks of totAr;
@@ -719,7 +718,7 @@ long double *Array_Create_1D_longdouble(const int xDim, const char* ArrName){
 /// \param yDim: Size of first index
 /// \param ArrName: Dummy name for the array, for debugging.
 /// \return Pointer to array-of-pointers, or a 2D array.
-int **Array_Create_2D_int(const int xDim, const int yDim, const char* ArrName) {
+int **Create2DInt(const int xDim, const int yDim, const char* ArrName) {
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
 #endif
@@ -747,7 +746,7 @@ int **Array_Create_2D_int(const int xDim, const int yDim, const char* ArrName) {
 }
 
 
-/// Array_Create_2D_int creates a 2D array of arbitrary size of dimensions [yDim][xDim], in C-style.
+/// Create2DInt creates a 2D array of arbitrary size of dimensions [yDim][xDim], in C-style.
 /// The array is for long doubles
 /// We first allocate an array of pointers which have size yDim. Call this yArr[]
 /// Using the first pointer, we then allocate a new array of size xDim*yDim.
@@ -757,7 +756,7 @@ int **Array_Create_2D_int(const int xDim, const int yDim, const char* ArrName) {
 /// \param yDim: Size of first index
 /// \param ArrName: Dummy name for the array, for debugging.
 /// \return Pointer to array-of-pointers, or a 2D array.
-long double **Array_Create_2D_longdouble(const int xDim, const int yDim, const char* ArrName) {
+long double **Create2DLongdouble(const int xDim, const int yDim, const char* ArrName) {
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
 #endif

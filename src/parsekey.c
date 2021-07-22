@@ -181,19 +181,19 @@ int Parse_Keyfile(char *filename) {
         Parse_StructureFile_CalcBeadsAndChains(strStructFile, &tot_beads,
                                                &tot_chains, &tot_chain_types);
         strcpy(strTemp, "Chain Info.");
-        chain_info = Array_Create_2D_int(CHAININFO_MAX, tot_chains, strTemp);
+        chain_info = Create2DInt(CHAININFO_MAX, tot_chains, strTemp);
 
         strcpy(strTemp, "Topo Info.");
-        topo_info  = Array_Create_2D_int(MAX_BONDS, tot_beads, strTemp);
+        topo_info  = Create2DInt(MAX_BONDS, tot_beads, strTemp);
 
         strcpy(strTemp, "Linker Len.");
-        linker_len = Array_Create_2D_int(MAX_BONDS, tot_beads, strTemp);
+        linker_len = Create2DInt(MAX_BONDS, tot_beads, strTemp);
 
         strcpy(strTemp, "Bead Info.");
-        bead_info  = Array_Create_2D_int(BEADINFO_MAX, tot_beads, strTemp);
+        bead_info  = Create2DInt(BEADINFO_MAX, tot_beads, strTemp);
 
         strcpy(strTemp, "Old Bead.");
-        old_bead   = Array_Create_2D_int(BEADINFO_MAX, tot_beads, strTemp);
+        old_bead   = Create2DInt(BEADINFO_MAX, tot_beads, strTemp);
 
         Parse_StructureFile(strStructFile);
 //        exit(1);
