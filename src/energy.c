@@ -304,8 +304,8 @@ float Energy_Isotropic_Old(const int beadID) {//Calculate Contact and Overlap en
 }
 
 /// Energy_Isotroptic calculates the isotropic contribution to the energy by searching the 3^3-1 = 26 'neighbors'
-/// The energy function  is like the BFM, where $\epislon$ represents the overlap cost for total overlap, which is
-/// forbidden explicitly in LASSI, so we have $\epislon/2$,$\epislon/4$ and $\epislon/8$ with increasing
+/// The energy function  is like the BFM, where $x$ represents the overlap cost for total overlap, which is
+/// forbidden explicitly in LASSI, so we have $x/2$,$x/4$ and $x/8$ with increasing
 /// distance.
 /// \param beadID
 /// \return
@@ -649,12 +649,12 @@ void Energy_Total_System(void) {
     int i;//Indecies
     // initialization
     for (i = 0; i < MAX_E; i++) {
-        faCurrEn[i] = 0.0;
+        faCurrEn[i] = 0.0f;
     }
 //printf("We have %d beads and %d chains", tot_beads, tot_chains);
     for (i = 0; i < tot_beads; i++) {
-        faCurrEn[E_OVLP] += Energy_Isotropic(i) / 2.;
-        faCurrEn[E_SC_SC] += Energy_Anisotropic(i) / 2.;
+        faCurrEn[E_OVLP] += Energy_Isotropic(i) / 2.f;
+        faCurrEn[E_SC_SC] += Energy_Anisotropic(i) / 2.f;
         //printf("Done with bead %d\n", i);
     }
 
