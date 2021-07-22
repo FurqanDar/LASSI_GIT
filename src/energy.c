@@ -235,8 +235,8 @@ float Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis
 }
 
 /// Energy_Isotroptic_Old calculates the isotropic contribution to the energy by searching the 3^3-1 = 26 'neighbors'
-/// The energy function  is like the BFM, where \f$\epislon$\f represents the overlap cost for total overlap, which is
-/// forbidden explicitly in LASSI, so we have \f$\epislon/2$\f,\f$\epislon/4$\f and \f$\epislon/8$\f with increasing
+/// The energy function  is like the BFM, where $\epislon$ represents the overlap cost for total overlap, which is
+/// forbidden explicitly in LASSI, so we have $\epislon/2$,$\epislon/4$ and $\epislon/8$ with increasing
 /// distance.
 /// \param beadID
 /// \return
@@ -304,8 +304,8 @@ float Energy_Isotropic_Old(int beadID) {//Calculate Contact and Overlap energy o
 }
 
 /// Energy_Isotroptic calculates the isotropic contribution to the energy by searching the 3^3-1 = 26 'neighbors'
-/// The energy function  is like the BFM, where \f$\epislon$\f represents the overlap cost for total overlap, which is
-/// forbidden explicitly in LASSI, so we have \f$\epislon/2$\f,\f$\epislon/4$\f and \f$\epislon/8$\f with increasing
+/// The energy function  is like the BFM, where $\epislon$ represents the overlap cost for total overlap, which is
+/// forbidden explicitly in LASSI, so we have $\epislon/2$,$\epislon/4$ and $\epislon/8$ with increasing
 /// distance.
 /// \param beadID
 /// \return
