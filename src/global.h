@@ -9,10 +9,8 @@
 
 #define PI 3.14159
 
-#define MAX_BEADS      50000
 #define MAX_AA         10
 #define MAX_CHAINTYPES 10
-#define MAX_CHAINS     20000
 #define MAX_CHAINLEN   1000
 #define MAX_BONDS      4
 #define MAX_VALENCY    1000
@@ -85,12 +83,6 @@ lInt **chain_info;
 lInt **topo_info;
 lInt **linker_len;
 
-//lInt bead_info[MAX_BEADS][BEADINFO_MAX];
-//lInt old_bead[MAX_BEADS][BEADINFO_MAX]; //Redundant copy for MCSteps
-//lInt linker_len[MAX_BEADS][MAX_BONDS];//Remember that this one is an INT, not float
-//lInt topo_info[MAX_BEADS][MAX_BONDS];
-//lInt chain_info[MAX_CHAINS][CHAININFO_MAX];
-
 lInt tot_beads;
 lInt tot_chains;
 lInt tot_chain_types;
@@ -152,8 +144,6 @@ lLong MCAccepMat[2][MAX_MV];
 
 // Cluster analysis
 lInt nClusteringMode;
-//lInt naCluster[MAX_CHAINS][MAX_CHAINS];
-//lInt naList[MAX_CHAINS];
 lInt **naCluster;
 lInt *naList;
 lLong *naClusHistList;

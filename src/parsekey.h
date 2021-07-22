@@ -13,4 +13,5 @@ void Parse_StructureFile(char *filename);
 void Parse_StructureFile_CalcBeadsAndChains(char* filename, int* n_bead_num,
                                             int* n_chain_types, int* n_chain_num);
 
+void CreateBeadsAndChains(int n_bead_num, int n_chain_types, int n_chain_num);
 #endif // _PARSEKEY_H_

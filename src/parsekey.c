@@ -180,23 +180,10 @@ int Parse_Keyfile(char *filename) {
 
         Parse_StructureFile_CalcBeadsAndChains(strStructFile, &tot_beads,
                                                &tot_chains, &tot_chain_types);
-        strcpy(strTemp, "Chain Info.");
-        chain_info = Create2DInt(CHAININFO_MAX, tot_chains, strTemp);
 
-        strcpy(strTemp, "Topo Info.");
-        topo_info  = Create2DInt(MAX_BONDS, tot_beads, strTemp);
-
-        strcpy(strTemp, "Linker Len.");
-        linker_len = Create2DInt(MAX_BONDS, tot_beads, strTemp);
-
-        strcpy(strTemp, "Bead Info.");
-        bead_info  = Create2DInt(BEADINFO_MAX, tot_beads, strTemp);
-
-        strcpy(strTemp, "Old Bead.");
-        old_bead   = Create2DInt(BEADINFO_MAX, tot_beads, strTemp);
+        CreateBeadsAndChains(tot_beads, tot_chains, tot_chain_types);
 
         Parse_StructureFile(strStructFile);
-//        exit(1);
 
         if (nStructFiletype == 0) {
             bReadConf = 0;
@@ -557,7 +544,6 @@ void Parse_StructureFile(char *filename) {
 }
 
 
-
 /// Parse_StructureFile_CalcBeadsAndChains - reads the structure-file filename, and records
 /// the total number of beads, chains, bead-types, and chain-types.
 /// \param filename: Full path of the file, or name of file if in the same directory.
@@ -586,15 +572,13 @@ void Parse_StructureFile_CalcBeadsAndChains(char *filename, int* n_bead_num,
     FILE *inFile;
     inFile = fopen(filename, "r");
 
-
-
     while (fgets(strLine, sizeof(strLine), inFile) != NULL && errCode == 0) {
         sscanf(strLine, "%s", strKey);
         if (strKey[0] == '#'){//Ignore comments
             continue;
         }
 
-        if (strcmp(strKey, "NEW{") == 0){
+        if (strcmp(strKey, "NEW{") == 0){//New molecule is starting
             per_ch_bd_num = 0;
             fgets(strLine, sizeof(strLine), inFile);
             sscanf(strLine, "%s", strKey);
@@ -621,7 +605,7 @@ void Parse_StructureFile_CalcBeadsAndChains(char *filename, int* n_bead_num,
                     errCode = 1;
                     break;
                 }
-                if (strcmp(strKey, "}END") == 0){
+                if (strcmp(strKey, "}END") == 0){//Molecule has ended
                     dum_beads += per_ch_bd_num * per_chain_num;
                     break;
                 }
@@ -645,4 +629,27 @@ void Parse_StructureFile_CalcBeadsAndChains(char *filename, int* n_bead_num,
     *n_chain_types = dum_chain_types;
 
     fclose(inFile);
+}
+
+/// CreateBeadsAndChains. Allocate memory for the given number of beads, chains, and chain-types.
+/// \param n_bead_num
+/// \param n_chain_types
+/// \param n_chain_num
+void CreateBeadsAndChains(int n_bead_num, int n_chain_types, int n_chain_num){
+    char* strTemp[100];
+
+    strcpy(strTemp, "Chain Info.");
+    chain_info = Create2DInt(CHAININFO_MAX, tot_chains, strTemp);
+
+    strcpy(strTemp, "Topo Info.");
+    topo_info  = Create2DInt(MAX_BONDS, tot_beads, strTemp);
+
+    strcpy(strTemp, "Linker Len.");
+    linker_len = Create2DInt(MAX_BONDS, tot_beads, strTemp);
+
+    strcpy(strTemp, "Bead Info.");
+    bead_info  = Create2DInt(BEADINFO_MAX, tot_beads, strTemp);
+
+    strcpy(strTemp, "Old Bead.");
+    old_bead   = Create2DInt(BEADINFO_MAX, tot_beads, strTemp);
 }
