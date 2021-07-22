@@ -181,7 +181,7 @@ int Parse_Keyfile(char *filename) {
         Parse_StructureFile_CalcBeadsAndChains(strStructFile, &tot_beads,
                                                &tot_chains, &tot_chain_types);
 
-        CreateBeadsAndChains(tot_beads, tot_chains, tot_chain_types);
+        CreateBeadsAndChains(tot_beads, tot_chains);
 
         Parse_StructureFile(strStructFile);
 
@@ -549,12 +549,12 @@ void Parse_StructureFile(char *filename) {
 /// \param n_bead_num: Stores how many total beads are in the structure file.
 /// \param n_chain_num: Stores how many total chains are in the structure file.
 /// \param n_chain_types: Stores how many different chain-types are in the file.
-void Parse_StructureFile_CalcBeadsAndChains(char *filename, int* n_bead_num,
-                                            int* n_chain_num, int* n_chain_types){
-    int dum_beads  = 0;
-    int dum_chains = 0;
-    int dum_chain_types = 0;
-    int per_chain_num;
+void Parse_StructureFile_CalcBeadsAndChains(char *filename, size_t* n_bead_num,
+                                            size_t* n_chain_num, size_t* n_chain_types){
+    size_t dum_beads  = 0;
+    size_t dum_chains = 0;
+    size_t dum_chain_types = 0;
+    int per_chain_num = 0;
     int per_ch_bd_num = 0;
     int errCode = 0;
     int nFlag   = -1;
@@ -634,21 +634,21 @@ void Parse_StructureFile_CalcBeadsAndChains(char *filename, int* n_bead_num,
 /// \param n_bead_num
 /// \param n_chain_types
 /// \param n_chain_num
-void CreateBeadsAndChains(int n_bead_num, int n_chain_types, int n_chain_num){
+void CreateBeadsAndChains(size_t n_bead_num, size_t n_chain_num){
     char strTemp[100];
 
     strcpy(strTemp, "Chain Info.");
-    chain_info = Create2DInt(CHAININFO_MAX, tot_chains, strTemp);
+    chain_info = Create2DInt(CHAININFO_MAX, n_chain_num, strTemp);
 
     strcpy(strTemp, "Topo Info.");
-    topo_info  = Create2DInt(MAX_BONDS, tot_beads, strTemp);
+    topo_info  = Create2DInt(MAX_BONDS, n_bead_num, strTemp);
 
     strcpy(strTemp, "Linker Len.");
-    linker_len = Create2DInt(MAX_BONDS, tot_beads, strTemp);
+    linker_len = Create2DInt(MAX_BONDS, n_bead_num, strTemp);
 
     strcpy(strTemp, "Bead Info.");
-    bead_info  = Create2DInt(BEADINFO_MAX, tot_beads, strTemp);
+    bead_info  = Create2DInt(BEADINFO_MAX, n_bead_num, strTemp);
 
     strcpy(strTemp, "Old Bead.");
-    old_bead   = Create2DInt(BEADINFO_MAX, tot_beads, strTemp);
+    old_bead   = Create2DInt(BEADINFO_MAX, n_bead_num, strTemp);
 }

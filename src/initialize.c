@@ -249,12 +249,15 @@ void Global_Array_Initialization_AtStart(void) {
             fKT_Cycle[i] = 1./fKT_Cycle[i];
         }
     }
+
     float VolumeConst = 4./3.*M_PI;
     float IntendedVol = 0.2;
     //fSquishRad =  (float) nBoxSize[0]/2.;
     fSquishRad = cbrtf((float) tot_beads / VolumeConst / IntendedVol );
     //fSquishRad =  fSquishRad*fSquishRad/4.;
     ld_LogOfSmallestPossibleProb = logl((lLDub) 1. / (lLDub) RAND_MAX);
+
+    nLimitedClusterSize = tot_chains > 15 ? 15 : tot_chains/2;
 
     printf("All setup has been completed!\n");
 }
@@ -625,12 +628,12 @@ float Temperature_Function(int mode, long nGen) {
 /// \param xDim Length of array.
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
-int *Create1DInt(const int xDim, const char* ArrName){
+int *Create1DInt(const size_t xDim, const char* ArrName){
     int *dumPtr;
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
 #endif
-    dumPtr = malloc(xDim * sizeof (int));
+    dumPtr = (int*) malloc(xDim * sizeof (int));
 
     if (dumPtr == NULL) {
         printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
@@ -647,12 +650,12 @@ int *Create1DInt(const int xDim, const char* ArrName){
 /// \param xDim Length of array.
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
-long *Create1DLong(const int xDim, const char* ArrName){
+long *Create1DLong(const size_t xDim, const char* ArrName){
     long *dumPtr;
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
 #endif
-    dumPtr = malloc(xDim * sizeof (long));
+    dumPtr = (long*) malloc(xDim * sizeof (long));
 
     if (dumPtr == NULL) {
         printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
@@ -669,12 +672,12 @@ long *Create1DLong(const int xDim, const char* ArrName){
 /// \param xDim Length of array.
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
-float *Create1DFloat(const int xDim, const char* ArrName){
+float *Create1DFloat(const size_t xDim, const char* ArrName){
     float *dumPtr;
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
 #endif
-    dumPtr = malloc(xDim * sizeof (float));
+    dumPtr = (float*) malloc(xDim * sizeof (float));
 
     if (dumPtr == NULL) {
         printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
@@ -691,12 +694,12 @@ float *Create1DFloat(const int xDim, const char* ArrName){
 /// \param xDim Length of array.
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
-long double *Create1DLongdouble(const int xDim, const char* ArrName){
+long double *Create1DLongdouble(const size_t xDim, const char* ArrName){
     long double *dumPtr;
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
 #endif
-    dumPtr = malloc(xDim * sizeof (long double));
+    dumPtr = (long double *)malloc(xDim * sizeof (long double));
 
     if (dumPtr == NULL) {
         printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
@@ -718,7 +721,7 @@ long double *Create1DLongdouble(const int xDim, const char* ArrName){
 /// \param yDim: Size of first index
 /// \param ArrName: Dummy name for the array, for debugging.
 /// \return Pointer to array-of-pointers, or a 2D array.
-int **Create2DInt(const int xDim, const int yDim, const char* ArrName) {
+int **Create2DInt(const size_t xDim, const size_t yDim, const char* ArrName) {
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
 #endif
@@ -756,7 +759,7 @@ int **Create2DInt(const int xDim, const int yDim, const char* ArrName) {
 /// \param yDim: Size of first index
 /// \param ArrName: Dummy name for the array, for debugging.
 /// \return Pointer to array-of-pointers, or a 2D array.
-long double **Create2DLongdouble(const int xDim, const int yDim, const char* ArrName) {
+long double **Create2DLongdouble(const size_t xDim, const size_t yDim, const char* ArrName) {
 #if DEBUG
     printf("%s is being allocated ... ", ArrName);
 #endif

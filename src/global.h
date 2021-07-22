@@ -83,9 +83,9 @@ lInt **chain_info;
 lInt **topo_info;
 lInt **linker_len;
 
-lInt tot_beads;
-lInt tot_chains;
-lInt tot_chain_types;
+size_t tot_beads;
+size_t tot_chains;
+size_t tot_chain_types;
 lInt Temp_Mode, nTemp_inv;
 lInt nThermalization_Mode, RotBias_Mode;
 
@@ -154,6 +154,9 @@ lLDub *ldMOLCLUS_ARR;
 lLDub *ld_TOTMOLCLUS_ARR;
 lInt naTempR[POS_MAX];
 lInt nLargestClusterRightNow;
+size_t nLimitedClusterSize;
+
+
 
 // Radial Densities and PDFs
 lLDub *ld_TOTRDF_Arr;

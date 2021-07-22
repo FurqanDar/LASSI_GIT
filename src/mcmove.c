@@ -1553,6 +1553,7 @@ int Move_BranchedRot(int chainID, float MyTemp) {
     }
 }
 
+
 int Move_SmallClus_Proximity(int chainID){
 //Performs a cluster move where a given chain and it's cluster are moved. No new 'bonds' are made so the move is reversible....
 

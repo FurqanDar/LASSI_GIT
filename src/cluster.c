@@ -805,7 +805,8 @@ int Clus_Proximity_LimitedCluster_All(int const chainID) {
     //Updates naList to have all proteins bound to  chainID and it's cluster
     //The idea is to check every bead and see if there is a unique bonded chain, and to add it to naList
     //If Cluster becomes larger than 15, exit and return -1
-    int ClusterLimit = 15;
+    //If the number of chains is lower than 15, we use tot_chains/2.
+    size_t ClusterLimit = nLimitedClusterSize;
     int i, j, k; //Loop iterators
     for (i = 0; i < ClusterLimit; i++) {
         naList[i] = -1;
@@ -1247,10 +1248,9 @@ void Clus_Perform_MolWise_LargestClusters(void) {
     int *clus_numof_MolType; //Tracks the number breakdown in each cluster
     int *clusID_of_type;     //Tracks the clusterID of largest of each type
     int *largestClus_of_type;//Tracks the largest number seen for each type
-
-    clus_numof_MolType  = malloc( (tot_chain_types+1) * sizeof(lInt));
-    clusID_of_type      = malloc( (tot_chain_types+1) * sizeof(lInt));
-    largestClus_of_type = malloc( (tot_chain_types+1) * sizeof(lInt));
+    clus_numof_MolType  = (int*)calloc( (tot_chain_types+1), sizeof(int));
+    clusID_of_type      = (int*)calloc( (tot_chain_types+1), sizeof(int));
+    largestClus_of_type = (int*)calloc( (tot_chain_types+1), sizeof(int));
 
     for(i=0; i<=tot_chain_types; i++){
         clus_numof_MolType[i]  = 0;

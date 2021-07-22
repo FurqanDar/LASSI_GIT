@@ -80,7 +80,7 @@ int main(int argc, char *argv[]){
     for (nGen = 0;
          nGen < nMCPreSteps; nGen++) {//Intentionally not performing any data acquisition in the thermalizing phase.
         nMCInfo = MC_Step_Equil(fCuTemp);
-        //printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
+//        printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
         Print_Data(nGen, -1);
     }
 
@@ -99,7 +99,7 @@ The system has thermalized!
         for (nGen = 0; nGen <= nMCStepsPerCycle; nGen++) {
             fCuTemp = Temperature_Function(Temp_Mode, nGen);
             nMCInfo = MC_Step(fCuTemp);
-            //printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
+//            printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
             Print_Data(nGen, run_cycle);
         }
         Temp_Mode = -1;
