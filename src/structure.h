@@ -39,7 +39,7 @@ int RadDenArr_Index(const int run_cycle, const int rad_comp, const int x_pos);
 
 int MolClusArr_Index(const int run_cycle, const int chain_type, const int clus_size);
 
-void Calc_CenterOfMass_OfSystem(lDub *tmpR);
+void Calc_SystemCenterOfMass(lDub *tmpR);
 
 void Calc_CenterOfMass_OfCluster(lDub *tmpR, const int cluster_size, const int *ClusList);
 
@@ -53,7 +53,10 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void);
 
 void GyrTensor_GyrRad_Avg(void);
 
-int NeighborList_StoreNeighborsAndDistance(const int beadID, const int *startVec, const int searchRad, int *neighList,
-                                           float *distList);
+int NeighborSearch_AroundPoint_wRad(const int beadID, const int *startVec, const int dumRad, int *neighList);
+
+void Vec3D_Add_wPBC(int* outVec, const int* firVec, const int* secVec);
+
+void Vec3D_Add_noPBC(int* outVec, const int* firVec, const int* secVec);
 
 #endif // _STRUCTURE_H_

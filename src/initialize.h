@@ -9,6 +9,8 @@ void Memory_VerifyMalloc(void);
 
 void Global_Array_Initialization_AtStart(void);
 
+void Reset_Counters(void);
+
 void Reset_Global_Arrays(void);
 
 void Initial_Conditions_Simple(void);

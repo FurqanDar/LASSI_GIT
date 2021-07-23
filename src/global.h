@@ -99,6 +99,7 @@ char bReadConf;
 lInt nBeadTypes;
 float fEnergy[MAX_AA][MAX_AA][MAX_E];
 float fEnRad[MAX_AA][MAX_AA][MAX_E];
+lInt nLargestRadius;
 lInt rot_trial[MAX_VALENCY][MAX_ROTSTATES];//Used in orientational-bias MC moves
 lLDub bolt_fac[MAX_ROTSTATES - 1];//Used in orientational-bias
 lLDub bolt_norm[MAX_VALENCY];
@@ -156,6 +157,11 @@ lInt naTempR[POS_MAX];
 lInt nLargestClusterRightNow;
 size_t nLimitedClusterSize;
 
+//Neighor search
+lInt* oldNeighs;
+lInt* newNeighs;
+lInt* oldDists;
+lInt* newDists;
 
 
 // Radial Densities and PDFs

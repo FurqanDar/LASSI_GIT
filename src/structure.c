@@ -906,3 +906,53 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
     free(clus_id_list);
 }
 
+int NeighborSearch_AroundPoint_wRad(const int beadID, const int *startVec, const int dumRad, int *neighList) {
+
+    int neigh_num = 0;
+    int tmpBead;
+    int r_disp[POS_MAX] = {0};
+
+    int r_search[POS_MAX] = {0};
+    int j;
+
+
+    for(r_disp[0] = -dumRad; r_disp[0] <= dumRad; r_disp[0]++){
+        for(r_disp[1] = -dumRad; r_disp[1] <= dumRad; r_disp[1]++){
+            for(r_disp[2] = -dumRad; r_disp[2] <= dumRad; r_disp[2]++){
+//                printf("%d %d %d\n", r_disp[0], r_disp[1], r_disp[2]);
+                Vec3D_Add_wPBC(r_search, startVec, r_disp);
+                tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
+                if (tmpBead > -1 && tmpBead != beadID){
+                    neighList[neigh_num++] = tmpBead;
+                }
+            }
+        }
+    }
+//    printf("%d\n", neigh_num);
+//    exit(1);
+    return neigh_num;
+
+}
+
+void Vec3D_Add_wPBC(int* outVec, const int* firVec, const int* secVec){
+    short j;
+    for (j=0; j<POS_MAX; j++){
+        outVec[j] = firVec[j] + secVec[j];
+    }
+
+    for (j=0; j<POS_MAX; j++){
+        outVec[j] = outVec[j] < 0 ? outVec[j] + nBoxSize[j] : outVec[j];
+    }
+
+    for (j=0; j<POS_MAX; j++){
+        outVec[j] = outVec[j] >= nBoxSize[j] ? outVec[j] - nBoxSize[j] : outVec[j];
+    }
+
+}
+
+void Vec3D_Add_noPBC(int* outVec, const int* firVec, const int* secVec){
+    short j;
+    for (j=0; j<POS_MAX; j++){
+        outVec[j] = firVec[j] + secVec[j];
+    }
+}

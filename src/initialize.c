@@ -10,6 +10,18 @@ void Memory_Initialization_AtStart(void) {
     strcpy(arr_name, "naTotLattice");
     naTotLattice = Create1DInt(nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arr_name);
 
+    nLargestRadius=2;
+    strcpy(arr_name, "oldNeighs");
+    oldNeighs = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
+    strcpy(arr_name, "newNeighs");
+    newNeighs = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
+
+    strcpy(arr_name, "oldDists");
+    oldDists = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
+    strcpy(arr_name, "newDists");
+    newDists = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
+
+
     strcpy(arr_name, "naClusHistList");
     naClusHistList = Create1DLong((1 + tot_chains), arr_name);
 
@@ -24,6 +36,7 @@ void Memory_Initialization_AtStart(void) {
 
     strcpy(arr_name, "naCluster");
     naCluster = Create2DInt(tot_chains + 1, tot_chains + 1, arr_name);
+
 
     if (nReport[REPORT_NETWORK] != 0) {
         strcpy(arr_name, "ldTotClusArr");
@@ -194,14 +207,16 @@ void Global_Array_Initialization_AtStart(void) {
         }
         }
 
+
     //Setting counters
-    fSysGyrRad = 0.;
-    nTotGyrRadCounter = 0;
-    nRDFCounter = 0;
-    nRadDenCounter = 0;
-    nTotClusCounter = 0;
-    nLargestClusterRightNow = 0;
-    nTrajCurFrame = 0;
+    Reset_Counters();
+//    fSysGyrRad = 0.f;
+//    nTotGyrRadCounter = 0;
+//    nRDFCounter = 0;
+//    nRadDenCounter = 0;
+//    nTotClusCounter = 0;
+//    nLargestClusterRightNow = 0;
+//    nTrajCurFrame = 0;
 
     //Checking which bead types interact rotationally and via overlap, separately.
     for (i = 0; i < MAX_AA; i++) {
@@ -246,12 +261,12 @@ void Global_Array_Initialization_AtStart(void) {
 
     if (nTemp_inv == 1){
         for (i = 0; i < nTot_CycleNum; i++) {
-            fKT_Cycle[i] = 1./fKT_Cycle[i];
+            fKT_Cycle[i] = 1.f/fKT_Cycle[i];
         }
     }
 
-    float VolumeConst = 4./3.*M_PI;
-    float IntendedVol = 0.2;
+    float VolumeConst = 4.f / 3.f * (float)M_PI ;
+    float IntendedVol = 0.2f;
     //fSquishRad =  (float) nBoxSize[0]/2.;
     fSquishRad = cbrtf((float) tot_beads / VolumeConst / IntendedVol );
     //fSquishRad =  fSquishRad*fSquishRad/4.;
@@ -261,6 +276,17 @@ void Global_Array_Initialization_AtStart(void) {
 
     printf("All setup has been completed!\n");
 }
+
+void Reset_Counters(void){
+    fSysGyrRad = 0.f;
+    nTotGyrRadCounter = 0;
+    nRDFCounter = 0;
+    nRadDenCounter = 0;
+    nTotClusCounter = 0;
+    nLargestClusterRightNow = 0;
+    nTrajCurFrame = 0;
+}
+
 
 /// Reset_Global_Arrays - resets the various global counters and arrays for system analysis.
 void Reset_Global_Arrays(void) {
@@ -295,13 +321,14 @@ void Reset_Global_Arrays(void) {
         }
     }
     //Setting counters
-    fSysGyrRad = 0.;
-    nTotGyrRadCounter = 0;
-    nRDFCounter = 0;
-    nRadDenCounter = 0;
-    nTotClusCounter = 0;
-    nLargestClusterRightNow = 0;
-    nTrajCurFrame = 0;
+    Reset_Counters();
+//    fSysGyrRad = 0.;
+//    nTotGyrRadCounter = 0;
+//    nRDFCounter = 0;
+//    nRadDenCounter = 0;
+//    nTotClusCounter = 0;
+//    nLargestClusterRightNow = 0;
+//    nTrajCurFrame = 0;
 }
 
 /// Initial_Conditions_Simple - randomly place all the molecules.
