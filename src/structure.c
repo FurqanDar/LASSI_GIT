@@ -192,10 +192,17 @@ int Check_System_Structure(void) {
 }
 
 /// Dist_VecMag - non periodic boundary euclidean magnitude of vector
-/// \param f1
+/// \param f1: The array where indicies 0,1 and 3 correspond to x y and z.
 /// \return
 float Dist_VecMag(const int *f1) {//Outputs the magnitude of the vector
     return sqrtf((float) (f1[0] * f1[0] + f1[1] * f1[1] + f1[2] * f1[2]));
+}
+
+/// Dist_VecMagSq - non periodic boundary euclidean magnitude of vector
+/// \param f1: The array where indicies 0,1 and 3 correspond to x y and z.
+/// \return Square of magnitude: x^2 + y^2 + z^2
+int Dist_VecMagSq(const int *f1) {//Outputs the magnitude of the vector
+    return  (f1[0] * f1[0] + f1[1] * f1[1] + f1[2] * f1[2]);
 }
 
 /// GyrTensor_ClusterSpecific - calculates the total Gyration Tensor for a given cluster
@@ -906,23 +913,38 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void){
     free(clus_id_list);
 }
 
-int NeighborSearch_AroundPoint_wRad(const int beadID, const int *startVec, const int dumRad, int *neighList) {
+
+void Calculate_Distances_For_Radius(float* thisList, const int nRad){
+    int r_disp[POS_MAX] = {0};
+
+    int dum_iter = 0;
+
+    for(r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++){
+        for(r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++){
+            for(r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++){
+                thisList[dum_iter++] = Dist_VecMag(r_disp);
+            }
+        }
+    }
+//    printf("%d", dum_iter);
+//    exit(1);
+}
+
+int NeighborSearch_AroundPoint_wRad(const int beadID, const int *startVec, const int nRad, int *neighList) {
 
     int neigh_num = 0;
     int tmpBead;
     int r_disp[POS_MAX] = {0};
 
     int r_search[POS_MAX] = {0};
-    int j;
 
 
-    for(r_disp[0] = -dumRad; r_disp[0] <= dumRad; r_disp[0]++){
-        for(r_disp[1] = -dumRad; r_disp[1] <= dumRad; r_disp[1]++){
-            for(r_disp[2] = -dumRad; r_disp[2] <= dumRad; r_disp[2]++){
-//                printf("%d %d %d\n", r_disp[0], r_disp[1], r_disp[2]);
+    for(r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++){
+        for(r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++){
+            for(r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++){
                 Vec3D_Add_wPBC(r_search, startVec, r_disp);
                 tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
-                if (tmpBead > -1 && tmpBead != beadID){
+                if (tmpBead != -1 && tmpBead != beadID){
                     neighList[neigh_num++] = tmpBead;
                 }
             }

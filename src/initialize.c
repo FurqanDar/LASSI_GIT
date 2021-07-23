@@ -10,17 +10,18 @@ void Memory_Initialization_AtStart(void) {
     strcpy(arr_name, "naTotLattice");
     naTotLattice = Create1DInt(nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arr_name);
 
-    nLargestRadius=2;
-    strcpy(arr_name, "oldNeighs");
-    oldNeighs = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
-    strcpy(arr_name, "newNeighs");
-    newNeighs = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
+//    nLargestRadius=2;
+//    strcpy(arr_name, "oldNeighs");
+//    oldNeighs = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
+//    strcpy(arr_name, "newNeighs");
+//    newNeighs = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
+//
+//    strcpy(arr_name, "oldDists");
+//    oldDists = Create1DFloat(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
+//    strcpy(arr_name, "newDists");
+//    newDists = Create1DFloat(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
 
-    strcpy(arr_name, "oldDists");
-    oldDists = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
-    strcpy(arr_name, "newDists");
-    newDists = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
-
+    Memory_Allocate_NeighborLists();
 
     strcpy(arr_name, "naClusHistList");
     naClusHistList = Create1DLong((1 + tot_chains), arr_name);
@@ -83,6 +84,24 @@ void Memory_Initialization_AtStart(void) {
     }
 //    Memory_VerifyMalloc();
     printf("Successfully allocated memory! Arrays initialized.\n");
+}
+
+void Memory_Allocate_NeighborLists(void){
+    char arr_name[50];
+    nLargestRadius=2;
+
+    int num_of_points = nLargestRadius*2;
+    num_of_points     = num_of_points*num_of_points*num_of_points;
+
+    strcpy(arr_name, "oldNeighs");
+    oldNeighs = Create1DInt(num_of_points, arr_name);
+    strcpy(arr_name, "newNeighs");
+    newNeighs = Create1DInt(num_of_points, arr_name);
+
+    strcpy(arr_name, "oldDists");
+    oldDists = Create1DFloat(num_of_points, arr_name);
+    strcpy(arr_name, "newDists");
+    newDists = Create1DFloat(num_of_points, arr_name);
 }
 
 void Memory_VerifyMalloc(void){
@@ -274,6 +293,14 @@ void Global_Array_Initialization_AtStart(void) {
 
     nLimitedClusterSize = tot_chains > 15 ? 15 : tot_chains/2;
 
+    Calculate_Distances_For_Radius(oldDists, nLargestRadius);
+    Calculate_Distances_For_Radius(newDists, nLargestRadius);
+
+//    for(i=0; i<nLargestRadius*nLargestRadius*nLargestRadius*8; i++){
+//        printf("%2.2f ", oldDists[i]);
+//    }
+//    printf("\n");
+//    exit(1);
     printf("All setup has been completed!\n");
 }
 

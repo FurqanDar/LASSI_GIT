@@ -17,9 +17,9 @@ float Dist_PointToPoint_Float(const float *f1, const float *f2);
 
 float Dist_PointToPoint(const int *f1, const int *f2);
 
-float Dist_nVecMag(const int *f1);
+float Dist_VecMag(const int *f1);
 
-float Dist_fVecMag(const float *f1);
+int Dist_VecMagSq(const int *f1);
 
 int Check_LinkerConstraint(const int beadID, const int *tmpR);
 
@@ -53,7 +53,9 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void);
 
 void GyrTensor_GyrRad_Avg(void);
 
-int NeighborSearch_AroundPoint_wRad(const int beadID, const int *startVec, const int dumRad, int *neighList);
+void Calculate_Distances_For_Radius(float* thisList, const int nRad);
+
+int NeighborSearch_AroundPoint_wRad(const int beadID, const int *startVec, const int nRad, int *neighList);
 
 void Vec3D_Add_wPBC(int* outVec, const int* firVec, const int* secVec);
 

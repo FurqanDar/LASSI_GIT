@@ -5,6 +5,8 @@
 
 void Memory_Initialization_AtStart(void);
 
+void Memory_Allocate_NeighborLists(void);
+
 void Memory_VerifyMalloc(void);
 
 void Global_Array_Initialization_AtStart(void);

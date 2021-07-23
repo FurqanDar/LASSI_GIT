@@ -160,8 +160,8 @@ size_t nLimitedClusterSize;
 //Neighor search
 lInt* oldNeighs;
 lInt* newNeighs;
-lInt* oldDists;
-lInt* newDists;
+float* oldDists;
+float* newDists;
 
 
 // Radial Densities and PDFs
