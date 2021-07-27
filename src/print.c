@@ -179,7 +179,7 @@ void Write_Trajectory(char *filename, long nGen) {
         fprintf(fp, "%ld\n", nGen); // Timestep
 
         fprintf(fp, "ITEM: NUMBER OF ATOMS\n");
-        fprintf(fp, "%d\n", tot_beads); // Total atom number
+        fprintf(fp, "%ld\n", tot_beads); // Total atom number
 
         fprintf(fp,
                 "ITEM: BOX BOUNDS pp pp pp\n"); // BCs are always periodic for now
@@ -235,7 +235,7 @@ void Write_Saved_Trajectory(char *filename, const int run_it) {
         }
 
         fprintf(fp, "ITEM: NUMBER OF ATOMS\n");
-        fprintf(fp, "%d\n", tot_beads); // Total atom number
+        fprintf(fp, "%ld\n", tot_beads); // Total atom number
 
         fprintf(fp,
                 "ITEM: BOX BOUNDS pp pp pp\n"); // BCs are always periodic for now
@@ -273,9 +273,9 @@ void Print_Key(void) { // should be output-dependent (stdout, stderr, other file
     char rBrace[] = "      ======>";
     printf("%s System Settings %s\n", lBrace, rBrace);
     printf("Number of Sticker Types = %d\n", nBeadTypes);
-    printf("Number of Beads         = %d\n", tot_beads);
-    printf("Number of Chains        = %d\n", tot_chains);
-    printf("Number of Components    = %d\n", tot_chain_types);
+    printf("Number of Beads         = %ld\n", tot_beads);
+    printf("Number of Chains        = %ld\n", tot_chains);
+    printf("Number of Components    = %ld\n", tot_chain_types);
     printf("Box Size                = %d, %d, %d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]);
     printf("Monomer density         = %1.1e\n",
            (float)tot_beads / (float)nBoxSize[0] / (float)nBoxSize[1] / (float)nBoxSize[2]);
@@ -412,7 +412,7 @@ void Write_TopFile(char *filename) {
     printf("Writing the topology file!\n");
     fprintf(fp, "LAMMPS Description\n");   // The file must start with this.
     fprintf(fp, "\n");                     // Empty line.
-    fprintf(fp, "%d\tatoms\n", tot_beads); // Listing total number of atoms
+    fprintf(fp, "%ld\tatoms\n", tot_beads); // Listing total number of atoms
     numBonds = 0;
     for (i = 0; i < tot_beads; i++) {
         for (j = 0; j < MAX_BONDS; j++) {

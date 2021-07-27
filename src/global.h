@@ -130,12 +130,12 @@ lInt nMCMaxTrials, nTot_CycleNum;
 lInt RNG_Seed;
 
 // report-related
-char strReportPrefix[524];
-char fileEnergy[524];
-char fileStruct[524];
-char fileMCMove[524];
-char fileSysProp[524];
-char strRestartFile[524];
+char strReportPrefix[512];
+char fileEnergy[512];
+char fileStruct[512];
+char fileMCMove[512];
+char fileSysProp[512];
+char strRestartFile[512];
 lLong nReport[MAX_REPORT];//Array to store report frequencies.
 lLong nTrajMode;
 //Matrix to store acceptances and rejections 0: Rejected; 1: Accepted
@@ -160,6 +160,7 @@ size_t nLimitedClusterSize;
 //Neighor search
 lInt* oldNeighs;
 lInt* newNeighs;
+float* allDists;
 float* oldDists;
 float* newDists;
 

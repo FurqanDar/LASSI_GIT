@@ -309,12 +309,11 @@ int Move_Local(int beadID, float MyTemp) {//Performs a local translation MC-move
     }
 
     //Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
-    resi = bead_info[beadID][BEAD_TYPE];//I want to treat linker beads differently always because they have no rotational states
-    /*
-    Find neighbors here!
-     */
+    resi = bead_info[beadID][BEAD_TYPE];//I want to treat linker beads differently
+                                        // always because they have no rotational states
+
     int old_neigh_num, new_neigh_num;
-    old_neigh_num = NeighborSearch_AroundPoint_wRad(beadID, r_pos0, 1, oldNeighs);
+    old_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_pos0, 1, oldNeighs);
 
     oldEn += Energy_Isotropic(beadID);
     if (nBeadTypeIsSticker[resi] == 1) {//Only non linkers can bond
@@ -347,16 +346,16 @@ int Move_Local(int beadID, float MyTemp) {//Performs a local translation MC-move
         OP_MoveBeadTo(beadID, tmpR2);
     }
 
-    new_neigh_num = NeighborSearch_AroundPoint_wRad(beadID, r_pos0, 1, newNeighs);
-
-    for(i=0; i<old_neigh_num; i++) {
-        printf("%d ", oldNeighs[i]);
-    }
-    printf("\n");
-    for(i=0; i<new_neigh_num; i++) {
-        printf("%d ", newNeighs[i]);
-    }
-    exit(1);
+//    new_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_pos0, 1, newNeighs);
+//
+//    for(i=0; i<old_neigh_num; i++) {
+//        printf("%d ", oldNeighs[i]);
+//    }
+//    printf("\n");
+//    for(i=0; i<new_neigh_num; i++) {
+//        printf("%d ", newNeighs[i]);
+//    }
+//    exit(1);
     //Now let's calculate the energy of the new state. SC-SC energy is already done.
     newEn += Energy_Isotropic(beadID);
     MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
@@ -1649,13 +1648,12 @@ int Move_Local_Equil(int beadID, float MyTemp) {//Performs a local translation M
     lRadUp = lRadLow * 2 + 1;//2*2+1
 
     yTemp = 0;//Initialize these guys.
-    for (j = 0; j < POS_MAX; j++) {
-        r_disp[j] = (rand() % lRadUp) - lRadLow;//Generate number between -2 and 2
-//        r_new[j] = (r_pos0[j] + r_new[j] + nBoxSize[j]) % nBoxSize[j];
-    }
+//    for (j = 0; j < POS_MAX; j++) {
+//        r_disp[j] = (rand() % lRadUp) - lRadLow;//Generate number between -2 and 2
+//    }
 
-    Vec3D_Add_wPBC(r_new, r_pos0, r_disp);
-
+    PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
+    PosArr_add_wPBC(r_new, r_pos0, r_disp);
 
     yTemp = Check_MoveBeadTo(r_new);
     if (yTemp == 1) {//This means we found an empty lattice site. So let's check if the linkers are okay.
@@ -1669,25 +1667,24 @@ int Move_Local_Equil(int beadID, float MyTemp) {//Performs a local translation M
         return bAccept;
     }
     //Have successfully found a good lattice spot.
-    oldEn = (lLDub) Energy_Isotropic(beadID);
 
     int old_neigh_num, new_neigh_num;
-    old_neigh_num = NeighborSearch_AroundPoint_wRad(beadID, r_pos0, 1, oldNeighs);
+    int resi = bead_info[beadID][BEAD_TYPE];
+
+    old_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_pos0, 1, oldNeighs);
+
+    oldEn = (lLDub)Energy_ofBead_wNeighList(beadID, oldNeighs, old_neigh_num);
+    oldEn += (lLDub)(fEnergy[resi][resi][E_F_SOL] * (float)(26 - old_neigh_num));
 
     OP_MoveBeadTo(beadID, r_new);
-    new_neigh_num = NeighborSearch_AroundPoint_wRad(beadID, r_new, 1, newNeighs);
 
-    for(i=0; i<old_neigh_num; i++) {
-        printf("%d ", oldNeighs[i]);
-    }
-    printf("\n");
-    for(i=0; i<new_neigh_num; i++) {
-        printf("%d ", newNeighs[i]);
-    }
-//    exit(1);
+    new_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_new, 1, newNeighs);
 
-    //Now let's calculate the energy of the new state. SC-SC energy is already done.
-    newEn += (lLDub) Energy_Isotropic(beadID);
+    newEn = (lLDub)Energy_ofBead_wNeighList(beadID, newNeighs, new_neigh_num);
+    newEn += (lLDub)(fEnergy[resi][resi][E_F_SOL] * (float)(26 - new_neigh_num));
+    newEn += (lLDub)Energy_ofSol_wNeighList(oldNeighs, old_neigh_num);
+    newEn -= (lLDub)Energy_ofSol_wNeighList(newNeighs, new_neigh_num);
+
     MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
     if (MCProb < MHAcc) {//Accept this state
@@ -1764,7 +1761,6 @@ int Move_Snake_Equil(int chainID, float MyTemp) {//Performs a slither MC-move on
         for (j = 0; j < BEADINFO_MAX; j++) {
             old_bead[i][j] = bead_info[i][j];
         }
-
     }
 
     for (i = firstB; i < lastB; i++) {//Counting states in the previous location
@@ -2680,65 +2676,62 @@ void OP_ShuffleRotIndecies(void) {
     }
 }
 
-/*int Check_RotStatesOld(int beadID, int resi, float MyTemp){
+/// Check_RotStates_wNeighList: Given this bead and the supplied neighbor-list and numbers, we see which of the
+/// neighbors are viable anisotropic partners. For each viable bead, we also record the Rosenbluth factors, and store
+/// which bead it is.
+/// \param beadID
+/// \param resi
+/// \param neighList
+/// \param neighNum
+/// \return The number of beads that beadID could bond to.
+int Check_RotStates_wNeighList(int const beadID, int const resi, const int* neighList, int const neighNum){
+    int CandNums = 0;
+    int tmpBead;
+    int resj, i;
 
-  int i, j, k, tmpBead;
-  int tmpR[POS_MAX], tmpR2[POS_MAX];
-  for(j=0; j<POS_MAX; j++){
-    tmpR[j] = bead_info[beadID][j];
-    }
-  for(k=0; k<MAX_ROTSTATES-1; k++){
-    i = Rot_IndArr[k];
-    for(j=0; j<POS_MAX; j++){
-      tmpR2[j] = (tmpR[j] + LocalArr[i][j] + nBoxSize[j]) % nBoxSize[j];
-      }
-      tmpBead = Lat_Ind_FromVec(tmpR2);
-      tmpBead = naTotLattice[tmpBead];
-      if (tmpBead != -1){
-        j = bead_info[tmpBead][BEAD_TYPE];
-        if (fEnergy[resi][j][E_SC_SC] != 0 && (bead_info[tmpBead][BEAD_FACE] == -1 || bead_info[tmpBead][BEAD_FACE] == beadID)){
-            //bolt_fac[k] = exp(-fEnergy[resi][j][E_SC_SC] / MyTemp);
-            bolt_fac[k] = dbias_bolt_fac[resi][j];
-            rot_trial[0][k] = tmpBead;
-          }
-        else{
-            bolt_fac[k] = fRot_Bias;
-            rot_trial[0][k] = -1;
-          }
-        }
-      else{
-          bolt_fac[k] = fRot_Bias;
-          rot_trial[0][k] = -1;
+    for (i = 0; i < neighNum; i++){
+        tmpBead = neighList[i];
+        resj    = bead_info[tmpBead][BEAD_TYPE];
+
+        if (fEnergy[resi][resj][E_SC_SC] < 0){
+            if (bead_info[tmpBead][BEAD_FACE] == -1 || bead_info[tmpBead][BEAD_FACE] == beadID){
+                bolt_fac[CandNums] = dbias_bolt_fac[resi][resj];
+                rot_trial[0][CandNums] = tmpBead;
+                CandNums++;
+            }
         }
     }
 
-  return k;
+    return CandNums;
+}
 
-}*/
 
 /// Check_RotStatesOld -- goes around beadID, of type resi to built the boltzmann distribution if the rotational states.
 /// Used in the old location.
-/// Note that this implementation is one where the solvent interaction does not exist for the rotaitonal state.
+/// Note that this implementation is one where the solvent interaction does not exist for the rotational state.
 /// The commented version below is one where the solvent also has a contribution to the boltzmann distribution of
 /// the rotational states.
 /// \param beadID
 /// \param resi
 /// \param MyTemp
 /// \return The total number of possible candidates
-int Check_RotStatesOld(int beadID, int resi, float MyTemp) {
+int Check_RotStatesOld(int const beadID, int const resi, float const MyTemp) {
 
     int i, j, k, tmpBead;
     int CandNums = 0;
-    int tmpR[POS_MAX], tmpR2[POS_MAX];
+    int r_pos0[POS_MAX], r_search[POS_MAX];
     for (j = 0; j < POS_MAX; j++) {
-        tmpR[j] = bead_info[beadID][j];
+        r_pos0[j] = bead_info[beadID][j];
     }
     for (k = 0; k < MAX_ROTSTATES - 1; k++) {
         i = Rot_IndArr[k];
-        for (j = 0; j < POS_MAX; j++) {
-            tmpR2[j] = (tmpR[j] + LocalArr[i][j] + nBoxSize[j]) % nBoxSize[j];
-        }
-        tmpBead = Lat_Ind_FromVec(tmpR2);
+//        for (j = 0; j < POS_MAX; j++) {
+//            r_search[j] = (r_pos0[j] + LocalArr[i][j] + nBoxSize[j]) % nBoxSize[j];
+//        }
+
+        PosArr_add_wPBC(r_search, r_pos0, LocalArr[i]);
+
+        tmpBead = Lat_Ind_FromVec(r_search);
         tmpBead = naTotLattice[tmpBead];
         if (tmpBead != -1) {
             j = bead_info[tmpBead][BEAD_TYPE];
@@ -2755,41 +2748,6 @@ int Check_RotStatesOld(int beadID, int resi, float MyTemp) {
 
 }
 
-/*int Check_RotStatesNew(int beadID, int resi, float MyTemp){
-
-  int i, j, k, tmpBead;
-  int tmpR[POS_MAX], tmpR2[POS_MAX];
-  for(j=0; j<POS_MAX; j++){
-    tmpR[j] = bead_info[beadID][j];
-    }
-  for(k=0; k<MAX_ROTSTATES-1; k++){
-    i = Rot_IndArr[k];
-    for(j=0; j<POS_MAX; j++){
-      tmpR2[j] = (tmpR[j] + LocalArr[i][j] + nBoxSize[j]) % nBoxSize[j];
-      }
-      tmpBead = Lat_Ind_FromVec(tmpR2);
-      tmpBead = naTotLattice[tmpBead];
-      if (tmpBead != -1){
-        j = bead_info[tmpBead][BEAD_TYPE];
-        if (fEnergy[resi][j][E_SC_SC] != 0 && (bead_info[tmpBead][BEAD_FACE] == -1 || bead_info[tmpBead][BEAD_FACE] == beadID)){
-            //bolt_fac[k] = exp(-fEnergy[resi][j][E_SC_SC] / MyTemp);
-            bolt_fac[k] = dbias_bolt_fac[resi][j];
-            rot_trial[0][k] = tmpBead;
-          }
-        else{
-            bolt_fac[k] = fRot_Bias;
-            rot_trial[0][k] = -1;
-          }
-        }
-      else{
-          bolt_fac[k] = fRot_Bias;
-          rot_trial[0][k] = -1;
-        }
-    }
-
-  return k;
-
-}*/
 
 /// Check_RotStatesNew -- goes around beadID, of type resi to built the boltzmann distribution if the rotational states.
 /// Used in the new proposed location.
@@ -2800,7 +2758,7 @@ int Check_RotStatesOld(int beadID, int resi, float MyTemp) {
 /// \param resi
 /// \param MyTemp
 /// \return The total number of possible candidates
-int Check_RotStatesNew(int beadID, int resi, float MyTemp) {
+int Check_RotStatesNew(int const  beadID, int const  resi, float const  MyTemp) {
 
     int i, j, k, tmpBead;
     int CandNums = 0;
@@ -2829,6 +2787,7 @@ int Check_RotStatesNew(int beadID, int resi, float MyTemp) {
     return CandNums;
 
 }
+
 
 /// OP_NormalizeRotState -- normalizes the rotational boltzmann distribution, and generates the cumulative distribution
 /// so that we can sample from it.

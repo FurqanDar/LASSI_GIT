@@ -87,9 +87,11 @@ void Rot_Z_270(int beadID, const int tmpR[]);
 
 void OP_ShuffleRotIndecies(void);
 
-int Check_RotStatesOld(int beadID, int resi, float MyTemp);
+int Check_RotStates_wNeighList(int const beadID, int const resi, const int* neighList, int const neighNum);
 
-int Check_RotStatesNew(int beadID, int resi, float MyTemp);
+int Check_RotStatesOld(int const beadID, int const resi, float const MyTemp);
+
+int Check_RotStatesNew(int const beadID, int const resi, float const MyTemp);
 
 void OP_NormalizeRotState(int beadVal, int CandNums);
 

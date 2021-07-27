@@ -234,21 +234,76 @@ float Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis
     return fEnergy[beadType1][beadType2][E_CONT] / xDis;
 }
 
+/// Energy_Iso_fSol: Returns the solvation energy of this bead.
+/// \param beadType
+/// \param xDis
+/// \return
+inline float Energy_Iso_fSol(int const beadType){
+    return fEnergy[beadType][beadType][E_F_SOL];
+}
+
+/// Energy_ofBead_wNeighList: Given this bead, and a supplied list of neighbors and number of neighbors,
+/// we loop over all the neighbors and add the energies. This function _only_ calculate the pairwise energies
+/// so the solvation energy has to be handled somewhere else.
+/// \param beadID
+/// \param neighList
+/// \param neighNum
+/// \return
+float Energy_ofBead_wNeighList(int const beadID, const int* neighList, int const neighNum){
+    float totEn;
+    int i;
+    const int resi = bead_info[beadID][BEAD_TYPE];
+    int resj, tmpID;
+    float xDis;
+
+    totEn = nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
+
+    for(i=0; i<neighNum; i++){
+        tmpID = neighList[i];
+        resj  = bead_info[tmpID][BEAD_TYPE];
+        xDis  = Dist_BeadToBead(beadID, tmpID);
+        totEn += Energy_Iso_Ovlp(resi, resj, xDis);
+        totEn += Energy_Iso_Cont(resi, resj, xDis);
+    }
+
+    return totEn;
+}
+
+/// Energy_ofSol_wNeighList: Given the neighbor list, we calculate the total solvation energy at the lattice-site
+/// where beadID is, but if the site was empty.
+/// \param neighList
+/// \param neighNum
+/// \return
+float Energy_ofSol_wNeighList(const int* neighList, int const neighNum){
+    float totEn;
+    int i;
+    int resj, tmpID;
+
+    for(i=0; i<neighNum; i++){
+        tmpID = neighList[i];
+        resj  = bead_info[tmpID][BEAD_TYPE];
+        totEn += Energy_Iso_fSol(resj);
+    }
+
+    return totEn;
+}
+
+
 /// Energy_Isotroptic_Old calculates the isotropic contribution to the energy by searching the 3^3-1 = 26 'neighbors'
-/// The energy function  is like the BFM, where $\epislon$ represents the overlap cost for total overlap, which is
-/// forbidden explicitly in LASSI, so we have $\epislon/2$,$\epislon/4$ and $\epislon/8$ with increasing
+/// The energy function  is like the BFM, where $epislon$ represents the overlap cost for total overlap, which is
+/// forbidden explicitly in LASSI, so we have $epislon/2$,$epislon/4$ and $epislon/8$ with increasing
 /// distance.
 /// \param beadID
 /// \return
 float Energy_Isotropic_Old(const int beadID) {//Calculate Contact and Overlap energy of bead beadID
-    float totEn = 0.0; //Storing total overlap energy
+    float totEn = 0.f; //Storing total overlap energy
     int i, j;//Indecies
     int   r_pos_0[POS_MAX], r_chck[POS_MAX], r_disp[POS_MAX];
     int x, y, z; //Lattice indecies
     int secBi, resj;//Second bead index
-    float xDis = 0.;//Distance between beads.
+    float xDis = 0.f;//Distance between beads.
     int resi = bead_info[beadID][BEAD_TYPE];
-    totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
+    totEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
 
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 &&
@@ -256,7 +311,7 @@ float Energy_Isotropic_Old(const int beadID) {//Calculate Contact and Overlap en
         return totEn;
     }//No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -279,11 +334,11 @@ float Energy_Isotropic_Old(const int beadID) {//Calculate Contact and Overlap en
                     xDis = sqrtf((float)(x*x + y*y + z*z));
                     //xDis = Dist_BeadToBead(beadID, secBi);
                     if (xDis <= 1.0) {
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.0;
+                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.0f;
                     } else if (xDis <= 1.42) { // sqrt(2)
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 4.0;
+                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 4.0f;
                     } else if (xDis <= 1.74) { // sqrt(3)
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 8.0;
+                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 8.0f;
                     }
                     else {//This way, contact is only outside ovlp
                         totEn += Energy_Iso_Cont(resi, resj, xDis);
@@ -325,7 +380,7 @@ float Energy_Isotropic(const int beadID) {//Calculate Contact and Overlap energy
         return totEn;
     }//No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -336,11 +391,12 @@ float Energy_Isotropic(const int beadID) {//Calculate Contact and Overlap energy
             r_disp[1] = y;
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
-                for (j = 0; j < POS_MAX; j++){
-                    r_chck[j] = r_pos_0[j] + r_disp[j];
-                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
-                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
-                }
+                PosArr_add_wPBC(r_chck, r_pos_0, r_disp);
+//                for (j = 0; j < POS_MAX; j++){
+//                    r_chck[j] = r_pos_0[j] + r_disp[j];
+//                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
+//                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
+//                }
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
@@ -383,7 +439,7 @@ float Energy_Isotropic_Self(const int beadID) {//Calculate Contact and Overlap e
         return totEn;
     }//No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -445,7 +501,7 @@ float Energy_Isotropic_For_Chain(const int beadID) {//Calculate Contact and Over
         return totEn;
     }//No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -514,7 +570,7 @@ float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bea
         return totEn;
     }//No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -581,7 +637,7 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
     int secBi, resj;//Second bead index
     float xDis = 0.;//Distance between beads.
     int resi = bead_info[beadID][BEAD_TYPE];
-    totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
+    totEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
 
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 &&
@@ -589,7 +645,7 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
         return totEn;
     }//No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: 3;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -600,11 +656,12 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
             r_disp[1] = y;
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
-                for (j = 0; j < POS_MAX; j++){
-                    r_chck[j] = r_pos_0[j] + r_disp[j];
-                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
-                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
-                }
+                PosArr_add_wPBC(r_chck, r_pos_0, r_disp);
+//                for (j = 0; j < POS_MAX; j++){
+//                    r_chck[j] = r_pos_0[j] + r_disp[j];
+//                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
+//                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
+//                }
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];

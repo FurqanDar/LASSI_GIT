@@ -930,7 +930,57 @@ void Calculate_Distances_For_Radius(float* thisList, const int nRad){
 //    exit(1);
 }
 
-int NeighborSearch_AroundPoint_wRad(const int beadID, const int *startVec, const int nRad, int *neighList) {
+
+int NeighborSearch_AroundPoint_UptoIndex(const int beadID, const int *startVec, const int upTO,
+                                         int *neighList){
+    int i;
+    int neigh_num = 0;
+    int tmpBead;
+    int r_disp[POS_MAX] = {0};
+
+    int r_search[POS_MAX] = {0};
+
+    int r_all[100][POS_MAX] = {0};
+
+    for (i = 0; i < upTO; ++i){
+        PosArr_add_wPBC(r_search, startVec, r_all[i]);
+        tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
+        if (tmpBead != -1){
+            neighList[neigh_num++] = tmpBead;
+        }
+    }
+
+
+    return neigh_num;
+}
+
+
+int NeighborSearch_AroundPoint_wRad_IgnBead(const int beadID, const int *startVec, const int nRad, int *neighList) {
+
+    int neigh_num = 0;
+    int tmpBead;
+    int r_disp[POS_MAX] = {0};
+    int r_search[POS_MAX] = {0};
+
+
+    for(r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++){
+        for(r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++){
+            for(r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++){
+                PosArr_add_wPBC(r_search, startVec, r_disp);
+                tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
+                if (tmpBead != -1 && tmpBead != beadID){
+                    neighList[neigh_num++] = tmpBead;
+                }
+            }
+        }
+    }
+    return neigh_num;
+
+}
+
+
+int NeighborSearch_AroundPoint_wRad_wDists(const int beadID, const int* startVec, const int nRad,
+                                           int* neighList, float *distList) {
 
     int neigh_num = 0;
     int tmpBead;
@@ -942,37 +992,51 @@ int NeighborSearch_AroundPoint_wRad(const int beadID, const int *startVec, const
     for(r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++){
         for(r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++){
             for(r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++){
-                Vec3D_Add_wPBC(r_search, startVec, r_disp);
+                PosArr_add_wPBC(r_search, startVec, r_disp);
                 tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
                 if (tmpBead != -1 && tmpBead != beadID){
-                    neighList[neigh_num++] = tmpBead;
+                    neighList[neigh_num] = tmpBead;
+                    distList[neigh_num]  = Dist_VecMag(r_disp);
+                    neigh_num++;
                 }
             }
         }
     }
-//    printf("%d\n", neigh_num);
-//    exit(1);
     return neigh_num;
 
 }
 
-void Vec3D_Add_wPBC(int* outVec, const int* firVec, const int* secVec){
+/// PosArr_gen_rand_wRad. Given a radius, we generate a random set of coordinates between -Radius and Radius
+/// for each dimension.
+/// \param outVec
+/// \param nRadius
+void PosArr_gen_rand_wRad(int* outVec, const int nRadius){
+    int j;
+    int radUp = 2 * nRadius + 1;
+    for(j = 0; j < POS_MAX; j++){
+        outVec[j] = rand() % radUp;
+    }
+    for(j = 0; j < POS_MAX; j++){
+        outVec[j] -= nRadius;
+    }
+}
+
+void PosArr_add_wPBC(int* outVec, const int* firVec, const int* secVec){
     short j;
     for (j=0; j<POS_MAX; j++){
         outVec[j] = firVec[j] + secVec[j];
     }
-
     for (j=0; j<POS_MAX; j++){
         outVec[j] = outVec[j] < 0 ? outVec[j] + nBoxSize[j] : outVec[j];
     }
-
     for (j=0; j<POS_MAX; j++){
         outVec[j] = outVec[j] >= nBoxSize[j] ? outVec[j] - nBoxSize[j] : outVec[j];
     }
 
 }
 
-void Vec3D_Add_noPBC(int* outVec, const int* firVec, const int* secVec){
+
+void PosArr_add_noPBC(int* outVec, const int* firVec, const int* secVec){
     short j;
     for (j=0; j<POS_MAX; j++){
         outVec[j] = firVec[j] + secVec[j];
