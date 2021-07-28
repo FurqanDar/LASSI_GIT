@@ -280,8 +280,8 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     int   r_pos0[POS_MAX], r_posNew[POS_MAX], r_posTmp[POS_MAX]; // Vectors to stores coordinates.
     int   FWWeight, BWWeight;              // Used to perform orientational bias MC
     lLDub FWRos, BWRos;                    // Forwards and backwards Rosenbluth Factors
-    FWRos = 1.;
-    BWRos = 1.;
+    FWRos = 0.;
+    BWRos = 0.;
     PosArr_copy(r_pos0, bead_info[beadID]);
 
     // Attempt to find an empty lattice point.
@@ -303,7 +303,7 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     resi = bead_info[beadID][BEAD_TYPE]; // I want to treat linker beads differently
                                          //  always because they have no rotational states
 
-    oldEn += Energy_Isotropic(beadID);
+    oldEn = Energy_Isotropic(beadID);
     if (nBeadTypeIsSticker[resi] == 1) { // Only non linkers can bond
         if (bead_info[beadID][BEAD_FACE] != -1) {
             resj = bead_info[bead_info[beadID][BEAD_FACE]][BEAD_TYPE]; // This is type of who I'm currently bonded to
@@ -1632,24 +1632,9 @@ int Move_Local_Equil(int beadID, float MyTemp) { // Performs a local translation
     }
     // Have successfully found a good lattice spot.
 
-//    int old_neigh_num, new_neigh_num;
-//    int resi = bead_info[beadID][BEAD_TYPE];
-//
-//    old_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_pos0, 1, oldNeighs);
-//
-//    oldEn = (lLDub)Energy_ofBead_wNeighList(beadID, oldNeighs, old_neigh_num);
-//    oldEn += (lLDub)(fEnergy[resi][resi][E_F_SOL] * (float)(26 - old_neigh_num));
-
     oldEn = (lLDub)Energy_Isotropic(beadID);
 
     OP_MoveBeadTo(beadID, r_new);
-
-//    new_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_new, 1, newNeighs);
-//
-//    newEn = (lLDub)Energy_ofBead_wNeighList(beadID, newNeighs, new_neigh_num);
-//    newEn += (lLDub)(fEnergy[resi][resi][E_F_SOL] * (float)(26 - new_neigh_num));
-//    newEn += (lLDub)Energy_ofSol_wNeighList(oldNeighs, old_neigh_num);
-//    newEn -= (lLDub)Energy_ofSol_wNeighList(newNeighs, new_neigh_num);
 
     oldEn = (lLDub)Energy_Isotropic(beadID);
 
@@ -1739,7 +1724,8 @@ int Move_Snake_Equil(int chainID, float MyTemp) { // Performs a slither MC-move 
         i = lastB - 1;
         PosArr_copy(bead_info[i], pos_new);
         naTotLattice[Lat_Ind_FromVec(pos_new)] = i;
-    } else { // Slithering backwards in ID-space
+    }
+    else { // Slithering backwards in ID-space
         for (i = firstB + 1; i < lastB; i++) {
             PosArr_copy(tmpR2, bead_info[i]);
             PosArr_copy(bead_info[i], old_bead[i-1]); // Hopping back by one bead
@@ -1767,7 +1753,7 @@ int Move_Snake_Equil(int chainID, float MyTemp) { // Performs a slither MC-move 
         bAccept = 1;
         return bAccept;
     } else {
-        OP_RestoreBeadsFromOld(firstB, lastB);
+        OP_RestoreChain_ForSnake(firstB, lastB);
         bAccept = 0;
         return bAccept;
     }
