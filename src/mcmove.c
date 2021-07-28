@@ -2098,7 +2098,6 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
 
     // Pick the first bead as the center
     int anchorBead = firstB;
-    // anchorBead = firstB + anchorBead;
 
     // Randomly selecting a symmetry operation
     int PivotM;
@@ -2112,9 +2111,8 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
     int i, j;
     int xTemp, yTemp;
     int anchorPos[POS_MAX];
-    for (j = 0; j < POS_MAX; j++) {
-        anchorPos[j] = bead_info[anchorBead][j];
-    }
+
+    PosArr_copy(anchorPos, bead_info[anchorBead]);
 
     yTemp = 0;
     xTemp = 0;
@@ -2136,19 +2134,13 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
     lLDub newEn = 0.;
     lLDub MCProb;
 
-    /*
-    for (i = anchorBead + 1; i < lastB; i++) {
-        oldEn += (lLDub) Energy_Isotropic(i);
-    }*/
     oldEn = (lLDub)Energy_Of_Chain(chainID);
+
     for (i = anchorBead + 1; i < lastB; i++) {
         OP_Rotation(PivotM, i, anchorPos);
         OP_MoveBeadTo(i, naTempR);
     }
-    /*
-    for (i = anchorBead + 1; i < lastB; i++) {//Counting states in the new location
-        newEn += (lLDub) Energy_Isotropic(i);
-    }*/
+
     newEn       = (lLDub)Energy_Of_Chain(chainID);
     MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
