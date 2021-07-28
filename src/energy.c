@@ -1,5 +1,5 @@
-#include "global.h"
 #include "energy.h"
+#include "global.h"
 #include "structure.h"
 
 /// Energy_InitPotential calculates the biasing potential used in the thermalization/equilibration
@@ -7,106 +7,102 @@
 /// \param beadID
 /// \return The energy, given the nThermalization_Mode
 float Energy_InitPotential(const int beadID) {
-    int j;
+    int   j;
     float totEn = 0.;
-    int tmpR[POS_MAX];
+    int   tmpR[POS_MAX];
     if (fCuTemp - fKT > 0.005) {
         switch (nThermalization_Mode) {
-            case 1:
-                for (j = 0; j < POS_MAX; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                totEn = (fCuTemp - fKT) * totEn;
-                break;
+        case 1:
+            for (j = 0; j < POS_MAX; j++) {
+                tmpR[j] = bead_info[beadID][j];
+                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                totEn += (float)(tmpR[j] * tmpR[j]);
+            }
+            totEn = (fCuTemp - fKT) * totEn;
+            break;
 
-            case 2:
-                for (j = 0; j < POS_MAX; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if (totEn >= 250.) {
-                    totEn = (fCuTemp - fKT) * ( totEn);
-                } else if (totEn <= 600.) {
-                    totEn = (fCuTemp - fKT) * ((float) tot_beads + 1. / (totEn + 0.02));
-                }
-                else{
-                    totEn=0.;
-                }
-                break;
-
-            case 3:
-                for (j = 0; j < POS_MAX; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if (totEn >= 35*35) {
-                    totEn = (fCuTemp) * totEn;
-                }
-                else {
-                    totEn = 0.;
-                }
-                break;
-            case 4:
-                for (j = 0; j < POS_MAX; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if (totEn <= 100.) {
-                    totEn = (fCuTemp - fKT) * (totEn+0.2);
-                } /*else if (totEn <= 2000.) {
-                    totEn = ;(fCuTemp - fKT*0.) * ((float) tot_beads + 1. / (totEn + 0.02));
-                }*/
-                else{
-                    totEn=0.;
-                }
-                break;
-            case 5:
-                for (j = 0; j < 1; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                totEn = (fCuTemp - fKT) * totEn;
-                break;
-
-            case 6:
-
-                for (j = 0; j < POS_MAX; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if (totEn > fSquishRad*fSquishRad) {
-                    totEn = (fCuTemp - fKT) * totEn;
-                }
-                else {
-                    totEn = 0.;
-                }
-                break;
-
-            case 7:
-
-                for (j = 0; j < 1; j++) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if (totEn > 100) {
-                    totEn = (fCuTemp - fKT) * totEn;
-                }
-                else {
-                    totEn = 0.;
-                }
-                break;
-
-            default:
+        case 2:
+            for (j = 0; j < POS_MAX; j++) {
+                tmpR[j] = bead_info[beadID][j];
+                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                totEn += (float)(tmpR[j] * tmpR[j]);
+            }
+            if (totEn >= 250.) {
+                totEn = (fCuTemp - fKT) * (totEn);
+            } else if (totEn <= 600.) {
+                totEn = (fCuTemp - fKT) * ((float)tot_beads + 1. / (totEn + 0.02));
+            } else {
                 totEn = 0.;
-                break;
+            }
+            break;
+
+        case 3:
+            for (j = 0; j < POS_MAX; j++) {
+                tmpR[j] = bead_info[beadID][j];
+                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                totEn += (float)(tmpR[j] * tmpR[j]);
+            }
+            if (totEn >= 35 * 35) {
+                totEn = (fCuTemp)*totEn;
+            } else {
+                totEn = 0.;
+            }
+            break;
+        case 4:
+            for (j = 0; j < POS_MAX; j++) {
+                tmpR[j] = bead_info[beadID][j];
+                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                totEn += (float)(tmpR[j] * tmpR[j]);
+            }
+            if (totEn <= 100.) {
+                totEn = (fCuTemp - fKT) * (totEn + 0.2);
+            } /*else if (totEn <= 2000.) {
+                totEn = ;(fCuTemp - fKT*0.) * ((float) tot_beads + 1. / (totEn + 0.02));
+            }*/
+            else {
+                totEn = 0.;
+            }
+            break;
+        case 5:
+            for (j = 0; j < 1; j++) {
+                tmpR[j] = bead_info[beadID][j];
+                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                totEn += (float)(tmpR[j] * tmpR[j]);
+            }
+            totEn = (fCuTemp - fKT) * totEn;
+            break;
+
+        case 6:
+
+            for (j = 0; j < POS_MAX; j++) {
+                tmpR[j] = bead_info[beadID][j];
+                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                totEn += (float)(tmpR[j] * tmpR[j]);
+            }
+            if (totEn > fSquishRad * fSquishRad) {
+                totEn = (fCuTemp - fKT) * totEn;
+            } else {
+                totEn = 0.;
+            }
+            break;
+
+        case 7:
+
+            for (j = 0; j < 1; j++) {
+                tmpR[j] = bead_info[beadID][j];
+                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                totEn += (float)(tmpR[j] * tmpR[j]);
+            }
+            if (totEn > 100) {
+                totEn = (fCuTemp - fKT) * totEn;
+            } else {
+                totEn = 0.;
+            }
+            break;
+
+        default:
+            totEn = 0.;
+            break;
         }
     } else {
         nThermalization_Mode = -1;
@@ -118,8 +114,8 @@ float Energy_InitPotential(const int beadID) {
 /// Energy_Anisotropic - returns the bond energy for beadID if it is bonded.
 /// \param beadID
 /// \return
-float Energy_Anisotropic(const int beadID) {//Calculates the SC-SC energy of the bead in question.
-    float totEn = 0.0; //Storing total overlap energy
+float Energy_Anisotropic(const int beadID) { // Calculates the SC-SC energy of the bead in question.
+    float totEn = 0.0;                       // Storing total overlap energy
     if (bead_info[beadID][BEAD_FACE] != -1) {
         totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bead_info[beadID][BEAD_FACE]][BEAD_TYPE]][E_SC_SC];
     }
@@ -130,10 +126,10 @@ float Energy_Anisotropic(const int beadID) {//Calculates the SC-SC energy of the
 /// to a bead in the same chain. Note that this does not account for double counting
 /// \param beadID
 /// \return
-float Energy_Anisotropic_Self(const int beadID) {//Calculates the SC-SC energy of the bead in question.
-    float totEn = 0.0; //Storing total overlap energy
-    int bP = bead_info[beadID][BEAD_FACE];
-    if (bP != -1) {//This bead does have a bond
+float Energy_Anisotropic_Self(const int beadID) { // Calculates the SC-SC energy of the bead in question.
+    float totEn = 0.0;                            // Storing total overlap energy
+    int   bP    = bead_info[beadID][BEAD_FACE];
+    if (bP != -1) { // This bead does have a bond
         if (bead_info[beadID][BEAD_CHAINID] == bead_info[bP][BEAD_CHAINID]) {
             totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
         }
@@ -146,20 +142,18 @@ float Energy_Anisotropic_Self(const int beadID) {//Calculates the SC-SC energy o
 /// This should only be used when calculating the energy of an entire chain!
 /// \param beadID
 /// \return
-float Energy_Anisotropic_For_Chain(const int beadID) {//Calculates the SC-SC energy of the bead in question.
-    float totEn = 0.0; //Storing total overlap energy
-    int bP = bead_info[beadID][BEAD_FACE];
-    if (bP != -1) {//This bead does have a bond
+float Energy_Anisotropic_For_Chain(const int beadID) { // Calculates the SC-SC energy of the bead in question.
+    float totEn = 0.0;                                 // Storing total overlap energy
+    int   bP    = bead_info[beadID][BEAD_FACE];
+    if (bP != -1) { // This bead does have a bond
         if (bead_info[beadID][BEAD_CHAINID] == bead_info[bP][BEAD_CHAINID]) {
-            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC]/2.;
-        }
-        else{
+            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC] / 2.;
+        } else {
             totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
         }
     }
     return totEn;
 }
-
 
 /// Energy_Anisotropic_Contiguous_Range - returns the bond energy for beadID if it is bonded.
 /// This function assumes that we get a beadID range [smallest_bead, largest_bead], and that
@@ -167,19 +161,17 @@ float Energy_Anisotropic_For_Chain(const int beadID) {//Calculates the SC-SC ene
 /// we divide by 2 to account for double counting.
 /// \param beadID
 /// \return
-float Energy_Anisotropic_Contiguous_Range(const int beadID, const int smallest_bead, const int largest_bead){
-    float totEn = 0.0; //Storing total overlap energy
-    int bP = bead_info[beadID][BEAD_FACE];
-    if (bP != -1) {//This bead does have a bond
-        if (bead_info[beadID][BEAD_CHAINID] == bead_info[bP][BEAD_CHAINID]) {//Intra-molecular
-            if (bP >= smallest_bead && bP <= largest_bead) {//Within subset
+float Energy_Anisotropic_Contiguous_Range(const int beadID, const int smallest_bead, const int largest_bead) {
+    float totEn = 0.0; // Storing total overlap energy
+    int   bP    = bead_info[beadID][BEAD_FACE];
+    if (bP != -1) {                                                           // This bead does have a bond
+        if (bead_info[beadID][BEAD_CHAINID] == bead_info[bP][BEAD_CHAINID]) { // Intra-molecular
+            if (bP >= smallest_bead && bP <= largest_bead) {                  // Within subset
                 totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC] / 2.;
-            }
-            else{
+            } else {
                 totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
             }
-        }
-        else{
+        } else {
             totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
         }
     }
@@ -192,22 +184,21 @@ float Energy_Anisotropic_Contiguous_Range(const int beadID, const int smallest_b
 /// So if the bead partner is within this list, we divide by 2 to account for double counting.
 /// \param beadID
 /// \return
-float Energy_Anisotropic_With_List(const int beadID, const int *bead_list, const int list_size){
-    float totEn = 0.0; //Storing total overlap energy
-    int bP = bead_info[beadID][BEAD_FACE];
-    int check_bead = 0;
-    int i;
-    if (bP != -1) {//This bead does have a bond
-        for (i=0; i<list_size; i++){//Checking if we should worry about double counting
-            if (bP == bead_list[i]){
+float Energy_Anisotropic_With_List(const int beadID, const int *bead_list, const int list_size) {
+    float totEn      = 0.0; // Storing total overlap energy
+    int   bP         = bead_info[beadID][BEAD_FACE];
+    int   check_bead = 0;
+    int   i;
+    if (bP != -1) {                       // This bead does have a bond
+        for (i = 0; i < list_size; i++) { // Checking if we should worry about double counting
+            if (bP == bead_list[i]) {
                 check_bead = 1;
                 break;
             }
         }
-        if (check_bead == 1){
+        if (check_bead == 1) {
             totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC] / 2.;
-        }
-        else{
+        } else {
             totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
         }
     }
@@ -220,7 +211,7 @@ float Energy_Anisotropic_With_List(const int beadID, const int *bead_list, const
 /// \param beadType2: Type of second bead.
 /// \param xDis: Distance between the two beads.
 /// \return fEnergy[beadType1][beadType2][E_OVLP].
-float Energy_Iso_Ovlp(int const beadType1, int const beadType2, float const xDis){
+float Energy_Iso_Ovlp(int const beadType1, int const beadType2, float const xDis) {
     return fEnergy[beadType1][beadType2][E_OVLP];
 }
 
@@ -230,7 +221,7 @@ float Energy_Iso_Ovlp(int const beadType1, int const beadType2, float const xDis
 /// \param beadType2: Type of second bead.
 /// \param xDis: Distance between the two beads.
 /// \return fEnergy[beadType1][beadType2][E_CONT]/xDis.
-float Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis){
+float Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis) {
     return fEnergy[beadType1][beadType2][E_CONT] / xDis;
 }
 
@@ -238,9 +229,7 @@ float Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis
 /// \param beadType
 /// \param xDis
 /// \return
-inline float Energy_Iso_fSol(int const beadType){
-    return fEnergy[beadType][beadType][E_F_SOL];
-}
+inline float Energy_Iso_fSol(int const beadType) { return fEnergy[beadType][beadType][E_F_SOL]; }
 
 /// Energy_ofBead_wNeighList: Given this bead, and a supplied list of neighbors and number of neighbors,
 /// we loop over all the neighbors and add the energies. This function _only_ calculate the pairwise energies
@@ -249,16 +238,16 @@ inline float Energy_Iso_fSol(int const beadType){
 /// \param neighList
 /// \param neighNum
 /// \return
-float Energy_ofBead_wNeighList(int const beadID, const int* neighList, int const neighNum){
-    float totEn;
-    int i;
+float Energy_ofBead_wNeighList(int const beadID, const int *neighList, int const neighNum) {
+    float     totEn;
+    int       i;
     const int resi = bead_info[beadID][BEAD_TYPE];
-    int resj, tmpID;
-    float xDis;
+    int       resj, tmpID;
+    float     xDis;
 
     totEn = nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    for(i=0; i<neighNum; i++){
+    for (i = 0; i < neighNum; i++) {
         tmpID = neighList[i];
         resj  = bead_info[tmpID][BEAD_TYPE];
         xDis  = Dist_BeadToBead(beadID, tmpID);
@@ -274,12 +263,12 @@ float Energy_ofBead_wNeighList(int const beadID, const int* neighList, int const
 /// \param neighList
 /// \param neighNum
 /// \return
-float Energy_ofSol_wNeighList(const int* neighList, int const neighNum){
+float Energy_ofSol_wNeighList(const int *neighList, int const neighNum) {
     float totEn;
-    int i;
-    int resj, tmpID;
+    int   i;
+    int   resj, tmpID;
 
-    for(i=0; i<neighNum; i++){
+    for (i = 0; i < neighNum; i++) {
         tmpID = neighList[i];
         resj  = bead_info[tmpID][BEAD_TYPE];
         totEn += Energy_Iso_fSol(resj);
@@ -288,30 +277,28 @@ float Energy_ofSol_wNeighList(const int* neighList, int const neighNum){
     return totEn;
 }
 
-
 /// Energy_Isotroptic_Old calculates the isotropic contribution to the energy by searching the 3^3-1 = 26 'neighbors'
 /// The energy function  is like the BFM, where $epislon$ represents the overlap cost for total overlap, which is
 /// forbidden explicitly in LASSI, so we have $epislon/2$,$epislon/4$ and $epislon/8$ with increasing
 /// distance.
 /// \param beadID
 /// \return
-float Energy_Isotropic_Old(const int beadID) {//Calculate Contact and Overlap energy of bead beadID
-    float totEn = 0.f; //Storing total overlap energy
-    int i, j;//Indecies
+float Energy_Isotropic_Old(const int beadID) { // Calculate Contact and Overlap energy of bead beadID
+    float totEn = 0.f;                         // Storing total overlap energy
+    int   i, j;                                // Indecies
     int   r_pos_0[POS_MAX], r_chck[POS_MAX], r_disp[POS_MAX];
-    int x, y, z; //Lattice indecies
-    int secBi, resj;//Second bead index
-    float xDis = 0.f;//Distance between beads.
-    int resi = bead_info[beadID][BEAD_TYPE];
+    int   x, y, z;     // Lattice indecies
+    int   secBi, resj; // Second bead index
+    float xDis = 0.f;  // Distance between beads.
+    int   resi = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 &&
-        nBeadTypeCanFSol[resi] == 0 && nBeadTypeCanTInd[resi] == 0) {
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0) {
         return totEn;
-    }//No need to do anything if there's no isotropic interactions.
+    } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : nLargestRadius; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -322,7 +309,7 @@ float Energy_Isotropic_Old(const int beadID) {//Calculate Contact and Overlap en
             r_disp[1] = y;
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
-                for (j = 0; j < POS_MAX; j++){
+                for (j = 0; j < POS_MAX; j++) {
                     r_chck[j] = r_pos_0[j] + r_disp[j];
                     r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
                     r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
@@ -331,21 +318,19 @@ float Energy_Isotropic_Old(const int beadID) {//Calculate Contact and Overlap en
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
                     totEn += Energy_Iso_Ovlp(resi, resj, xDis);
-                    xDis = sqrtf((float)(x*x + y*y + z*z));
-                    //xDis = Dist_BeadToBead(beadID, secBi);
+                    xDis = sqrtf((float)(x * x + y * y + z * z));
+                    // xDis = Dist_BeadToBead(beadID, secBi);
                     if (xDis <= 1.0) {
                         totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.0f;
                     } else if (xDis <= 1.42) { // sqrt(2)
                         totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 4.0f;
                     } else if (xDis <= 1.74) { // sqrt(3)
                         totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 8.0f;
-                    }
-                    else {//This way, contact is only outside ovlp
+                    } else { // This way, contact is only outside ovlp
                         totEn += Energy_Iso_Cont(resi, resj, xDis);
-                  }
-                }
-                else if (secBi == -1){
-                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                    }
+                } else if (secBi == -1) {
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) { // Want solvation radius to be 1
                         totEn += fEnergy[resi][resi][E_F_SOL];
                         totEn += fEnergy[resi][resi][E_T_IND] * fCuTemp;
                     }
@@ -355,7 +340,6 @@ float Energy_Isotropic_Old(const int beadID) {//Calculate Contact and Overlap en
     }
 
     return totEn;
-
 }
 
 /// Energy_Isotroptic calculates the isotropic contribution to the energy by searching the 3^3-1 = 26 'neighbors'
@@ -364,23 +348,22 @@ float Energy_Isotropic_Old(const int beadID) {//Calculate Contact and Overlap en
 /// distance.
 /// \param beadID
 /// \return
-float Energy_Isotropic(const int beadID) {//Calculate Contact and Overlap energy of bead beadID
-    float totEn = 0.0; //Storing total overlap energy
-    int i, j;//Indecies
+float Energy_Isotropic(const int beadID) { // Calculate Contact and Overlap energy of bead beadID
+    float totEn = 0.0;                     // Storing total overlap energy
+    int   i, j;                            // Indecies
     int   r_pos_0[POS_MAX], r_chck[POS_MAX], r_disp[POS_MAX];
-    int x, y, z; //Lattice indecies
-    int secBi, resj;//Second bead index
-    float xDis = 0.;//Distance between beads.
-    int resi = bead_info[beadID][BEAD_TYPE];
+    int   x, y, z;     // Lattice indecies
+    int   secBi, resj; // Second bead index
+    float xDis = 0.;   // Distance between beads.
+    int   resi = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 &&
-        nBeadTypeCanFSol[resi] == 0 && nBeadTypeCanTInd[resi] == 0) {
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0) {
         return totEn;
-    }//No need to do anything if there's no isotropic interactions.
+    } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : nLargestRadius; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -392,21 +375,20 @@ float Energy_Isotropic(const int beadID) {//Calculate Contact and Overlap energy
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
                 PosArr_add_wPBC(r_chck, r_pos_0, r_disp);
-//                for (j = 0; j < POS_MAX; j++){
-//                    r_chck[j] = r_pos_0[j] + r_disp[j];
-//                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
-//                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
-//                }
+                //                for (j = 0; j < POS_MAX; j++){
+                //                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                //                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
+                //                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
+                //                }
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float)(x*x + y*y + z*z));
-                    totEn += Energy_Iso_Ovlp(resi, resj, xDis) ;/// xDis / xDis / xDis;
+                    xDis = sqrtf((float)(x * x + y * y + z * z));
+                    totEn += Energy_Iso_Ovlp(resi, resj, xDis); /// xDis / xDis / xDis;
 
                     totEn += Energy_Iso_Cont(resi, resj, xDis);
-                }
-                else if (secBi == -1){
-                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                } else if (secBi == -1) {
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) { // Want solvation radius to be 1
                         totEn += fEnergy[resi][resi][E_F_SOL];
                     }
                 }
@@ -415,31 +397,30 @@ float Energy_Isotropic(const int beadID) {//Calculate Contact and Overlap energy
     }
 
     return totEn;
-
 }
 
 /// Energy_Isotropic_Self - returns the bond energy for beadID only if it is interacting with a bead within the same
 /// molecule. Note that it does not account for double counting
 /// \param beadID
 /// \return
-float Energy_Isotropic_Self(const int beadID) {//Calculate Contact and Overlap energy of beadID but only intra-molecular
-    //interactions
-    float totEn = 0.0; //Storing total overlap energy
-    int i, j;//Indecies
+float Energy_Isotropic_Self(
+    const int beadID) { // Calculate Contact and Overlap energy of beadID but only intra-molecular
+    // interactions
+    float totEn = 0.0; // Storing total overlap energy
+    int   i, j;        // Indecies
     int   r_pos_0[POS_MAX], r_chck[POS_MAX], r_disp[POS_MAX];
-    int x, y, z; //Lattice indecies
-    int secBi, resj;//Second bead index
-    float xDis = 0.;//Distance between beads.
-    int resi = bead_info[beadID][BEAD_TYPE];
-    //totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
+    int   x, y, z;     // Lattice indecies
+    int   secBi, resj; // Second bead index
+    float xDis = 0.;   // Distance between beads.
+    int   resi = bead_info[beadID][BEAD_TYPE];
+    // totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 &&
-        nBeadTypeCanFSol[resi] == 0 && nBeadTypeCanTInd[resi] == 0) {
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0) {
         return totEn;
-    }//No need to do anything if there's no isotropic interactions.
+    } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : nLargestRadius; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -450,7 +431,7 @@ float Energy_Isotropic_Self(const int beadID) {//Calculate Contact and Overlap e
             r_disp[1] = y;
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
-                for (j = 0; j < POS_MAX; j++){
+                for (j = 0; j < POS_MAX; j++) {
                     r_chck[j] = r_pos_0[j] + r_disp[j];
                     r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
                     r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
@@ -459,14 +440,13 @@ float Energy_Isotropic_Self(const int beadID) {//Calculate Contact and Overlap e
                 if (secBi != -1 && secBi != beadID) {
                     if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {
                         resj = bead_info[secBi][BEAD_TYPE];
-                        xDis = sqrtf((float) (x * x + y * y + z * z));
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis);/// xDis / xDis / xDis;
+                        xDis = sqrtf((float)(x * x + y * y + z * z));
+                        totEn += Energy_Iso_Ovlp(resi, resj, xDis); /// xDis / xDis / xDis;
 
                         totEn += Energy_Iso_Cont(resi, resj, xDis);
                     }
-                }
-                else if (secBi == -1){
-                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                } else if (secBi == -1) {
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) { // Want solvation radius to be 1
                         totEn += fEnergy[resi][resi][E_F_SOL];
                     }
                 }
@@ -475,33 +455,30 @@ float Energy_Isotropic_Self(const int beadID) {//Calculate Contact and Overlap e
     }
 
     return totEn;
-
 }
-
 
 /// Energy_Isotropic_For_Chain - returns the isotropic interaction energy for beadID
 /// If we have an intra-molecular interaction, divide the energy by 2.
 /// This should only be used when calculating the energy of an entire chain!
 /// \param beadID
 /// \return
-float Energy_Isotropic_For_Chain(const int beadID) {//Calculate Contact and Overlap energy of beadID
-    //Takes care of intra-molecular double counting
-    float totEn = 0.0; //Storing total overlap energy
-    int i, j;//Indecies
+float Energy_Isotropic_For_Chain(const int beadID) { // Calculate Contact and Overlap energy of beadID
+    // Takes care of intra-molecular double counting
+    float totEn = 0.0; // Storing total overlap energy
+    int   i, j;        // Indecies
     int   r_pos_0[POS_MAX], r_chck[POS_MAX], r_disp[POS_MAX];
-    int x, y, z; //Lattice indecies
-    int secBi, resj;//Second bead index
-    float xDis = 0.;//Distance between beads.
-    int resi = bead_info[beadID][BEAD_TYPE];
+    int   x, y, z;     // Lattice indecies
+    int   secBi, resj; // Second bead index
+    float xDis = 0.;   // Distance between beads.
+    int   resi = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 &&
-        nBeadTypeCanFSol[resi] == 0 && nBeadTypeCanTInd[resi] == 0) {
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0) {
         return totEn;
-    }//No need to do anything if there's no isotropic interactions.
+    } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : nLargestRadius; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -512,7 +489,7 @@ float Energy_Isotropic_For_Chain(const int beadID) {//Calculate Contact and Over
             r_disp[1] = y;
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
-                for (j = 0; j < POS_MAX; j++){
+                for (j = 0; j < POS_MAX; j++) {
                     r_chck[j] = r_pos_0[j] + r_disp[j];
                     r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
                     r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
@@ -520,20 +497,18 @@ float Energy_Isotropic_For_Chain(const int beadID) {//Calculate Contact and Over
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float) (x * x + y * y + z * z));
-                    if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {//Intra-molecular
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) /2.;// / xDis / xDis / xDis /2.;
+                    xDis = sqrtf((float)(x * x + y * y + z * z));
+                    if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) { // Intra-molecular
+                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.; // / xDis / xDis / xDis /2.;
 
-                        totEn += Energy_Iso_Cont(resi, resj, xDis) /2.;
-                    }
-                    else{//Inter-molecular
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) ;// xDis / xDis / xDis;
+                        totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.;
+                    } else {                                        // Inter-molecular
+                        totEn += Energy_Iso_Ovlp(resi, resj, xDis); // xDis / xDis / xDis;
 
                         totEn += Energy_Iso_Cont(resi, resj, xDis);
                     }
-                }
-                else if (secBi == -1){
-                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                } else if (secBi == -1) {
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) { // Want solvation radius to be 1
                         totEn += fEnergy[resi][resi][E_F_SOL];
                     }
                 }
@@ -542,7 +517,6 @@ float Energy_Isotropic_For_Chain(const int beadID) {//Calculate Contact and Over
     }
 
     return totEn;
-
 }
 
 /// Energy_Isotropic_Contiguous_Range - returns the isotropic interactions for beadID
@@ -551,26 +525,26 @@ float Energy_Isotropic_For_Chain(const int beadID) {//Calculate Contact and Over
 /// we divide by 2 to account for double counting.
 /// \param beadID
 /// \return
-float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bead, const int largest_bead) {//Calculate Contact and Overlap energy of beadID
-    //Takes care of intra-molecular double counting
-    //If the bead is between smallest_bead and largest_bead, we divide by two.
-    //This assumes that every bead between smallest_bead and largest_bead will be looped over
-    float totEn = 0.0; //Storing total overlap energy
-    int i, j;//Indecies
+float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bead,
+                                        const int largest_bead) { // Calculate Contact and Overlap energy of beadID
+    // Takes care of intra-molecular double counting
+    // If the bead is between smallest_bead and largest_bead, we divide by two.
+    // This assumes that every bead between smallest_bead and largest_bead will be looped over
+    float totEn = 0.0; // Storing total overlap energy
+    int   i, j;        // Indecies
     int   r_pos_0[POS_MAX], r_chck[POS_MAX], r_disp[POS_MAX];
-    int x, y, z; //Lattice indecies
-    int secBi, resj;//Second bead index
-    float xDis = 0.;//Distance between beads.
-    int resi = bead_info[beadID][BEAD_TYPE];
+    int   x, y, z;     // Lattice indecies
+    int   secBi, resj; // Second bead index
+    float xDis = 0.;   // Distance between beads.
+    int   resi = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 &&
-        nBeadTypeCanFSol[resi] == 0 && nBeadTypeCanTInd[resi] == 0) {
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0) {
         return totEn;
-    }//No need to do anything if there's no isotropic interactions.
+    } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : nLargestRadius; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -581,7 +555,7 @@ float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bea
             r_disp[1] = y;
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
-                for (j = 0; j < POS_MAX; j++){
+                for (j = 0; j < POS_MAX; j++) {
                     r_chck[j] = r_pos_0[j] + r_disp[j];
                     r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
                     r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
@@ -589,27 +563,24 @@ float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bea
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float) (x * x + y * y + z * z));
-                    if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) {//Intra-molecular
-                        if (secBi >= smallest_bead && secBi <= largest_bead) {//Within subset
-                            totEn += Energy_Iso_Ovlp(resi, resj, xDis) /2.;// xDis / xDis / xDis / 2.;
+                    xDis = sqrtf((float)(x * x + y * y + z * z));
+                    if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID]) { // Intra-molecular
+                        if (secBi >= smallest_bead && secBi <= largest_bead) {               // Within subset
+                            totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.;                 // xDis / xDis / xDis / 2.;
 
                             totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.;
-                        }
-                        else{
-                            totEn += Energy_Iso_Ovlp(resi, resj, xDis) ;// xDis / xDis / xDis;
+                        } else {
+                            totEn += Energy_Iso_Ovlp(resi, resj, xDis); // xDis / xDis / xDis;
 
                             totEn += Energy_Iso_Cont(resi, resj, xDis);
                         }
-                    }
-                    else{//Inter-molecular
+                    } else {                                        // Inter-molecular
                         totEn += Energy_Iso_Ovlp(resi, resj, xDis); // / xDis / xDis / xDis;
 
                         totEn += Energy_Iso_Cont(resi, resj, xDis);
                     }
-                }
-                else if (secBi == -1){
-                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                } else if (secBi == -1) {
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) { // Want solvation radius to be 1
                         totEn += fEnergy[resi][resi][E_F_SOL];
                     }
                 }
@@ -618,7 +589,6 @@ float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bea
     }
 
     return totEn;
-
 }
 
 /// Energy_Isotropic_With_List - returns the isotropic interactions for beadID.
@@ -627,25 +597,25 @@ float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bea
 /// So if the interactor is within this list, we divide by 2 to account for double counting.
 /// \param beadID
 /// \return
-float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const int list_size) {//Calculate Contact and Overlap energy of beadID
-    //Takes care of intra-molecular double counting
-    float totEn = 0.0; //Storing total overlap energy
-    int i, j;//Indecies
-    int bead_check = 0;
+float Energy_Isotropic_With_List(const int beadID, const int *bead_list,
+                                 const int list_size) { // Calculate Contact and Overlap energy of beadID
+    // Takes care of intra-molecular double counting
+    float totEn = 0.0; // Storing total overlap energy
+    int   i, j;        // Indecies
+    int   bead_check = 0;
     int   r_pos_0[POS_MAX], r_chck[POS_MAX], r_disp[POS_MAX];
-    int x, y, z; //Lattice indecies
-    int secBi, resj;//Second bead index
-    float xDis = 0.;//Distance between beads.
-    int resi = bead_info[beadID][BEAD_TYPE];
+    int   x, y, z;     // Lattice indecies
+    int   secBi, resj; // Second bead index
+    float xDis = 0.;   // Distance between beads.
+    int   resi = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 &&
-        nBeadTypeCanFSol[resi] == 0 && nBeadTypeCanTInd[resi] == 0) {
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0) {
         return totEn;
-    }//No need to do anything if there's no isotropic interactions.
+    } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1: nLargestRadius;//No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : nLargestRadius; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++) {
         r_pos_0[j] = bead_info[beadID][j];
@@ -657,36 +627,34 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
             for (z = -BoxRad; z <= BoxRad; z++) {
                 r_disp[2] = z;
                 PosArr_add_wPBC(r_chck, r_pos_0, r_disp);
-//                for (j = 0; j < POS_MAX; j++){
-//                    r_chck[j] = r_pos_0[j] + r_disp[j];
-//                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
-//                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
-//                }
+                //                for (j = 0; j < POS_MAX; j++){
+                //                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                //                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
+                //                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
+                //                }
                 secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (secBi != -1 && secBi != beadID) {
                     resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float) (x * x + y * y + z * z));
+                    xDis = sqrtf((float)(x * x + y * y + z * z));
 
                     bead_check = 0;
-                    for (i=0; i<list_size; i++){
-                        if (secBi == bead_list[i]){
+                    for (i = 0; i < list_size; i++) {
+                        if (secBi == bead_list[i]) {
                             bead_check = 1;
                             break;
                         }
                     }
-                    if (bead_check == 1) {//Intra-list
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) /2.;// / xDis / xDis / xDis /2.;
+                    if (bead_check == 1) {                               // Intra-list
+                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.; // / xDis / xDis / xDis /2.;
 
-                        totEn += Energy_Iso_Cont(resi, resj, xDis) /2.;
-                    }
-                    else{//Inter-list
+                        totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.;
+                    } else {                                        // Inter-list
                         totEn += Energy_Iso_Ovlp(resi, resj, xDis); // / xDis / xDis / xDis;
 
                         totEn += Energy_Iso_Cont(resi, resj, xDis);
                     }
-                }
-                else if (secBi == -1){
-                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) {//Want solvation radius to be 1
+                } else if (secBi == -1) {
+                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1) { // Want solvation radius to be 1
                         totEn += fEnergy[resi][resi][E_F_SOL];
                     }
                 }
@@ -695,24 +663,23 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list, const i
     }
 
     return totEn;
-
 }
 
-//TODO: Change total energy calculation so that it properly decomposes the system energy into individual components.
+// TODO: Change total energy calculation so that it properly decomposes the system energy into individual components.
 /// Energy_Total_System - calculates the total energy of the system using the functions above.
 /// Note the factor of 1/2 to account for double counting since all the energy contributions (for now)
 /// are pair-wise. Furthermore, faCurrEn[] stores the two energies separately as well.
 void Energy_Total_System(void) {
-    int i;//Indecies
+    int i; // Indecies
     // initialization
     for (i = 0; i < MAX_E; i++) {
         faCurrEn[i] = 0.0f;
     }
-//printf("We have %d beads and %d chains", tot_beads, tot_chains);
+    // printf("We have %d beads and %d chains", tot_beads, tot_chains);
     for (i = 0; i < tot_beads; i++) {
         faCurrEn[E_OVLP] += Energy_Isotropic(i) / 2.f;
         faCurrEn[E_SC_SC] += Energy_Anisotropic(i) / 2.f;
-        //printf("Done with bead %d\n", i);
+        // printf("Done with bead %d\n", i);
     }
 
     for (i = 1; i < MAX_E; i++) {
@@ -723,11 +690,11 @@ void Energy_Total_System(void) {
 /// Energy_Of_Chain - calculates the total energy of a molecule. Takes care of double-counting intra interactions
 /// \param chainID - ID of the molecule to calculate the energy.
 /// \return The total aniso + isotropic energy of this chain.
-float Energy_Of_Chain(const int chainID) {//Calculates the energy of the given chain.
+float Energy_Of_Chain(const int chainID) { // Calculates the energy of the given chain.
     float totEn = 0.0;
-    int i;//Looping index
-    int fB = chain_info[chainID][CHAIN_START];
-    int lB = chain_info[chainID][CHAIN_START] + chain_info[chainID][CHAIN_LENGTH];
+    int   i; // Looping index
+    int   fB = chain_info[chainID][CHAIN_START];
+    int   lB = chain_info[chainID][CHAIN_START] + chain_info[chainID][CHAIN_LENGTH];
     for (i = fB; i < lB; i++) {
         totEn += Energy_Anisotropic_For_Chain(i) + Energy_Isotropic_For_Chain(i);
     }
@@ -738,16 +705,16 @@ float Energy_Of_Chain(const int chainID) {//Calculates the energy of the given c
 /// Energy_Of_Chain_Self - only calculates the intra-molecular energy of this molecule
 /// \param chainID - ID of the molecule to calculate the energy.
 /// \return The total aniso + isotropic energy of this chain.
-float Energy_Of_Chain_Self(const int chainID) {//Calculates only intra-molecular interactions
+float Energy_Of_Chain_Self(const int chainID) { // Calculates only intra-molecular interactions
     float totEn = 0.0;
-    int i;//Looping index
-    int fB = chain_info[chainID][CHAIN_START];
-    int lB = chain_info[chainID][CHAIN_START] + chain_info[chainID][CHAIN_LENGTH];
+    int   i; // Looping index
+    int   fB = chain_info[chainID][CHAIN_START];
+    int   lB = chain_info[chainID][CHAIN_START] + chain_info[chainID][CHAIN_LENGTH];
     for (i = fB; i < lB; i++) {
         totEn += Energy_Anisotropic_Self(i) + Energy_Isotropic_Self(i);
     }
 
-    return totEn/2.;
+    return totEn / 2.;
 }
 
 /// Energy_Of_Chain_OLD - calculates the total energy of a molecule. Double counts intra-molecular energies.
@@ -756,12 +723,12 @@ float Energy_Of_Chain_Self(const int chainID) {//Calculates only intra-molecular
 /// Note that this sub-routine is dumb and does not account for double counting within the same chain.
 /// As such, this function should be used in both the old and new energy calculations so that the energy difference
 /// is still correct.
-float Energy_Of_Chain_OLD(const int chainID) {//Calculates the energy of the given chain
+float Energy_Of_Chain_OLD(const int chainID) { // Calculates the energy of the given chain
     float totEn = 0.0;
-    int i;//Looping index
+    int   i; // Looping index
 
-    for (i = chain_info[chainID][CHAIN_START];
-         i < chain_info[chainID][CHAIN_START] + chain_info[chainID][CHAIN_LENGTH]; i++) {
+    for (i = chain_info[chainID][CHAIN_START]; i < chain_info[chainID][CHAIN_START] + chain_info[chainID][CHAIN_LENGTH];
+         i++) {
         totEn += Energy_Anisotropic(i) + Energy_Isotropic(i);
     }
 

@@ -410,8 +410,8 @@ void Write_TopFile(char *filename) {
     int i, j, k;               // Loop iterators.
     int numBonds;              // Used to count total number of bonds!
     printf("Writing the topology file!\n");
-    fprintf(fp, "LAMMPS Description\n");   // The file must start with this.
-    fprintf(fp, "\n");                     // Empty line.
+    fprintf(fp, "LAMMPS Description\n");    // The file must start with this.
+    fprintf(fp, "\n");                      // Empty line.
     fprintf(fp, "%ld\tatoms\n", tot_beads); // Listing total number of atoms
     numBonds = 0;
     for (i = 0; i < tot_beads; i++) {
