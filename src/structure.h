@@ -55,15 +55,20 @@ void GyrTensor_GyrRad_Avg(void);
 
 void Calculate_Distances_For_Radius(float *thisList, const int nRad);
 
+int NeighborSearch_SolSitesAround(const int *startVec);
+
 int NeighborSearch_AroundPoint_wRad_IgnBead(const int beadID, const int *startVec, const int nRad, int *neighList);
 
 int NeighborSearch_AroundPoint_wRad_wDists(const int beadID, const int *startVec, const int nRad, int *neighList,
                                            float *distList);
 
-void PosArr_gen_rand_wRad(int *outVec, const int nRadius);
+void PosArr_copy(int *copy_vec, const int* in_vec);
 
 void PosArr_add_wPBC(int *outVec, const int *firVec, const int *secVec);
 
 void PosArr_add_noPBC(int *outVec, const int *firVec, const int *secVec);
+
+void PosArr_gen_rand_wRad(int *outVec, const int nRadius);
+
 
 #endif // _STRUCTURE_H_

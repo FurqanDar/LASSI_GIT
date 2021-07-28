@@ -379,7 +379,7 @@ int RDF_ComponentIndex(const int i, const int j) {
     }
 }
 
-/// RDFArr_Inde - 1D index for ld_TOTRDF_Arr which is used to globally store the different RDFs
+/// RDFArr_Index - 1D index for ld_TOTRDF_Arr which is used to globally store the different RDFs
 /// \param run_cycle
 /// \param rdf_comp
 /// \param x_pos
@@ -433,6 +433,8 @@ void RDF_ComponentWise_Avg(void) {
 }
 
 /// Check_LinkerConstraint - if I move beadID to tmpR, do I still satisfy the linker lengths for beadID?
+/// For the proposed location, we loop over all bonded partners of beadID and check if the distance is within the
+/// linker_len distance.
 /// \param beadID
 /// \param tmpR
 /// \return 1 means all is good, 0 means bad.
@@ -933,6 +935,14 @@ int NeighborSearch_EmptySitesAround_wRad(const int *startVec, const int nRad) {
     return empty_num;
 }
 
+/// NeighborSearch_SolSitesAround: number of solvation sites around this point. Finds the number of empty lattice
+/// sites in the 26 closest sites.
+/// \param startVec
+/// \return Empty sites around this point.
+int NeighborSearch_SolSitesAround(const int *startVec){
+    return NeighborSearch_EmptySitesAround_wRad(startVec, 1);
+}
+
 int NeighborSearch_AroundPoint_UptoIndex(const int beadID, const int *startVec, const int upTO, int *neighList) {
     int i;
     int neigh_num = 0;
@@ -998,6 +1008,16 @@ int NeighborSearch_AroundPoint_wRad_wDists(const int beadID, const int *startVec
     }
     return neigh_num;
 }
+
+/// PosArr_copy: Copies the position elements to copy_vec.
+/// \param copy_vec
+/// \param in_vec
+void PosArr_copy(int *copy_vec, const int* in_vec){
+    copy_vec[0] = in_vec[0];
+    copy_vec[1] = in_vec[1];
+    copy_vec[2] = in_vec[2];
+}
+
 
 /// PosArr_gen_rand_wRad. Given a radius, we generate a random set of coordinates between -Radius and Radius
 /// for each dimension. The result is stored in outVec

@@ -1640,9 +1640,6 @@ int Move_Local_Equil(int beadID, float MyTemp) { // Performs a local translation
     lRadUp  = lRadLow * 2 + 1; // 2*2+1
 
     yTemp = 0; // Initialize these guys.
-    //    for (j = 0; j < POS_MAX; j++) {
-    //        r_disp[j] = (rand() % lRadUp) - lRadLow;//Generate number between -2 and 2
-    //    }
 
     PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
     PosArr_add_wPBC(r_new, r_pos0, r_disp);
@@ -1716,36 +1713,46 @@ int Move_Snake_Equil(int chainID, float MyTemp) { // Performs a slither MC-move 
     newEn = 0.;
     int i, j, k;                                       // Loop iterators
     int xTemp, yTemp, lRadUp, lRadLow;                 // Random numbers to store things
-    int tmpR[POS_MAX], tmpR2[POS_MAX], tmpR3[POS_MAX]; // Vectors to store positions.
+    int pos_new[POS_MAX], tmpR2[POS_MAX], tmpR3[POS_MAX]; // Vectors to store positions.
 
     MCProb = (lLDub)rand() / (lLDub)RAND_MAX;            // To decide if we slither forwards or backwards
     if (MCProb < 0.5) {                                  // Forwards slither, so lastB-1 (last bead) is anchor
-        lRadUp  = (int)2 * linker_len[lastB - 1][0] + 1; // lastB-1 will be replaced by lastB-2
-        lRadLow = (int)linker_len[lastB - 1][0];
-        yTemp   = 0;
+//        lRadUp  = 2 * linker_len[lastB - 1][0] + 1; // lastB-1 will be replaced by lastB-2
+//        lRadLow = linker_len[lastB - 1][0];
+//        yTemp   = 0;
+//
+//        for (j = 0; j < POS_MAX; j++) {
+//            pos_new[j] = (rand() % lRadUp) - lRadLow;
+//            pos_new[j] = (bead_info[lastB - 1][j] + pos_new[j] + nBoxSize[j]) % nBoxSize[j];
+//        }
 
-        for (j = 0; j < POS_MAX; j++) {
-            tmpR[j] = (rand() % lRadUp) - lRadLow;
-            tmpR[j] = (bead_info[lastB - 1][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
-        }
-        yTemp = Check_MoveBeadTo(tmpR); // 0: there is no space, 1: there is space
+        PosArr_gen_rand_wRad(pos_new, linker_len[lastB - 1][0]);
+        PosArr_copy(tmpR2, pos_new);
+        PosArr_add_wPBC(pos_new, bead_info[lastB - 1], tmpR2);
+
+        yTemp = Check_MoveBeadTo(pos_new); // 0: there is no space, 1: there is space
 
     } else {                                          // Backwards slither, so firstB is anchor
-        lRadUp  = (int)2 * linker_len[firstB][0] + 1; // firstB will be replaced by firstB+1
-        lRadLow = (int)linker_len[firstB][0];
-        yTemp   = 0;
+//        lRadUp  = 2 * linker_len[firstB][0] + 1; // firstB will be replaced by firstB+1
+//        lRadLow = linker_len[firstB][0];
+//        yTemp   = 0;
+//
+//        for (j = 0; j < POS_MAX; j++) {
+//            pos_new[j] = (rand() % lRadUp) - lRadLow;
+//            pos_new[j] = (bead_info[firstB][j] + pos_new[j] + nBoxSize[j]) % nBoxSize[j];
+//        }
 
-        for (j = 0; j < POS_MAX; j++) {
-            tmpR[j] = (rand() % lRadUp) - lRadLow;
-            tmpR[j] = (bead_info[firstB][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
-        }
-        yTemp = Check_MoveBeadTo(tmpR); // 0: there is no space, 1: there is space
+        PosArr_gen_rand_wRad(pos_new, linker_len[firstB][0]);
+        PosArr_copy(tmpR2, pos_new);
+        PosArr_add_wPBC(pos_new, bead_info[firstB], tmpR2);
+
+        yTemp = Check_MoveBeadTo(pos_new); // 0: there is no space, 1: there is space
     }
     if (yTemp == 0) { // Couldn't find a spot, so reject the damn move
         bAccept = 0;
         return bAccept;
     }
-    // We should have a spot to move to! tmpR has the location
+    // We should have a spot to move to! pos_new has the location
 
     // Let's remember where this chain exists.
     for (i = firstB; i < lastB; i++) {
@@ -1771,12 +1778,12 @@ int Move_Snake_Equil(int chainID, float MyTemp) { // Performs a slither MC-move 
             }
             naTotLattice[Lat_Ind_FromVec(tmpR3)] = i;
         }
-        // Moving the last bead, and it has to be done independently because lastB-1 -> tmpR
+        // Moving the last bead, and it has to be done independently because lastB-1 -> pos_new
         i = lastB - 1;
         for (j = 0; j < POS_MAX; j++) {
-            bead_info[i][j] = tmpR[j];
+            bead_info[i][j] = pos_new[j];
         }
-        naTotLattice[Lat_Ind_FromVec(tmpR)] = i;
+        naTotLattice[Lat_Ind_FromVec(pos_new)] = i;
     } else { // Slithering backwards in ID-space
         for (i = firstB + 1; i < lastB; i++) {
             for (j = 0; j < POS_MAX; j++) {
@@ -1789,12 +1796,12 @@ int Move_Snake_Equil(int chainID, float MyTemp) { // Performs a slither MC-move 
             }
             naTotLattice[Lat_Ind_FromVec(tmpR3)] = i;
         }
-        // Moving the first bead, and it has to be done independently because firstB -> tmpR
+        // Moving the first bead, and it has to be done independently because firstB -> pos_new
         i = firstB;
         for (j = 0; j < POS_MAX; j++) {
-            bead_info[i][j] = tmpR[j];
+            bead_info[i][j] = pos_new[j];
         }
-        naTotLattice[Lat_Ind_FromVec(tmpR)] = i;
+        naTotLattice[Lat_Ind_FromVec(pos_new)] = i;
     }
 
     for (i = firstB; i < lastB; i++) { // Counting states in the new location
