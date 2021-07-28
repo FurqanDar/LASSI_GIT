@@ -277,29 +277,21 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     int   i, j; // Loop iterators
     int   resi, resj;
     int   xTemp, yTemp, lRadUp, lRadLow;   // Random numbers to store things
-    int   r_pos0[POS_MAX], tmpR2[POS_MAX]; // Vectors to stores coordinates.
+    int   r_pos0[POS_MAX], r_posNew[POS_MAX], r_posTmp[POS_MAX]; // Vectors to stores coordinates.
     int   FWWeight, BWWeight;              // Used to perform orientational bias MC
     lLDub FWRos, BWRos;                    // Forwards and backwards Rosenbluth Factors
     FWRos = 1.;
     BWRos = 1.;
-    for (j = 0; j < POS_MAX; j++) { // Initializing the vectors to where this bead is.
-        r_pos0[j] = bead_info[beadID][j];
-    }
-    // Initialize the radii for the search of next trial location
-    // For now just +-2, but could also use a linker length from the bead
-    lRadLow = linker_len[beadID][0];
-    // lRadLow = 2;
-    lRadUp = lRadLow * 2 + 1; // 2*2+1
+    PosArr_copy(r_pos0, bead_info[beadID]);
 
-    yTemp = 0; // Initialize
     // Attempt to find an empty lattice point.
-    for (j = 0; j < POS_MAX; j++) {
-        tmpR2[j] = (rand() % lRadUp) - lRadLow; // Generate number between -L and L
-        tmpR2[j] = (r_pos0[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
-    }
-    yTemp = Check_MoveBeadTo(tmpR2);
+    PosArr_gen_rand_wRad(r_posNew, linker_len[beadID][0]);
+    PosArr_copy(r_posTmp, r_posNew);
+    PosArr_add_wPBC(r_posNew, r_pos0, r_posTmp);
+    yTemp = Check_MoveBeadTo(r_posNew);
+
     if (yTemp == 1) { // This means we found an empty lattice site. So let's check if the linkers are okay.
-        yTemp = Check_LinkerConstraint(beadID, tmpR2);
+        yTemp = Check_LinkerConstraint(beadID, r_posNew);
     }
 
     if (yTemp == 0) { // No space -- reject.
@@ -310,9 +302,6 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     // Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
     resi = bead_info[beadID][BEAD_TYPE]; // I want to treat linker beads differently
                                          //  always because they have no rotational states
-
-    int old_neigh_num, new_neigh_num;
-    old_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_pos0, 1, oldNeighs);
 
     oldEn += Energy_Isotropic(beadID);
     if (nBeadTypeIsSticker[resi] == 1) { // Only non linkers can bond
@@ -326,7 +315,7 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
         OP_NormalizeRotState(0, BWWeight);
         BWRos = logl(bolt_norm[0]);
 
-        OP_MoveBeadTo(beadID, tmpR2); // Does not break bond
+        OP_MoveBeadTo(beadID, r_posNew); // Does not break bond
 
         OP_ShuffleRotIndecies(); // Need to shuffle because this also acts as selecting new partner
         FWWeight = Check_RotStatesNew(beadID, resi, MyTemp);
@@ -341,19 +330,9 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
         }
     } else { // These beads have no rotational states.
         yTemp = -1;
-        OP_MoveBeadTo(beadID, tmpR2);
+        OP_MoveBeadTo(beadID, r_posNew);
     }
 
-    //    new_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_pos0, 1, newNeighs);
-    //
-    //    for(i=0; i<old_neigh_num; i++) {
-    //        printf("%d ", oldNeighs[i]);
-    //    }
-    //    printf("\n");
-    //    for(i=0; i<new_neigh_num; i++) {
-    //        printf("%d ", newNeighs[i]);
-    //    }
-    //    exit(1);
     // Now let's calculate the energy of the new state. SC-SC energy is already done.
     newEn += Energy_Isotropic(beadID);
     MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
@@ -1632,14 +1611,9 @@ int Move_Local_Equil(int beadID, float MyTemp) { // Performs a local translation
     int xTemp, yTemp, lRadUp, lRadLow;                    // Random numbers to store things
     int r_pos0[POS_MAX], r_new[POS_MAX], r_disp[POS_MAX]; // Vectors to stores coordinates.
     // printf("Beginning LOCAL\n");
-    for (j = 0; j < POS_MAX; j++) { // Initializing the vectors to where this bead is.
-        r_pos0[j] = bead_info[beadID][j];
-    }
-    // Initialize the radii for the search of next trial location
-    lRadLow = linker_len[beadID][0];
-    lRadUp  = lRadLow * 2 + 1; // 2*2+1
 
-    yTemp = 0; // Initialize these guys.
+    PosArr_copy(r_pos0, bead_info[beadID]);
+    // Initialize the radii for the search of next trial location
 
     PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
     PosArr_add_wPBC(r_new, r_pos0, r_disp);
@@ -1648,6 +1622,7 @@ int Move_Local_Equil(int beadID, float MyTemp) { // Performs a local translation
     if (yTemp == 1) { // This means we found an empty lattice site. So let's check if the linkers are okay.
         yTemp = Check_LinkerConstraint(beadID, r_new);
     }
+
     if (yTemp == 0) {
         // This means that we have failed to find an appropriate spot for this bead to be moved to.
         //  Therefore, the move is rejected!
@@ -1657,22 +1632,26 @@ int Move_Local_Equil(int beadID, float MyTemp) { // Performs a local translation
     }
     // Have successfully found a good lattice spot.
 
-    int old_neigh_num, new_neigh_num;
-    int resi = bead_info[beadID][BEAD_TYPE];
+//    int old_neigh_num, new_neigh_num;
+//    int resi = bead_info[beadID][BEAD_TYPE];
+//
+//    old_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_pos0, 1, oldNeighs);
+//
+//    oldEn = (lLDub)Energy_ofBead_wNeighList(beadID, oldNeighs, old_neigh_num);
+//    oldEn += (lLDub)(fEnergy[resi][resi][E_F_SOL] * (float)(26 - old_neigh_num));
 
-    old_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_pos0, 1, oldNeighs);
-
-    oldEn = (lLDub)Energy_ofBead_wNeighList(beadID, oldNeighs, old_neigh_num);
-    oldEn += (lLDub)(fEnergy[resi][resi][E_F_SOL] * (float)(26 - old_neigh_num));
+    oldEn = (lLDub)Energy_Isotropic(beadID);
 
     OP_MoveBeadTo(beadID, r_new);
 
-    new_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_new, 1, newNeighs);
+//    new_neigh_num = NeighborSearch_AroundPoint_wRad_IgnBead(beadID, r_new, 1, newNeighs);
+//
+//    newEn = (lLDub)Energy_ofBead_wNeighList(beadID, newNeighs, new_neigh_num);
+//    newEn += (lLDub)(fEnergy[resi][resi][E_F_SOL] * (float)(26 - new_neigh_num));
+//    newEn += (lLDub)Energy_ofSol_wNeighList(oldNeighs, old_neigh_num);
+//    newEn -= (lLDub)Energy_ofSol_wNeighList(newNeighs, new_neigh_num);
 
-    newEn = (lLDub)Energy_ofBead_wNeighList(beadID, newNeighs, new_neigh_num);
-    newEn += (lLDub)(fEnergy[resi][resi][E_F_SOL] * (float)(26 - new_neigh_num));
-    newEn += (lLDub)Energy_ofSol_wNeighList(oldNeighs, old_neigh_num);
-    newEn -= (lLDub)Energy_ofSol_wNeighList(newNeighs, new_neigh_num);
+    oldEn = (lLDub)Energy_Isotropic(beadID);
 
     MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
