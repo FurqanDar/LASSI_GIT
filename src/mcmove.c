@@ -1850,7 +1850,8 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
     int topIt;                      // Iterator for topo_info
     int i, j;                       // Loop iterators
     int curID;                      // current bead being looked at
-    int tmpR[MAX_VALENCY][POS_MAX]; // Storing temporary locations
+    int r_pos0[MAX_BONDS][POS_MAX]; // Storing temporary locations
+    int r_tmp[POS_MAX];
     int bAccept;
     int lRadLow, lRadUp;
     lRadLow   = 2;
@@ -1860,12 +1861,8 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
     curID     = beadID;
     topIt     = 0;
     while (curID != -1) {
-        for (j = 0; j < BEADINFO_MAX; j++) {
-            old_bead[curID][j] = bead_info[curID][j]; // Remembering
-            if (j < POS_MAX) {
-                tmpR[topIt][j] = bead_info[curID][j];
-            }
-        }
+        OP_CopyBead(old_bead[curID], bead_info[curID]);
+        PosArr_copy(r_pos0[topIt], bead_info[curID]);
         curID = topo_info[beadID][topIt++];
     }
 
@@ -1879,22 +1876,21 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
     topIt = 0;
     while (curID != -1) {
         yTemp = 1;
-        for (j = 0; j < POS_MAX; j++) {
-            tmpR[topIt][j] = (rand() % lRadUp) - lRadLow;
-            tmpR[topIt][j] = (bead_info[curID][j] + tmpR[topIt][j] + nBoxSize[j]) % nBoxSize[j];
-        }
-        if (naTotLattice[Lat_Ind_FromVec(tmpR[topIt])] != -1) {
+        PosArr_gen_rand_wRad(r_pos0[topIt], 2);
+        PosArr_copy(r_tmp, r_pos0[topIt]);
+        PosArr_add_wPBC(r_pos0[topIt], r_tmp, bead_info[curID]);
+        if (naTotLattice[Lat_Ind_FromVec(r_pos0[topIt])] != -1) {
             yTemp = 0;
             break;
         }
-        naTotLattice[Lat_Ind_FromVec(tmpR[topIt])] = curID;
+        naTotLattice[Lat_Ind_FromVec(r_pos0[topIt])] = curID;
         curID                                      = topo_info[beadID][topIt++];
     }
     if (yTemp == 1) { // No steric clash so check for topology constraint
-        yTemp = Check_MTLinkerConstraint(beadID, tmpR);
+        yTemp = Check_MTLinkerConstraint(beadID, r_pos0);
     }
     for (i = 0; i < topIt; i++) {
-        naTotLattice[Lat_Ind_FromVec(tmpR[i])] = -1;
+        naTotLattice[Lat_Ind_FromVec(r_pos0[i])] = -1;
     }
 
     if (yTemp == 0) { // Linker or steric clash didn't work out
@@ -1913,7 +1909,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
     lLDub newEn = 0.;
     lLDub MCProb;
 
-    int bead_list[MAX_BONDS + 1] = {0.};
+    int bead_list[MAX_BONDS + 1] = {0};
     int bead_num                 = 0;
     curID                        = beadID;
     topIt                        = 0;
@@ -1934,7 +1930,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp) {
     curID = beadID;
     topIt = 0;
     while (curID != -1) {
-        OP_MoveBeadTo_ForMTLocal(curID, tmpR[topIt]);
+        OP_MoveBeadTo_ForMTLocal(curID, r_pos0[topIt]);
         curID = topo_info[beadID][topIt++];
     }
 
@@ -2278,17 +2274,26 @@ void OP_RestoreChain(int chainID) { // Uses old_bead to undo what OP_DispChain d
     }
 }
 
+/// OP_CopyBead: Copies BEADINFO_MAX elements of orig_arr into copy_arr
+/// \param copy_arr
+/// \param orig_arr
+inline void OP_CopyBead(int* copy_arr, const int* orig_arr){
+    int j;
+    for(j = 0; j < BEADINFO_MAX; j++){
+        copy_arr[j] = orig_arr[j];
+    }
+}
+
 /// OP_CopyBeadsToOld: Copies all beads in [firstB, lastB) to old_beads. This is sort of a wrapper for ease.
 /// \param firstB
 /// \param lastB
 inline void OP_CopyBeadsToOld(const int firstB, const int lastB){
     int i, j;
     for(i = firstB; i < lastB; i++){
-        for (j = 0; j < BEADINFO_MAX; j++){
-            old_bead[i][j] = bead_info[i][j];
-        }
+        OP_CopyBead(old_bead[i], bead_info[i]);
     }
 }
+
 
 /// OP_RestoreBeadsFromOld: Copies all beads in [firstB, lastB) from old_beads. This is sort of a wrapper for ease.
 /// \param firstB
@@ -2296,9 +2301,7 @@ inline void OP_CopyBeadsToOld(const int firstB, const int lastB){
 inline void OP_RestoreBeadsFromOld(const int firstB, const int lastB){
     int i, j;
     for(i = firstB; i < lastB; i++){
-        for (j = 0; j < BEADINFO_MAX; j++){
-            bead_info[i][j] = old_bead[i][j];
-        }
+        OP_CopyBead(bead_info[i], old_bead[i]);
     }
 }
 

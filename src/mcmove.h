@@ -55,6 +55,8 @@ void OP_RestoreChain(int chainID);
 
 void OP_RestoreChain_ForTrans(int chainID);
 
+void OP_CopyBead(int* copy_arr, const int* orig_arr);
+
 void OP_CopyBeadsToOld(const int firstB, const int lastB);
 
 void OP_RestoreBeadsFromOld(const int firstB, const int lastB);
