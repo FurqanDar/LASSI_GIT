@@ -1739,11 +1739,7 @@ int Move_Snake_Equil(int chainID, float MyTemp) { // Performs a slither MC-move 
     // We should have a spot to move to! pos_new has the location
 
     // Let's remember where this chain exists.
-    for (i = firstB; i < lastB; i++) {
-        for (j = 0; j < BEADINFO_MAX; j++) {
-            old_bead[i][j] = bead_info[i][j];
-        }
-    }
+    OP_CopyBeadsToOld(firstB, lastB);
 
     for (i = firstB; i < lastB; i++) { // Counting states in the previous location
         oldEn += (lLDub)Energy_Isotropic_For_Chain(i);
@@ -1752,11 +1748,9 @@ int Move_Snake_Equil(int chainID, float MyTemp) { // Performs a slither MC-move 
     if (MCProb < 0.5) {
         // Slithering the chain forwards in ID-space
         for (i = firstB; i < lastB - 1; i++) {
-            for (j = 0; j < POS_MAX; j++) {
-                tmpR2[j]        = bead_info[i][j];
-                bead_info[i][j] = old_bead[i + 1][j]; // Hopping over by one bead
-                tmpR3[j]        = bead_info[i][j];
-            }
+            PosArr_copy(tmpR2, bead_info[i]);
+            PosArr_copy(bead_info[i], old_bead[i+1]); // Hopping over by one bead
+            PosArr_copy(tmpR3, bead_info[i]);
             if (i == firstB) { // Only the firstB's location is empty
                 naTotLattice[Lat_Ind_FromVec(tmpR2)] = -1;
             }
@@ -1764,17 +1758,13 @@ int Move_Snake_Equil(int chainID, float MyTemp) { // Performs a slither MC-move 
         }
         // Moving the last bead, and it has to be done independently because lastB-1 -> pos_new
         i = lastB - 1;
-        for (j = 0; j < POS_MAX; j++) {
-            bead_info[i][j] = pos_new[j];
-        }
+        PosArr_copy(bead_info[i], pos_new);
         naTotLattice[Lat_Ind_FromVec(pos_new)] = i;
     } else { // Slithering backwards in ID-space
         for (i = firstB + 1; i < lastB; i++) {
-            for (j = 0; j < POS_MAX; j++) {
-                tmpR2[j]        = bead_info[i][j];
-                bead_info[i][j] = old_bead[i - 1][j]; // Hopping back by one bead
-                tmpR3[j]        = bead_info[i][j];
-            }
+            PosArr_copy(tmpR2, bead_info[i]);
+            PosArr_copy(bead_info[i], old_bead[i-1]); // Hopping back by one bead
+            PosArr_copy(tmpR3, bead_info[i]);
             if (i == lastB - 1) { // Only the lastB-1's location is empty
                 naTotLattice[Lat_Ind_FromVec(tmpR2)] = -1;
             }
@@ -1782,9 +1772,7 @@ int Move_Snake_Equil(int chainID, float MyTemp) { // Performs a slither MC-move 
         }
         // Moving the first bead, and it has to be done independently because firstB -> pos_new
         i = firstB;
-        for (j = 0; j < POS_MAX; j++) {
-            bead_info[i][j] = pos_new[j];
-        }
+        PosArr_copy(bead_info[i], pos_new);
         naTotLattice[Lat_Ind_FromVec(pos_new)] = i;
     }
 
@@ -1800,7 +1788,7 @@ int Move_Snake_Equil(int chainID, float MyTemp) { // Performs a slither MC-move 
         bAccept = 1;
         return bAccept;
     } else {
-        OP_RestoreChain_ForSnake(firstB, lastB);
+        OP_RestoreBeadsFromOld(firstB, lastB);
         bAccept = 0;
         return bAccept;
     }
@@ -2287,6 +2275,30 @@ void OP_RestoreChain(int chainID) { // Uses old_bead to undo what OP_DispChain d
         }
         naTotLattice[Lat_Ind_FromVec(tmpR)]  = -1; // Removing from old place
         naTotLattice[Lat_Ind_FromVec(tmpR2)] = i;
+    }
+}
+
+/// OP_CopyBeadsToOld: Copies all beads in [firstB, lastB) to old_beads. This is sort of a wrapper for ease.
+/// \param firstB
+/// \param lastB
+inline void OP_CopyBeadsToOld(const int firstB, const int lastB){
+    int i, j;
+    for(i = firstB; i < lastB; i++){
+        for (j = 0; j < BEADINFO_MAX; j++){
+            old_bead[i][j] = bead_info[i][j];
+        }
+    }
+}
+
+/// OP_RestoreBeadsFromOld: Copies all beads in [firstB, lastB) from old_beads. This is sort of a wrapper for ease.
+/// \param firstB
+/// \param lastB
+inline void OP_RestoreBeadsFromOld(const int firstB, const int lastB){
+    int i, j;
+    for(i = firstB; i < lastB; i++){
+        for (j = 0; j < BEADINFO_MAX; j++){
+            bead_info[i][j] = old_bead[i][j];
+        }
     }
 }
 
