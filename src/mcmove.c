@@ -2022,9 +2022,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
         }
     }
 
-    for (j = 0; j < POS_MAX; j++) {
-        anchorPos[j] = bead_info[anchorBead][j];
-    }
+    PosArr_copy(anchorPos, bead_info[anchorBead]);
 
     yTemp = 0;
     xTemp = 0;
@@ -2048,11 +2046,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
     lLDub MCProb;
 
     yTemp = 0;
-    /*
-    for (j = 0; j < listLen; j++) {
-        i = tmpList[j];
-        oldEn += (lLDub) Energy_Isotropic(i);
-    }*/
+
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
         oldEn += (lLDub)Energy_Isotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
@@ -2063,11 +2057,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp) {
         OP_MoveBeadTo(i, naTempR);
     }
 
-    yTemp = 0; /*
-     for (j = 0; j < listLen; j++) {
-         i = tmpList[j];
-         newEn += (lLDub) Energy_Isotropic(i);
-     }*/
+    yTemp = 0;
     for (j = 0; j < listLen; j++) {
         i = tmpList[j];
         newEn += (lLDub)Energy_Isotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
