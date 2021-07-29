@@ -935,6 +935,7 @@ int NeighborSearch_ForOvlp(int const beadID, const int *startVec, int *neighList
             }
         }
     }
+    neighList[neigh_num] = -1;
     return neigh_num;
 }
 
@@ -969,6 +970,8 @@ int NeighborSearch_ForCont(int const beadID, const int *startVec, int *contList,
             }
         }
     }
+    contList[neigh_num] = -1;
+    ovlpList[*ovlpNum]  = -1;
     return neigh_num;
 }
 

@@ -114,7 +114,7 @@ float Energy_InitPotential(const int beadID) {
 /// Energy_Anisotropic - returns the bond energy for beadID if it is bonded.
 /// \param beadID
 /// \return
-float Energy_Anisotropic(const int beadID) { // Calculates the SC-SC energy of the bead in question.
+inline float Energy_Anisotropic(const int beadID) { // Calculates the SC-SC energy of the bead in question.
     const int bP = bead_info[beadID][BEAD_FACE];
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj;
@@ -234,7 +234,9 @@ float Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis
 /// \param beadType
 /// \param xDis
 /// \return
-inline float Energy_Iso_fSol(int const beadType) { return fEnergy[beadType][beadType][E_F_SOL]; }
+inline float Energy_Iso_fSol(int const beadType) {
+    return fEnergy[beadType][beadType][E_F_SOL];
+}
 
 
 /// Energy_OfOvlp_wNeighList: Given this bead, and a supplied list of neighbors and number of neighbors,
@@ -314,7 +316,7 @@ float Energy_ofPairs_wNeighList(int const beadID, const int *neighList, int cons
 /// \param neighNum
 /// \return
 float Energy_ofSol_wNeighList(const int *neighList, int const neighNum) {
-    float totEn;
+    float totEn = 0.f;
     int   i;
     int   resj, tmpID;
 
@@ -720,18 +722,38 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list,
 /// Note the factor of 1/2 to account for double counting since all the energy contributions (for now)
 /// are pair-wise. Furthermore, faCurrEn[] stores the two energies separately as well.
 void Energy_Total_System(void) {
-    size_t i; // Indecies
+    int i; // Indecies
     // initialization
     for (i = 0; i < MAX_E; i++) {
         faCurrEn[i] = 0.0f;
     }
     // printf("We have %d beads and %d chains", tot_beads, tot_chains);
-    for (i = 0; i < tot_beads; i++) {
-        faCurrEn[E_OVLP] += Energy_Isotropic(i) / 2.f;
-        faCurrEn[E_SC_SC] += Energy_Anisotropic(i) / 2.f;
-        // printf("Done with bead %d\n", i);
+
+    for(i = 0; i < tot_beads; i++){
+        faCurrEn[E_SC_SC] += Energy_Anisotropic(i);
     }
 
+
+    int resi, ovlp_num, cont_num;
+
+    for (i = 0; i < tot_beads; i++){
+        resi = bead_info[i][BEAD_TYPE];
+        if (nBeadTypeCanCont[resi]){
+            cont_num = NeighborSearch_ForCont(i, bead_info[i], oldContNeighs, oldOvlpNeighs, &ovlp_num);
+            faCurrEn[E_CONT] += Energy_OfCont_wNeighList(i, oldContNeighs, cont_num);
+        }
+        else{
+            ovlp_num = NeighborSearch_ForOvlp(i, bead_info[i], oldOvlpNeighs);
+        }
+        faCurrEn[E_OVLP]  += Energy_OfOvlp_wNeighList(i, oldOvlpNeighs, ovlp_num);
+        faCurrEn[E_F_SOL] += (26-fEnergy[resi][resi][E_F_SOL]);
+    }
+
+
+    //Taking care of double-counting energies.
+    faCurrEn[E_SC_SC] *= 0.5f;
+    faCurrEn[E_OVLP]  *= 0.5f;
+    faCurrEn[E_CONT]  *= 0.5f;
     for (i = 1; i < MAX_E; i++) {
         faCurrEn[E_TOT] += faCurrEn[i];
     }

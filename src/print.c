@@ -109,7 +109,8 @@ void Print_LogToScreen(long nGen, int run_it) {
     // printf("MC Temp = %.3e;\tRot Bias Prob = %.3e /site;\n", fCuTemp,
     // fRot_Bias);
     printf("MC Temp  = %.3e;\n", fCuTemp);
-    printf("Total E  = %.3e;\tIso E = %.3e;\tAniso E = %.3e;\n", faCurrEn[E_TOT], faCurrEn[E_OVLP], faCurrEn[E_SC_SC]);
+    printf("Total E  = %.3e;\tIso E = %.3e;\tAniso E = %.3e;\tFSol E = %.3e;\n",
+           faCurrEn[E_TOT], faCurrEn[E_OVLP], faCurrEn[E_SC_SC], faCurrEn[E_F_SOL]);
     printf("Percolation Parameter Is: %.3f\n",
            ((float)nLargestClusterRightNow) / ((float)nTotClusCounter + 0.0001) / (float)tot_chains);
     int i, j;
