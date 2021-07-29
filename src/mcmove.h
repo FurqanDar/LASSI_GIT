@@ -63,7 +63,7 @@ void OP_RestoreBeadsFromOld(const int firstB, const int lastB);
 
 void OP_RestoreChain_ForSnake(const int fB, const int lB);
 
-void OP_MoveBeadTo(int beadID, const int *newPos);
+void OP_MoveBeadTo(const int beadID, const int *newPos);
 
 void OP_Inv_MoveBeadTo(int beadID);
 

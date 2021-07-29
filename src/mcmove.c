@@ -271,148 +271,98 @@ int Move_Rot(int beadID, float MyTemp) {
 int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-move on beadID
 
     int   bAccept = 0;          // Used in MC steps
-    lLDub MCProb, oldEn, newEn; // For Metropolis Hastings
-    oldEn = 0.;
-    newEn = 0.;
-    int   i, j; // Loop iterators
-    int   bP;
-    int   resi, resj;
-    int   xTemp, yTemp, lRadUp, lRadLow;   // Random numbers to store things
-    int   r_pos0[POS_MAX], r_posNew[POS_MAX], r_posTmp[POS_MAX]; // Vectors to stores coordinates.
-    int   FWWeight, BWWeight;              // Used to perform orientational bias MC
-    lLDub FWRos, BWRos;                    // Forwards and backwards Rosenbluth Factors
-    FWRos = 0.;
-    BWRos = 0.;
+    int   yTemp;   // Random numbers to store things
+    int   r_pos0[POS_MAX], r_posNew[POS_MAX], r_disp[POS_MAX]; // Vectors to stores coordinates.
     PosArr_copy(r_pos0, bead_info[beadID]);
-
     // Attempt to find an empty lattice point.
-    PosArr_gen_rand_wRad(r_posNew, linker_len[beadID][0]);
-    PosArr_copy(r_posTmp, r_posNew);
-    PosArr_add_wPBC(r_posNew, r_pos0, r_posTmp);
+    PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
+    PosArr_add_wPBC(r_posNew, r_pos0, r_disp);
     yTemp = Check_MoveBeadTo(r_posNew);
 
     if (yTemp == 1) { // This means we found an empty lattice site. So let's check if the linkers are okay.
         yTemp = Check_LinkerConstraint(beadID, r_posNew);
     }
-
-    if (yTemp == 0) { // No space -- reject.
+    if (yTemp != 1){// No space -- reject.
         bAccept = 0;
         return bAccept;
     }
 
+    lLDub MCProb, oldEn, newEn; // For Metropolis Hastings
+    oldEn = 0.;
+    newEn = 0.;
+    int   resj;
+    int   FWWeight, BWWeight;              // Used to perform orientational bias MC
+    lLDub FWRos, BWRos;                    // Forwards and backwards Rosenbluth Factors
+    FWRos = 0.;
+    BWRos = 0.;
+
     // Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
-    resi = bead_info[beadID][BEAD_TYPE];
+    const int resi = bead_info[beadID][BEAD_TYPE];
 
     oldEn = nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
     newEn = 0.;
 
-    int ovlp_neigh_num_old, cont_neigh_num_old;
+    int old_ovlp_num, old_cont_num;
 
-    if ((nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
-        && (!nBeadTypeCanCont[resi])){ // Only the 26-site near neighbors.
-
-        ovlp_neigh_num_old = NeighborSearch_ForOvlp(beadID, r_pos0, oldOvlpNeighs);
-
-        if (nBeadTypeIsSticker[resi]){ // Need to handle sticker interactions.
-            oldEn += Energy_Anisotropic(beadID);
-            BWWeight = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, ovlp_neigh_num_old);
-            OP_NormalizeRotState(0, BWWeight);
-            BWRos = logl(bolt_norm[0]);
-        }
-
-        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
-            oldEn += Energy_OfOvlp_wNeighList(beadID, oldOvlpNeighs, ovlp_neigh_num_old);
-        }
-
-        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
-                                     // We can add to newEn as well.
-            oldEn += (float)(26 - ovlp_neigh_num_old) * fEnergy[resi][resi][E_F_SOL];
-            newEn += Energy_ofSol_wNeighList(oldOvlpNeighs, ovlp_neigh_num_old);
-        }
-
+    if (nBeadTypeCanCont[resi]){
+        old_cont_num = NeighborSearch_ForCont(beadID, r_pos0, oldContNeighs,
+                                                    oldOvlpNeighs, &old_ovlp_num);
+        oldEn += Energy_OfCont_wNeighList(beadID, oldContNeighs, old_cont_num);
     }
-    else if (nBeadTypeCanCont[resi]){ // Calculate all neighbor lists.
+    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi]){
+        old_ovlp_num       = NeighborSearch_ForOvlp(beadID, r_pos0, oldOvlpNeighs);
+    }
 
-        cont_neigh_num_old = NeighborSearch_ForCont(beadID, r_pos0, oldContNeighs,
-                                                    oldOvlpNeighs, &ovlp_neigh_num_old);
+    if (nBeadTypeIsSticker[resi]){
+        oldEn += Energy_Anisotropic(beadID);
+        BWWeight = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, old_ovlp_num);
+        OP_NormalizeRotState(0, BWWeight);
+        BWRos = logl(bolt_norm[0]);
+    }
 
-        if (nBeadTypeIsSticker[resi]){ // Need to handle sticker interactions.
-            oldEn += Energy_Anisotropic(beadID);
-            BWWeight = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, ovlp_neigh_num_old);
-            OP_NormalizeRotState(0, BWWeight);
-            BWRos = logl(bolt_norm[0]);
-        }
+    if (nBeadTypeCanOvlp[resi]){
+        oldEn += Energy_OfOvlp_wNeighList(beadID, oldOvlpNeighs, old_ovlp_num);
+    }
 
-        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
-            oldEn += Energy_OfOvlp_wNeighList(beadID, oldOvlpNeighs, ovlp_neigh_num_old);
-        }
-
-        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
-            // We can add to newEn as well.
-            oldEn += (float)(26 - ovlp_neigh_num_old) * fEnergy[resi][resi][E_F_SOL];
-            newEn += Energy_ofSol_wNeighList(oldOvlpNeighs, ovlp_neigh_num_old);
-        }
-
-        oldEn += Energy_OfCont_wNeighList(beadID, oldContNeighs, cont_neigh_num_old);
-
+    if (nBeadTypeCanFSol[resi]){
+        oldEn += (float)(26 - old_ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+        newEn += Energy_ofSol_wNeighList(oldOvlpNeighs, old_ovlp_num);
     }
 
     OP_MoveBeadTo(beadID, r_posNew);
 
     newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    int ovlp_neigh_num_new, cont_neigh_num_new;
+    int new_ovlp_num, new_cont_num;
 
-    if ((nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
-        && (!nBeadTypeCanCont[resi])){ // Only the 26-site near neighbors.
-
-        ovlp_neigh_num_new = NeighborSearch_ForOvlp(beadID, r_pos0, newOvlpNeighs);
-
-        yTemp = - 1;
-        if (nBeadTypeIsSticker[resi]){ // Need to handle sticker interactions.
-            OP_ShuffleArray(ovlp_neigh_num_new, newOvlpNeighs);
-            FWWeight = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, ovlp_neigh_num_new);
-            OP_NormalizeRotState(0, FWWeight);
-            FWRos = logl(bolt_norm[0]);
-            yTemp = OP_PickRotState(FWWeight);
-        }
-
-        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
-            newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, ovlp_neigh_num_new);
-        }
-
-        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
-            // We can add to newEn as well.
-            newEn += (float)(26 - ovlp_neigh_num_new) * fEnergy[resi][resi][E_F_SOL];
-            oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, ovlp_neigh_num_new);
-        }
-
+    if (nBeadTypeCanCont[resi]){
+        new_cont_num = NeighborSearch_ForCont(beadID, r_posNew, newContNeighs,
+                                              newOvlpNeighs, &new_ovlp_num);
+        newEn += Energy_OfCont_wNeighList(beadID, newContNeighs, new_cont_num);
     }
-    else if (nBeadTypeCanCont[resi]){ // Calculate all neighbor lists.
-
-        cont_neigh_num_old = NeighborSearch_ForCont(beadID, r_pos0, oldContNeighs,
-                                                    oldOvlpNeighs, &ovlp_neigh_num_old);
-
-        yTemp = - 1;
-        if (nBeadTypeIsSticker[resi]){ // Need to handle sticker interactions.
-            OP_ShuffleArray(ovlp_neigh_num_new, newOvlpNeighs);
-            FWWeight = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, ovlp_neigh_num_new);
-            OP_NormalizeRotState(0, FWWeight);
-            FWRos = logl(bolt_norm[0]);
-            yTemp = OP_PickRotState(FWWeight);
+    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi]){
+        new_ovlp_num       = NeighborSearch_ForOvlp(beadID, r_posNew, newOvlpNeighs);
+    }
+    yTemp = -1;
+    if (nBeadTypeIsSticker[resi]){
+        OP_ShuffleArray(new_ovlp_num, newOvlpNeighs);
+        FWWeight = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, new_ovlp_num);
+        OP_NormalizeRotState(0, FWWeight);
+        FWRos = logl(bolt_norm[0]);
+        yTemp = OP_PickRotState(FWWeight);
+        if (yTemp != -1){
+            resj = bead_info[yTemp][BEAD_TYPE];
+            newEn += fEnergy[resi][resj][E_SC_SC];
         }
+    }
 
-        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
-            newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, ovlp_neigh_num_new);
-        }
+    if (nBeadTypeCanOvlp[resi]){
+        newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, new_ovlp_num);
+    }
 
-        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
-            // We can add to newEn as well.
-            newEn += (float)(26 - ovlp_neigh_num_new) * fEnergy[resi][resi][E_F_SOL];
-            oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, ovlp_neigh_num_new);
-        }
-        newEn += Energy_OfCont_wNeighList(beadID, newContNeighs, cont_neigh_num_new);
-
+    if (nBeadTypeCanFSol[resi]){
+        newEn += (float)(26 - new_ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+        oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, new_ovlp_num);
     }
 
 
@@ -429,7 +379,8 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
         }
         bAccept = 1;
         return bAccept;
-    } else {
+    }
+    else {
         OP_Inv_MoveBeadTo(beadID);
         bAccept = 0;
         return bAccept;
@@ -1685,26 +1636,20 @@ int Move_SmallClus_Proximity(int chainID) {
 int Move_Local_Equil(int beadID, float MyTemp) { // Performs a local translation MC-move on beadID
 
     int   bAccept = 0;          // Used in MC steps
-    lLDub MCProb, oldEn, newEn; // For Metropolis Hastings
-    oldEn = 0.;
-    newEn = 0.;
-    int i, j;                                             // Loop iterators
-    int xTemp, yTemp, lRadUp, lRadLow;                    // Random numbers to store things
+    int yTemp;
     int r_pos0[POS_MAX], r_posNew[POS_MAX], r_disp[POS_MAX]; // Vectors to stores coordinates.
     // printf("Beginning LOCAL\n");
-
     PosArr_copy(r_pos0, bead_info[beadID]);
-    // Initialize the radii for the search of next trial location
-
     PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
     PosArr_add_wPBC(r_posNew, r_pos0, r_disp);
 
     yTemp = Check_MoveBeadTo(r_posNew);
+
     if (yTemp == 1) { // This means we found an empty lattice site. So let's check if the linkers are okay.
         yTemp = Check_LinkerConstraint(beadID, r_posNew);
     }
 
-    if (yTemp == 0) {
+    if (yTemp != 1) {
         // This means that we have failed to find an appropriate spot for this bead to be moved to.
         //  Therefore, the move is rejected!
         bAccept = 0;
@@ -1712,87 +1657,58 @@ int Move_Local_Equil(int beadID, float MyTemp) { // Performs a local translation
         return bAccept;
     }
     // Have successfully found a good lattice spot.
+    lLDub MCProb, oldEn, newEn; // For Metropolis Hastings
+    oldEn = 0.;
+    newEn = 0.;
 
-    // Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
-    int const resi = bead_info[beadID][BEAD_TYPE];
+    const int resi = bead_info[beadID][BEAD_TYPE];
 
     oldEn = nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
     newEn = 0.;
 
-    int ovlp_neigh_num_old, cont_neigh_num_old;
+    int old_ovlp_num, old_cont_num;
 
-    if ((nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
-        && (!nBeadTypeCanCont[resi])){ // Only the 26-site near neighbors.
-
-        ovlp_neigh_num_old = NeighborSearch_ForOvlp(beadID, r_pos0, oldOvlpNeighs);
-
-        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
-            oldEn += Energy_OfOvlp_wNeighList(beadID, oldOvlpNeighs, ovlp_neigh_num_old);
-        }
-
-        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
-            // We can add to newEn as well.
-            oldEn += (float)(26 - ovlp_neigh_num_old) * fEnergy[resi][resi][E_F_SOL];
-            newEn += Energy_ofSol_wNeighList(oldOvlpNeighs, ovlp_neigh_num_old);
-        }
-
+    if (nBeadTypeCanCont[resi]){
+        old_cont_num = NeighborSearch_ForCont(beadID, r_pos0, oldContNeighs,
+                                              oldOvlpNeighs, &old_ovlp_num);
+        oldEn += Energy_OfCont_wNeighList(beadID, oldContNeighs, old_cont_num);
     }
-    else if (nBeadTypeCanCont[resi]){ // Calculate all neighbor lists.
+    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi]){
+        old_ovlp_num       = NeighborSearch_ForOvlp(beadID, r_pos0, oldOvlpNeighs);
+    }
 
-        cont_neigh_num_old = NeighborSearch_ForCont(beadID, r_pos0, oldContNeighs,
-                                                    oldOvlpNeighs, &ovlp_neigh_num_old);
+    if (nBeadTypeCanOvlp[resi]){
+        oldEn += Energy_OfOvlp_wNeighList(beadID, oldOvlpNeighs, old_ovlp_num);
+    }
 
-        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
-            oldEn += Energy_OfOvlp_wNeighList(beadID, oldOvlpNeighs, ovlp_neigh_num_old);
-        }
-
-        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
-            // We can add to newEn as well.
-            oldEn += (float)(26 - ovlp_neigh_num_old) * fEnergy[resi][resi][E_F_SOL];
-            newEn += Energy_ofSol_wNeighList(oldOvlpNeighs, ovlp_neigh_num_old);
-        }
-
-        oldEn += Energy_OfCont_wNeighList(beadID, oldContNeighs, cont_neigh_num_old);
-
+    if (nBeadTypeCanFSol[resi]){
+        oldEn += (float)(26 - old_ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+        newEn += Energy_ofSol_wNeighList(oldOvlpNeighs, old_ovlp_num);
     }
 
     OP_MoveBeadTo(beadID, r_posNew);
 
     newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    int ovlp_neigh_num_new, cont_neigh_num_new;
+    int new_ovlp_num, new_cont_num;
 
-    if ((nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
-        && (!nBeadTypeCanCont[resi])){ // Only the 26-site near neighbors.
-
-        ovlp_neigh_num_new = NeighborSearch_ForOvlp(beadID, r_pos0, newOvlpNeighs);
-
-        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
-            newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, ovlp_neigh_num_new);
-        }
-
-        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
-            // We can add to newEn as well.
-            newEn += (float)(26 - ovlp_neigh_num_new) * fEnergy[resi][resi][E_F_SOL];
-            oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, ovlp_neigh_num_new);
-        }
-
+    yTemp = -1;
+    if (nBeadTypeCanCont[resi]){
+        new_cont_num = NeighborSearch_ForCont(beadID, r_posNew, newContNeighs,
+                                              newOvlpNeighs, &new_ovlp_num);
+        newEn += Energy_OfCont_wNeighList(beadID, newContNeighs, new_cont_num);
     }
-    else if (nBeadTypeCanCont[resi]){ // Calculate all neighbor lists.
+    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi]){
+        new_ovlp_num       = NeighborSearch_ForOvlp(beadID, r_posNew, newOvlpNeighs);
+    }
 
-        cont_neigh_num_old = NeighborSearch_ForCont(beadID, r_pos0, oldContNeighs,
-                                                    oldOvlpNeighs, &ovlp_neigh_num_old);
+    if (nBeadTypeCanOvlp[resi]){
+        newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, new_ovlp_num);
+    }
 
-        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
-            newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, ovlp_neigh_num_new);
-        }
-
-        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
-            // We can add to newEn as well.
-            newEn += (float)(26 - ovlp_neigh_num_new) * fEnergy[resi][resi][E_F_SOL];
-            oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, ovlp_neigh_num_new);
-        }
-        newEn += Energy_OfCont_wNeighList(beadID, newContNeighs, cont_neigh_num_new);
+    if (nBeadTypeCanFSol[resi]){
+        newEn += (float)(26 - new_ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+        oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, new_ovlp_num);
     }
 
     MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
@@ -2479,7 +2395,7 @@ inline int Check_MoveBeadTo(int *newPos) { // Checks if I can move here
 /// OP_MoveBeadTo - move beadID to newPos[POS_MAX], while remebering the bead properties, and handling the lattice.
 /// \param beadID
 /// \param newPos
-void OP_MoveBeadTo(int beadID, const int *newPos) { // Updates position to new one and handles lattice
+void OP_MoveBeadTo(const int beadID, const int *newPos) { // Updates position to new one and handles lattice
     int i;
     int tmpR[POS_MAX], tmpR2[POS_MAX];
     for (i = 0; i < BEADINFO_MAX; i++) {
@@ -2806,7 +2722,7 @@ int Check_RotStates_wNeighList(int const beadID, int const resi, const int *neig
         tmpBead = neighList[i];
         resj    = bead_info[tmpBead][BEAD_TYPE];
 
-        if (fEnergy[resi][resj][E_SC_SC] < 0) {
+        if (fEnergy[resi][resj][E_SC_SC] != 0.f) {
             if (bead_info[tmpBead][BEAD_FACE] == -1 || bead_info[tmpBead][BEAD_FACE] == beadID) {
                 bolt_fac[CandNums]     = dbias_bolt_fac[resi][resj];
                 rot_trial[0][CandNums] = tmpBead;
@@ -2837,9 +2753,6 @@ int Check_RotStatesOld(int const beadID, int const resi, float const MyTemp) {
     }
     for (k = 0; k < MAX_ROTSTATES - 1; k++) {
         i = Rot_IndArr[k];
-        //        for (j = 0; j < POS_MAX; j++) {
-        //            r_search[j] = (r_pos0[j] + LocalArr[i][j] + nBoxSize[j]) % nBoxSize[j];
-        //        }
 
         PosArr_add_wPBC(r_search, r_pos0, LocalArr[i]);
 
@@ -2934,7 +2847,8 @@ int OP_PickRotState(int CandNums) {
     nCheck       = rand() % nCheck;
     if (nCheck == 0) {
         newRot = -1;
-    } else {
+    }
+    else {
         fProb = (lLDub)rand() / (lLDub)RAND_MAX;
         for (i = 0; i < CandNums; i++) {
             if (fProb < bolt_fac[i]) {
