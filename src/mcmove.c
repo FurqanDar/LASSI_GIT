@@ -596,7 +596,7 @@ int Move_Trans(int chainID, float MyTemp) { // Performs a translation move with 
     int   i, j; // Loop iterators
     int   resi, resj, firstB, lastB;
     int   xTemp, yTemp, lRadUp, lRadLow; // Random numbers to store things
-    int   tmpR[POS_MAX];                 // Vectors to store coordinates.
+    int   r_disp[POS_MAX];                 // Vectors to store coordinates.
     int   FWWeight, BWWeight;            // Used to perform orientational bias MC
     lLDub FSum, BSum;                    // Overall Rosenbluth sums
 
@@ -608,11 +608,9 @@ int Move_Trans(int chainID, float MyTemp) { // Performs a translation move with 
     lRadUp  = 2 * lRadLow + 1;
 
     yTemp = 0;
+    PosArr_gen_rand_wRad(r_disp, nBoxSize[0]/2);
 
-    for (j = 0; j < POS_MAX; j++) {
-        tmpR[j] = (rand() % lRadUp) - lRadLow; // Random vector to move all beads within r=L/4
-    }
-    yTemp = Check_ChainDisp(chainID, tmpR); // yTemp=0 means clash
+    yTemp = Check_ChainDisp(chainID, r_disp); // yTemp=0 means clash
 
     if (yTemp == 0) { // We have failed to find a good spot for this chain.
         bAccept = 0;
@@ -641,7 +639,7 @@ int Move_Trans(int chainID, float MyTemp) { // Performs a translation move with 
         BSum += logl(bolt_norm[i]);
     }
 
-    OP_DispChain_ForTrans(chainID, tmpR); // Moved the chain, broke bonds, and remembered stuff
+    OP_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff
 
     yTemp = 0;
     // Again, separate the energy calculation from the Rosenbluth sampling
@@ -1854,6 +1852,8 @@ int Move_Trans_Equil(int chainID, float MyTemp) { // Performs a translation move
     for (j = 0; j < POS_MAX; j++) {
         tmpR[j] = (rand() % lRadUp) - lRadLow; // Random vector to move all beads within r=L/4
     }
+
+
     yTemp = Check_ChainDisp(chainID, tmpR); // yTemp=0 means clash
 
     if (yTemp == 0) { // We have failed to find a good spot for this chain.
