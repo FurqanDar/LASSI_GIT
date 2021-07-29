@@ -746,7 +746,7 @@ void Energy_Total_System(void) {
             ovlp_num = NeighborSearch_ForOvlp(i, bead_info[i], oldOvlpNeighs);
         }
         faCurrEn[E_OVLP]  += Energy_OfOvlp_wNeighList(i, oldOvlpNeighs, ovlp_num);
-        faCurrEn[E_F_SOL] += (26-fEnergy[resi][resi][E_F_SOL]);
+        faCurrEn[E_F_SOL] += (float)(26-ovlp_num)*fEnergy[resi][resi][E_F_SOL];
     }
 
 

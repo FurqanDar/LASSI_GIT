@@ -109,14 +109,21 @@ void Print_LogToScreen(long nGen, int run_it) {
     // printf("MC Temp = %.3e;\tRot Bias Prob = %.3e /site;\n", fCuTemp,
     // fRot_Bias);
     printf("MC Temp  = %.3e;\n", fCuTemp);
-    printf("Total E  = %.3e;\tIso E = %.3e;\tAniso E = %.3e;\tFSol E = %.3e;\n",
-           faCurrEn[E_TOT], faCurrEn[E_OVLP], faCurrEn[E_SC_SC], faCurrEn[E_F_SOL]);
+
+    printf("Energies\n");
+    printf("Tot: %.2e| ", faCurrEn[E_TOT]);
+    printf("Ovlp: %.2e| ", faCurrEn[E_OVLP]);
+    printf("Cont: %.2e| ", faCurrEn[E_CONT]);
+    printf("Aniso: %.2e| ", faCurrEn[E_SC_SC]);
+    printf("FSol: %.2e| ", faCurrEn[E_F_SOL]);
+    printf("\n");
+
     printf("Percolation Parameter Is: %.3f\n",
            ((float)nLargestClusterRightNow) / ((float)nTotClusCounter + 0.0001) / (float)tot_chains);
     int i, j;
     printf("Acceptance Ratios:\n");
     for (i = 1; i < MAX_MV; i++) {
-        printf("%.2f\t",
+        printf("%5.2f ",
                100. * (float)MCAccepMat[1][i] / ((float)MCAccepMat[0][i] + 0.00001 + (float)MCAccepMat[1][i]));
     }
     printf("\n\n");
