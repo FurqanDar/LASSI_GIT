@@ -94,8 +94,8 @@ int main(int argc, char *argv[]) {
     // Going through the MC cycles.
     for (run_cycle = 0; run_cycle < nTot_CycleNum; run_cycle++) {
 
-        fEnergy[0][0][E_CONT] = ((float)run_cycle + 0.0f) * 0.5f;
-        fEnergy[1][1][E_CONT] = ((float)run_cycle + 0.0f) * 0.5f;
+//        fEnergy[0][0][E_CONT] = ((float)run_cycle + 0.0f) * 0.5f;
+//        fEnergy[1][1][E_CONT] = ((float)run_cycle + 0.0f) * 0.5f;
 
         fKT = fKT_Cycle[run_cycle];
         Calculate_Rot_Bias(fKT);

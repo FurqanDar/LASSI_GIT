@@ -910,6 +910,68 @@ void Calculate_Distances_For_Radius(float *thisList, const int nRad) {
     //    exit(1);
 }
 
+/// NeighborSearch_ForOvlp: Given the beadID, which should be at startVec, we calculate all the neighbors
+/// within the +-1 cube. We return the number of neighbors.
+/// \param beadID
+/// \param startVec
+/// \param neighList
+/// \return Number of neighbors.
+int NeighborSearch_ForOvlp(int const beadID, const int *startVec, int *neighList){
+    int neigh_num=0;
+
+    int tmpBead;
+    int r_disp[POS_MAX]   = {0};
+    int r_search[POS_MAX] = {0};
+    const int nRad = 1;
+
+    for (r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++) {
+        for (r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++) {
+            for (r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++) {
+                PosArr_add_wPBC(r_search, startVec, r_disp);
+                tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
+                if (tmpBead != -1 && tmpBead != beadID) {
+                    neighList[neigh_num++] = tmpBead;
+                }
+            }
+        }
+    }
+    return neigh_num;
+}
+
+/// NeighborSearch_ForOvlp: Given the beadID, which should be at startVec, we calculate all the neighbors
+/// within the +-1 cube. We return the number of neighbors.
+/// \param beadID
+/// \param startVec
+/// \param neighList
+/// \return Number of neighbors.
+int NeighborSearch_ForCont(int const beadID, const int *startVec, int *contList, int *ovlpList, int *ovlpNum){
+    int neigh_num=0;
+
+    int tmpBead;
+    int r_disp[POS_MAX]   = {0};
+    int r_search[POS_MAX] = {0};
+    const int nRad = LARGEST_RADIUS;
+
+    *ovlpNum = 0;
+
+    for (r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++) {
+        for (r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++) {
+            for (r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++) {
+                PosArr_add_wPBC(r_search, startVec, r_disp);
+                tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
+                if (tmpBead != -1 && tmpBead != beadID) {
+                    if ((abs(r_disp[0]) <= 1) && (abs(r_disp[1]) <= 1) && (abs(r_disp[2]) <= 1)) {
+                        ovlpList[*ovlpNum] = tmpBead;
+                        *ovlpNum = *ovlpNum + 1;
+                    }
+                    contList[neigh_num++] = tmpBead;
+                }
+            }
+        }
+    }
+    return neigh_num;
+}
+
 /// NeighborSearch_EmptySitesAround_wRad: Given the starting point, and radius, we calculate how many sites
 /// around this point are empty.
 /// \param startVec

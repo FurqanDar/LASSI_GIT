@@ -199,7 +199,7 @@ int MC_Step_Equil(float fMCTemp) {
 }
 
 /*
- * The following functions are sub-routines that perform the varios Monte-Carlo (MC) moves.
+ * The following functions are sub-routines that perform the various Monte-Carlo (MC) moves.
  */
 
 /// Move_Rot - searches the 3^3-1=26 possible sites for forming a bond, and performs Metropolis-Hastings.
@@ -275,6 +275,7 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     oldEn = 0.;
     newEn = 0.;
     int   i, j; // Loop iterators
+    int   bP;
     int   resi, resj;
     int   xTemp, yTemp, lRadUp, lRadLow;   // Random numbers to store things
     int   r_pos0[POS_MAX], r_posNew[POS_MAX], r_posTmp[POS_MAX]; // Vectors to stores coordinates.
@@ -300,41 +301,152 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     }
 
     // Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
-    resi = bead_info[beadID][BEAD_TYPE]; // I want to treat linker beads differently
-                                         //  always because they have no rotational states
+    resi = bead_info[beadID][BEAD_TYPE];
 
-    oldEn = Energy_Isotropic(beadID);
-    if (nBeadTypeIsSticker[resi] == 1) { // Only non linkers can bond
-        if (bead_info[beadID][BEAD_FACE] != -1) {
-            resj = bead_info[bead_info[beadID][BEAD_FACE]][BEAD_TYPE]; // This is type of who I'm currently bonded to
-            oldEn += (lLDub)fEnergy[resi][resj][E_SC_SC];
+    oldEn = nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
+    newEn = 0.;
+
+    int ovlp_neigh_num_old, cont_neigh_num_old;
+
+    if ((nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+        && (!nBeadTypeCanCont[resi])){ // Only the 26-site near neighbors.
+
+        ovlp_neigh_num_old = NeighborSearch_ForOvlp(beadID, r_pos0, oldOvlpNeighs);
+
+        if (nBeadTypeIsSticker[resi]){ // Need to handle sticker interactions.
+            oldEn += Energy_Anisotropic(beadID);
+            BWWeight = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, ovlp_neigh_num_old);
+            OP_NormalizeRotState(0, BWWeight);
+            BWRos = logl(bolt_norm[0]);
         }
 
-        // OP_ShuffleRotIndecies(); //No need to shuffle just to check.
-        BWWeight = Check_RotStatesOld(beadID, resi, MyTemp);
-        OP_NormalizeRotState(0, BWWeight);
-        BWRos = logl(bolt_norm[0]);
-
-        OP_MoveBeadTo(beadID, r_posNew); // Does not break bond
-
-        OP_ShuffleRotIndecies(); // Need to shuffle because this also acts as selecting new partner
-        FWWeight = Check_RotStatesNew(beadID, resi, MyTemp);
-        OP_NormalizeRotState(0, FWWeight);
-        FWRos = logl(bolt_norm[0]);
-
-        yTemp = OP_PickRotState(FWWeight);
-
-        if (yTemp != -1) { // There is a bead at this position in the rot_trial, so let's add the energy.
-            resj  = bead_info[yTemp][BEAD_TYPE];
-            newEn = (lLDub)fEnergy[resi][resj][E_SC_SC];
+        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
+            oldEn += Energy_OfOvlp_wNeighList(beadID, oldOvlpNeighs, ovlp_neigh_num_old);
         }
-    } else { // These beads have no rotational states.
-        yTemp = -1;
-        OP_MoveBeadTo(beadID, r_posNew);
+
+        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
+                                     // We can add to newEn as well.
+            oldEn += (float)(26 - ovlp_neigh_num_old) * fEnergy[resi][resi][E_F_SOL];
+            newEn += Energy_ofSol_wNeighList(oldOvlpNeighs, ovlp_neigh_num_old);
+        }
+
+    }
+    else if (nBeadTypeCanCont[resi]){ // Calculate all neighbor lists.
+
+        cont_neigh_num_old = NeighborSearch_ForCont(beadID, r_pos0, oldContNeighs,
+                                                    oldOvlpNeighs, &ovlp_neigh_num_old);
+
+        if (nBeadTypeIsSticker[resi]){ // Need to handle sticker interactions.
+            oldEn += Energy_Anisotropic(beadID);
+            BWWeight = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, ovlp_neigh_num_old);
+            OP_NormalizeRotState(0, BWWeight);
+            BWRos = logl(bolt_norm[0]);
+        }
+
+        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
+            oldEn += Energy_OfOvlp_wNeighList(beadID, oldOvlpNeighs, ovlp_neigh_num_old);
+        }
+
+        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
+            // We can add to newEn as well.
+            oldEn += (float)(26 - ovlp_neigh_num_old) * fEnergy[resi][resi][E_F_SOL];
+            newEn += Energy_ofSol_wNeighList(oldOvlpNeighs, ovlp_neigh_num_old);
+        }
+
+        oldEn += Energy_OfCont_wNeighList(beadID, oldContNeighs, cont_neigh_num_old);
+
     }
 
+    OP_MoveBeadTo(beadID, r_posNew);
+
+    newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
+
+    int ovlp_neigh_num_new, cont_neigh_num_new;
+
+    if ((nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+        && (!nBeadTypeCanCont[resi])){ // Only the 26-site near neighbors.
+
+        ovlp_neigh_num_new = NeighborSearch_ForOvlp(beadID, r_pos0, newOvlpNeighs);
+
+        yTemp = - 1;
+        if (nBeadTypeIsSticker[resi]){ // Need to handle sticker interactions.
+            OP_ShuffleArray(ovlp_neigh_num_new, newOvlpNeighs);
+            FWWeight = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, ovlp_neigh_num_new);
+            OP_NormalizeRotState(0, FWWeight);
+            FWRos = logl(bolt_norm[0]);
+            yTemp = OP_PickRotState(FWWeight);
+        }
+
+        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
+            newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, ovlp_neigh_num_new);
+        }
+
+        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
+            // We can add to newEn as well.
+            newEn += (float)(26 - ovlp_neigh_num_new) * fEnergy[resi][resi][E_F_SOL];
+            oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, ovlp_neigh_num_new);
+        }
+
+    }
+    else if (nBeadTypeCanCont[resi]){ // Calculate all neighbor lists.
+
+        cont_neigh_num_old = NeighborSearch_ForCont(beadID, r_pos0, oldContNeighs,
+                                                    oldOvlpNeighs, &ovlp_neigh_num_old);
+
+        yTemp = - 1;
+        if (nBeadTypeIsSticker[resi]){ // Need to handle sticker interactions.
+            OP_ShuffleArray(ovlp_neigh_num_new, newOvlpNeighs);
+            FWWeight = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, ovlp_neigh_num_new);
+            OP_NormalizeRotState(0, FWWeight);
+            FWRos = logl(bolt_norm[0]);
+            yTemp = OP_PickRotState(FWWeight);
+        }
+
+        if (nBeadTypeCanOvlp[resi]){ // Calculate the Ovlp energies and add to total.
+            newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, ovlp_neigh_num_new);
+        }
+
+        if (nBeadTypeCanFSol[resi]){ // Calculate the fSol energies and add to total.
+            // We can add to newEn as well.
+            newEn += (float)(26 - ovlp_neigh_num_new) * fEnergy[resi][resi][E_F_SOL];
+            oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, ovlp_neigh_num_new);
+        }
+        newEn += Energy_OfCont_wNeighList(beadID, newContNeighs, cont_neigh_num_new);
+    }
+
+
+//    oldEn = Energy_Isotropic(beadID);
+//    if (nBeadTypeIsSticker[resi] == 1) { // Only non linkers can bond
+//        if (bead_info[beadID][BEAD_FACE] != -1) {
+//            resj = bead_info[bead_info[beadID][BEAD_FACE]][BEAD_TYPE]; // This is type of who I'm currently bonded to
+//            oldEn += (lLDub)fEnergy[resi][resj][E_SC_SC];
+//        }
+//
+//        // OP_ShuffleRotIndecies(); //No need to shuffle just to check.
+//        BWWeight = Check_RotStatesOld(beadID, resi, MyTemp);
+//        OP_NormalizeRotState(0, BWWeight);
+//        BWRos = logl(bolt_norm[0]);
+//
+//        OP_MoveBeadTo(beadID, r_posNew); // Does not break bond
+//
+//        OP_ShuffleRotIndecies(); // Need to shuffle because this also acts as selecting new partner
+//        FWWeight = Check_RotStatesNew(beadID, resi, MyTemp);
+//        OP_NormalizeRotState(0, FWWeight);
+//        FWRos = logl(bolt_norm[0]);
+//
+//        yTemp = OP_PickRotState(FWWeight);
+//
+//        if (yTemp != -1) { // There is a bead at this position in the rot_trial, so let's add the energy.
+//            resj  = bead_info[yTemp][BEAD_TYPE];
+//            newEn = (lLDub)fEnergy[resi][resj][E_SC_SC];
+//        }
+//    } else { // These beads have no rotational states.
+//        yTemp = -1;
+//        OP_MoveBeadTo(beadID, r_posNew);
+//    }
+
     // Now let's calculate the energy of the new state. SC-SC energy is already done.
-    newEn += Energy_Isotropic(beadID);
+//    newEn += Energy_Isotropic(beadID);
     MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FWRos, BWRos, oldEn - newEn, (lLDub)MyTemp);
     // Accept or reject this state
@@ -2416,9 +2528,9 @@ void OP_SwapBeads(int bead1, int bead2) {
 /// OP_Rotation - given the rotation operation PivotM, rotate beadID using tmpR[POS_MAX] as the origin.
 /// Note the global array naTempR[POS_MAX] stores the locations of the post-rotated beads. Furthermore, if PivotM is 10,
 /// the null operation is still performed.
-/// Mathematically, we have that \f$\vec{r}^\prime = \hat{R}_i(\theta)\vec{r}\f$ where \f$\vec{r}\f$ is the new
-/// position, \f$\hat{R}_i(\theta)\f$ is the standard rotation matrix where i=X,Y,Z and
-/// \f$\theta=45^\circ,180^\circ,270^\circ\f$. For now, only 90 degree rotations are implemented where the Rot_{#1}_{#2}
+/// Mathematically, we have that f$vec{r}^prime = hat{R}_i(theta)vec{r}f$ where f$vec{r}f$ is the new
+/// position, f$hat{R}_i(theta)f$ is the standard rotation matrix where i=X,Y,Z and
+/// f$theta=45^circ,180^circ,270^circf$. For now, only 90 degree rotations are implemented where the Rot_{#1}_{#2}
 /// functions/sub-routines below explicitly calculate what the new vector is given the axis ({#1}) and angle ({#2}).
 /// Aribitrary rotations are a little harder on lattices because some rotations do not fully overlap with points on
 /// the lattice being used. In our case, it is a simple cubic lattice.
@@ -2610,6 +2722,25 @@ void OP_ShuffleRotIndecies(void) {
         j_val         = Rot_IndArr[j];
         Rot_IndArr[i] = j_val;
         Rot_IndArr[j] = i_val;
+    }
+}
+
+/// OP_ShuffleArray: Given an array of at-most size arr_size, we shuffle the elements in dum_arr.
+/// Note that if arr_size is smaller than the actual size of the array, only the elements less than arr_size
+/// shall be shuffled. So this _could_ be used to shuffle a starting subset of the array.
+/// \param arr_size
+/// \param dum_arr
+void OP_ShuffleArray(const int arr_size, int *dum_arr){
+    // Algorithm taken from
+    // https://www.w3resource.com/c-programming-exercises/array/c-array-exercise-77.php
+    // Takes the array and shuffles the numbers in it. Used to randomly, but fully, sample arrays.
+    int i;
+    int jVal, j;
+    for (i = arr_size - 1; i > 0; i--){
+        j = rand() % (i+1);
+        jVal = dum_arr[i];
+        dum_arr[i] = dum_arr[j];
+        dum_arr[j] = jVal;
     }
 }
 

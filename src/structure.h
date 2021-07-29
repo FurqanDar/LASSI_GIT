@@ -55,6 +55,10 @@ void GyrTensor_GyrRad_Avg(void);
 
 void Calculate_Distances_For_Radius(float *thisList, const int nRad);
 
+int NeighborSearch_ForOvlp(int const beadID, const int *startVec, int *neighList);
+
+int NeighborSearch_ForCont(int const beadID, const int *startVec, int *contList, int *ovlpList, int *ovlpNum);
+
 int NeighborSearch_SolSitesAround(const int *startVec);
 
 int NeighborSearch_AroundPoint_wRad_IgnBead(const int beadID, const int *startVec, const int nRad, int *neighList);

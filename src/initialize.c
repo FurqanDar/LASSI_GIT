@@ -10,16 +10,16 @@ void Memory_Initialization_AtStart(void) {
     strcpy(arr_name, "naTotLattice");
     naTotLattice = Create1DInt(nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arr_name);
 
-    //    nLargestRadius=2;
-    //    strcpy(arr_name, "oldNeighs");
-    //    oldNeighs = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
-    //    strcpy(arr_name, "newNeighs");
-    //    newNeighs = Create1DInt(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
+    //    LARGEST_RADIUS=2;
+    //    strcpy(arr_name, "oldOvlpNeighs");
+    //    oldOvlpNeighs = Create1DInt(LARGEST_RADIUS*LARGEST_RADIUS*LARGEST_RADIUS, arr_name);
+    //    strcpy(arr_name, "newOvlpNeighs");
+    //    newOvlpNeighs = Create1DInt(LARGEST_RADIUS*LARGEST_RADIUS*LARGEST_RADIUS, arr_name);
     //
     //    strcpy(arr_name, "allDists");
-    //    allDists = Create1DFloat(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
+    //    allDists = Create1DFloat(LARGEST_RADIUS*LARGEST_RADIUS*LARGEST_RADIUS, arr_name);
     //    strcpy(arr_name, "newDists");
-    //    newDists = Create1DFloat(nLargestRadius*nLargestRadius*nLargestRadius, arr_name);
+    //    newDists = Create1DFloat(LARGEST_RADIUS*LARGEST_RADIUS*LARGEST_RADIUS, arr_name);
 
     Memory_Allocate_NeighborLists();
 
@@ -87,15 +87,25 @@ void Memory_Initialization_AtStart(void) {
 
 void Memory_Allocate_NeighborLists(void) {
     char arr_name[50];
-    nLargestRadius = 2;
+//    LARGEST_RADIUS = 2;
 
-    int num_of_points = nLargestRadius * 2;
+    int num_of_points;
+
+    num_of_points     = 1 * 2;
     num_of_points     = num_of_points * num_of_points * num_of_points;
+    strcpy(arr_name, "oldOvlpNeighs");
+    oldOvlpNeighs = Create1DInt(num_of_points, arr_name);
+    strcpy(arr_name, "newOvlpNeighs");
+    newOvlpNeighs = Create1DInt(num_of_points, arr_name);
 
-    strcpy(arr_name, "oldNeighs");
-    oldNeighs = Create1DInt(num_of_points, arr_name);
-    strcpy(arr_name, "newNeighs");
-    newNeighs = Create1DInt(num_of_points, arr_name);
+    num_of_points     = LARGEST_RADIUS * 2;
+    num_of_points     = num_of_points * num_of_points * num_of_points;
+    strcpy(arr_name, "oldContNeighs");
+    oldContNeighs = Create1DInt(num_of_points, arr_name);
+    strcpy(arr_name, "newContNeighs");
+    newContNeighs = Create1DInt(num_of_points, arr_name);
+
+
 
     strcpy(arr_name, "allDists");
     allDists = Create1DFloat(num_of_points, arr_name);
@@ -293,10 +303,10 @@ void Global_Array_Initialization_AtStart(void) {
 
     nLimitedClusterSize = tot_chains > 15 ? 15 : tot_chains / 2;
 
-    Calculate_Distances_For_Radius(allDists, nLargestRadius);
-    Calculate_Distances_For_Radius(newDists, nLargestRadius);
+    Calculate_Distances_For_Radius(allDists, LARGEST_RADIUS);
+    Calculate_Distances_For_Radius(newDists, LARGEST_RADIUS);
 
-    //    for(i=0; i<nLargestRadius*nLargestRadius*nLargestRadius*8; i++){
+    //    for(i=0; i<LARGEST_RADIUS*LARGEST_RADIUS*LARGEST_RADIUS*8; i++){
     //        printf("%2.2f ", allDists[i]);
     //    }
     //    printf("\n");
