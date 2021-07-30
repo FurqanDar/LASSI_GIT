@@ -295,9 +295,7 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     oldEn = 0.;
     newEn = 0.;
     int   resj;
-    int   FWWeight;              // Used to perform orientational bias MC
     lLDub FWRos, BWRos;                    // Forwards and backwards Rosenbluth Factors
-    FWRos = 0.;
 
     int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
 
@@ -1615,55 +1613,21 @@ int Move_Local_Equil(int beadID, float MyTemp) { // Performs a local translation
     oldEn = 0.;
     newEn = 0.;
 
+    int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
+
     const int resi = bead_info[beadID][BEAD_TYPE];
 
     oldEn = nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
     newEn = 0.;
 
-    int old_ovlp_num, old_cont_num;
-
-    if (nBeadTypeCanCont[resi]){
-        old_cont_num = NeighborSearch_ForCont(beadID, r_pos0, oldContNeighs,
-                                              oldOvlpNeighs, &old_ovlp_num);
-        oldEn += Energy_OfCont_wNeighList(beadID, oldContNeighs, old_cont_num);
-    }
-    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi]){
-        old_ovlp_num       = NeighborSearch_ForOvlp(beadID, r_pos0, oldOvlpNeighs);
-    }
-
-    if (nBeadTypeCanOvlp[resi]){
-        oldEn += Energy_OfOvlp_wNeighList(beadID, oldOvlpNeighs, old_ovlp_num);
-    }
-
-    if (nBeadTypeCanFSol[resi]){
-        oldEn += (float)(26 - old_ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        newEn += Energy_ofSol_wNeighList(oldOvlpNeighs, old_ovlp_num);
-    }
+    Energy_Iso_ForLocal(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
 
     OP_MoveBeadTo(beadID, r_posNew);
 
     newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    int new_ovlp_num, new_cont_num;
+    Energy_Iso_ForLocal(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs, newContNeighs);
 
-    yTemp = -1;
-    if (nBeadTypeCanCont[resi]){
-        new_cont_num = NeighborSearch_ForCont(beadID, r_posNew, newContNeighs,
-                                              newOvlpNeighs, &new_ovlp_num);
-        newEn += Energy_OfCont_wNeighList(beadID, newContNeighs, new_cont_num);
-    }
-    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi]){
-        new_ovlp_num       = NeighborSearch_ForOvlp(beadID, r_posNew, newOvlpNeighs);
-    }
-
-    if (nBeadTypeCanOvlp[resi]){
-        newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, new_ovlp_num);
-    }
-
-    if (nBeadTypeCanFSol[resi]){
-        newEn += (float)(26 - new_ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, new_ovlp_num);
-    }
 
     MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);

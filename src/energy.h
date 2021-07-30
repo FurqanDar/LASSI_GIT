@@ -50,4 +50,8 @@ void Energy_Iso_ForLocal(const int beadID, const int resi, const int* r_pos0,
                          long double *oldEn, long double *newEn,
                          int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
 
+void Energy_Iso_ForLocalEquil(const int beadID, const int resi, const int* r_pos0,
+                         long double *oldEn, long double *newEn,
+                         int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
+
 #endif // _ENERGY_H_
