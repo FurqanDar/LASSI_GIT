@@ -948,9 +948,9 @@ int NeighborSearch_ForOvlp(int const beadID, const int *startVec, int *neighList
 int NeighborSearch_ForCont(int const beadID, const int *startVec, int *contList, int *ovlpList, int *ovlpNum){
     int neigh_num=0;
 
-    int tmpBead;
-    int r_disp[POS_MAX]   = {0};
-    int r_search[POS_MAX] = {0};
+    int       tmpBead;
+    int       r_disp[POS_MAX]   = {0};
+    int       r_chck[POS_MAX] = {0};
     const int nRad = LARGEST_RADIUS;
 
     *ovlpNum = 0;
@@ -958,8 +958,8 @@ int NeighborSearch_ForCont(int const beadID, const int *startVec, int *contList,
     for (r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++) {
         for (r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++) {
             for (r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++) {
-                PosArr_add_wPBC(r_search, startVec, r_disp);
-                tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
+                PosArr_add_wPBC(r_chck, startVec, r_disp);
+                tmpBead = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if (tmpBead != -1 && tmpBead != beadID) {
                     if ((abs(r_disp[0]) <= 1) && (abs(r_disp[1]) <= 1) && (abs(r_disp[2]) <= 1)) {
                         ovlpList[*ovlpNum] = tmpBead;

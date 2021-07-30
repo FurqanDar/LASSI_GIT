@@ -717,10 +717,8 @@ float Energy_Isotropic_With_List(const int beadID, const int *bead_list,
     return totEn;
 }
 
-// TODO: Change total energy calculation so that it properly decomposes the system energy into individual components.
-/// Energy_Total_System - calculates the total energy of the system using the functions above.
-/// Note the factor of 1/2 to account for double counting since all the energy contributions (for now)
-/// are pair-wise. Furthermore, faCurrEn[] stores the two energies separately as well.
+
+/// Energy_Total_System: Calculate the total energy of the system.
 void Energy_Total_System(void) {
     int i; // Indecies
     // initialization

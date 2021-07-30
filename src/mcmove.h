@@ -43,7 +43,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp);
 
 int Move_BranchedRot_Equil(int chainID, float MyTemp);
 
-int Check_ChainDisp(int chainID, const int *tR);
+int Check_ChainDisp(const int chainID, const int *vec_disp);
 
 int Check_MoveBeadTo(int *newPos);
 

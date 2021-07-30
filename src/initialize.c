@@ -10,17 +10,6 @@ void Memory_Initialization_AtStart(void) {
     strcpy(arr_name, "naTotLattice");
     naTotLattice = Create1DInt(nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arr_name);
 
-    //    LARGEST_RADIUS=2;
-    //    strcpy(arr_name, "oldOvlpNeighs");
-    //    oldOvlpNeighs = Create1DInt(LARGEST_RADIUS*LARGEST_RADIUS*LARGEST_RADIUS, arr_name);
-    //    strcpy(arr_name, "newOvlpNeighs");
-    //    newOvlpNeighs = Create1DInt(LARGEST_RADIUS*LARGEST_RADIUS*LARGEST_RADIUS, arr_name);
-    //
-    //    strcpy(arr_name, "allDists");
-    //    allDists = Create1DFloat(LARGEST_RADIUS*LARGEST_RADIUS*LARGEST_RADIUS, arr_name);
-    //    strcpy(arr_name, "newDists");
-    //    newDists = Create1DFloat(LARGEST_RADIUS*LARGEST_RADIUS*LARGEST_RADIUS, arr_name);
-
     Memory_Allocate_NeighborLists();
 
     strcpy(arr_name, "naClusHistList");
@@ -87,18 +76,17 @@ void Memory_Initialization_AtStart(void) {
 
 void Memory_Allocate_NeighborLists(void) {
     char arr_name[50];
-//    LARGEST_RADIUS = 2;
 
     int num_of_points;
 
-    num_of_points     = 1 * 2;
+    num_of_points     = 1 * 2 + 1;
     num_of_points     = num_of_points * num_of_points * num_of_points;
     strcpy(arr_name, "oldOvlpNeighs");
     oldOvlpNeighs = Create1DInt(num_of_points, arr_name);
     strcpy(arr_name, "newOvlpNeighs");
     newOvlpNeighs = Create1DInt(num_of_points, arr_name);
 
-    num_of_points     = LARGEST_RADIUS * 2;
+    num_of_points     = LARGEST_RADIUS * 2 + 1;
     num_of_points     = num_of_points * num_of_points * num_of_points;
     strcpy(arr_name, "oldContNeighs");
     oldContNeighs = Create1DInt(num_of_points, arr_name);
@@ -785,7 +773,7 @@ int **Create2DInt(const size_t xDim, const size_t yDim, const char *ArrName) {
         exit(1);
     }
 
-    int i;
+    size_t i;
     for (i = 1; i < yDim; i++) {
         dumPtr[i] = &dumPtr[0][i * xDim];
     }
@@ -822,7 +810,7 @@ long double **Create2DLongdouble(const size_t xDim, const size_t yDim, const cha
         exit(1);
     }
 
-    int i;
+    size_t i;
     for (i = 1; i < yDim; i++) {
         dumPtr[i] = &dumPtr[0][i * xDim];
     }

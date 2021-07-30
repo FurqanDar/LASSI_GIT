@@ -590,33 +590,34 @@ int Move_Snake(int chainID, float MyTemp) { // Performs a slither MC-move on cha
 /// \return 1 if accepted, 0 if rejected.
 int Move_Trans(int chainID, float MyTemp) { // Performs a translation move with orientational bias
     int   bAccept = 0;                      // Used in MC steps
-    lLDub MCProb, oldEn, newEn;             // For Metropolis Hastings
-    oldEn = 0.;
-    newEn = 0.;
-    int   i, j; // Loop iterators
-    int   resi, resj, firstB, lastB;
-    int   xTemp, yTemp, lRadUp, lRadLow; // Random numbers to store things
+    int   xTemp, yTemp; // Random numbers to store things
     int   r_disp[POS_MAX];                 // Vectors to store coordinates.
-    int   FWWeight, BWWeight;            // Used to perform orientational bias MC
-    lLDub FSum, BSum;                    // Overall Rosenbluth sums
 
-    // Finding the bounds for looping over the molecule/chain
-    firstB = chain_info[chainID][CHAIN_START];
-    lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
-    // Radii for translation moves. All moves are L/2 radius
-    lRadLow = nBoxSize[2] / 2;
-    lRadUp  = 2 * lRadLow + 1;
+
+    // All moves are L/2 radius
 
     yTemp = 0;
     PosArr_gen_rand_wRad(r_disp, nBoxSize[0]/2);
 
     yTemp = Check_ChainDisp(chainID, r_disp); // yTemp=0 means clash
-
     if (yTemp == 0) { // We have failed to find a good spot for this chain.
         bAccept = 0;
         return bAccept;
     }
+
     // We now have a chain which when moved does not overlap.
+
+    lLDub MCProb, oldEn, newEn;             // For Metropolis Hastings
+    oldEn = 0.;
+    newEn = 0.;
+    int   i, j; // Loop iterators
+    int   FWWeight, BWWeight;            // Used to perform orientational bias MC
+    lLDub FSum, BSum;                    // Overall Rosenbluth sums
+
+    int   resi, resj, firstB, lastB;
+    // Finding the bounds for looping over the molecule/chain
+    firstB = chain_info[chainID][CHAIN_START];
+    lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
 
     // Idea is to separate the energy calculations from the Rosenbluth sampling.
     yTemp = 0;
@@ -2194,27 +2195,23 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp) {
     }
 }
 
-/// Check_ChainDisp - checks if moving chainID by tR[POS_MAX] will lead to sterix clash.
+/// Check_ChainDisp - checks if moving chainID by vec_disp[POS_MAX] will lead to sterix clash.
 /// \param chainID
-/// \param tR
+/// \param vec_disp
 /// \return 0 if clash, 1 if no clash.
-int Check_ChainDisp(int chainID, const int *tR) { // Checks if chain can be displaced by tR
-    int i, j;
-    int canI = 1;
-    int tmpR[POS_MAX];
+int Check_ChainDisp(const int chainID, const int *vec_disp) { // Checks if chain can be displaced by vec_disp
+    int i;
+    int r_chck[POS_MAX];
 
     for (i = chain_info[chainID][CHAIN_START]; i < chain_info[chainID][CHAIN_START] + chain_info[chainID][CHAIN_LENGTH];
          i++) {
-        for (j = 0; j < POS_MAX; j++) {
-            tmpR[j] = (bead_info[i][j] + tR[j] + nBoxSize[j]) % nBoxSize[j];
-        }
-        if (naTotLattice[Lat_Ind_FromVec(tmpR)] != -1) {
-            canI = 0; // 0 means steric clash
-            return canI;
+        PosArr_add_wPBC(r_chck, vec_disp, bead_info[i]);
+        if (naTotLattice[Lat_Ind_FromVec(r_chck)] != -1) { // Steric clash
+            return 0;
         }
     }
 
-    return canI;
+    return 1;
 }
 
 /// OP_DispChain - displaced chainID by movR[POS_MAX], while remembering the chain in old_beads. Also handles the
