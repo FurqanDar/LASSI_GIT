@@ -306,7 +306,7 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     oldEn = nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
     newEn = 0.;
 
-    Energy_Iso_ForLocal(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num);
+    Energy_Iso_ForLocal(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
 
     BWRos = MC_RosenbluthSampling_ForLocal_AtOld(beadID, resi, &oldEn, old_ovlp_num);
 
@@ -314,9 +314,9 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
 
     newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    Energy_Iso_ForLocal(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num);
+    Energy_Iso_ForLocal(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs, newContNeighs);
 
-    FWRos = MC_RosenbluthSampling_ForLocal_AtNew(beadID, resi, &yTemp, &newEn, &new_ovlp_num);
+    FWRos = MC_RosenbluthSampling_ForLocal_AtNew(beadID, resi, &yTemp, &newEn, new_ovlp_num);
     if (yTemp != -1){
         resj = bead_info[yTemp][BEAD_TYPE];
         newEn += fEnergy[resi][resj][E_SC_SC];

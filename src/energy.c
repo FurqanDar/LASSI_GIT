@@ -808,30 +808,29 @@ float Energy_Of_Chain_OLD(const int chainID) { // Calculates the energy of the g
 
 void Energy_Iso_ForLocal(const int beadID, const int resi, const int* r_pos0,
                          long double *oldEn, long double *newEn,
-                         int *ovlp_num, int *cont_num){
+                         int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs){
 
     *ovlp_num     = 0;
     *cont_num     = 0;
     if (nBeadTypeCanCont[resi]){// CONT neighbors.
-        *cont_num = NeighborSearch_ForCont(beadID, r_pos0, oldContNeighs,
-                                               oldOvlpNeighs, ovlp_num);
+        *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
     }
     else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi]){
         //OVLP neighbors.
-        *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, oldOvlpNeighs);
+        *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
     }
 
     if (nBeadTypeCanCont[resi]){// CONT energy.
-        *oldEn = *oldEn + Energy_OfCont_wNeighList(beadID, oldContNeighs, *cont_num);
+        *oldEn = *oldEn + Energy_OfCont_wNeighList(beadID, cont_neighs, *cont_num);
     }
 
     if (nBeadTypeCanOvlp[resi]){// OVLP energy.
-        *oldEn = *oldEn + Energy_OfOvlp_wNeighList(beadID, oldOvlpNeighs, *ovlp_num);
+        *oldEn = *oldEn + Energy_OfOvlp_wNeighList(beadID, ovlp_neighs, *ovlp_num);
     }
 
     if (nBeadTypeCanFSol[resi]){// Solvation energy.
         *oldEn = *oldEn + (float)(26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        *newEn = *newEn + Energy_ofSol_wNeighList(oldOvlpNeighs, *ovlp_num);
+        *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
     }
 
 }

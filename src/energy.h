@@ -48,6 +48,6 @@ float Energy_InitPotential(const int beadID);
 
 void Energy_Iso_ForLocal(const int beadID, const int resi, const int* r_pos0,
                          long double *oldEn, long double *newEn,
-                         int *ovlp_num, int *cont_num);
+                         int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
 
 #endif // _ENERGY_H_
