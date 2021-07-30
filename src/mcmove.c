@@ -273,12 +273,14 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     int   bAccept = 0;          // Used in MC steps
     int   yTemp;   // Random numbers to store things
     int   r_pos0[POS_MAX], r_posNew[POS_MAX], r_disp[POS_MAX]; // Vectors to stores coordinates.
-    PosArr_copy(r_pos0, bead_info[beadID]);
+
     // Attempt to find an empty lattice point.
+    PosArr_copy(r_pos0, bead_info[beadID]);
     PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
     PosArr_add_wPBC(r_posNew, r_pos0, r_disp);
-    yTemp = Check_MoveBeadTo(r_posNew);
 
+    //Checking to see validity of new point.
+    yTemp = Check_MoveBeadTo(r_posNew);
     if (yTemp == 1) { // This means we found an empty lattice site. So let's check if the linkers are okay.
         yTemp = Check_LinkerConstraint(beadID, r_posNew);
     }
@@ -293,10 +295,9 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     oldEn = 0.;
     newEn = 0.;
     int   resj;
-    int   FWWeight, BWWeight;              // Used to perform orientational bias MC
+    int   FWWeight;              // Used to perform orientational bias MC
     lLDub FWRos, BWRos;                    // Forwards and backwards Rosenbluth Factors
     FWRos = 0.;
-    BWRos = 0.;
 
     int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
 
@@ -307,7 +308,7 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
 
     Energy_Iso_ForLocal(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num);
 
-    BWRos = MC_ForSticker_AtOld(beadID, resi, &oldEn, old_ovlp_num);
+    BWRos = MC_RosenbluthSampling_ForLocal_AtOld(beadID, resi, &oldEn, old_ovlp_num);
 
     OP_MoveBeadTo(beadID, r_posNew);
 
@@ -315,17 +316,10 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
 
     Energy_Iso_ForLocal(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num);
 
-    yTemp = -1;
-    if (nBeadTypeIsSticker[resi]){
-        OP_ShuffleArray(new_ovlp_num, newOvlpNeighs);
-        FWWeight = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, new_ovlp_num);
-        OP_NormalizeRotState(0, FWWeight);
-        FWRos = logl(bolt_norm[0]);
-        yTemp = OP_PickRotState(FWWeight);
-        if (yTemp != -1){
-            resj = bead_info[yTemp][BEAD_TYPE];
-            newEn += fEnergy[resi][resj][E_SC_SC];
-        }
+    FWRos = MC_RosenbluthSampling_ForLocal_AtNew(beadID, resi, &yTemp, &newEn, &new_ovlp_num);
+    if (yTemp != -1){
+        resj = bead_info[yTemp][BEAD_TYPE];
+        newEn += fEnergy[resi][resj][E_SC_SC];
     }
 
     MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
@@ -2773,7 +2767,7 @@ int Check_RotStatesNew(int const beadID, int const resi, float const MyTemp) {
 /// \param beadVal - bolt_norm[MAX_VALENCY] stores the total Rosenbluth weights for moves that sample multiple stickers.
 /// Note that bolt_fac[] is now the cumulative boltzmann distribution, which is sampled to propose bonds.
 /// \param CandNums - total possible bonding partners for this particular sticker case.
-void OP_NormalizeRotState(int beadVal, int CandNums) {
+void OP_NormalizeRotState(const int beadVal, const int CandNums) {
     int i;
 
     if (CandNums > 0) { // There is a possible candidate, so normalize bolt_fac
@@ -2849,7 +2843,7 @@ lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp) {
 }
 
 
-lLDub MC_ForSticker_AtOld(const int beadID, const int resi, long double *oldEn, const int neigh_num){
+lLDub MC_RosenbluthSampling_ForLocal_AtOld(const int beadID, const int resi, long double *oldEn, const int neigh_num){
     int ros_num;
     if (nBeadTypeIsSticker[resi]){
         *oldEn = *oldEn + Energy_Anisotropic(beadID);
@@ -2861,3 +2855,25 @@ lLDub MC_ForSticker_AtOld(const int beadID, const int resi, long double *oldEn, 
         return 0.;
     }
 }
+
+
+lLDub MC_RosenbluthSampling_ForLocal_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num){
+    int ros_num;
+    *bead_part = -1;
+    if (nBeadTypeIsSticker[resi]){
+        OP_ShuffleArray(neigh_num, newOvlpNeighs);
+        ros_num = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, neigh_num);
+        OP_NormalizeRotState(0, ros_num);
+
+        *bead_part = OP_PickRotState(ros_num);
+
+        return logl(bolt_norm[0]);
+    }
+    else{
+        return 0.;
+    }
+
+}
+
+
+

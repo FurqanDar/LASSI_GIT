@@ -101,12 +101,14 @@ int Check_RotStatesOld(int const beadID, int const resi, float const MyTemp);
 
 int Check_RotStatesNew(int const beadID, int const resi, float const MyTemp);
 
-void OP_NormalizeRotState(int beadVal, int CandNums);
+void OP_NormalizeRotState(const int beadVal, const int CandNums);
 
 int OP_PickRotState(int CandNums);
 
 lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp);
 
-lLDub MC_ForSticker_AtOld(const int beadID, const int resi, long double *oldEn, const int neigh_num);
+lLDub MC_RosenbluthSampling_ForLocal_AtOld(const int beadID, const int resi, long double *oldEn, const int neigh_num);
+
+lLDub MC_RosenbluthSampling_ForLocal_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num);
 
 #endif // _MCMOVE_H_
