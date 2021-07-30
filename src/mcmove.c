@@ -287,6 +287,8 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
         return bAccept;
     }
 
+    // Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
+
     lLDub MCProb, oldEn, newEn; // For Metropolis Hastings
     oldEn = 0.;
     newEn = 0.;
@@ -296,51 +298,22 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     FWRos = 0.;
     BWRos = 0.;
 
-    // Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
+    int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
+
     const int resi = bead_info[beadID][BEAD_TYPE];
 
     oldEn = nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
     newEn = 0.;
 
-    int old_ovlp_num, old_cont_num;
+    Energy_Iso_ForLocal(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num);
 
-    Energy_Iso_ForLocal(beadID, resi, r_pos0,
-                        &oldEn, &newEn, &old_ovlp_num, &old_cont_num);
-
-    if (nBeadTypeIsSticker[resi]){
-        oldEn += Energy_Anisotropic(beadID);
-        BWWeight = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, old_ovlp_num);
-        OP_NormalizeRotState(0, BWWeight);
-        BWRos = logl(bolt_norm[0]);
-    }
-
+    BWRos = MC_ForSticker_AtOld(beadID, resi, &oldEn, old_ovlp_num);
 
     OP_MoveBeadTo(beadID, r_posNew);
 
     newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    int new_ovlp_num, new_cont_num;
-
-//    if (nBeadTypeCanCont[resi]){
-//        new_cont_num = NeighborSearch_ForCont(beadID, r_posNew, newContNeighs,
-//                                              newOvlpNeighs, &new_ovlp_num);
-//        newEn += Energy_OfCont_wNeighList(beadID, newContNeighs, new_cont_num);
-//    }
-//    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi]){
-//        new_ovlp_num       = NeighborSearch_ForOvlp(beadID, r_posNew, newOvlpNeighs);
-//    }
-//
-//    if (nBeadTypeCanOvlp[resi]){
-//        newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, new_ovlp_num);
-//    }
-//
-//    if (nBeadTypeCanFSol[resi]){
-//        newEn += (float)(26 - new_ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-//        oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, new_ovlp_num);
-//    }
-
-    Energy_Iso_ForLocal(beadID, resi, r_posNew,
-                        &newEn, &oldEn, &new_ovlp_num, &new_cont_num);
+    Energy_Iso_ForLocal(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num);
 
     yTemp = -1;
     if (nBeadTypeIsSticker[resi]){
@@ -2873,4 +2846,18 @@ lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp) {
         MH_Value = expl(MH_Value);
     }
     return MH_Value;
+}
+
+
+lLDub MC_ForSticker_AtOld(const int beadID, const int resi, long double *oldEn, const int neigh_num){
+    int ros_num;
+    if (nBeadTypeIsSticker[resi]){
+        *oldEn = *oldEn + Energy_Anisotropic(beadID);
+        ros_num = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, neigh_num);
+        OP_NormalizeRotState(0, ros_num);
+        return logl(bolt_norm[0]);
+    }
+    else{
+        return 0.;
+    }
 }
