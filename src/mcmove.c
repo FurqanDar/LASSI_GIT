@@ -292,29 +292,28 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
     // Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
 
     lLDub MCProb, oldEn, newEn; // For Metropolis Hastings
-    oldEn = 0.;
-    newEn = 0.;
     int   resj;
-    lLDub FWRos, BWRos;                    // Forwards and backwards Rosenbluth Factors
 
     int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
 
     const int resi = bead_info[beadID][BEAD_TYPE];
 
-    oldEn = nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
+    oldEn = nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
     newEn = 0.;
 
-    Energy_Iso_ForLocal(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
+    Energy_Iso_ForLocal(beadID, resi, r_pos0, &oldEn, &newEn,
+                        &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
 
-    BWRos = MC_RosenbluthSampling_ForLocal_AtOld(beadID, resi, &oldEn, old_ovlp_num);
+    lLDub BWRos = MC_RosenbluthSampling_ForLocal_AtOld(beadID, resi, &oldEn, old_ovlp_num);
 
     OP_MoveBeadTo(beadID, r_posNew);
 
     newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    Energy_Iso_ForLocal(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs, newContNeighs);
+    Energy_Iso_ForLocal(beadID, resi, r_posNew, &newEn, &oldEn,
+                        &new_ovlp_num, &new_cont_num, newOvlpNeighs, newContNeighs);
 
-    FWRos = MC_RosenbluthSampling_ForLocal_AtNew(beadID, resi, &yTemp, &newEn, new_ovlp_num);
+    lLDub FWRos = MC_RosenbluthSampling_ForLocal_AtNew(beadID, resi, &yTemp, &newEn, new_ovlp_num);
     if (yTemp != -1){
         resj = bead_info[yTemp][BEAD_TYPE];
         newEn += fEnergy[resi][resj][E_SC_SC];
