@@ -46,4 +46,8 @@ float Energy_Of_Chain_Self(const int chainID);
 
 float Energy_InitPotential(const int beadID);
 
+void Energy_Iso_ForLocal(const int beadID, const int resi, const int* r_pos0,
+                         long double *oldEn, long double *newEn,
+                         int *ovlp_num, int *cont_num);
+
 #endif // _ENERGY_H_

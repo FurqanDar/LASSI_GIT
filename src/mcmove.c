@@ -304,14 +304,8 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
 
     int old_ovlp_num, old_cont_num;
 
-    if (nBeadTypeCanCont[resi]){
-        old_cont_num = NeighborSearch_ForCont(beadID, r_pos0, oldContNeighs,
-                                                    oldOvlpNeighs, &old_ovlp_num);
-        oldEn += Energy_OfCont_wNeighList(beadID, oldContNeighs, old_cont_num);
-    }
-    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi]){
-        old_ovlp_num       = NeighborSearch_ForOvlp(beadID, r_pos0, oldOvlpNeighs);
-    }
+    Energy_Iso_ForLocal(beadID, resi, r_pos0,
+                        &oldEn, &newEn, &old_ovlp_num, &old_cont_num);
 
     if (nBeadTypeIsSticker[resi]){
         oldEn += Energy_Anisotropic(beadID);
@@ -320,14 +314,6 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
         BWRos = logl(bolt_norm[0]);
     }
 
-    if (nBeadTypeCanOvlp[resi]){
-        oldEn += Energy_OfOvlp_wNeighList(beadID, oldOvlpNeighs, old_ovlp_num);
-    }
-
-    if (nBeadTypeCanFSol[resi]){
-        oldEn += (float)(26 - old_ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        newEn += Energy_ofSol_wNeighList(oldOvlpNeighs, old_ovlp_num);
-    }
 
     OP_MoveBeadTo(beadID, r_posNew);
 
@@ -335,14 +321,27 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
 
     int new_ovlp_num, new_cont_num;
 
-    if (nBeadTypeCanCont[resi]){
-        new_cont_num = NeighborSearch_ForCont(beadID, r_posNew, newContNeighs,
-                                              newOvlpNeighs, &new_ovlp_num);
-        newEn += Energy_OfCont_wNeighList(beadID, newContNeighs, new_cont_num);
-    }
-    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi]){
-        new_ovlp_num       = NeighborSearch_ForOvlp(beadID, r_posNew, newOvlpNeighs);
-    }
+//    if (nBeadTypeCanCont[resi]){
+//        new_cont_num = NeighborSearch_ForCont(beadID, r_posNew, newContNeighs,
+//                                              newOvlpNeighs, &new_ovlp_num);
+//        newEn += Energy_OfCont_wNeighList(beadID, newContNeighs, new_cont_num);
+//    }
+//    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi]){
+//        new_ovlp_num       = NeighborSearch_ForOvlp(beadID, r_posNew, newOvlpNeighs);
+//    }
+//
+//    if (nBeadTypeCanOvlp[resi]){
+//        newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, new_ovlp_num);
+//    }
+//
+//    if (nBeadTypeCanFSol[resi]){
+//        newEn += (float)(26 - new_ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+//        oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, new_ovlp_num);
+//    }
+
+    Energy_Iso_ForLocal(beadID, resi, r_posNew,
+                        &newEn, &oldEn, &new_ovlp_num, &new_cont_num);
+
     yTemp = -1;
     if (nBeadTypeIsSticker[resi]){
         OP_ShuffleArray(new_ovlp_num, newOvlpNeighs);
@@ -355,16 +354,6 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
             newEn += fEnergy[resi][resj][E_SC_SC];
         }
     }
-
-    if (nBeadTypeCanOvlp[resi]){
-        newEn += Energy_OfOvlp_wNeighList(beadID, newOvlpNeighs, new_ovlp_num);
-    }
-
-    if (nBeadTypeCanFSol[resi]){
-        newEn += (float)(26 - new_ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        oldEn += Energy_ofSol_wNeighList(newOvlpNeighs, new_ovlp_num);
-    }
-
 
     MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FWRos, BWRos, oldEn - newEn, (lLDub)MyTemp);
@@ -593,10 +582,7 @@ int Move_Trans(int chainID, float MyTemp) { // Performs a translation move with 
     int   xTemp, yTemp; // Random numbers to store things
     int   r_disp[POS_MAX];                 // Vectors to store coordinates.
 
-
     // All moves are L/2 radius
-
-    yTemp = 0;
     PosArr_gen_rand_wRad(r_disp, nBoxSize[0]/2);
 
     yTemp = Check_ChainDisp(chainID, r_disp); // yTemp=0 means clash
@@ -623,11 +609,13 @@ int Move_Trans(int chainID, float MyTemp) { // Performs a translation move with 
     yTemp = 0;
     for (i = firstB; i < lastB; i++) { // Rosenbluth in old location.
         resi = bead_info[i][BEAD_TYPE];
+
+
+
+
         if (nBeadTypeIsSticker[resi] == 0) { // Skip beads that cannot bond.
             continue;
         }
-
-        // OP_ShuffleRotIndecies();
         BWWeight = Check_RotStatesOld(i, resi, MyTemp);
         OP_NormalizeRotState(yTemp, BWWeight);
         yTemp++;

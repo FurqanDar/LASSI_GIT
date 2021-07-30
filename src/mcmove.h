@@ -107,4 +107,8 @@ int OP_PickRotState(int CandNums);
 
 lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp);
 
+//void Energy_Iso_ForLocal(const int beadID, const int resi, const int* r_pos0,
+//                               lLDub *oldEn, lLDub *newEn,
+//                               int *old_ovlp_num, int *old_cont_num);
+
 #endif // _MCMOVE_H_
