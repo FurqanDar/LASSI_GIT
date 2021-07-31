@@ -288,18 +288,15 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
         bAccept = 0;
         return bAccept;
     }
-
     // Have successfully found a good lattice spot. Let's perform the usual Metropolis-Hastings shenanigans.
 
-    lLDub MCProb, oldEn, newEn; // For Metropolis Hastings
-    int   resj;
 
     int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
 
     const int resi = bead_info[beadID][BEAD_TYPE];
 
-    oldEn = nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
-    newEn = 0.;
+    lLDub oldEn = nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
+    lLDub newEn = 0.;
 
     Energy_Iso_ForLocal(beadID, resi, r_pos0, &oldEn, &newEn,
                         &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
@@ -314,12 +311,13 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
                         &new_ovlp_num, &new_cont_num, newOvlpNeighs, newContNeighs);
 
     lLDub FWRos = MC_RosenbluthSampling_ForLocal_AtNew(beadID, resi, &yTemp, &newEn, new_ovlp_num);
+    int   resj;
     if (yTemp != -1){
         resj = bead_info[yTemp][BEAD_TYPE];
         newEn += fEnergy[resi][resj][E_SC_SC];
     }
 
-    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
+    lLDub MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FWRos, BWRos, oldEn - newEn, (lLDub)MyTemp);
     // Accept or reject this state
     if (MCProb < MHAcc) {                         // Accept this state
@@ -557,74 +555,81 @@ int Move_Trans(int chainID, float MyTemp) { // Performs a translation move with 
 
     // We now have a chain which when moved does not overlap.
 
-    lLDub MCProb, oldEn, newEn;             // For Metropolis Hastings
-    oldEn = 0.;
-    newEn = 0.;
     int   i, j; // Loop iterators
-    int   FWWeight, BWWeight;            // Used to perform orientational bias MC
-    lLDub FSum, BSum;                    // Overall Rosenbluth sums
 
     int   resi, resj, firstB, lastB;
     // Finding the bounds for looping over the molecule/chain
     firstB = chain_info[chainID][CHAIN_START];
     lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
 
-    // Idea is to separate the energy calculations from the Rosenbluth sampling.
-    yTemp = 0;
-    for (i = firstB; i < lastB; i++) { // Rosenbluth in old location.
+    lLDub newEn = 0.;
+    lLDub oldEn = 0.;
+    if (nThermalization_Mode != -1){
+        for(i = firstB; i < lastB; i++){
+            oldEn += Energy_InitPotential(i);
+        }
+    }
+
+    int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
+
+    lLDub BSum = 0.;
+    for(i = firstB; i < lastB; i++){
+    Energy_Iso_ForTrans(i, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
+    resi = bead_info[i][BEAD_TYPE];
+    BSum += MC_RosenbluthSampling_ForTrans_AtOld(i, resi, &oldEn, old_ovlp_num);
+    }
+
+    OP_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff.
+
+    if (nThermalization_Mode != -1){
+        for(i = firstB; i < lastB; i++){
+            newEn += Energy_InitPotential(i);
+        }
+    }
+
+    lLDub FSum = 0.;
+    for(i = firstB; i < lastB; i++){
+        Energy_Iso_ForTrans(i, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs, newContNeighs);
         resi = bead_info[i][BEAD_TYPE];
-
-
-
-
-        if (nBeadTypeIsSticker[resi] == 0) { // Skip beads that cannot bond.
-            continue;
+        FSum += MC_RosenbluthSampling_ForTrans_AtNew(i, resi, &yTemp, &newEn, new_ovlp_num);
+        if (yTemp != -1) { // An appropriate partner has been selected. Form the bonds and add the energy
+            bead_info[i][BEAD_FACE]     = xTemp;
+            bead_info[xTemp][BEAD_FACE] = i;
+            newEn += Energy_Anisotropic_For_Chain(i);
         }
-        BWWeight = Check_RotStatesOld(i, resi, MyTemp);
-        OP_NormalizeRotState(yTemp, BWWeight);
-        yTemp++;
     }
 
-    oldEn = (lLDub)Energy_Of_Chain(chainID);
+//    yTemp = 0;
+//    // Again, separate the energy calculation from the Rosenbluth sampling
+//    for (i = firstB; i < lastB; i++) { // Rosenbluth in new location
+//        resi = bead_info[i][BEAD_TYPE];
+//        if (nBeadTypeIsSticker[resi] == 0) { // Because linkers don't have rotational states
+//            continue;
+//        }
+//
+//        OP_ShuffleRotIndecies();
+//        FWWeight = Check_RotStatesNew(i, resi, MyTemp);
+//        OP_NormalizeRotState(yTemp, FWWeight);
+//        // Note that the bonds need to be formed in this loop so that we don't overcount!
+//        if (bead_info[i][BEAD_FACE] == -1) { // Make sure this bead is unbonded!
+//            // Let's assign a rotational state to this bead
+//            xTemp = OP_PickRotState(FWWeight);
+//            if (xTemp != -1) { // An appropriate partner has been selected. Form the bonds and add the energy
+//                // resj = bead_info[xTemp][BEAD_TYPE];
+//                bead_info[i][BEAD_FACE]     = xTemp;
+//                bead_info[xTemp][BEAD_FACE] = i;
+//            }
+//        }
+//        yTemp++; // This keeps track of which residue*/
+//    }
+//
+//    newEn = (lLDub)Energy_Of_Chain(chainID);
+//    FSum  = 0.;
+//    for (i = 0; i < yTemp; i++) {
+//        FSum += logl(bolt_norm[i]);
+//    }
 
-    BSum = 0.;
-    for (i = 0; i < yTemp; i++) {
-        BSum += logl(bolt_norm[i]);
-    }
-
-    OP_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff
-
-    yTemp = 0;
-    // Again, separate the energy calculation from the Rosenbluth sampling
-    for (i = firstB; i < lastB; i++) { // Rosenbluth in new location
-        resi = bead_info[i][BEAD_TYPE];
-        if (nBeadTypeIsSticker[resi] == 0) { // Because linkers don't have rotational states
-            continue;
-        }
-
-        OP_ShuffleRotIndecies();
-        FWWeight = Check_RotStatesNew(i, resi, MyTemp);
-        OP_NormalizeRotState(yTemp, FWWeight);
-        // Note that the bonds need to be formed in this loop so that we don't overcount!
-        if (bead_info[i][BEAD_FACE] == -1) { // Make sure this bead is unbonded!
-            // Let's assign a rotational state to this bead
-            xTemp = OP_PickRotState(FWWeight);
-            if (xTemp != -1) { // An appropriate partner has been selected. Form the bonds and add the energy
-                // resj = bead_info[xTemp][BEAD_TYPE];
-                bead_info[i][BEAD_FACE]     = xTemp;
-                bead_info[xTemp][BEAD_FACE] = i;
-            }
-        }
-        yTemp++; // This keeps track of which residue*/
-    }
-
-    newEn = (lLDub)Energy_Of_Chain(chainID);
-    FSum  = 0.;
-    for (i = 0; i < yTemp; i++) {
-        FSum += logl(bolt_norm[i]);
-    }
-
-    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
+    lLDub MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above!
         bAccept = 1;
@@ -1756,40 +1761,53 @@ int Move_Trans_Equil(int chainID, float MyTemp) { // Performs a translation move
     newEn = 0.;
     int i, j; // Loop iterators
     int firstB, lastB;
-    int xTemp, yTemp, lRadUp, lRadLow; // Random numbers to store things
-    int tmpR[POS_MAX];                 // Vectors to store coordinates.
+    int yTemp; // Random numbers to store things
+    int r_disp[POS_MAX];                 // Vectors to store coordinates.
     // Finding the bounds for looping over the molecule/chain
     firstB = chain_info[chainID][CHAIN_START];
     lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
     // Radii for translation moves. All moves are L/4 radius
-    lRadLow = nBoxSize[2] / 2;
-    lRadUp  = 2 * lRadLow + 1;
-    // Initialize these iterators.
-    // printf("Beginning TRANS\n");
 
-    yTemp = 0;
-    for (j = 0; j < POS_MAX; j++) {
-        tmpR[j] = (rand() % lRadUp) - lRadLow; // Random vector to move all beads within r=L/4
-    }
+    PosArr_gen_rand_wRad(r_disp, nBoxSize[2] / 2);
 
-
-    yTemp = Check_ChainDisp(chainID, tmpR); // yTemp=0 means clash
-
+    yTemp = Check_ChainDisp(chainID, r_disp); // yTemp=0 means clash
     if (yTemp == 0) { // We have failed to find a good spot for this chain.
         bAccept = 0;
         // printf("Ending TRANS no space\n");
         return bAccept;
     }
     // We now have a chain which when moved does not overlap.
-    // Initialize the orientational-bias sums and vectors.
-    // Counting states in the previous location
-    for (i = firstB; i < lastB; i++) {
-        oldEn += (lLDub)Energy_Isotropic_For_Chain(i);
+
+    int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
+
+    oldEn = 0.;
+    if (nThermalization_Mode != -1){
+        for(i = firstB; i < lastB; i++){
+            oldEn += Energy_InitPotential(i);
+        }
     }
-    OP_DispChain_ForTrans(chainID, tmpR); // Moved the chain, broke bonds, and remembered stuff
-    for (i = firstB; i < lastB; i++) {    // Counting states in the new location
-        newEn += (lLDub)Energy_Isotropic_For_Chain(i);
+
+    for(i = firstB; i < lastB; i++){
+        Energy_Iso_ForTransEquil(i, &oldEn, &newEn,
+                                 &old_ovlp_num, &old_cont_num,
+                                 oldOvlpNeighs, oldContNeighs);
     }
+
+    OP_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff
+
+    newEn = 0.;
+    if (nThermalization_Mode != -1){
+        for(i = firstB; i < lastB; i++){
+            newEn += Energy_InitPotential(i);
+        }
+    }
+
+    for(i = firstB; i < lastB; i++){
+        Energy_Iso_ForTransEquil(i, &newEn, &oldEn,
+                                 &new_ovlp_num, &new_cont_num,
+                                 newOvlpNeighs, newContNeighs);
+    }
+
     MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above!
@@ -2822,6 +2840,7 @@ lLDub MC_RosenbluthSampling_ForLocal_AtOld(const int beadID, const int resi, lon
 
 lLDub MC_RosenbluthSampling_ForLocal_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num){
     int ros_num;
+
     *bead_part = -1;
     if (nBeadTypeIsSticker[resi]){
         OP_ShuffleArray(neigh_num, newOvlpNeighs);
@@ -2835,8 +2854,36 @@ lLDub MC_RosenbluthSampling_ForLocal_AtNew(const int beadID, const int resi, int
     else{
         return 0.;
     }
+}
 
+lLDub MC_RosenbluthSampling_ForTrans_AtOld(const int beadID, const int resi, long double *oldEn, const int neigh_num){
+    int ros_num;
+    if (nBeadTypeIsSticker[resi]){
+        *oldEn = *oldEn + Energy_Anisotropic_For_Chain(beadID);
+        ros_num = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, neigh_num);
+        OP_NormalizeRotState(0, ros_num);
+        return logl(bolt_norm[0]);
+    }
+    else{
+        return 0.;
+    }
 }
 
 
-
+lLDub MC_RosenbluthSampling_ForTrans_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num){
+    int ros_num;
+    const int cur_part = bead_info[beadID][BEAD_FACE];
+    *bead_part = -1;
+    if (nBeadTypeIsSticker[resi]){
+        OP_ShuffleArray(neigh_num, newOvlpNeighs);
+        ros_num = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, neigh_num);
+        OP_NormalizeRotState(0, ros_num);
+        if (cur_part != -1) {
+            *bead_part = OP_PickRotState(ros_num);
+        }
+        return logl(bolt_norm[0]);
+    }
+    else{
+        return 0.;
+    }
+}

@@ -54,4 +54,15 @@ void Energy_Iso_ForLocalEquil(const int beadID, const int resi, const int* r_pos
                          long double *oldEn, long double *newEn,
                          int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
 
+
+float Energy_OfOvlp_wNeighList_ForTrans(int const beadID, const int *neighList, int const neighNum);
+
+float Energy_OfCont_wNeighList_ForTrans(int const beadID, const int *neighList, int const neighNum);
+
+void Energy_Iso_ForTrans(const int beadID, long double *oldEn, long double *newEn,
+                         int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
+
+void Energy_Iso_ForTransEquil(const int beadID, long double *oldEn, long double *newEn,
+                         int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
+
 #endif // _ENERGY_H_

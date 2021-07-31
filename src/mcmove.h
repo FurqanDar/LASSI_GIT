@@ -111,4 +111,8 @@ lLDub MC_RosenbluthSampling_ForLocal_AtOld(const int beadID, const int resi, lon
 
 lLDub MC_RosenbluthSampling_ForLocal_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num);
 
+lLDub MC_RosenbluthSampling_ForTrans_AtOld(const int beadID, const int resi, long double *oldEn, const int neigh_num);
+
+lLDub MC_RosenbluthSampling_ForTrans_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num);
+
 #endif // _MCMOVE_H_
