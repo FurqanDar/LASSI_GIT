@@ -105,14 +105,18 @@ void OP_NormalizeRotState(const int beadVal, const int CandNums);
 
 int OP_PickRotState(int CandNums);
 
+void OP_Snake_SlitherFwd(const int firstB, const int lastB, const int *r_posNew);
+
+void OP_Snake_SlitherBck(const int firstB, const int lastB, const int *r_posNew);
+
 lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp);
 
 lLDub MC_RosenbluthSampling_ForLocal_AtOld(const int beadID, const int resi, long double *oldEn, const int neigh_num);
 
 lLDub MC_RosenbluthSampling_ForLocal_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num);
 
-lLDub MC_RosenbluthSampling_ForTrans_AtOld(const int beadID, const int resi, long double *oldEn, const int neigh_num);
+lLDub MC_RosenbluthSampling_ForChains_AtOld(const int beadID, const int resi, long double *oldEn, const int neigh_num);
 
-lLDub MC_RosenbluthSampling_ForTrans_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num);
+lLDub MC_RosenbluthSampling_ForChains_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num);
 
 #endif // _MCMOVE_H_

@@ -928,7 +928,7 @@ void Energy_Iso_ForLocalEquil(const int beadID, const int resi, const int* r_pos
 }
 
 
-void Energy_Iso_ForTrans(const int beadID, long double *oldEn, long double *newEn,
+void Energy_Iso_ForChains(const int beadID, long double *oldEn, long double *newEn,
                          int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs){
     const int resi   = bead_info[beadID][BEAD_TYPE];
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
@@ -957,7 +957,7 @@ void Energy_Iso_ForTrans(const int beadID, long double *oldEn, long double *newE
 
 }
 
-void Energy_Iso_ForTransEquil(const int beadID, long double *oldEn, long double *newEn,
+void Energy_Iso_ForChainsEquil(const int beadID, long double *oldEn, long double *newEn,
                          int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs){
     const int resi   = bead_info[beadID][BEAD_TYPE];
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
