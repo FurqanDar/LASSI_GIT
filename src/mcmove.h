@@ -21,7 +21,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp);
 
 int Move_DbPvt(int beadID);
 
-int Move_CoLocal(int beadID, float MyTemp);
+int Move_CoLocal(int thisBeadID, float MyTemp);
 
 int Move_MultiLocal(int beadID, float MyTemp);
 

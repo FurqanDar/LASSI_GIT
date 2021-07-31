@@ -55,14 +55,29 @@ void Energy_Iso_ForLocalEquil(const int beadID, const int resi, const int* r_pos
                          int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
 
 
-float Energy_OfOvlp_wNeighList_ForTrans(int const beadID, const int *neighList, int const neighNum);
+float Energy_OfOvlp_wNeighList_ForChains(int const beadID, const int *neighList, int const neighNum);
 
-float Energy_OfCont_wNeighList_ForTrans(int const beadID, const int *neighList, int const neighNum);
+
+float Energy_OfCont_wNeighList_ForChains(int const beadID, const int *neighList, int const neighNum);
+
+
+float Energy_OfOvlp_wNeighList_ForRange(int const beadID, const int loBead, const int hiBead,
+                                        const int *neighList, int const neighNum);
+
+float Energy_OfCont_wNeighList_ForRange(int const beadID, const int loBead, const int hiBead,
+                                        const int *neighList, int const neighNum);
+
 
 void Energy_Iso_ForChains(const int beadID, long double *oldEn, long double *newEn,
                          int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
 
+
 void Energy_Iso_ForChainsEquil(const int beadID, long double *oldEn, long double *newEn,
                          int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
+
+
+void Energy_Iso_ForCoLocal(const int thisBeadID, const int otherBeadID, const int* r_pos0,
+                           long double *oldEn, long double *newEn,
+                           int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
 
 #endif // _ENERGY_H_

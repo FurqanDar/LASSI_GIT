@@ -243,7 +243,6 @@ int Move_Rot(int beadID, float MyTemp) {
     // See if we can accept this move
     MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
-    // if (MCProb < expl((oldEn - newEn) / MyTemp)) {//Accept this state
     if (MCProb < MHAcc) {                                            // Accept this state
         if (bead_info[beadID][BEAD_FACE] != -1) {                    // Break old bond
             bead_info[bead_info[beadID][BEAD_FACE]][BEAD_FACE] = -1; // Breaking bond with old partner
@@ -465,7 +464,8 @@ int Move_Snake(int chainID, float MyTemp) { // Performs a slither MC-move on cha
     if (MCProb < MHAcc) { // Accept this state. Bonds have already been formed!
         bAccept = 1;
         return bAccept;
-    } else {
+    }
+    else {
         OP_RestoreChain_ForSnake(firstB, lastB);
         bAccept = 0;
         return bAccept;
@@ -475,7 +475,7 @@ int Move_Snake(int chainID, float MyTemp) { // Performs a slither MC-move on cha
 /// Move_Trans - performs a biased translation of chainID by:
 /// 1. Seeing if there is a spot to move the entire chain in a <+-L/2,+-L/2,+-L/2> random location.
 /// Move fails if no spot available.
-/// 2. Calculcate the Rosenbluth weights of the whole chain like Move_Snake().
+/// 2. Calculate the Rosenbluth weights of the whole chain like Move_Snake().
 /// 3. Move the chain and recalculate the total weights.
 /// 4. Perform the Metropolis-Hastings step.
 /// \param chainID
@@ -836,69 +836,82 @@ FoundMax_back:
     } //
 }
 
-/// Move_CoLocal - move beadID and it's physical bond partner to a new location.
-/// Move fails if beadID has no partner, and if no space is found.
+/// Move_CoLocal - move thisBeadID and it's physical bond partner to a new location.
+/// Move fails if thisBeadID has no partner, and if no space is found.
 /// A standard unbiased translation of two beads where a Metropolis-Hastings step is performed
 /// at the end.
-/// \param beadID
+/// \param thisBeadID
 /// \param MyTemp
 /// \return 1 if accepted, 0 if rejected.
-int Move_CoLocal(int beadID, float MyTemp) {
+int Move_CoLocal(int thisBeadID, float MyTemp) {
     /*
   Translate a bead and its partner in tandem. If no partner, reject move.
   */
 
     int bAccept = 0; // Used in MC steps
 
-    if (bead_info[beadID][BEAD_FACE] == -1) {
+    if (bead_info[thisBeadID][BEAD_FACE] == -1) {
         bAccept = 0;
         return bAccept;
     }
-    int tmpR[POS_MAX]; // Random translation vector.
-    int tmpR1[POS_MAX], tmpR2[POS_MAX];
-    int beadPart = bead_info[beadID][BEAD_FACE];
-    // printf("Partner is (%d)?!\n", beadPart);
-    lLDub MCProb, newEn, oldEn; // For Metropolis Hastings.
-    oldEn = 0.;
-    newEn = 0.;
-    int i, j; // Loop iterators
-    int xTemp, yTemp;
-    int lRadLow, lRadUp;
-    lRadLow = 2;
-    lRadUp  = lRadLow * 2 + 1; // 2*2+1
+    int r_disp[POS_MAX]; // Random translation vector.
+    int r_posNew1[POS_MAX], r_posNew2[POS_MAX];
+    int r_pos1[POS_MAX], r_pos2[POS_MAX];
+    const int otherBeadID = bead_info[thisBeadID][BEAD_FACE];
+    int yTemp;
 
-    yTemp = 0; // Initialize these guys.
+    PosArr_copy(r_pos1, bead_info[thisBeadID]);
+    PosArr_copy(r_pos2, bead_info[otherBeadID]);
 
-    for (j = 0; j < POS_MAX; j++) {
-        tmpR[j]  = (rand() % lRadUp) - lRadLow;
-        tmpR1[j] = (bead_info[beadID][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
-        tmpR2[j] = (bead_info[beadPart][j] + tmpR[j] + nBoxSize[j]) % nBoxSize[j];
-    }
+    PosArr_gen_rand_wRad(r_disp, 2);
+    PosArr_add_wPBC(r_posNew1, r_disp, r_pos1);
+    PosArr_add_wPBC(r_posNew2, r_disp, r_pos2);
 
-    yTemp = Check_MoveBeadTo(tmpR1) * Check_MoveBeadTo(tmpR2);
+    yTemp = Check_MoveBeadTo(r_posNew1) * Check_MoveBeadTo(r_posNew2);
     if (yTemp == 1) { // This means we found an empty lattice site. So let's check if the linkers are okay.
-        yTemp = Check_LinkerConstraint(beadID, tmpR1) * Check_LinkerConstraint(beadPart, tmpR2);
+        yTemp = Check_LinkerConstraint(thisBeadID, r_posNew1) * Check_LinkerConstraint(otherBeadID, r_posNew2);
     }
-
-    if (yTemp == 0) {
-        // This means that we have failed to find an appropriate spot for this bead to be moved to. Therefore, the move
-        // is rejected!
+    if (yTemp == 0) { // Steric-clash or bad location for the beads.
         bAccept = 0;
         return bAccept;
     }
-    oldEn = Energy_Isotropic(beadID) + Energy_Isotropic(beadPart);
-    OP_MoveBeadTo(beadID, tmpR1);
-    OP_MoveBeadTo(beadPart, tmpR2);
-    newEn       = Energy_Isotropic(beadID) + Energy_Isotropic(beadPart);
-    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
+
+    lLDub newEn = 0.;
+    lLDub oldEn = 0.;
+    if (nThermalization_Mode != -1){
+        oldEn += Energy_InitPotential(thisBeadID);
+        oldEn += Energy_InitPotential(otherBeadID);
+    }
+
+    int ovlp_num, cont_num;
+    Energy_Iso_ForCoLocal(thisBeadID, otherBeadID, r_pos1, &oldEn, &newEn,
+                          &ovlp_num, &cont_num, oldOvlpNeighs, oldContNeighs);
+    Energy_Iso_ForCoLocal(otherBeadID, thisBeadID, r_pos2, &oldEn, &newEn,
+                          &ovlp_num, &cont_num, oldOvlpNeighs, oldContNeighs);
+
+    OP_MoveBeadTo(thisBeadID,  r_posNew1);
+    OP_MoveBeadTo(otherBeadID, r_posNew2);
+
+    if (nThermalization_Mode != -1){
+        newEn += Energy_InitPotential(thisBeadID);
+        newEn += Energy_InitPotential(otherBeadID);
+    }
+
+    Energy_Iso_ForCoLocal(thisBeadID, otherBeadID, r_posNew1, &newEn, &oldEn,
+                          &ovlp_num, &cont_num, oldOvlpNeighs, oldContNeighs);
+    Energy_Iso_ForCoLocal(otherBeadID, thisBeadID, r_posNew2, &newEn, &oldEn,
+                          &ovlp_num, &cont_num, oldOvlpNeighs, oldContNeighs);
+
+    lLDub MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
     if (MCProb < MHAcc) { // Accept this state
         bAccept = 1;
         // printf("Accepted!\n");
         return bAccept;
-    } else {
-        OP_Inv_MoveBeadTo(beadID);
-        OP_Inv_MoveBeadTo(beadPart);
+    }
+    else {
+        OP_Inv_MoveBeadTo(thisBeadID);
+        OP_Inv_MoveBeadTo(otherBeadID);
         bAccept = 0;
         // printf("Rejected move; undoing!\n");
         return bAccept;
@@ -922,9 +935,9 @@ int Move_MultiLocal(int beadID, float MyTemp) {
     int curID;                      // current bead being looked at
     int tmpR[MAX_VALENCY][POS_MAX]; // Storing temporary locations
     int bAccept;
-    int lRadLow, lRadUp;
-    lRadLow   = 2;
-    lRadUp    = lRadLow * 2 + 1; // 2*2+1
+//    int lRadLow, lRadUp;
+    const int lRadLow   = 2;
+    const int lRadUp    = lRadLow * 2 + 1; // 2*2+1
     int xTemp = 0;
     int yTemp = 0;
 
@@ -987,7 +1000,7 @@ int Move_MultiLocal(int beadID, float MyTemp) {
     lLDub newEn = 0.;
     lLDub MCProb;
 
-    int bead_list[MAX_BONDS + 1] = {0.};
+    int bead_list[MAX_BONDS + 1] = {0};
     int bead_num                 = 0;
     curID                        = beadID;
     topIt                        = 0;
@@ -1536,13 +1549,13 @@ int Move_Local_Equil(int beadID, float MyTemp) { // Performs a local translation
     oldEn = nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
     newEn = 0.;
 
-    Energy_Iso_ForLocal(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
+    Energy_Iso_ForLocalEquil(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
 
     OP_MoveBeadTo(beadID, r_posNew);
 
     newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    Energy_Iso_ForLocal(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs, newContNeighs);
+    Energy_Iso_ForLocalEquil(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs, newContNeighs);
 
 
     MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
@@ -2318,7 +2331,7 @@ void OP_SwapBeads(int bead1, int bead2) {
 /// the null operation is still performed.
 /// Mathematically, we have that f$vec{r}^prime = hat{R}_i(theta)vec{r}f$ where f$vec{r}f$ is the new
 /// position, f$hat{R}_i(theta)f$ is the standard rotation matrix where i=X,Y,Z and
-/// f$theta=45^circ,180^circ,270^circf$. For now, only 90 degree rotations are implemented where the Rot_{#1}_{#2}
+/// $theta=45^circ,180^circ,270^circ$. For now, only 90 degree rotations are implemented where the Rot_{#1}_{#2}
 /// functions/sub-routines below explicitly calculate what the new vector is given the axis ({#1}) and angle ({#2}).
 /// Aribitrary rotations are a little harder on lattices because some rotations do not fully overlap with points on
 /// the lattice being used. In our case, it is a simple cubic lattice.
