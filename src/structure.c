@@ -1,6 +1,5 @@
 #include "structure.h"
 #include "cluster.h"
-#include "global.h"
 
 /// Lat_Ind_FromCoords - helper function to get the correct 1D index of this position
 /// \param i
@@ -8,7 +7,7 @@
 /// \param k
 /// \return the 1D index location for (i,j,k) position
 int Lat_Ind_FromCoords(const int i, const int j, const int k) { // Lattice index from 3D to 1D array
-    return i + nBoxSize[0] * (j + nBoxSize[1] * k);
+    return i + nBoxSize[POS_X] * (j + nBoxSize[POS_Y] * k);
 }
 
 /// Lat_Ind_FromVec - returns the 1D index given the array xArr
@@ -498,6 +497,50 @@ int Check_MTLinkerConstraint(int beadID, int (*tmpR)[POS_MAX]) {
     }
 
     return canI;
+}
+
+/// Check_MTLinkerConstraint_New - given that all the beads in beadList are at the new
+/// positions already, as part of the MTLocal move, we iterate over every bead and check if
+/// any linker constraints are broken. If so, return 0. If not, return 1 for success.
+/// \param beadID
+/// \param tmpR
+/// \return
+int Check_MTLinkerConstraint_New(const int listSize, const int* beadList) {
+
+    int i, j, bead1, bead2;
+    int dumBonds[MAX_BONDS+1];
+    int dumNum;
+    float xDis;
+    for (i = 0; i < listSize; i++){
+        bead1   = beadList[i];
+        dumNum  = OP_GetTopoBonds(bead1, dumBonds);
+        for (j=1; j<dumNum; j++){//No need for self-distance = 0.
+            bead2 = dumBonds[j];
+            xDis = Dist_BeadToBead(bead1, bead2);
+            if (xDis > 1.74 * (float) linker_len[bead1][j-1]){
+                return 0;
+            }
+        }
+    }
+
+    return 1;
+}
+
+/// Check_BeadID_InList: Iterate over the list of beads to see if the bead is in the list.
+/// If so, return 1. Otherwise return 0.
+/// \param thisBeadID
+/// \param listSize
+/// \param beadList
+/// \return
+int Check_BeadID_InList(const int thisBeadID,
+                        const int listSize, const int beadList[MAX_BONDS+1]){
+    int i;
+    for(i = 0; i < listSize; i++){
+        if (thisBeadID == beadList[i]){
+            return 1;
+        }
+    }
+    return 0;
 }
 
 void Calc_SystemCenterOfMass(lDub *tmpR) {
@@ -1127,4 +1170,18 @@ void PosArr_add_noPBC(int *outVec, const int *firVec, const int *secVec) {
     for (j = 0; j < POS_MAX; j++) {
         outVec[j] = firVec[j] + secVec[j];
     }
+}
+
+
+int OP_GetTopoBonds(const int beadID, int *dum_list){
+    int top_it = 0;
+    int curID = beadID;
+
+    while (curID != -1){
+        dum_list[top_it] = curID;
+        curID = topo_info[beadID][top_it++];
+    }
+
+    return top_it;
+
 }

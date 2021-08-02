@@ -105,9 +105,25 @@ void OP_NormalizeRotState(const int beadVal, const int CandNums);
 
 int OP_PickRotState(int CandNums);
 
-void OP_Snake_SlitherFwd(const int firstB, const int lastB, const int *r_posNew);
+void OP_System_Snake_SlitherFwd(const int firstB, const int lastB, const int *r_posNew);
 
-void OP_Snake_SlitherBck(const int firstB, const int lastB, const int *r_posNew);
+void OP_System_Snake_SlitherBck(const int firstB, const int lastB, const int *r_posNew);
+
+void OP_Beads_CopyBeadsInListToOld(const int listSize, const int* beadList);
+
+void OP_Beads_CopyBeadsInListFromOld(const int listSize, const int *beadList);
+
+void OP_Beads_CopyBeadsInListToPosList(const int listSize, const int *beadList, int (*beadPos)[POS_MAX]);
+
+void OP_Lattice_EmptySitesForListOfBeads(const int listSize, const int *beadList);
+
+void OP_Lattice_PlaceBeadsInList(const int listSize, const int *beadList);
+
+void OP_Lattice_EmptySitesForListOfPos(const int listSize, const int (*beadPos)[POS_MAX]);
+
+void OP_Beads_MoveBeadsInListToPos(const int listSize, const int *beadList, const int (*newPos)[POS_MAX]);
+
+void OP_Inv_MoveBeads_InList_ToPos(const int listSize, const int *beadList);
 
 lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp);
 
@@ -118,5 +134,24 @@ lLDub MC_RosenbluthSampling_ForLocal_AtNew(const int beadID, const int resi, int
 lLDub MC_RosenbluthSampling_ForChains_AtOld(const int beadID, const int resi, long double *oldEn, const int neigh_num);
 
 lLDub MC_RosenbluthSampling_ForChains_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num);
+
+lLDub MC_RosenbluthSampling_ForLists_AtOld(const int beadIdx,
+                                            const int listSize, const int beadList[MAX_BONDS+1],
+                                            lLDub *oldEn, const int neigh_num);
+
+lLDub MC_RosenbluthSampling_ForLists_AtNew(const int beadIdx,
+                                           const int listSize, const int beadList[MAX_BONDS+1],
+                                           int* bead_part, lLDub *oldEn, const int neigh_num);
+
+
+void OP_System_MoveBeadsInListToPos(const int listSize, const int *beadList, const int (*newPos)[POS_MAX]);
+
+void OP_Beads_BreakBondsInList(const int listSize, const int *beadList);
+
+void OP_Beads_BreakBond(const int beadID);
+
+void OP_Beads_RestoreBondsInList(const int listSize, const int *beadList);
+
+void OP_Beads_RestoreBond(const int beadID);
 
 #endif // _MCMOVE_H_

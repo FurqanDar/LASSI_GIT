@@ -1,8 +1,8 @@
 #include "mcmove.h"
 #include "cluster.h"
 #include "energy.h"
-#include "global.h"
 #include "structure.h"
+
 
 /// MC_Step - given the MC move frequencies, picks which move to try.
 /// \param fMCTemp
@@ -275,7 +275,8 @@ int Move_Local(int beadID, float MyTemp) { // Performs a local translation MC-mo
 
     // Attempt to find an empty lattice point.
     PosArr_copy(r_pos0, bead_info[beadID]);
-    PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
+    PosArr_gen_rand_wRad(r_disp, 2);
+//    PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
     PosArr_add_wPBC(r_posNew, r_pos0, r_disp);
 
     //Checking to see validity of new point.
@@ -425,10 +426,10 @@ int Move_Snake(int chainID, float MyTemp) { // Performs a slither MC-move on cha
     }
 
     if (MCProb < 0.5) { // Slithering the chain forwards in ID-space
-        OP_Snake_SlitherFwd(firstB, lastB, r_posNew);
+        OP_System_Snake_SlitherFwd(firstB, lastB, r_posNew);
     }
     else { // Slithering backwards in ID-space
-        OP_Snake_SlitherBck(firstB, lastB, r_posNew);
+        OP_System_Snake_SlitherBck(firstB, lastB, r_posNew);
     }
 
     // Have slithered the chain whichever way
@@ -517,8 +518,8 @@ int Move_Trans(int chainID, float MyTemp) { // Performs a translation move with 
     lLDub BSum = 0.;
     for(i = firstB; i < lastB; i++){
         Energy_Iso_ForChains(i, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
-    resi = bead_info[i][BEAD_TYPE];
-    BSum += MC_RosenbluthSampling_ForChains_AtOld(i, resi, &oldEn, old_ovlp_num);
+        resi = bead_info[i][BEAD_TYPE];
+        BSum += MC_RosenbluthSampling_ForChains_AtOld(i, resi, &oldEn, old_ovlp_num);
     }
 
     OP_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff.
@@ -930,191 +931,117 @@ int Move_CoLocal(int thisBeadID, float MyTemp) {
 /// \param MyTemp
 /// \return 1 if accepted, 0 if rejected.
 int Move_MultiLocal(int beadID, float MyTemp) {
-    int topIt;                      // Iterator for topo_info
-    int i, j;                       // Loop iterators
-    int curID;                      // current bead being looked at
-    int tmpR[MAX_VALENCY][POS_MAX]; // Storing temporary locations
+
+    int beadsList[MAX_BONDS+1];
+    const int beadNum = OP_GetTopoBonds(beadID, beadsList);
     int bAccept;
-//    int lRadLow, lRadUp;
-    const int lRadLow   = 2;
-    const int lRadUp    = lRadLow * 2 + 1; // 2*2+1
-    int xTemp = 0;
-    int yTemp = 0;
 
-    curID = beadID;
-    topIt = 0;
-    while (curID != -1) {
-        for (j = 0; j < BEADINFO_MAX; j++) {
-            old_bead[curID][j] = bead_info[curID][j]; // Remembering
-            if (j < POS_MAX) {
-                tmpR[topIt][j] = bead_info[curID][j];
-            }
-        }
-        curID = topo_info[beadID][topIt++];
-    }
-
-    curID = beadID;
-    topIt = 0;
-    while (curID != -1) { // Removing from where we were
-        naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = -1;
-        curID                                           = topo_info[beadID][topIt++];
-    }
-    curID = beadID;
-    topIt = 0;
-    while (curID != -1) {
-        yTemp = 1;
-        for (j = 0; j < POS_MAX; j++) {
-            tmpR[topIt][j] = (rand() % lRadUp) - lRadLow;
-            tmpR[topIt][j] = (bead_info[curID][j] + tmpR[topIt][j] + nBoxSize[j]) % nBoxSize[j];
-        }
-        if (naTotLattice[Lat_Ind_FromVec(tmpR[topIt])] != -1) {
-            yTemp = 0;
-            break;
-        }
-        naTotLattice[Lat_Ind_FromVec(tmpR[topIt])] = curID;
-        curID                                      = topo_info[beadID][topIt++];
-    }
-    if (yTemp == 1) { // No steric clash so check for topology constraint
-        yTemp = Check_MTLinkerConstraint(beadID, tmpR);
-    }
-    for (i = 0; i < topIt; i++) { // Removing from trial locations
-        naTotLattice[Lat_Ind_FromVec(tmpR[i])] = -1;
-    }
-
-    if (yTemp == 0) { // Linker or steric clash didn't work out
-        curID = beadID;
-        topIt = 0;
-        while (curID != -1) { // Putting us back, because rejection
-            naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
-            curID                                           = topo_info[beadID][topIt++];
-        }
+    if (beadNum < 2){ // Bead must be bonded to at least 2 things.
         bAccept = 0;
         return bAccept;
     }
 
-    int   FWWeight, BWWeight; // Used to perform orientational bias MC
-    lLDub FSum, BSum, Ros_Offset;
-    int   resi, resj;
-    // int tmpR2[POS_MAX], tmpR3[POS_MAX];
+    int beads_pos0[MAX_BONDS+1][POS_MAX];
+    int beads_posNew[MAX_BONDS+1][POS_MAX];
+    int r_posTmp1[POS_MAX];
+    int tmpBead;
+    int i;
+    int yTemp;
+
+    OP_Beads_CopyBeadsInListToOld(beadNum, beadsList);
+    OP_Beads_CopyBeadsInListToPosList(beadNum, beadsList, beads_pos0);
+
+    OP_Lattice_EmptySitesForListOfPos(beadNum, beads_pos0);
+
+    for (i = 0; i < beadNum; i++){
+        PosArr_gen_rand_wRad(r_posTmp1, 2);
+        PosArr_add_wPBC(beads_posNew[i], r_posTmp1, beads_pos0[i]);
+        yTemp = Check_MoveBeadTo(beads_posNew[i]);
+        if (yTemp == 0){
+            break;
+        }
+        tmpBead = beadsList[i];
+        naTotLattice[Lat_Ind_FromVec(beads_posNew[i])] = tmpBead;
+    }
+
+    OP_Lattice_EmptySitesForListOfPos(i, beads_posNew);
+
+    if (yTemp == 1) { // No steric clash so check for topology constraint.
+        OP_Beads_MoveBeadsInListToPos(beadNum, beadsList, beads_posNew);
+        yTemp = Check_MTLinkerConstraint_New(beadNum, beadsList);
+        OP_Beads_MoveBeadsInListToPos(beadNum, beadsList, beads_pos0);
+    }
+
+    OP_Lattice_PlaceBeadsInList(beadNum, beadsList);
+
+    if (yTemp == 0){
+        bAccept = 0;
+        return bAccept;
+    }
+
     lLDub oldEn = 0.;
+
+    if (nThermalization_Mode != -1){
+        for (i = 0; i < beadNum; i++){
+            tmpBead = beadsList[i];
+            oldEn += Energy_InitPotential(tmpBead);
+        }
+    }
+
+    int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
+
+    lLDub BSum  = 0.;
     lLDub newEn = 0.;
-    lLDub MCProb;
+    for (i = 0; i < beadNum; i++){
+        Energy_Iso_ForLists(i, beadNum, beadsList, beads_pos0,
+                            &oldEn,        &newEn,
+                            &old_ovlp_num, &old_cont_num,
+                            oldOvlpNeighs, oldContNeighs);
+        BSum += MC_RosenbluthSampling_ForLists_AtOld(i, beadNum, beadsList, &oldEn, old_ovlp_num);
+    }
 
-    int bead_list[MAX_BONDS + 1] = {0};
-    int bead_num                 = 0;
-    curID                        = beadID;
-    topIt                        = 0;
-    yTemp                        = 0;
-    while (curID != -1) {
-        bead_list[topIt] = curID;
-        resi             = bead_info[curID][BEAD_TYPE];
-        if (nBeadTypeIsSticker[resi] == 0) { // Skip non-interactors
-            curID = topo_info[beadID][topIt++];
-            continue;
+    OP_System_MoveBeadsInListToPos(beadNum, beadsList, beads_posNew);
+    OP_Beads_BreakBondsInList(beadNum, beadsList);
+
+    if (nThermalization_Mode != -1){
+        for (i = 0; i < beadNum; i++){
+            tmpBead = beadsList[i];
+            newEn += Energy_InitPotential(tmpBead);
         }
-
-        BWWeight = Check_RotStatesOld(curID, resi, MyTemp);
-        OP_NormalizeRotState(yTemp, BWWeight);
-        curID = topo_info[beadID][topIt++];
-        yTemp++;
-    }
-    bead_num = topIt;
-    curID    = beadID;
-    topIt    = 0;
-    while (curID != -1) {
-        oldEn += (lLDub)Energy_Anisotropic_With_List(curID, bead_list, bead_num);
-        oldEn += (lLDub)Energy_Isotropic_With_List(curID, bead_list, bead_num);
-        curID = topo_info[beadID][topIt++];
-    }
-    BSum = 0.;
-    for (i = 0; i < yTemp; i++) {
-        BSum += logl(bolt_norm[i]);
-    }
-    // BSum = expf(BSum);
-    curID = beadID;
-    topIt = 0;
-    while (curID != -1) {
-        OP_MoveBeadTo_ForMTLocal(curID, tmpR[topIt]);
-        curID = topo_info[beadID][topIt++];
     }
 
-    /*curID = beadID;
-    topIt = 0;
-    while (curID != -1) {//Breaking old bonds
-        i = bead_info[curID][BEAD_FACE];
-        if (i != -1) {
-            bead_info[i][BEAD_FACE] = -1;
-            bead_info[curID][BEAD_FACE] = -1;
-        }
-        curID = topo_info[beadID][topIt++];
-    }*/
-
-    curID = beadID;
-    topIt = 0;
-    yTemp = 0;
-    while (curID != -1) {
-        resi = bead_info[curID][BEAD_TYPE];
-        if (nBeadTypeIsSticker[resi] == 0) { // Skip non-interactors
-            curID = topo_info[beadID][topIt++];
-            continue;
-        }
-        OP_ShuffleRotIndecies();
-        FWWeight = Check_RotStatesNew(curID, resi, MyTemp);
-        OP_NormalizeRotState(yTemp, FWWeight);
-        if (bead_info[curID][BEAD_FACE] == -1) { // Make sure this bead is unbonded!
-            xTemp = OP_PickRotState(FWWeight);
-            if (xTemp != -1) { // An appropriate partner has been selected. Form the bonds and add the energy
-                bead_info[curID][BEAD_FACE] = xTemp;
-                bead_info[xTemp][BEAD_FACE] = curID;
+    lLDub FSum = 0.;
+    for (i = 0; i < beadNum; i++){
+        Energy_Iso_ForLists(i, beadNum, beadsList, beads_posNew,
+                            &newEn,        &oldEn,
+                            &new_ovlp_num, &new_cont_num,
+                            newOvlpNeighs, newContNeighs);
+        FSum += MC_RosenbluthSampling_ForLists_AtNew(i, beadNum, beadsList, &yTemp, &newEn, new_ovlp_num);
+        if (yTemp != -1) { // An appropriate partner has been selected. Form the bonds and add the energy
+            tmpBead = beadsList[i];
+            if (bead_info[tmpBead][BEAD_FACE] != -1){
+                printf("HOW?!\n");
+                exit(1);
             }
+            bead_info[tmpBead][BEAD_FACE] = yTemp;
+            bead_info[yTemp][BEAD_FACE]   = tmpBead;
+            newEn += Energy_Anisotropic_For_List(tmpBead, beadNum, beadsList);
         }
-        curID = topo_info[beadID][topIt++];
-        yTemp++;
     }
 
-    curID = beadID;
-    topIt = 0;
-    while (curID != -1) {
-        newEn += (lLDub)Energy_Anisotropic_With_List(curID, bead_list, bead_num);
-        newEn += (lLDub)Energy_Isotropic_With_List(curID, bead_list, bead_num);
-        curID = topo_info[beadID][topIt++];
-    }
-
-    FSum = 0.;
-    for (i = 0; i < yTemp; i++) {
-        FSum += logl(bolt_norm[i]);
-    }
-
-    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
+    lLDub MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub)MyTemp);
+
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above
         bAccept = 1;
         return bAccept;
-    } else {
-        curID = beadID;
-        topIt = 0;
-        while (curID != -1) {
-            i = bead_info[curID][BEAD_FACE];
-            if (i != -1) {
-                bead_info[i][BEAD_FACE]     = -1;
-                bead_info[curID][BEAD_FACE] = -1;
-            }
-            naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = -1;
-            for (j = 0; j < BEADINFO_MAX; j++) {
-                bead_info[curID][j] = old_bead[curID][j];
-            }
-            curID = topo_info[beadID][topIt++];
-        }
-        curID = beadID;
-        topIt = 0;
-        while (curID != -1) {
-            naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
-            i                                               = bead_info[curID][BEAD_FACE];
-            if (i != -1) {
-                bead_info[i][BEAD_FACE] = curID;
-            }
-            curID = topo_info[beadID][topIt++];
-        }
+    }
+    else {
+        OP_Beads_BreakBondsInList(beadNum, beadsList);
+        OP_Lattice_EmptySitesForListOfBeads(beadNum, beadsList);
+        OP_Beads_CopyBeadsInListFromOld(beadNum, beadsList);
+        OP_Beads_RestoreBondsInList(beadNum, beadsList);
+        OP_Lattice_PlaceBeadsInList(beadNum, beadsList);
         bAccept = 0;
         return bAccept;
     }
@@ -1136,32 +1063,20 @@ int Move_MultiLocal(int beadID, float MyTemp) {
 /// \return 1 if accepted, 0 if rejected.
 int Move_Pivot(int chainID, float MyTemp) {
     // Performs a pivot move on chainID
-    /*
-  Randomly pick a bead in this chain (anchorBead), and perform a symmetry operation on the beads after the anchorBead.
-  Note that if anchorBead is the second-to-last, or last, bead, the move is rejected. Local and slither moves would be
-  better for those. The protein must be linear and the move is rejected if the chain is branched. It is assumed that a
-  linear chain has been passed!
-  */
+    /* Randomly pick a bead in this chain (anchorBead), and perform a symmetry operation on the beads after the anchorBead.
+     * Note that if anchorBead is the second-to-last, or last, bead, the move is rejected. Local and slither moves would be
+     * better for those. The protein must be linear and the move is rejected if the chain is branched. It is assumed that a
+     * linear chain has been passed!
+     */
     int bAccept = 0;
-    // Check if the chain is longer than 3 or if it is linear
-    int chainLength = chain_info[chainID][CHAIN_LENGTH];
-    if (chainLength <= 3 || nChainTypeIsLinear[chain_info[chainID][CHAIN_TYPE]] != 1) {
-        bAccept = 0;
+    if (!nChainTypeIsLinear[chain_info[chainID][CHAIN_TYPE]]){
         return bAccept;
     }
-    int firstB, lastB;
-    // Get the beadID's for the first and last bead
-    firstB = chain_info[chainID][CHAIN_START];
-    lastB  = firstB + chainLength;
-
-    // Randomly select a bead that is neither the first nor last
-    int anchorBead = chainLength - 2;
-    anchorBead     = 1 + (rand() % anchorBead);
-
-    int PivotDir; //-1 Means backwards, +1 means forwards. Always Pivot the smaller portion
-    PivotDir   = anchorBead > chainLength / 2 ? 1 : -1;
-    anchorBead = firstB + anchorBead;
-    // printf("Bead: %d\n", anchorBead);
+    // Check if the chain is longer than 3 or if it is linear
+    const int chainLength = chain_info[chainID][CHAIN_LENGTH];
+    if (chainLength <= 3) {
+        return bAccept;
+    }
 
     int PivotM;
     PivotM = rand() % 10;
@@ -1170,38 +1085,52 @@ int Move_Pivot(int chainID, float MyTemp) {
         return bAccept;
     }
 
+    // Get the beadID's for the first and last bead
+    const int firstB = chain_info[chainID][CHAIN_START];
+    const int lastB  = firstB + chainLength;
+
+    // Randomly select a bead that is neither the first nor last
+    int anchorBead = chainLength - 2;
+    anchorBead     = 1 + (rand() % anchorBead);
+
+    //-1 Means backwards, +1 means forwards. Always Pivot the smaller portion
+    const int PivotDir   = anchorBead > chainLength / 2 ? 1 : -1;
+    anchorBead = firstB + anchorBead;
+    // printf("Bead: %d\n", anchorBead);
+
     int i, j;
     int xTemp, yTemp;
     int anchorPos[POS_MAX];
-    int tmpList[MAX_CHAINLEN];
-    int listLen = 0;
+    int beadsList[MAX_CHAINLEN];
+    int beadNum = 0;
 
     if (PivotDir == 1) {
         for (i = anchorBead + 1; i < lastB; i++) {
-            tmpList[listLen++] = i;
+            beadsList[beadNum++] = i;
         }
-    } else {
+    }
+    else {
         for (i = firstB; i < anchorBead; i++) {
-            tmpList[listLen++] = i;
+            beadsList[beadNum++] = i;
         }
     }
 
-    for (j = 0; j < POS_MAX; j++) {
-        anchorPos[j] = bead_info[anchorBead][j];
-    }
+    const int smBead = beadsList[0];
+    const int lgBead = beadsList[beadNum-1];
 
-    yTemp = 0;
+    PosArr_copy(anchorPos, bead_info[anchorBead]);
 
-    for (j = 0; j < listLen; j++) {
-        i = tmpList[j];
+    int tmpBead;
+
+    for (i = 0; i < beadNum; i++) {
+        tmpBead = beadsList[i];
         // Use anchorbead as origin, and check what happens after the rotation to every bead
-        OP_Rotation(PivotM, i, anchorPos);
+        OP_Rotation(PivotM, tmpBead, anchorPos);
         yTemp = Check_MoveBeadTo(naTempR);
         if (yTemp == 0) {
             break;
         }
     }
-
     if (yTemp == 0) {
         bAccept = 0;
         return bAccept;
@@ -1214,9 +1143,25 @@ int Move_Pivot(int chainID, float MyTemp) {
     lLDub newEn = 0.;
     lLDub MCProb;
 
+    oldEn = 0.;
+    if (nThermalization_Mode != -1) {
+        for (i = 0; i < beadNum; i++) {
+            tmpBead = beadsList[i];
+            oldEn += Energy_InitPotential(tmpBead);
+        }
+    }
+
+    int old_ovlp_num, old_cont_num;
+
+    for (i = 0; i < beadNum; i++){
+        tmpBead = beadsList[i];
+//        Energy_Iso
+
+    }
+
     yTemp = 0;
-    for (j = 0; j < listLen; j++) {
-        i    = tmpList[j];
+    for (j = 0; j < beadNum; j++) {
+        i    = beadsList[j];
         resi = bead_info[i][BEAD_TYPE];
         if (nBeadTypeIsSticker[resi] == 0) { // Skip beads that cannot bond.
             continue;
@@ -1227,10 +1172,10 @@ int Move_Pivot(int chainID, float MyTemp) {
         yTemp++;
     }
 
-    for (j = 0; j < listLen; j++) {
-        i = tmpList[j];
-        oldEn += (lLDub)Energy_Anisotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
-        oldEn += (lLDub)Energy_Isotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
+    for (j = 0; j < beadNum; j++) {
+        i = beadsList[j];
+        oldEn += (lLDub)Energy_Anisotropic_Contiguous_Range(i, beadsList[0], beadsList[beadNum - 1]);
+        oldEn += (lLDub)Energy_Isotropic_Contiguous_Range(i, beadsList[0], beadsList[beadNum - 1]);
     }
 
     BSum = 0.;
@@ -1238,14 +1183,14 @@ int Move_Pivot(int chainID, float MyTemp) {
         BSum += logl(bolt_norm[i]);
     }
 
-    for (j = 0; j < listLen; j++) {
-        i = tmpList[j];
+    for (j = 0; j < beadNum; j++) {
+        i = beadsList[j];
         OP_Rotation(PivotM, i, anchorPos);
         OP_MoveBeadTo(i, naTempR);
     }
 
-    for (j = 0; j < listLen; j++) { // Break all bonds for the list
-        i = tmpList[j];
+    for (j = 0; j < beadNum; j++) { // Break all bonds for the list
+        i = beadsList[j];
         if (bead_info[i][BEAD_FACE] != -1) {
             bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1;
             bead_info[i][BEAD_FACE]                       = -1;
@@ -1253,8 +1198,8 @@ int Move_Pivot(int chainID, float MyTemp) {
     }
 
     yTemp = 0;
-    for (j = 0; j < listLen; j++) {
-        i    = tmpList[j];
+    for (j = 0; j < beadNum; j++) {
+        i    = beadsList[j];
         resi = bead_info[i][BEAD_TYPE];
         if (nBeadTypeIsSticker[resi] == 0) { // Because linkers don't have rotational states
             continue;
@@ -1273,10 +1218,10 @@ int Move_Pivot(int chainID, float MyTemp) {
         }
         yTemp++;
     }
-    for (j = 0; j < listLen; j++) {
-        i = tmpList[j];
-        newEn += (lLDub)Energy_Anisotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
-        newEn += (lLDub)Energy_Isotropic_Contiguous_Range(i, tmpList[0], tmpList[listLen - 1]);
+    for (j = 0; j < beadNum; j++) {
+        i = beadsList[j];
+        newEn += (lLDub)Energy_Anisotropic_Contiguous_Range(i, beadsList[0], beadsList[beadNum - 1]);
+        newEn += (lLDub)Energy_Isotropic_Contiguous_Range(i, beadsList[0], beadsList[beadNum - 1]);
     }
     FSum = 0.;
     for (i = 0; i < yTemp; i++) {
@@ -1288,16 +1233,17 @@ int Move_Pivot(int chainID, float MyTemp) {
     if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above!
         bAccept = 1;
         return bAccept;
-    } else {                            // Rejecting move
-        for (j = 0; j < listLen; j++) { // Break all newly proposed bonds
-            i = tmpList[j];
+    }
+    else {                            // Rejecting move
+        for (j = 0; j < beadNum; j++) { // Break all newly proposed bonds
+            i = beadsList[j];
             if (bead_info[i][BEAD_FACE] != -1) {
                 bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1;
                 bead_info[i][BEAD_FACE]                       = -1;
             }
         }
-        for (j = 0; j < listLen; j++) {
-            i = tmpList[j];
+        for (j = 0; j < beadNum; j++) {
+            i = beadsList[j];
             OP_Inv_MoveBeadTo(i);
         }
         bAccept = 0;
@@ -1521,7 +1467,8 @@ int Move_Local_Equil(int beadID, float MyTemp) { // Performs a local translation
     int r_pos0[POS_MAX], r_posNew[POS_MAX], r_disp[POS_MAX]; // Vectors to stores coordinates.
     // printf("Beginning LOCAL\n");
     PosArr_copy(r_pos0, bead_info[beadID]);
-    PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
+//    PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
+    PosArr_gen_rand_wRad(r_disp, 2);
     PosArr_add_wPBC(r_posNew, r_pos0, r_disp);
 
     yTemp = Check_MoveBeadTo(r_posNew);
@@ -1634,10 +1581,10 @@ int Move_Snake_Equil(int chainID, float MyTemp) { // Performs a slither MC-move 
     }
 
     if (MCProb < 0.5) {// Slithering the chain forwards in ID-space
-        OP_Snake_SlitherFwd(firstB, lastB, r_posNew);
+        OP_System_Snake_SlitherFwd(firstB, lastB, r_posNew);
     }
     else {// Slithering backwards in ID-space
-        OP_Snake_SlitherBck(firstB, lastB, r_posNew);
+        OP_System_Snake_SlitherBck(firstB, lastB, r_posNew);
     }
 
     if (nThermalization_Mode != -1){
@@ -1729,123 +1676,98 @@ int Move_Trans_Equil(int chainID, float MyTemp) { // Performs a translation move
 
 int Move_MultiLocal_Equil(int beadID, float MyTemp) {
 
-    int topIt;                      // Iterator for topo_info
-    int i, j;                       // Loop iterators
-    int curID;                      // current bead being looked at
-    int r_pos0[MAX_BONDS][POS_MAX]; // Storing temporary locations
-    int r_tmp[POS_MAX];
+    int beadsList[MAX_BONDS+1];
+    const int beadNum = OP_GetTopoBonds(beadID, beadsList);
     int bAccept;
-    int lRadLow, lRadUp;
-    lRadLow   = 2;
-    lRadUp    = lRadLow * 2 + 1; // 2*2+1
-    int xTemp = 0;
-    int yTemp = 0;
-    curID     = beadID;
-    topIt     = 0;
-    while (curID != -1) {
-        OP_CopyBead(old_bead[curID], bead_info[curID]);
-        PosArr_copy(r_pos0[topIt], bead_info[curID]);
-        curID = topo_info[beadID][topIt++];
+
+    if (beadNum < 2){ // Bead must be bonded to at least 2 things.
+        bAccept = 0;
+        return bAccept;
     }
 
-    curID = beadID;
-    topIt = 0;
-    while (curID != -1) {
-        naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = -1;
-        curID                                           = topo_info[beadID][topIt++];
-    }
-    curID = beadID;
-    topIt = 0;
-    while (curID != -1) {
-        yTemp = 1;
-        PosArr_gen_rand_wRad(r_pos0[topIt], 2);
-        PosArr_copy(r_tmp, r_pos0[topIt]);
-        PosArr_add_wPBC(r_pos0[topIt], r_tmp, bead_info[curID]);
-        if (naTotLattice[Lat_Ind_FromVec(r_pos0[topIt])] != -1) {
-            yTemp = 0;
+    int beads_pos0[MAX_BONDS+1][POS_MAX];
+    int beads_posNew[MAX_BONDS+1][POS_MAX];
+    int r_posTmp1[POS_MAX];
+    int tmpBead;
+    int i;
+    int yTemp;
+
+    OP_Beads_CopyBeadsInListToOld(beadNum, beadsList);
+    OP_Beads_CopyBeadsInListToPosList(beadNum, beadsList, beads_pos0);
+    OP_Lattice_EmptySitesForListOfPos(beadNum, beads_pos0);
+
+    for (i = 0; i < beadNum; i++){
+        PosArr_gen_rand_wRad(r_posTmp1, 2);
+        PosArr_add_wPBC(beads_posNew[i], r_posTmp1, beads_pos0[i]);
+        yTemp = Check_MoveBeadTo(beads_posNew[i]);
+        if (yTemp == 0){
             break;
         }
-        naTotLattice[Lat_Ind_FromVec(r_pos0[topIt])] = curID;
-        curID                                      = topo_info[beadID][topIt++];
-    }
-    if (yTemp == 1) { // No steric clash so check for topology constraint
-        yTemp = Check_MTLinkerConstraint(beadID, r_pos0);
-    }
-    for (i = 0; i < topIt; i++) {
-        naTotLattice[Lat_Ind_FromVec(r_pos0[i])] = -1;
+        tmpBead = beadsList[i];
+        naTotLattice[Lat_Ind_FromVec(beads_posNew[i])] = tmpBead;
     }
 
-    if (yTemp == 0) { // Linker or steric clash didn't work out
-        curID = beadID;
-        topIt = 0;
-        while (curID != -1) {
-            naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
-            curID                                           = topo_info[beadID][topIt++];
-        }
-        // printf("No space!\n");
+    OP_Lattice_EmptySitesForListOfPos(i, beads_posNew);
+
+    if (yTemp == 1) { // No steric clash so check for topology constraint.
+        OP_Beads_MoveBeadsInListToPos(beadNum, beadsList, beads_posNew);
+        yTemp = Check_MTLinkerConstraint_New(beadNum, beadsList);
+        OP_Beads_MoveBeadsInListToPos(beadNum, beadsList, beads_pos0);
+    }
+
+    OP_Lattice_PlaceBeadsInList(beadNum, beadsList);
+
+    if (yTemp == 0){
         bAccept = 0;
         return bAccept;
     }
 
     lLDub oldEn = 0.;
+
+    if (nThermalization_Mode != -1){
+        for (i = 0; i < beadNum; i++){
+            tmpBead = beadsList[i];
+            oldEn += Energy_InitPotential(tmpBead);
+        }
+    }
+
+    int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
+
     lLDub newEn = 0.;
-    lLDub MCProb;
-
-    int bead_list[MAX_BONDS + 1] = {0};
-    int bead_num                 = 0;
-    curID                        = beadID;
-    topIt                        = 0;
-    while (curID != -1) {
-        bead_list[topIt] = curID;
-        curID            = topo_info[beadID][topIt++];
+    for (i = 0; i < beadNum; i++){
+        Energy_Iso_ForLists(i, beadNum, beadsList, beads_pos0,
+                            &oldEn,        &newEn,
+                            &old_ovlp_num, &old_cont_num,
+                            oldOvlpNeighs, oldContNeighs);
     }
 
-    bead_num = topIt;
+    OP_System_MoveBeadsInListToPos(beadNum, beadsList, beads_posNew);
 
-    curID = beadID;
-    topIt = 0;
-    while (curID != -1) {
-        oldEn += (lLDub)Energy_Isotropic_With_List(curID, bead_list, bead_num);
-        curID = topo_info[beadID][topIt++];
+    if (nThermalization_Mode != -1){
+        for (i = 0; i < beadNum; i++){
+            tmpBead = beadsList[i];
+            newEn += Energy_InitPotential(tmpBead);
+        }
     }
 
-    curID = beadID;
-    topIt = 0;
-    while (curID != -1) {
-        OP_MoveBeadTo_ForMTLocal(curID, r_pos0[topIt]);
-        curID = topo_info[beadID][topIt++];
+    for (i = 0; i < beadNum; i++){
+        Energy_Iso_ForLists(i, beadNum, beadsList, beads_posNew,
+                            &newEn,        &oldEn,
+                            &new_ovlp_num, &new_cont_num,
+                            newOvlpNeighs, newContNeighs);
     }
 
-    curID = beadID;
-    topIt = 0;
-    while (curID != -1) {
-        newEn += (lLDub)Energy_Isotropic_With_List(curID, bead_list, bead_num);
-        curID = topo_info[beadID][topIt++];
-    }
-
-    MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
+    lLDub MCProb      = (lLDub)rand() / (lLDub)RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub)MyTemp);
-    if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above!
+
+    if (MCProb < MHAcc) { // Accept the move. Remember that the bonds were assigned above
         bAccept = 1;
-        // printf("Win\n" );
         return bAccept;
-    } else {
-        curID = beadID;
-        topIt = 0;
-        while (curID != -1) {
-            naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = -1;
-            curID                                           = topo_info[beadID][topIt++];
-        }
-        curID = beadID;
-        topIt = 0;
-        while (curID != -1) {
-            for (i = 0; i < BEADINFO_MAX; i++) {
-                bead_info[curID][i] = old_bead[curID][i];
-            }
-            naTotLattice[Lat_Ind_FromVec(bead_info[curID])] = curID;
-            curID                                           = topo_info[beadID][topIt++];
-        }
-        // printf("fail\n");
+    }
+    else {
+        OP_Lattice_EmptySitesForListOfBeads(beadNum, beadsList);
+        OP_Beads_CopyBeadsInListFromOld(beadNum, beadsList);
+        OP_Lattice_PlaceBeadsInList(beadNum, beadsList);
         bAccept = 0;
         return bAccept;
     }
@@ -2289,6 +2211,22 @@ void OP_MoveBeadTo_ForMTLocal(
         bead_info[i][BEAD_FACE]      = -1;
         bead_info[beadID][BEAD_FACE] = -1;
     }
+}
+
+void OP_System_MoveBeadsInListToPos(const int listSize, const int *beadList, const int (*newPos)[POS_MAX]){
+
+    OP_Lattice_EmptySitesForListOfBeads(listSize, beadList);
+    OP_Beads_MoveBeadsInListToPos(listSize, beadList, newPos);
+    OP_Lattice_PlaceBeadsInList(listSize, beadList);
+
+}
+
+void OP_Inv_MoveBeadsTo_InList(const int listSize, const int beadList[MAX_BONDS+1],
+                               const int newPos[MAX_BONDS+1][POS_MAX]){
+    OP_Lattice_EmptySitesForListOfBeads(listSize, beadList);
+//    OP_Lattice_PlaceBeadsInList()
+
+
 }
 
 /// OP_SwapBeads - swaps all the properties, including bonding partners betweem bead1 and bead2. Used in the DbPvt move.
@@ -2744,7 +2682,6 @@ lLDub MC_RosenbluthSampling_ForLocal_AtOld(const int beadID, const int resi, lon
     }
 }
 
-
 lLDub MC_RosenbluthSampling_ForLocal_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num){
     int ros_num;
 
@@ -2776,7 +2713,6 @@ lLDub MC_RosenbluthSampling_ForChains_AtOld(const int beadID, const int resi, lo
     }
 }
 
-
 lLDub MC_RosenbluthSampling_ForChains_AtNew(const int beadID, const int resi, int* bead_part, long double *newEn, const int neigh_num){
     int ros_num;
     const int cur_part = bead_info[beadID][BEAD_FACE];
@@ -2785,7 +2721,7 @@ lLDub MC_RosenbluthSampling_ForChains_AtNew(const int beadID, const int resi, in
         OP_ShuffleArray(neigh_num, newOvlpNeighs);
         ros_num = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, neigh_num);
         OP_NormalizeRotState(0, ros_num);
-        if (cur_part != -1) {
+        if (cur_part == -1) {
             *bead_part = OP_PickRotState(ros_num);
         }
         return logl(bolt_norm[0]);
@@ -2796,7 +2732,7 @@ lLDub MC_RosenbluthSampling_ForChains_AtNew(const int beadID, const int resi, in
 }
 
 
-void OP_Snake_SlitherFwd(const int firstB, const int lastB, const int *r_posNew){
+void OP_System_Snake_SlitherFwd(const int firstB, const int lastB, const int *r_posNew){
     int i;
     int r_posTmp1[POS_MAX], r_posTmp2[POS_MAX];
     for (i = firstB; i < lastB - 1; i++) {
@@ -2814,7 +2750,7 @@ void OP_Snake_SlitherFwd(const int firstB, const int lastB, const int *r_posNew)
     naTotLattice[Lat_Ind_FromVec(r_posNew)] = i;
 }
 
-void OP_Snake_SlitherBck(const int firstB, const int lastB, const int *r_posNew){
+void OP_System_Snake_SlitherBck(const int firstB, const int lastB, const int *r_posNew){
     int i;
     int r_posTmp1[POS_MAX], r_posTmp2[POS_MAX];
     for (i = firstB + 1; i < lastB; i++) {
@@ -2832,7 +2768,143 @@ void OP_Snake_SlitherBck(const int firstB, const int lastB, const int *r_posNew)
     naTotLattice[Lat_Ind_FromVec(r_posNew)] = i;
 }
 
+void OP_Beads_CopyBeadsInListToOld(const int listSize, const int *beadList){
 
+    int i, thisBead;
+    for (i = 0; i < listSize; i++){
+        thisBead = beadList[i];
+        OP_CopyBead(old_bead[thisBead], bead_info[thisBead]);
+    }
 
+}
 
+void OP_Beads_CopyBeadsInListFromOld(const int listSize, const int *beadList){
 
+    int i, thisBead;
+    for (i = 0; i < listSize; i++){
+        thisBead = beadList[i];
+        OP_CopyBead(bead_info[thisBead], old_bead[thisBead]);
+    }
+
+}
+
+void OP_Beads_CopyBeadsInListToPosList(const int listSize, const int *beadList, int (*beadPos)[POS_MAX]){
+
+    int i, thisBead;
+    for (i = 0; i < listSize; i++){
+        thisBead = beadList[i];
+        PosArr_copy(beadPos[i], bead_info[thisBead]);
+    }
+
+}
+
+void OP_Lattice_EmptySitesForListOfBeads(const int listSize, const int *beadList){
+    int i, thisBead;
+    for (i = 0; i < listSize; i++){
+        thisBead = beadList[i];
+        naTotLattice[Lat_Ind_OfBead(thisBead)] = -1;
+    }
+}
+
+void OP_Lattice_PlaceBeadsInList(const int listSize, const int *beadList){
+    int i, thisBead;
+    for (i = 0; i < listSize; i++){
+        thisBead = beadList[i];
+        naTotLattice[Lat_Ind_OfBead(thisBead)] = thisBead;
+    }
+}
+
+void OP_Lattice_EmptySitesForListOfPos(const int listSize, const int (*beadPos)[POS_MAX]){
+    int i;
+    for (i = 0; i < listSize; i++){
+        naTotLattice[Lat_Ind_FromVec(beadPos[i])] = -1;
+    }
+}
+
+void OP_Beads_MoveBeadsInListToPos(const int listSize, const int *beadList, const int (*newPos)[POS_MAX]){
+    int i, tmpBead;
+    for (i=0; i < listSize; i++){
+        tmpBead = beadList[i];
+        PosArr_copy(bead_info[tmpBead], newPos[i]);
+    }
+
+}
+
+void OP_Inv_MoveBeads_InList_ToPos(const int listSize, const int *beadList){
+    int i, tmpBead;
+    for (i=0; i < listSize; i++){
+        tmpBead = beadList[i];
+        PosArr_copy(bead_info[tmpBead], old_bead[tmpBead]);
+    }
+
+}
+
+lLDub MC_RosenbluthSampling_ForLists_AtOld(const int beadIdx,
+                                           const int listSize, const int beadList[MAX_BONDS+1],
+                                           lLDub *oldEn, const int neigh_num){
+    const int beadID = beadList[beadIdx];
+    const int resi   = bead_info[beadID][BEAD_TYPE];
+    int ros_num;
+    if (nBeadTypeIsSticker[resi]){
+        *oldEn = *oldEn + Energy_Anisotropic_For_List(beadID, listSize, beadList);
+        ros_num = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, neigh_num);
+        OP_NormalizeRotState(0, ros_num);
+        return logl(bolt_norm[0]);
+    }
+    else{
+        return 0.;
+    }
+}
+
+lLDub MC_RosenbluthSampling_ForLists_AtNew(const int beadIdx,
+                                           const int listSize, const int beadList[MAX_BONDS+1],
+                                           int* bead_part, lLDub *oldEn, const int neigh_num){
+    *bead_part = -1;
+    const int beadID  = beadList[beadIdx];
+    const int resi    = bead_info[beadID][BEAD_TYPE];
+    const int cur_part = bead_info[beadID][BEAD_FACE];
+    int ros_num;
+    if (nBeadTypeIsSticker[resi]){
+        *oldEn = *oldEn + Energy_Anisotropic_For_List(beadID, listSize, beadList);
+        ros_num = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, neigh_num);
+        if (cur_part == -1){
+            *bead_part = OP_PickRotState(ros_num);
+        }
+        OP_NormalizeRotState(0, ros_num);
+        return logl(bolt_norm[0]);
+    }
+    else{
+        return 0.;
+    }
+}
+
+void OP_Beads_BreakBondsInList(const int listSize, const int *beadList){
+    int i, tmpID, bP;
+    for(i = 0; i < listSize; i++){
+        tmpID = beadList[i];
+        OP_Beads_BreakBond(tmpID);
+    }
+}
+
+void OP_Beads_BreakBond(const int beadID){
+    const int bP = bead_info[beadID][BEAD_FACE];
+    if (bP != -1){
+        bead_info[bP][BEAD_FACE] = -1;
+        bead_info[beadID][BEAD_FACE] = -1;
+    }
+}
+
+void OP_Beads_RestoreBondsInList(const int listSize, const int *beadList){
+    int i, tmpID, bP;
+    for(i = 0; i < listSize; i++){
+        tmpID = beadList[i];
+        OP_Beads_RestoreBond(tmpID);
+    }
+}
+
+void OP_Beads_RestoreBond(const int beadID){
+    const int bP = bead_info[beadID][BEAD_FACE];
+    if (bP != -1){
+        bead_info[bP][BEAD_FACE] = beadID;
+    }
+}

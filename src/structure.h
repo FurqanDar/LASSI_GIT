@@ -25,6 +25,11 @@ int Check_LinkerConstraint(const int beadID, const int *tmpR);
 
 int Check_MTLinkerConstraint(const int beadID, int (*tmpR)[POS_MAX]);
 
+int Check_MTLinkerConstraint_New(const int listSize, const int* beadList);
+
+int Check_BeadID_InList(const int thisBeadID,
+                        const int listSize, const int beadList[MAX_BONDS+1]);
+
 int Check_System_Structure(void);
 
 void RDF_ComponentWise_Avg(void);
@@ -74,5 +79,5 @@ void PosArr_add_noPBC(int *outVec, const int *firVec, const int *secVec);
 
 void PosArr_gen_rand_wRad(int *outVec, const int nRadius);
 
-
+int OP_GetTopoBonds(const int beadID, int *dum_list);
 #endif // _STRUCTURE_H_
