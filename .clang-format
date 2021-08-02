@@ -1,11 +1,11 @@
 ---
 Language:        Cpp
-# BasedOnStyle:  LLVM
+BasedOnStyle:  LLVM
 AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
-AlignConsecutiveMacros: true
-AlignConsecutiveAssignments: true
-AlignConsecutiveDeclarations: true
+AlignConsecutiveMacros: Consecutive
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: None
 AlignEscapedNewlines: Right
 AlignOperands:   true
 AlignTrailingComments: true
@@ -14,11 +14,11 @@ AllowAllConstructorInitializersOnNextLine: true
 AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: All
+AllowShortFunctionsOnASingleLine: None
 AllowShortLambdasOnASingleLine: All
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
-AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterDefinitionReturnType: All
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: MultiLine
@@ -27,7 +27,7 @@ BinPackParameters: true
 BraceWrapping:
   AfterCaseLabel:  false
   AfterClass:      false
-  AfterControlStatement: false
+  AfterControlStatement: Never
   AfterEnum:       false
   AfterFunction:   false
   AfterNamespace:  false
@@ -36,7 +36,7 @@ BraceWrapping:
   AfterUnion:      false
   AfterExternBlock: false
   BeforeCatch:     false
-  BeforeElse:      false
+  BeforeElse:      true
   IndentBraces:    false
   SplitEmptyFunction: true
   SplitEmptyRecord: true
@@ -79,7 +79,7 @@ IncludeCategories:
     SortPriority:    0
 IncludeIsMainRegex: '(Test)?$'
 IncludeIsMainSourceRegex: ''
-IndentCaseLabels: false
+IndentCaseLabels: true
 IndentGotoLabels: true
 IndentPPDirectives: None
 IndentWidth:     4
@@ -90,7 +90,7 @@ KeepEmptyLinesAtTheStartOfBlocks: true
 MacroBlockBegin: ''
 MacroBlockEnd:   ''
 MaxEmptyLinesToKeep: 1
-NamespaceIndentation: None
+NamespaceIndentation: All
 ObjCBinPackProtocolList: Auto
 ObjCBlockIndentWidth: 2
 ObjCSpaceAfterProperty: false
@@ -103,24 +103,24 @@ PenaltyBreakString: 1000
 PenaltyBreakTemplateDeclaration: 10
 PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
-PointerAlignment: Right
+PointerAlignment: Left
 ReflowComments:  true
-SortIncludes:    true
+SortIncludes:    CaseInsensitive
 SortUsingDeclarations: true
-SpaceAfterCStyleCast: false
-SpaceAfterLogicalNot: false
+SpaceAfterCStyleCast: true
+SpaceAfterLogicalNot: true
 SpaceAfterTemplateKeyword: true
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeCpp11BracedList: false
 SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: true
-SpaceBeforeParens: ControlStatements
+SpaceBeforeParens: NonEmptyParentheses
 SpaceBeforeRangeBasedForLoopColon: true
-SpaceInEmptyBlock: false
+SpaceInEmptyBlock: true
 SpaceInEmptyParentheses: false
 SpacesBeforeTrailingComments: 1
 SpacesInAngles:  false
-SpacesInConditionalStatement: false
+SpacesInConditionalStatement: true
 SpacesInContainerLiterals: true
 SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
@@ -130,7 +130,7 @@ Standard:        Latest
 StatementMacros:
   - Q_UNUSED
   - QT_REQUIRE_VERSION
-TabWidth:        8
+TabWidth:        4
 UseCRLF:         false
 UseTab:          Never
 ...

@@ -70,24 +70,24 @@
 
 #define MAX_ROTSTATES 27
 
-typedef int         lInt;
-typedef long        lLong;
-typedef double      lDub;
+typedef int lInt;
+typedef long lLong;
+typedef double lDub;
 typedef long double lLDub;
 
 // configurations and structural info
 
-lInt **bead_info;
-lInt **old_bead;
-lInt **chain_info;
-lInt **topo_info;
-lInt **linker_len;
+lInt** bead_info;
+lInt** old_bead;
+lInt** chain_info;
+lInt** topo_info;
+lInt** linker_len;
 
 size_t tot_beads;
 size_t tot_chains;
 size_t tot_chain_types;
-lInt   Temp_Mode, nTemp_inv;
-lInt   nThermalization_Mode, RotBias_Mode;
+lInt Temp_Mode, nTemp_inv;
+lInt nThermalization_Mode, RotBias_Mode;
 
 // system setup
 lInt nBoxSize[POS_MAX];
@@ -96,100 +96,109 @@ lInt Rot_IndArr[MAX_ROTSTATES - 1];
 char bReadConf;
 
 // energy matrices for stickers
-lInt  nBeadTypes;
+lInt nBeadTypes;
 float fEnergy[MAX_AA][MAX_AA][MAX_E];
 float fEnRad[MAX_AA][MAX_AA][MAX_E];
-//lInt  LARGEST_RADIUS;
+// lInt  LARGEST_RADIUS;
 #define LARGEST_RADIUS 3
-lInt  rot_trial[MAX_VALENCY][MAX_ROTSTATES]; // Used in orientational-bias MC moves
-lLDub bolt_fac[MAX_ROTSTATES - 1];           // Used in orientational-bias
+lInt rot_trial[MAX_VALENCY][MAX_ROTSTATES]; // Used in orientational-bias MC moves
+lLDub bolt_fac[MAX_ROTSTATES - 1];          // Used in orientational-bias
 lLDub bolt_norm[MAX_VALENCY];
 lLDub dbias_bolt_fac[MAX_AA][MAX_AA]; // For pre-calculating the factors.
-lLDub ld_LogOfSmallestPossibleProb;   // Smallest probability possible logl(1/RAND_MAX)
+lLDub ld_LogOfSmallestPossibleProb;   // Smallest probability possible
+                                      // logl(1/RAND_MAX)
 float faCurrEn[MAX_E];                // Vector for current energy
 
 // Arrays to track certain topology and interaction information
-lInt nBeadTypeIsSticker[MAX_AA];         // Used to track if that beadType interacts via rotations.
-lInt nChainTypeIsLinear[MAX_CHAINTYPES]; // Used to track if this chainType is linear.
-lInt nBeadTypeCanOvlp[MAX_AA];           // Used to track if a certain beadType has an overlap cost.
-lInt nBeadTypeCanCont[MAX_AA];           // Used to track if a certain beadType has contact interactions
-lInt nBeadTypeCanFSol[MAX_AA];           // Used to track if a certain beadType has solvation energies
-lInt nBeadTypeCanTInd[MAX_AA];           // Used to track if a certain beadType has temperature independent solvation
+lInt nBeadTypeIsSticker[MAX_AA];         // Used to track if that beadType interacts via
+                                         // rotations.
+lInt nChainTypeIsLinear[MAX_CHAINTYPES]; // Used to track if this chainType is
+                                         // linear.
+lInt nBeadTypeCanOvlp[MAX_AA];           // Used to track if a certain beadType has an
+                                         // overlap cost.
+lInt nBeadTypeCanCont[MAX_AA];           // Used to track if a certain beadType has
+                                         // contact interactions
+lInt nBeadTypeCanFSol[MAX_AA];           // Used to track if a certain beadType has
+                                         // solvation energies
+lInt nBeadTypeCanTInd[MAX_AA];           // Used to track if a certain beadType has
+                                         // temperature independent solvation
 
 float fLinkerLength;
 float fLinkerSprCon;
 float fLinkerEqLen;
 
 // MC setup
-float  fKT, fPreKT, fCuTemp, fRot_Bias, f_globRotBias, fdelta_temp, fMC_Temp_Rate, fSquishRad;
-float *fKT_Cycle;
-lLong  nMCStepsPerCycle, nMCPreSteps;
-float  fMCFreq[MAX_MV];
-lInt   nMCMaxTrials, nTot_CycleNum;
+float fKT, fPreKT, fCuTemp, fRot_Bias, f_globRotBias, fdelta_temp, fMC_Temp_Rate, fSquishRad;
+float* fKT_Cycle;
+lLong nMCStepsPerCycle, nMCPreSteps;
+float fMCFreq[MAX_MV];
+lInt nMCMaxTrials, nTot_CycleNum;
 
 // random number generator RNG_Seed
 lInt RNG_Seed;
 
 // report-related
-char  strReportPrefix[512];
-char  fileEnergy[512];
-char  fileStruct[512];
-char  fileMCMove[512];
-char  fileSysProp[512];
-char  strRestartFile[512];
+char strReportPrefix[512];
+char fileEnergy[512];
+char fileStruct[512];
+char fileMCMove[512];
+char fileSysProp[512];
+char strRestartFile[512];
 lLong nReport[MAX_REPORT]; // Array to store report frequencies.
 lLong nTrajMode;
 // Matrix to store acceptances and rejections 0: Rejected; 1: Accepted
-// TODO: Have a more extensive way to record also where/when a particular move fails -- not just if it fails.
+// TODO: Have a more extensive way to record also where/when a particular move
+// fails -- not just if it fails.
 lLong MCAccepMat[2][MAX_MV];
 
 // Cluster analysis
-lInt    nClusteringMode;
-lInt ** naCluster;
-lInt *  naList;
-lLong * naClusHistList;
-lInt *  naChainCheckList;
-lInt    nTotClusCounter;
-lLDub **ld_TOTCLUS_ARR;
-lLDub * ldMOLCLUS_ARR;
-lLDub * ld_TOTMOLCLUS_ARR;
-lInt    naTempR[POS_MAX];
-lInt    nLargestClusterRightNow;
-size_t  nLimitedClusterSize;
+lInt nClusteringMode;
+lInt** naCluster;
+lInt* naList;
+lLong* naClusHistList;
+lInt* naChainCheckList;
+lInt nTotClusCounter;
+lLDub** ld_TOTCLUS_ARR;
+lLDub* ldMOLCLUS_ARR;
+lLDub* ld_TOTMOLCLUS_ARR;
+lInt naTempR[POS_MAX];
+lInt nLargestClusterRightNow;
+size_t nLimitedClusterSize;
 
 // Neighor search
-lInt * oldOvlpNeighs;
-lInt * newOvlpNeighs;
-lInt * oldContNeighs;
-lInt * newContNeighs;
-float *allDists;
-float *oldDists;
-float *newDists;
+lInt* oldOvlpNeighs;
+lInt* newOvlpNeighs;
+lInt* oldContNeighs;
+lInt* newContNeighs;
+float* allDists;
+float* oldDists;
+float* newDists;
 
 // Radial Densities and PDFs
-lLDub *ld_TOTRDF_Arr;
-lLDub *ld_TOTRadDen_Arr;
-lLDub *ldRDF_Arr;
-lLDub *ldRadDen_Arr;
-lInt   nRDF_TotComps;
-lInt   nRDFCounter; // This counts how many times the RDF has been calculated for averaging at the end.
-lInt   nRDF_TotBins;
-lInt   nRadDen_TotComps;
-lInt   nRadDen_CompShift;
-lInt   nRadDenCounter; // This counts for the Radial Density histograms
+lLDub* ld_TOTRDF_Arr;
+lLDub* ld_TOTRadDen_Arr;
+lLDub* ldRDF_Arr;
+lLDub* ldRadDen_Arr;
+lInt nRDF_TotComps;
+lInt nRDFCounter; // This counts how many times the RDF has been calculated for
+                  // averaging at the end.
+lInt nRDF_TotBins;
+lInt nRadDen_TotComps;
+lInt nRadDen_CompShift;
+lInt nRadDenCounter; // This counts for the Radial Density histograms
 
 // Gyration tensor
-float   fGyrTensor[7]; // Gyration tensor
-float   fSysGyrRad;    // Gyration radius of the system.
-lLDub **ld_TOTGYRRAD_ARR;
-lInt    nTotGyrRadCounter; // Counter for total averaging
+float fGyrTensor[7]; // Gyration tensor
+float fSysGyrRad;    // Gyration radius of the system.
+lLDub** ld_TOTGYRRAD_ARR;
+lInt nTotGyrRadCounter; // Counter for total averaging
 
 // Trajectory Saving
-lInt *n_TOTTRAJ_ARR;
+lInt* n_TOTTRAJ_ARR;
 lLong nTraj_FramesPerCycle;
-lInt  nTrajCurFrame;
+lInt nTrajCurFrame;
 
 // Lattice To Remember Things
-lInt *naTotLattice;
+lInt* naTotLattice;
 
 #endif // _GLOBAL_H_
