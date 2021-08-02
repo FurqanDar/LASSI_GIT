@@ -453,12 +453,12 @@ int Check_LinkerConstraint(const int beadID, const int *tmpR) {
     return 1; // This means that all linker constraints are satisfied.
 }
 
-/// Check_MTLinkerConstraint - if I move beadID and all of it's covalent bonded beads to the locations stored in
+/// Check_MTLinkerConstraint_OLD - if I move beadID and all of it's covalent bonded beads to the locations stored in
 /// tmpR[][], would all the linker constraints be satisfied?
 /// \param beadID
 /// \param tmpR
 /// \return
-int Check_MTLinkerConstraint(int beadID, int (*tmpR)[POS_MAX]) {
+int Check_MTLinkerConstraint_OLD(int beadID, int (*tmpR)[POS_MAX]) {
 
     int curID = beadID;
     int idx, bPart;
@@ -499,13 +499,13 @@ int Check_MTLinkerConstraint(int beadID, int (*tmpR)[POS_MAX]) {
     return canI;
 }
 
-/// Check_MTLinkerConstraint_New - given that all the beads in beadList are at the new
+/// Check_LinkerConstraints_ForBeadList - given that all the beads in beadList are at the new
 /// positions already, as part of the MTLocal move, we iterate over every bead and check if
 /// any linker constraints are broken. If so, return 0. If not, return 1 for success.
 /// \param beadID
 /// \param tmpR
 /// \return
-int Check_MTLinkerConstraint_New(const int listSize, const int* beadList) {
+int Check_LinkerConstraints_ForBeadList(const int listSize, const int* beadList) {
 
     int i, j, bead1, bead2;
     int dumBonds[MAX_BONDS+1];

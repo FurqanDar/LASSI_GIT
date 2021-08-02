@@ -23,9 +23,9 @@ int Dist_VecMagSq(const int *f1);
 
 int Check_LinkerConstraint(const int beadID, const int *tmpR);
 
-int Check_MTLinkerConstraint(const int beadID, int (*tmpR)[POS_MAX]);
+int Check_MTLinkerConstraint_OLD(int beadID, int (*tmpR)[POS_MAX]);
 
-int Check_MTLinkerConstraint_New(const int listSize, const int* beadList);
+int Check_LinkerConstraints_ForBeadList(const int listSize, const int* beadList);
 
 int Check_BeadID_InList(const int thisBeadID,
                         const int listSize, const int beadList[MAX_BONDS+1]);

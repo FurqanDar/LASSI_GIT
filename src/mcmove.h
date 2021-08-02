@@ -45,7 +45,7 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp);
 
 int Check_ChainDisp(const int chainID, const int *vec_disp);
 
-int Check_MoveBeadTo(int *newPos);
+int Check_MoveBeadTo(const int *newPos);
 
 void OP_DispChain(int chainID, const int *movR);
 
@@ -65,7 +65,7 @@ void OP_RestoreChain_ForSnake(const int fB, const int lB);
 
 void OP_System_MoveBeadTo(const int beadID, const int *newPos);
 
-void OP_Inv_MoveBeadTo(int beadID);
+void OP_System_MoveBeadTo_Inv(int beadID);
 
 void OP_MoveBeadTo_ForMTLocal(int beadID, const int *newPos);
 
