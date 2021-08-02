@@ -63,7 +63,7 @@ void OP_RestoreBeadsFromOld(const int firstB, const int lastB);
 
 void OP_RestoreChain_ForSnake(const int fB, const int lB);
 
-void OP_MoveBeadTo(const int beadID, const int *newPos);
+void OP_System_MoveBeadTo(const int beadID, const int *newPos);
 
 void OP_Inv_MoveBeadTo(int beadID);
 
@@ -143,6 +143,12 @@ lLDub MC_RosenbluthSampling_ForLists_AtNew(const int beadIdx,
                                            const int listSize, const int beadList[MAX_BONDS+1],
                                            int* bead_part, lLDub *oldEn, const int neigh_num);
 
+lLDub MC_RosenbluthSampling_ForRange_AtOld(const int beadID, const int resi,
+                                           const int smallestBead, const int largestBead,
+                                           lLDub *oldEn, const int neigh_num);
+
+lLDub MC_RosenbluthSampling_ForRange_AtNew(const int beadID, const int resi,
+                                           int *bead_part, lLDub *newEn, const int neigh_num);
 
 void OP_System_MoveBeadsInListToPos(const int listSize, const int *beadList, const int (*newPos)[POS_MAX]);
 

@@ -11,6 +11,8 @@ float Energy_Anisotropic_Self(const int beadID);
 
 float Energy_Anisotropic_For_Chain(const int beadID);
 
+float Energy_Anisotropic_For_Range(const int beadID, const int smBead, const int lgBead);
+
 float Energy_Anisotropic_Contiguous_Range(const int beadID, const int smallest_bead, const int largest_bead);
 
 float Energy_Anisotropic_For_List(const int beadID, const int listSize, const int beadList[MAX_BONDS+1]);
@@ -88,6 +90,14 @@ void Energy_Iso_ForCoLocal(const int thisBeadID, const int otherBeadID, const in
 
 void Energy_Iso_ForLists(const int beadIdx, int const listSize, const int beadList[MAX_BONDS+1],
                          const int beadPos[MAX_BONDS+1][POS_MAX],
+                         long double *oldEn, long double *newEn,
+                         int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
+
+void Energy_Iso_ForRange(const int beadID, const int smallestBead, const int largestBead,
+                           long double *oldEn, long double *newEn,
+                           int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
+
+void Energy_Iso_ForRangeEquil(const int beadID, const int smallestBead, const int largestBead,
                          long double *oldEn, long double *newEn,
                          int *ovlp_num, int *cont_num, int *ovlp_neighs, int *cont_neighs);
 
