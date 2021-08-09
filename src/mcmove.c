@@ -277,13 +277,12 @@ Move_Local (int beadID,
 
     int bAccept = 0; // Used in MC steps
     int yTemp;       // Random numbers to store things
-    int r_pos0[POS_MAX], r_posNew[POS_MAX],
-        r_disp[POS_MAX]; // Vectors to stores coordinates.
+    int r_pos0[POS_MAX], r_posNew[POS_MAX], r_disp[POS_MAX]; // Vectors to stores coordinates.
 
     // Attempt to find an empty lattice point.
     LatPos_copy (r_pos0, bead_info[beadID]);
-    LatPos_gen_rand_wRad (r_disp, 2);
-    //    LatPos_gen_rand_wRad(r_disp, linker_len[beadID][0]);
+//    LatPos_gen_rand_wRad (r_disp, 2);
+    LatPos_gen_rand_wRad(r_disp, linker_len[beadID][0]);
     LatPos_add_wPBC (r_posNew, r_pos0, r_disp);
 
     // Checking to see validity of new point.
@@ -309,6 +308,14 @@ Move_Local (int beadID,
     Energy_Iso_ForLocal (beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs,
                          oldContNeighs);
 
+    int bondList[MAX_BONDS+1];
+    const int bondNum = OP_GetTopoBonds(beadID, bondList);
+    int i, tmpBead;
+    for (i = 0; i < bondNum; ++i) {
+        tmpBead = bondList[i];
+        oldEn += Energy_Topo_Angle (tmpBead);
+    }
+
     lLDub BWRos = MC_RosenbluthSampling_ForLocal_AtOld (beadID, resi, &oldEn, old_ovlp_num);
 
     OP_System_MoveBeadTo (beadID, r_posNew);
@@ -317,7 +324,10 @@ Move_Local (int beadID,
 
     Energy_Iso_ForLocal (beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs,
                          newContNeighs);
-
+    for (i = 0; i < bondNum; ++i) {
+        tmpBead = bondList[i];
+        newEn += Energy_Topo_Angle (tmpBead);
+    }
     lLDub FWRos = MC_RosenbluthSampling_ForLocal_AtNew (beadID, resi, &yTemp, &newEn, new_ovlp_num);
     int resj;
     if ( yTemp != -1 ) {
@@ -1211,6 +1221,8 @@ Move_Pivot (int chainID, float MyTemp) {
         BSum += MC_RosenbluthSampling_ForRange_AtOld (tmpBead, resi, smBead, lgBead, &oldEn, old_ovlp_num);
     }
 
+    oldEn += Energy_Topo_Angle(anchorBead);
+
     for ( i = 0; i < beadNum; i++ ) {
         tmpBead = beadsList[i];
         OP_Rotation (PivotM, tmpBead, anchorPos);
@@ -1244,7 +1256,7 @@ Move_Pivot (int chainID, float MyTemp) {
         }
     }
 
-//    newEn += Energy_Topo_Angle(anchorBead);
+    newEn += Energy_Topo_Angle(anchorBead);
 
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc  = OP_GenMHValue (FSum, BSum, oldEn - newEn, (lLDub) MyTemp);
@@ -1478,8 +1490,8 @@ Move_Local_Equil (int beadID,
         r_disp[POS_MAX]; // Vectors to stores coordinates.
     // printf("Beginning LOCAL\n");
     LatPos_copy (r_pos0, bead_info[beadID]);
-    //    LatPos_gen_rand_wRad(r_disp, linker_len[beadID][0]);
-    LatPos_gen_rand_wRad (r_disp, 2);
+        LatPos_gen_rand_wRad(r_disp, linker_len[beadID][0]);
+//    LatPos_gen_rand_wRad (r_disp, 2);
     LatPos_add_wPBC (r_posNew, r_pos0, r_disp);
 
     yTemp = Check_MoveBeadTo (r_posNew);
@@ -1512,14 +1524,23 @@ Move_Local_Equil (int beadID,
     Energy_Iso_ForLocalEquil (beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs,
                               oldContNeighs);
 
+    int bondList[MAX_BONDS+1];
+    const int bondNum = OP_GetTopoBonds(beadID, bondList);
+    int i, tmpBead;
+    for (i = 0; i < bondNum; ++i) {
+        tmpBead = bondList[i];
+        oldEn += Energy_Topo_Angle (tmpBead);
+    }
     OP_System_MoveBeadTo (beadID, r_posNew);
 
     newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential (beadID);
 
     Energy_Iso_ForLocalEquil (beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs,
                               newContNeighs);
-
-//    newEn += Energy_Topo_Angle(beadID);
+    for (i = 0; i < bondNum; ++i) {
+        tmpBead = bondList[i];
+        newEn += Energy_Topo_Angle (tmpBead);
+    }
 
     MCProb      = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue (0., 0., oldEn - newEn, (lLDub) MyTemp);
@@ -1889,6 +1910,8 @@ Move_Pivot_Equil (int chainID, float MyTemp) {
                                   oldContNeighs);
     }
 
+    oldEn += Energy_Topo_Angle(anchorBead);
+
     for ( i = 0; i < beadNum; i++ ) {
         tmpBead = beadsList[i];
         OP_Rotation (PivotM, tmpBead, anchorPos);
@@ -1911,7 +1934,7 @@ Move_Pivot_Equil (int chainID, float MyTemp) {
                                   newContNeighs);
     }
 
-//    newEn += Energy_Topo_Angle(anchorBead);
+    newEn += Energy_Topo_Angle(anchorBead);
 
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc  = OP_GenMHValue (FSum, BSum, oldEn - newEn, (lLDub) MyTemp);

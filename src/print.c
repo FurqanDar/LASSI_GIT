@@ -123,6 +123,7 @@ Print_LogToScreen (long nGen, int run_it) {
     printf ("Cont: %.2e| ", faCurrEn[E_CONT]);
     printf ("Aniso: %.2e| ", faCurrEn[E_SC_SC]);
     printf ("FSol: %.2e| ", faCurrEn[E_F_SOL]);
+    printf ("Stiff: %.2e| ", faCurrEn[E_STIFF]);
     printf ("\n");
 
     printf ("Percolation Parameter Is: %.3f\n",
@@ -130,7 +131,7 @@ Print_LogToScreen (long nGen, int run_it) {
     int i, j;
     printf ("Acceptance Ratios:\n");
     for ( i = 1; i < MAX_MV; i++ ) {
-        printf ("%5.2f ",
+        printf ("%-5.2f ",
                 100. * (float) MCAccepMat[1][i] / ((float) MCAccepMat[0][i] + 0.00001 + (float) MCAccepMat[1][i]));
     }
     printf ("\n\n");

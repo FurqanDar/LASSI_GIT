@@ -297,7 +297,7 @@ Energy_Topo_Angle(int const beadID){
     BeadPos_sub_wPBC (vec1, r_pos0, r_posB);
     BeadPos_sub_wPBC (vec2, r_posF, r_pos0);
 
-    return fEnergy[0][0][E_STIFF] * (1.f + Vec3n_CosTheta(vec1, vec2));
+    return fEnergy[0][0][E_STIFF] * (1.f - Vec3n_CosTheta(vec1, vec2));
 }
 
 /// Energy_OfOvlp_wNeighList: Given this bead, and a supplied list of neighbors
@@ -990,15 +990,19 @@ Energy_Total_System (void) {
         } else {
             ovlp_num = NeighborSearch_ForOvlp (i, bead_info[i], oldOvlpNeighs);
         }
-        faCurrEn[E_OVLP] += Energy_OfOvlp_wNeighList (i, oldOvlpNeighs, ovlp_num);
+        faCurrEn[E_OVLP]  += Energy_OfOvlp_wNeighList (i, oldOvlpNeighs, ovlp_num);
         faCurrEn[E_F_SOL] += (float) (26 - ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-//        faCurrEn[E_STIFF] += Energy_Topo_Angle(i);
     }
+
+    for ( i = 0; i < tot_beads; i++ ) {
+        faCurrEn[E_STIFF] += Energy_Topo_Angle(i);
+    }
+
 
     // Taking care of double-counting energies.
     faCurrEn[E_SC_SC] *= 0.5f;
-    faCurrEn[E_OVLP] *= 0.5f;
-    faCurrEn[E_CONT] *= 0.5f;
+    faCurrEn[E_OVLP]  *= 0.5f;
+    faCurrEn[E_CONT]  *= 0.5f;
     for ( i = 1; i < MAX_E; i++ ) {
         faCurrEn[E_TOT] += faCurrEn[i];
     }

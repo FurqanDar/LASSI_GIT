@@ -1255,6 +1255,10 @@ BeadPos_sub_wPBC (int* outVec, const int* firVec, const int* secVec) {
   }
 }
 
+/// OP_GetTopoBonds - including beadID, get all the beads that are covalently bonded to beadID.
+/// \param beadID
+/// \param dum_list
+/// \return Number_of_bonds+1. Can be used to loop over list which includes beadID.
 int
 OP_GetTopoBonds (const int beadID, int* dum_list) {
     int top_it = 0;
