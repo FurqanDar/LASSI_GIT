@@ -139,7 +139,7 @@ Clus_Network_TotalAnalysis (void) {
 
 /// Clus_SecondLargestCluster - does what Clus_TotalAnalysis does, and then
 /// finds the second largest cluster. Note that naList[] now has the chainIDs of
-/// the second largest cluster! Furthemore, in the case where we have only one
+/// the second largest cluster! Furthermore, in the case where we have only one
 /// cluster, the function returns -1, which causes SmallClusMCMove to fail, and
 /// if we have multiple smallest clusters, randomly pick one. \return
 /// naCluster[clusID][0] - the size of the second largest cluster

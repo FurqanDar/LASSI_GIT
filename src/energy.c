@@ -277,9 +277,33 @@ Energy_Iso_fSol (int const beadType) {
     return fEnergy[beadType][beadType][E_F_SOL];
 }
 
+
+float
+Energy_Topo_Angle(int const beadID){
+//    return 0.f;
+    const int frontBead = topo_info[beadID][1];
+    if (frontBead == -1){
+        return 0.f;
+    }
+    const int backBead = topo_info[beadID][0];
+
+    const int r_pos0[POS_MAX] = {bead_info[beadID][0],    bead_info[beadID][1],    bead_info[beadID][2]};
+    const int r_posB[POS_MAX] = {bead_info[backBead][0],  bead_info[backBead][1],  bead_info[backBead][2]};
+    const int r_posF[POS_MAX] = {bead_info[frontBead][0], bead_info[frontBead][1], bead_info[frontBead][2]};
+
+    int vec1[POS_MAX];
+    int vec2[POS_MAX];
+
+    BeadPos_sub_wPBC (vec1, r_pos0, r_posB);
+    BeadPos_sub_wPBC (vec2, r_posF, r_pos0);
+
+    return fEnergy[0][0][E_STIFF] * (1.f + Vec3n_CosTheta(vec1, vec2));
+}
+
 /// Energy_OfOvlp_wNeighList: Given this bead, and a supplied list of neighbors
 /// and number of neighbors, we loop over all the neighbors and add the
-/// energies. This function _only_ calculates the Ovlp energies! \param beadID
+/// energies. This function _only_ calculates the Ovlp energies!
+/// \param beadID
 /// \param neighList
 /// \param neighNum
 /// \return
@@ -642,7 +666,7 @@ Energy_Isotropic (const int beadID) { // Calculate Contact and Overlap energy of
             r_disp[1] = y;
             for ( z = -BoxRad; z <= BoxRad; z++ ) {
                 r_disp[2] = z;
-                PosArr_add_wPBC (r_chck, r_pos_0, r_disp);
+                LatPos_add_wPBC (r_chck, r_pos_0, r_disp);
                 //                for (j = 0; j < POS_MAX; j++){
                 //                    r_chck[j] = r_pos_0[j] + r_disp[j];
                 //                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] +
@@ -901,7 +925,7 @@ Energy_Isotropic_With_List (const int beadID, const int* bead_list,
             r_disp[1] = y;
             for ( z = -BoxRad; z <= BoxRad; z++ ) {
                 r_disp[2] = z;
-                PosArr_add_wPBC (r_chck, r_pos_0, r_disp);
+                LatPos_add_wPBC (r_chck, r_pos_0, r_disp);
                 //                for (j = 0; j < POS_MAX; j++){
                 //                    r_chck[j] = r_pos_0[j] + r_disp[j];
                 //                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] +
@@ -968,6 +992,7 @@ Energy_Total_System (void) {
         }
         faCurrEn[E_OVLP] += Energy_OfOvlp_wNeighList (i, oldOvlpNeighs, ovlp_num);
         faCurrEn[E_F_SOL] += (float) (26 - ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+        faCurrEn[E_STIFF] += Energy_Topo_Angle(i);
     }
 
     // Taking care of double-counting energies.

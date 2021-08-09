@@ -281,10 +281,10 @@ Move_Local (int beadID,
         r_disp[POS_MAX]; // Vectors to stores coordinates.
 
     // Attempt to find an empty lattice point.
-    PosArr_copy (r_pos0, bead_info[beadID]);
-    PosArr_gen_rand_wRad (r_disp, 2);
-    //    PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
-    PosArr_add_wPBC (r_posNew, r_pos0, r_disp);
+    LatPos_copy (r_pos0, bead_info[beadID]);
+    LatPos_gen_rand_wRad (r_disp, 2);
+    //    LatPos_gen_rand_wRad(r_disp, linker_len[beadID][0]);
+    LatPos_add_wPBC (r_posNew, r_pos0, r_disp);
 
     // Checking to see validity of new point.
     yTemp = Check_MoveBeadTo (r_posNew);
@@ -398,16 +398,16 @@ Move_Snake (int chainID,
 
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX; // To decide if we slither forwards or backwards
     if ( MCProb < 0.5 ) {                             // Forwards slither, so lastB-1 (last bead) is anchor
-        PosArr_gen_rand_wRad (r_posTmp1,
+        LatPos_gen_rand_wRad (r_posTmp1,
                               linker_len[lastB - 1][0]); // lastB-1 will be replaced by lastB-2
-        PosArr_copy (r_posTmp2, bead_info[lastB - 1]);
-        PosArr_add_wPBC (r_posNew, r_posTmp1, r_posTmp2);
+        LatPos_copy (r_posTmp2, bead_info[lastB - 1]);
+        LatPos_add_wPBC (r_posNew, r_posTmp1, r_posTmp2);
         yTemp = Check_MoveBeadTo (r_posNew); // 0: there is no space, 1: there is space
     } else {                                 // Backwards slither, so firstB is anchor
-        PosArr_gen_rand_wRad (r_posTmp1,
+        LatPos_gen_rand_wRad (r_posTmp1,
                               linker_len[firstB][0]); // firstB will be replaced by firstB+1
-        PosArr_copy (r_posTmp2, bead_info[firstB]);
-        PosArr_add_wPBC (r_posNew, r_posTmp1, r_posTmp2);
+        LatPos_copy (r_posTmp2, bead_info[firstB]);
+        LatPos_add_wPBC (r_posNew, r_posTmp1, r_posTmp2);
         yTemp = Check_MoveBeadTo (r_posNew); // 0: there is no space, 1: there is space
     }
 
@@ -500,7 +500,7 @@ Move_Trans (int chainID,
     int r_disp[POS_MAX];    // Vectors to store coordinates.
 
     // All moves are L/2 radius
-    PosArr_gen_rand_wRad (r_disp, nBoxSize[0] / 2);
+    LatPos_gen_rand_wRad (r_disp, nBoxSize[0] / 2);
 
     yTemp = Check_ChainDisp (chainID, r_disp); // yTemp=0 means clash
     if ( yTemp == 0 ) {                        // We have failed to find a good spot for this chain.
@@ -912,12 +912,12 @@ Move_CoLocal (int thisBeadID, float MyTemp) {
     const int otherBeadID = bead_info[thisBeadID][BEAD_FACE];
     int yTemp;
 
-    PosArr_copy (r_pos1, bead_info[thisBeadID]);
-    PosArr_copy (r_pos2, bead_info[otherBeadID]);
+    LatPos_copy (r_pos1, bead_info[thisBeadID]);
+    LatPos_copy (r_pos2, bead_info[otherBeadID]);
 
-    PosArr_gen_rand_wRad (r_disp, 2);
-    PosArr_add_wPBC (r_posNew1, r_disp, r_pos1);
-    PosArr_add_wPBC (r_posNew2, r_disp, r_pos2);
+    LatPos_gen_rand_wRad (r_disp, 2);
+    LatPos_add_wPBC (r_posNew1, r_disp, r_pos1);
+    LatPos_add_wPBC (r_posNew2, r_disp, r_pos2);
 
     yTemp = Check_MoveBeadTo (r_posNew1) * Check_MoveBeadTo (r_posNew2);
     if ( yTemp == 1 ) { // This means we found an empty lattice site. So let's
@@ -1006,8 +1006,8 @@ Move_MultiLocal (int beadID, float MyTemp) {
     OP_Lattice_EmptySitesForListOfPos (beadNum, beads_pos0);
 
     for ( i = 0; i < beadNum; i++ ) {
-        PosArr_gen_rand_wRad (r_posTmp1, 2);
-        PosArr_add_wPBC (beads_posNew[i], r_posTmp1, beads_pos0[i]);
+        LatPos_gen_rand_wRad (r_posTmp1, 2);
+        LatPos_add_wPBC (beads_posNew[i], r_posTmp1, beads_pos0[i]);
         yTemp = Check_MoveBeadTo (beads_posNew[i]);
         if ( yTemp == 0 ) {
             break;
@@ -1171,7 +1171,7 @@ Move_Pivot (int chainID, float MyTemp) {
     const int smBead = beadsList[0];
     const int lgBead = beadsList[beadNum - 1];
 
-    PosArr_copy (anchorPos, bead_info[anchorBead]);
+    LatPos_copy (anchorPos, bead_info[anchorBead]);
 
     int tmpBead;
 
@@ -1244,13 +1244,16 @@ Move_Pivot (int chainID, float MyTemp) {
         }
     }
 
+    newEn += Energy_Topo_Angle(anchorBead);
+
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc  = OP_GenMHValue (FSum, BSum, oldEn - newEn, (lLDub) MyTemp);
     if ( MCProb < MHAcc ) { // Accept the move. Remember that the bonds were
                             // assigned above!
         bAccept = 1;
         return bAccept;
-    } else { // Rejecting move
+    }
+    else { // Rejecting move
         OP_Beads_BreakBondsInList (beadNum, beadsList);
         for ( i = 0; i < beadNum; i++ ) {
             tmpBead = beadsList[i];
@@ -1311,7 +1314,7 @@ Move_BranchedRot (int chainID, float MyTemp) {
     const int smBead = beadsList[0];
     const int lgBead = beadsList[beadNum - 1];
 
-    PosArr_copy (anchorPos, bead_info[anchorBead]);
+    LatPos_copy (anchorPos, bead_info[anchorBead]);
 
     int tmpBead;
 
@@ -1474,10 +1477,10 @@ Move_Local_Equil (int beadID,
     int r_pos0[POS_MAX], r_posNew[POS_MAX],
         r_disp[POS_MAX]; // Vectors to stores coordinates.
     // printf("Beginning LOCAL\n");
-    PosArr_copy (r_pos0, bead_info[beadID]);
-    //    PosArr_gen_rand_wRad(r_disp, linker_len[beadID][0]);
-    PosArr_gen_rand_wRad (r_disp, 2);
-    PosArr_add_wPBC (r_posNew, r_pos0, r_disp);
+    LatPos_copy (r_pos0, bead_info[beadID]);
+    //    LatPos_gen_rand_wRad(r_disp, linker_len[beadID][0]);
+    LatPos_gen_rand_wRad (r_disp, 2);
+    LatPos_add_wPBC (r_posNew, r_pos0, r_disp);
 
     yTemp = Check_MoveBeadTo (r_posNew);
 
@@ -1515,6 +1518,8 @@ Move_Local_Equil (int beadID,
 
     Energy_Iso_ForLocalEquil (beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs,
                               newContNeighs);
+
+    newEn += Energy_Topo_Angle(beadID);
 
     MCProb      = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue (0., 0., oldEn - newEn, (lLDub) MyTemp);
@@ -1559,16 +1564,16 @@ Move_Snake_Equil (int chainID,
 
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX; // To decide if we slither forwards or backwards
     if ( MCProb < 0.5 ) {                             // Forwards slither, so lastB-1 (last bead) is anchor
-        PosArr_gen_rand_wRad (r_posNew,
+        LatPos_gen_rand_wRad (r_posNew,
                               linker_len[lastB - 1][0]); // lastB-1 will be replaced by lastB-2
-        PosArr_copy (r_posTmp1, r_posNew);
-        PosArr_add_wPBC (r_posNew, bead_info[lastB - 1], r_posTmp1);
+        LatPos_copy (r_posTmp1, r_posNew);
+        LatPos_add_wPBC (r_posNew, bead_info[lastB - 1], r_posTmp1);
         yTemp = Check_MoveBeadTo (r_posNew); // 0: there is no space, 1: there is space
     } else {                                 // Backwards slither, so firstB is anchor
-        PosArr_gen_rand_wRad (r_posNew,
+        LatPos_gen_rand_wRad (r_posNew,
                               linker_len[firstB][0]); // firstB will be replaced by firstB+1
-        PosArr_copy (r_posTmp1, r_posNew);
-        PosArr_add_wPBC (r_posNew, bead_info[firstB], r_posTmp1);
+        LatPos_copy (r_posTmp1, r_posNew);
+        LatPos_add_wPBC (r_posNew, bead_info[firstB], r_posTmp1);
         yTemp = Check_MoveBeadTo (r_posNew); // 0: there is no space, 1: there is space
     }
 
@@ -1642,7 +1647,7 @@ Move_Trans_Equil (int chainID,
     lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
     // Radii for translation moves. All moves are L/4 radius
 
-    PosArr_gen_rand_wRad (r_disp, nBoxSize[2] / 2);
+    LatPos_gen_rand_wRad (r_disp, nBoxSize[2] / 2);
 
     yTemp = Check_ChainDisp (chainID, r_disp); // yTemp=0 means clash
     if ( yTemp == 0 ) {                        // We have failed to find a good spot for this chain.
@@ -1715,8 +1720,8 @@ Move_MultiLocal_Equil (int beadID, float MyTemp) {
     OP_Lattice_EmptySitesForListOfPos (beadNum, beads_pos0);
 
     for ( i = 0; i < beadNum; i++ ) {
-        PosArr_gen_rand_wRad (r_posTmp1, 2);
-        PosArr_add_wPBC (beads_posNew[i], r_posTmp1, beads_pos0[i]);
+        LatPos_gen_rand_wRad (r_posTmp1, 2);
+        LatPos_add_wPBC (beads_posNew[i], r_posTmp1, beads_pos0[i]);
         yTemp = Check_MoveBeadTo (beads_posNew[i]);
         if ( yTemp == 0 ) {
             break;
@@ -1847,7 +1852,7 @@ Move_Pivot_Equil (int chainID, float MyTemp) {
     const int smBead = beadsList[0];
     const int lgBead = beadsList[beadNum - 1];
 
-    PosArr_copy (anchorPos, bead_info[anchorBead]);
+    LatPos_copy (anchorPos, bead_info[anchorBead]);
 
     int tmpBead;
 
@@ -1906,13 +1911,16 @@ Move_Pivot_Equil (int chainID, float MyTemp) {
                                   newContNeighs);
     }
 
+    newEn += Energy_Topo_Angle(anchorBead);
+
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc  = OP_GenMHValue (FSum, BSum, oldEn - newEn, (lLDub) MyTemp);
     if ( MCProb < MHAcc ) { // Accept the move. Remember that the bonds were
                             // assigned above!
         bAccept = 1;
         return bAccept;
-    } else { // Rejecting move
+    }
+    else { // Rejecting move
         for ( i = 0; i < beadNum; i++ ) {
             tmpBead = beadsList[i];
             OP_System_MoveBeadTo_Inv (tmpBead);
@@ -1967,7 +1975,7 @@ Move_BranchedRot_Equil (int chainID, float MyTemp) {
     const int smBead = beadsList[0];
     const int lgBead = beadsList[beadNum - 1];
 
-    PosArr_copy (anchorPos, bead_info[anchorBead]);
+    LatPos_copy (anchorPos, bead_info[anchorBead]);
 
     int tmpBead;
 
@@ -2052,7 +2060,7 @@ Check_ChainDisp (const int chainID,
     const int firstB = chain_info[chainID][CHAIN_START];
     const int lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
     for ( i = firstB; i < lastB; i++ ) {
-        PosArr_add_wPBC (r_chck, vec_disp, bead_info[i]);
+        LatPos_add_wPBC (r_chck, vec_disp, bead_info[i]);
         if ( naTotLattice[Lat_Ind_FromVec (r_chck)] != -1 ) { // Steric clash
             return 0;
         }
@@ -2249,7 +2257,7 @@ void
 OP_System_MoveBeadTo (const int beadID,
                       const int* newPos) { // Updates position to new one and handles lattice
     OP_CopyBead (old_bead[beadID], bead_info[beadID]);
-    PosArr_copy (bead_info[beadID], newPos);
+    LatPos_copy (bead_info[beadID], newPos);
     naTotLattice[Lat_Ind_FromVec (old_bead[beadID])] = -1;     // Removing from old place.
     naTotLattice[Lat_Ind_FromVec (newPos)]           = beadID; // Placing in new place.
 }
@@ -2617,7 +2625,7 @@ Check_RotStatesOld (int const beadID, int const resi, float const MyTemp) {
     for ( k = 0; k < MAX_ROTSTATES - 1; k++ ) {
         i = Rot_IndArr[k];
 
-        PosArr_add_wPBC (r_search, r_pos0, LocalArr[i]);
+        LatPos_add_wPBC (r_search, r_pos0, LocalArr[i]);
 
         tmpBead = Lat_Ind_FromVec (r_search);
         tmpBead = naTotLattice[tmpBead];
@@ -2764,14 +2772,14 @@ OP_System_Snake_SlitherFwd (const int firstB, const int lastB, const int* r_posN
     int r_tmp[POS_MAX];
     naTotLattice[Lat_Ind_OfBead (firstB)] = -1; // Only the firstB's location is empty
     for ( i = firstB; i < lastB - 1; i++ ) {
-        PosArr_copy (bead_info[i], old_bead[i + 1]); // Hopping over by one bead
-        PosArr_copy (r_tmp, bead_info[i]);
+        LatPos_copy (bead_info[i], old_bead[i + 1]); // Hopping over by one bead
+        LatPos_copy (r_tmp, bead_info[i]);
         naTotLattice[Lat_Ind_FromVec (r_tmp)] = i;
     }
     // Moving the last bead, and it has to be done independently because lastB-1
     // -> r_posNew
     i = lastB - 1;
-    PosArr_copy (bead_info[i], r_posNew);
+    LatPos_copy (bead_info[i], r_posNew);
     naTotLattice[Lat_Ind_FromVec (r_posNew)] = i;
 }
 
@@ -2781,15 +2789,15 @@ OP_System_Snake_SlitherBck (const int firstB, const int lastB, const int* r_posN
     int r_tmp[POS_MAX];
     naTotLattice[Lat_Ind_OfBead (lastB - 1)] = -1; // Only the lastB-1's location is empty
     for ( i = firstB + 1; i < lastB; i++ ) {
-        PosArr_copy (bead_info[i], old_bead[i - 1]); // Hopping back by one bead
-        PosArr_copy (r_tmp, bead_info[i]);
+        LatPos_copy (bead_info[i], old_bead[i - 1]); // Hopping back by one bead
+        LatPos_copy (r_tmp, bead_info[i]);
         naTotLattice[Lat_Ind_FromVec (r_tmp)] = i;
     }
 
     // Moving the first bead, and it has to be done independently because firstB
     // -> r_posNew
     i = firstB;
-    PosArr_copy (bead_info[i], r_posNew);
+    LatPos_copy (bead_info[i], r_posNew);
     naTotLattice[Lat_Ind_FromVec (r_posNew)] = i;
 }
 
@@ -2819,7 +2827,7 @@ OP_Beads_CopyBeadsInListToPosList (const int listSize, const int* beadList, int 
     int i, thisBead;
     for ( i = 0; i < listSize; i++ ) {
         thisBead = beadList[i];
-        PosArr_copy (beadPos[i], bead_info[thisBead]);
+        LatPos_copy (beadPos[i], bead_info[thisBead]);
     }
 }
 
@@ -2854,7 +2862,7 @@ OP_Beads_MoveBeadsInListToPos (const int listSize, const int* beadList, const in
     int i, tmpBead;
     for ( i = 0; i < listSize; i++ ) {
         tmpBead = beadList[i];
-        PosArr_copy (bead_info[tmpBead], newPos[i]);
+        LatPos_copy (bead_info[tmpBead], newPos[i]);
     }
 }
 
@@ -2898,7 +2906,7 @@ OP_Inv_MoveBeads_InList_ToPos (const int listSize, const int* beadList) {
     int i, tmpBead;
     for ( i = 0; i < listSize; i++ ) {
         tmpBead = beadList[i];
-        PosArr_copy (bead_info[tmpBead], old_bead[tmpBead]);
+        LatPos_copy (bead_info[tmpBead], old_bead[tmpBead]);
     }
 }
 

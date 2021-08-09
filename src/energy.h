@@ -25,6 +25,8 @@ float Energy_Iso_Cont (int const beadType1, int const beadType2, float const xDi
 
 float Energy_Iso_fSol (int const beadType);
 
+float Energy_Topo_Angle(const int beadID);
+
 float Energy_OfOvlp_wNeighList (int const beadID, const int* neighList, int const neighNum);
 
 float Energy_OfCont_wNeighList (int const beadID, const int* neighList, int const neighNum);

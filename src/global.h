@@ -11,9 +11,9 @@
 
 #define MAX_AA         10
 #define MAX_CHAINTYPES 10
-#define MAX_CHAINLEN   100
+#define MAX_CHAINLEN   1000
 #define MAX_BONDS      4
-#define MAX_VALENCY    100
+#define MAX_VALENCY    1000
 
 // energy parameters
 #define E_TOT   0 // index zero must be assigned for total energy
@@ -200,5 +200,7 @@ lInt nTrajCurFrame;
 
 // Lattice To Remember Things
 lInt* naTotLattice;
+
+#define LINKER_RSCALE 1.74f
 
 #endif // _GLOBAL_H_

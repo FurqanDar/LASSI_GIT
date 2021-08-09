@@ -17,7 +17,7 @@ float Dist_PointToPoint_Float (const float* f1, const float* f2);
 
 float Dist_PointToPoint (const int* f1, const int* f2);
 
-float Dist_PosArr (const int* f1);
+float Dist_Vec3n (const int* f1);
 
 int Dist_VecMagSq (const int* f1);
 
@@ -70,15 +70,26 @@ int NeighborSearch_AroundPoint_wRad_IgnBead (const int beadID, const int* startV
 int NeighborSearch_AroundPoint_wRad_wDists (const int beadID, const int* startVec, const int nRad, int* neighList,
                                             float* distList);
 
-void PosArr_copy (int* copy_vec, const int* in_vec);
+void LatPos_copy (int* copy_vec, const int* in_vec);
 
-void PosArr_add_wPBC (int* outVec, const int* firVec, const int* secVec);
+void LatPos_add_wPBC (int* outVec, const int* firVec, const int* secVec);
 
-inline void PosArr_add_wPBC_ofComp (int* outVec, const int* firVec, const int* secVec, const int compNum);
+void BeadPos_sub_wPBC (int* outVec, const int* firVec, const int* secVec);
 
-void PosArr_add_noPBC (int* outVec, const int* firVec, const int* secVec);
+void LatPos_add_wPBC_ofComp (int* outVec, const int* firVec, const int* secVec, const int compNum);
 
-void PosArr_gen_rand_wRad (int* outVec, const int nRadius);
+void LatPos_add_noPBC (int* outVec, const int* firVec, const int* secVec);
+
+void LatPos_gen_rand_wRad (int* outVec, const int nRadius);
 
 int OP_GetTopoBonds (const int beadID, int* dum_list);
+
+int Vec3n_DotProd (const int* vec_1, const int* vec_2);
+
+float Vec3n_CosTheta(const int* v1, const int* v2);
+
+float Vec3n_AngleBetweenVecs (const int* vec_1, const int* vec_2);
+
+float BeadPos_CosThetaOfBeads(const int bead1, const int bead2);
+
 #endif // _STRUCTURE_H_

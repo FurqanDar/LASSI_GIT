@@ -15,26 +15,26 @@ Memory_Initialization_AtStart (void) {
     Memory_Allocate_NeighborLists();
 
     strcpy (arr_name, "naClusHistList");
-    naClusHistList = Create1DLong ((1 + tot_chains), arr_name);
+    naClusHistList = Create1DLong ((2 + tot_chains), arr_name);
 
     strcpy (arr_name, "naChainCheckList");
-    naChainCheckList = Create1DInt (1 + tot_chains, arr_name);
+    naChainCheckList = Create1DInt (2 + tot_chains, arr_name);
 
     strcpy (arr_name, "fKTCycle");
     fKT_Cycle = Create1DFloat (1 + nTot_CycleNum, arr_name);
 
     strcpy (arr_name, "naList");
-    naList = Create1DInt (1 + tot_chains, arr_name);
+    naList = Create1DInt (2 + tot_chains, arr_name);
 
     strcpy (arr_name, "naCluster");
-    naCluster = Create2DInt (tot_chains + 1, tot_chains + 1, arr_name);
+    naCluster = Create2DInt (tot_chains + 2, tot_chains + 2, arr_name);
 
     if ( nReport[REPORT_NETWORK] != 0 ) {
         strcpy (arr_name, "ldTotClusArr");
-        ld_TOTCLUS_ARR = Create2DLongdouble (1 + tot_chains, nTot_CycleNum, arr_name);
+        ld_TOTCLUS_ARR = Create2DLongdouble (2 + tot_chains, nTot_CycleNum, arr_name);
 
         strcpy (arr_name, "ldMolClusArr");
-        ldMOLCLUS_ARR = Create1DLongdouble ((tot_chains * tot_chain_types), arr_name);
+        ldMOLCLUS_ARR = Create1DLongdouble (((tot_chains+1) * tot_chain_types), arr_name);
 
         strcpy (arr_name, "ldTotMolClusArr");
         ld_TOTMOLCLUS_ARR = Create1DLongdouble ((tot_chains * tot_chain_types * nTot_CycleNum), arr_name);

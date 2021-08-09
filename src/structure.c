@@ -156,12 +156,12 @@ Check_System_Structure (void) {
         }
         while ( topo_info[i][idx] != -1 && idx < MAX_BONDS ) {
             bondPart = topo_info[i][idx];
-            if ( Dist_BeadToBead (i, bondPart) > 1.74 * linker_len[i][idx] ) {
+            if ( Dist_BeadToBead (i, bondPart) > LINKER_RSCALE * linker_len[i][idx] ) {
                 printf ("Bad beads! %d\t(%d %d %d)\t\tTopo:(%d %d %d)\t\tLinkers:(%.5f\t%.5f\t%.5f)\n", i,
                         bead_info[i][0], bead_info[i][1], bead_info[i][2], topo_info[i][0], topo_info[i][1],
                         topo_info[i][2], (float) linker_len[i][0], (float) linker_len[i][1], (float) linker_len[i][2]);
                 printf ("\t\t\t\t\t-------------------->\t\t%f\tSHOULD BE\t%f\n", Dist_BeadToBead (i, bondPart),
-                        1.74 * (float) linker_len[i][idx]);
+                        LINKER_RSCALE * (float) linker_len[i][idx]);
                 printf ("Bad beads! %d\t(%d %d %d)\t\tTopo:(%d %d %d)\t\tLinkers:(%.5f\t%.5f\t%.5f)\n\n", bondPart,
                         bead_info[bondPart][0], bead_info[bondPart][1], bead_info[bondPart][2], topo_info[bondPart][0],
                         topo_info[bondPart][1], topo_info[bondPart][2], (float) linker_len[bondPart][0],
@@ -185,7 +185,7 @@ Check_System_Structure (void) {
                         fEnergy[bead_info[i][BEAD_TYPE]][bead_info[bead_info[i][BEAD_FACE]][BEAD_TYPE]][E_SC_SC]);
                 return i + 1;
             }
-            if ( Dist_BeadToBead (i, bead_info[i][BEAD_FACE]) > 1.74 ) {
+            if ( Dist_BeadToBead (i, bead_info[i][BEAD_FACE]) > LINKER_RSCALE ) {
                 printf ("Bad bond! Distance is wrong\n\t%d %d %d\n Distance is %f. Crashing.\n", i,
                         bead_info[i][BEAD_FACE], bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE],
                         Dist_BeadToBead (i, bead_info[i][BEAD_FACE]));
@@ -196,11 +196,11 @@ Check_System_Structure (void) {
     return 0;
 }
 
-/// Dist_PosArr - non periodic boundary euclidean magnitude of vector
+/// Dist_Vec3n - non periodic boundary euclidean magnitude of vector
 /// \param f1: The array where indicies 0,1 and 3 correspond to x y and z.
 /// \return
 float
-Dist_PosArr (const int* f1) { // Outputs the magnitude of the vector
+Dist_Vec3n (const int* f1) { // Outputs the magnitude of the vector
     return sqrtf ((float) (f1[0] * f1[0] + f1[1] * f1[1] + f1[2] * f1[2]));
 }
 
@@ -467,7 +467,7 @@ Check_LinkerConstraint (const int beadID, const int* tmpR) {
     bondPartner = topo_info[beadID][idx];                       // Initializing the two.
     while ( idx < MAX_BONDS && topo_info[beadID][idx] != -1 ) { // Keep going till we run out of partners
         bondPartner = topo_info[beadID][idx];
-        if ( Dist_PointToPoint (bead_info[bondPartner], tmpR) > 1.74 * (float) linker_len[beadID][idx] ) {
+        if ( Dist_PointToPoint (bead_info[bondPartner], tmpR) > LINKER_RSCALE * (float) linker_len[beadID][idx] ) {
             return 0; // This means that we have broken one of the linkers.
         }
         idx++;
@@ -502,7 +502,7 @@ Check_MTLinkerConstraint_OLD (int beadID, int (*tmpR)[POS_MAX]) {
         idx   = 0;
         bPart = topo_info[curID][idx];
         while ( bPart != -1 && idx < MAX_BONDS ) {
-            if ( Dist_BeadToBead (curID, bPart) > 1.74 * (float) linker_len[curID][idx] ) {
+            if ( Dist_BeadToBead (curID, bPart) > LINKER_RSCALE * (float) linker_len[curID][idx] ) {
                 canI = 0;
                 break;
             }
@@ -541,7 +541,7 @@ Check_LinkerConstraints_ForBeadList (const int listSize, const int* beadList) {
         for ( j = 1; j < dumNum; j++ ) { // No need for self-distance = 0.
             bead2 = dumBonds[j];
             xDis  = Dist_BeadToBead (bead1, bead2);
-            if ( xDis > 1.74 * (float) linker_len[bead1][j - 1] ) {
+            if ( xDis > LINKER_RSCALE * (float) linker_len[bead1][j - 1] ) {
                 return 0;
             }
         }
@@ -977,7 +977,7 @@ Calculate_Distances_For_Radius (float* thisList, const int nRad) {
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                thisList[dum_iter++] = Dist_PosArr (r_disp);
+                thisList[dum_iter++] = Dist_Vec3n (r_disp);
             }
         }
     }
@@ -1001,12 +1001,12 @@ NeighborSearch_ForOvlp (int const beadID, const int* startVec, int* neighList) {
     const int nRad      = 1;
 
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
-        PosArr_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_X);
+        LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_X);
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
-            PosArr_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Y);
+            LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Y);
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                PosArr_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Z);
-                //                PosArr_add_wPBC(r_chck, startVec, r_disp);
+                LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Z);
+                //                LatPos_add_wPBC(r_chck, startVec, r_disp);
                 tmpBead = naTotLattice[Lat_Ind_FromVec (r_chck)];
                 if ( tmpBead != -1 && tmpBead != beadID ) {
                     neighList[neigh_num++] = tmpBead;
@@ -1036,11 +1036,11 @@ NeighborSearch_ForCont (int const beadID, const int* startVec, int* contList, in
     *ovlpNum = 0;
 
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
-        PosArr_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_X);
+        LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_X);
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
-            PosArr_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Y);
+            LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Y);
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                PosArr_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Z);
+                LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Z);
                 tmpBead = naTotLattice[Lat_Ind_FromVec (r_chck)];
                 if ( tmpBead != -1 && tmpBead != beadID ) {
                     if ( (abs (r_disp[0]) <= 1) && (abs (r_disp[1]) <= 1) && (abs (r_disp[2]) <= 1) ) {
@@ -1072,7 +1072,7 @@ NeighborSearch_EmptySitesAround_wRad (const int* startVec, const int nRad) {
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                PosArr_add_wPBC (r_search, startVec, r_disp);
+                LatPos_add_wPBC (r_search, startVec, r_disp);
                 tmpBead = naTotLattice[Lat_Ind_FromVec (r_search)];
                 if ( tmpBead == -1 ) {
                     empty_num++;
@@ -1103,7 +1103,7 @@ NeighborSearch_AroundPoint_UptoIndex (const int beadID, const int* startVec, con
     int r_all[100][POS_MAX] = {0};
 
     for ( i = 0; i < upTO; ++i ) {
-        PosArr_add_wPBC (r_search, startVec, r_all[i]);
+        LatPos_add_wPBC (r_search, startVec, r_all[i]);
         tmpBead = naTotLattice[Lat_Ind_FromVec (r_search)];
         if ( tmpBead != -1 ) {
             neighList[neigh_num++] = tmpBead;
@@ -1124,7 +1124,7 @@ NeighborSearch_AroundPoint_wRad_IgnBead (const int beadID, const int* startVec, 
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                PosArr_add_wPBC (r_search, startVec, r_disp);
+                LatPos_add_wPBC (r_search, startVec, r_disp);
                 tmpBead = naTotLattice[Lat_Ind_FromVec (r_search)];
                 if ( tmpBead != -1 && tmpBead != beadID ) {
                     neighList[neigh_num++] = tmpBead;
@@ -1148,11 +1148,11 @@ NeighborSearch_AroundPoint_wRad_wDists (const int beadID, const int* startVec, c
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                PosArr_add_wPBC (r_search, startVec, r_disp);
+                LatPos_add_wPBC (r_search, startVec, r_disp);
                 tmpBead = naTotLattice[Lat_Ind_FromVec (r_search)];
                 if ( tmpBead != -1 && tmpBead != beadID ) {
                     neighList[neigh_num] = tmpBead;
-                    distList[neigh_num]  = Dist_PosArr (r_disp);
+                    distList[neigh_num]  = Dist_Vec3n (r_disp);
                     neigh_num++;
                 }
             }
@@ -1161,22 +1161,22 @@ NeighborSearch_AroundPoint_wRad_wDists (const int beadID, const int* startVec, c
     return neigh_num;
 }
 
-/// PosArr_copy: Copies the position elements to copy_vec.
+/// LatPos_copy: Copies the position elements to copy_vec.
 /// \param copy_vec
 /// \param in_vec
 void
-PosArr_copy (int* copy_vec, const int* in_vec) {
+LatPos_copy (int* copy_vec, const int* in_vec) {
     copy_vec[0] = in_vec[0];
     copy_vec[1] = in_vec[1];
     copy_vec[2] = in_vec[2];
 }
 
-/// PosArr_gen_rand_wRad. Given a radius, we generate a random set of coordinates between -Radius and Radius
+/// LatPos_gen_rand_wRad. Given a radius, we generate a random set of coordinates between -Radius and Radius
 /// for each dimension. The result is stored in outVec
 /// \param outVec
 /// \param nRadius
 void
-PosArr_gen_rand_wRad (int* outVec, const int nRadius) {
+LatPos_gen_rand_wRad (int* outVec, const int nRadius) {
     int j;
     int radUp = 2 * nRadius + 1;
     for ( j = 0; j < POS_MAX; j++ ) {
@@ -1187,14 +1187,14 @@ PosArr_gen_rand_wRad (int* outVec, const int nRadius) {
     }
 }
 
-/// PosArr_add_wPBC: Given firVec and secVec, we add the two vectors, and take care of PBCs, storing in outVec.
+/// LatPos_add_wPBC: Given firVec and secVec, we add the two vectors, and take care of PBCs, storing in outVec.
 /// The implementation assumes that the sum of any coordinate can not be larger than twice the lattice-size,
 /// because there is no explicit modulo operation.
 /// \param outVec
 /// \param firVec
 /// \param secVec
 void
-PosArr_add_wPBC (int* outVec, const int* firVec, const int* secVec) {
+LatPos_add_wPBC (int* outVec, const int* firVec, const int* secVec) {
     short j;
     for ( j = 0; j < POS_MAX; j++ ) {
         outVec[j] = firVec[j] + secVec[j];
@@ -1207,7 +1207,7 @@ PosArr_add_wPBC (int* outVec, const int* firVec, const int* secVec) {
     }
 }
 
-/// PosArr_add_wPBC_ofComp: Given firVec and secVec, we add the compNum component of the two vectors,
+/// LatPos_add_wPBC_ofComp: Given firVec and secVec, we add the compNum component of the two vectors,
 /// and take care of PBCs, storing in outVec.
 /// The implementation assumes that the sum of any coordinate can not be larger than twice the lattice-size,
 /// because there is no explicit modulo operation.
@@ -1215,22 +1215,44 @@ PosArr_add_wPBC (int* outVec, const int* firVec, const int* secVec) {
 /// \param firVec
 /// \param secVec
 inline void
-PosArr_add_wPBC_ofComp (int* outVec, const int* firVec, const int* secVec, const int compNum) {
+LatPos_add_wPBC_ofComp (int* outVec, const int* firVec, const int* secVec, const int compNum) {
     outVec[compNum] = firVec[compNum] + secVec[compNum];
     outVec[compNum] = outVec[compNum] < 0 ? outVec[compNum] + nBoxSize[compNum] : outVec[compNum];
     outVec[compNum] = outVec[compNum] >= nBoxSize[compNum] ? outVec[compNum] - nBoxSize[compNum] : outVec[compNum];
 }
 
-/// PosArr_add_noPBC: Given the two arrays firVec and secVec, we store the sum of the two arrays in outVec.
+/// LatPos_add_noPBC: Given the two arrays firVec and secVec, we store the sum of the two arrays in outVec.
 /// \param outVec
 /// \param firVec
 /// \param secVec
 void
-PosArr_add_noPBC (int* outVec, const int* firVec, const int* secVec) {
+LatPos_add_noPBC (int* outVec, const int* firVec, const int* secVec) {
     short j;
     for ( j = 0; j < POS_MAX; j++ ) {
         outVec[j] = firVec[j] + secVec[j];
     }
+}
+
+
+/// BeadPos_sub_wPBC: Given firVec and secVec, we subtract second from first, and take care of PBCs, storing in outVec.
+/// The implementation assumes that the sum of any coordinate can not be larger than the lattice size
+/// because there is no explicit modulo operation.
+/// This version is specifically for bead-positions, or for inter-bead calculations.
+/// \param outVec
+/// \param firVec
+/// \param secVec
+void
+BeadPos_sub_wPBC (int* outVec, const int* firVec, const int* secVec) {
+  short j;
+  for ( j = 0; j < POS_MAX; j++ ) {
+    outVec[j] = firVec[j] - secVec[j];
+  }
+  for ( j = 0; j < POS_MAX; j++ ) {
+    outVec[j] = outVec[j] < -nBoxSize[j] / 2 ? outVec[j] + nBoxSize[j] / 2 : outVec[j];
+  }
+  for ( j = 0; j < POS_MAX; j++ ) {
+    outVec[j] = outVec[j] >= nBoxSize[j] / 2 ? outVec[j] - nBoxSize[j] / 2 : outVec[j];
+  }
 }
 
 int
@@ -1244,4 +1266,48 @@ OP_GetTopoBonds (const int beadID, int* dum_list) {
     }
 
     return top_it;
+}
+
+int
+Vec3n_DotProd (const int* vec_1, const int* vec_2){
+    return vec_1[0]*vec_2[0] + vec_1[1]*vec_2[1] + vec_1[2]*vec_2[2];
+}
+
+/// Vec3n_CosTheta - calculates the Cos(theta) between the vectors v1 and v2.
+/// Cos(theta) = v_1 . v_2 / |v_1| / |v_2|
+/// \param v1
+/// \param v2
+/// \return
+float
+Vec3n_CosTheta(const int* v1, const int* v2){
+  const int dotProd   = Vec3n_DotProd (v1, v2);
+  const int vec1MagSq = Vec3n_DotProd (v1, v1);
+  const int vec2MagSq = Vec3n_DotProd (v2, v2);
+  const float dumDenom  = (float) vec1MagSq * (float) vec2MagSq;
+  const float dumCosTheta = (float) dotProd / sqrtf(dumDenom);
+
+  return dumCosTheta;
+}
+
+
+float
+Vec3n_AngleBetweenVecs (const int* vec_1, const int* vec_2){
+
+    const float dumAng = Vec3n_CosTheta(vec_1, vec_2);
+    return acosf(dumAng);
+}
+
+
+float
+BeadPos_CosThetaOfBeads(const int bead1, const int bead2){
+
+    const int r_pos1[POS_MAX] = {bead_info[bead1][0],
+                                 bead_info[bead1][1],
+                                 bead_info[bead1][2]};
+
+    const int r_pos2[POS_MAX] = {bead_info[bead2][0],
+                                 bead_info[bead2][1],
+                                 bead_info[bead2][2]};
+
+    return Vec3n_CosTheta(r_pos1, r_pos2);
 }

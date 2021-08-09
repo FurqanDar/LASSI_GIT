@@ -63,7 +63,7 @@ main (int argc, char* argv[]) {
     }
 
     clock_t tEnd        = clock();
-    double elapsed_time = (tEnd - tStart) / (double) CLOCKS_PER_SEC;
+    double elapsed_time = (double) (tEnd - tStart) / (double) CLOCKS_PER_SEC;
     printf ("Initialization done. %.2f sec elapsed.\n", elapsed_time);
 
     tStart = clock();
@@ -76,14 +76,14 @@ main (int argc, char* argv[]) {
     printf ("_____________________\n");
     printf ("Thermalizing system.\n");
     printf ("---------------------\n\n");
-
+    fEnergy[0][0][E_STIFF] = -2.0f;
     // Thermalizing the system.
     fCuTemp = fPreKT;
-    Print_Data (-1, -1);                           // Initialization of files
+    Print_Data (-1, -1);                 // Initialization of files
     for ( nGen = 0; nGen < nMCPreSteps; nGen++ ) { // Intentionally not performing any data acquisition in the
                                                    // thermalizing phase.
         nMCInfo = MC_Step_Equil (fCuTemp);
-        //        printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
+//        printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
         Print_Data (nGen, -1);
     }
 
@@ -96,17 +96,14 @@ main (int argc, char* argv[]) {
     int run_cycle;
     // Going through the MC cycles.
     for ( run_cycle = 0; run_cycle < nTot_CycleNum; run_cycle++ ) {
-
-        //        fEnergy[0][0][E_CONT] = ((float)run_cycle + 0.0f) * 0.5f;
-        //        fEnergy[1][1][E_CONT] = ((float)run_cycle + 0.0f) * 0.5f;
-
+        fEnergy[0][0][E_STIFF] = ((float)run_cycle - 2.0f) * 1.0f;
         fKT = fKT_Cycle[run_cycle];
         Calculate_Rot_Bias (fKT);
         Print_Data (-1, run_cycle);
         for ( nGen = 0; nGen <= nMCStepsPerCycle; nGen++ ) {
             fCuTemp = Temperature_Function (Temp_Mode, nGen);
             nMCInfo = MC_Step (fCuTemp);
-            //            printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
+//            printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
             Print_Data (nGen, run_cycle);
         }
         Temp_Mode = -1;
@@ -118,9 +115,9 @@ main (int argc, char* argv[]) {
     Write_TotalSysProp (fileSysProp, run_cycle);
 
     tEnd         = clock();
-    elapsed_time = (tEnd - tStart) / (double) CLOCKS_PER_SEC;
+    elapsed_time = (double) (tEnd - tStart) / (double) CLOCKS_PER_SEC;
     printf ("____________________________________\n");
-    printf ("Simulation finished in %.2f minutes.\n", elapsed_time / 60.);
+    printf ("Simulation finished in %.f minutes.\n", elapsed_time / 60.);
     printf ("------------------------------------\n");
     printf ("%s ENDING %s\n", lBrace, rBrace);
     printf ("******************************************\n");
