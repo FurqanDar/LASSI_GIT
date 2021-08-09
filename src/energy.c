@@ -992,7 +992,7 @@ Energy_Total_System (void) {
         }
         faCurrEn[E_OVLP] += Energy_OfOvlp_wNeighList (i, oldOvlpNeighs, ovlp_num);
         faCurrEn[E_F_SOL] += (float) (26 - ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        faCurrEn[E_STIFF] += Energy_Topo_Angle(i);
+//        faCurrEn[E_STIFF] += Energy_Topo_Angle(i);
     }
 
     // Taking care of double-counting energies.
