@@ -1244,7 +1244,7 @@ Move_Pivot (int chainID, float MyTemp) {
         }
     }
 
-    newEn += Energy_Topo_Angle(anchorBead);
+//    newEn += Energy_Topo_Angle(anchorBead);
 
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc  = OP_GenMHValue (FSum, BSum, oldEn - newEn, (lLDub) MyTemp);
@@ -1519,7 +1519,7 @@ Move_Local_Equil (int beadID,
     Energy_Iso_ForLocalEquil (beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs,
                               newContNeighs);
 
-    newEn += Energy_Topo_Angle(beadID);
+//    newEn += Energy_Topo_Angle(beadID);
 
     MCProb      = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue (0., 0., oldEn - newEn, (lLDub) MyTemp);
@@ -1911,7 +1911,7 @@ Move_Pivot_Equil (int chainID, float MyTemp) {
                                   newContNeighs);
     }
 
-    newEn += Energy_Topo_Angle(anchorBead);
+//    newEn += Energy_Topo_Angle(anchorBead);
 
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc  = OP_GenMHValue (FSum, BSum, oldEn - newEn, (lLDub) MyTemp);
