@@ -5,147 +5,147 @@
 /// Memory_Initialization_AtStart - allocates memory, and initializes the
 /// various global arrays.
 void
-Memory_Initialization_AtStart (void) {
+Memory_Initialization_AtStart(void) {
     int i, j;
     char arr_name[100];
 
-    strcpy (arr_name, "naTotLattice");
-    naTotLattice = Create1DInt (nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arr_name);
+    strcpy(arr_name, "naTotLattice");
+    naTotLattice = Create1DInt(nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arr_name);
 
     Memory_Allocate_NeighborLists();
 
-    strcpy (arr_name, "naClusHistList");
-    naClusHistList = Create1DLong ((2 + tot_chains), arr_name);
+    strcpy(arr_name, "naClusHistList");
+    naClusHistList = Create1DLong((2 + tot_chains), arr_name);
 
-    strcpy (arr_name, "naChainCheckList");
-    naChainCheckList = Create1DInt (2 + tot_chains, arr_name);
+    strcpy(arr_name, "naChainCheckList");
+    naChainCheckList = Create1DInt(2 + tot_chains, arr_name);
 
-    strcpy (arr_name, "fKTCycle");
-    fKT_Cycle = Create1DFloat (1 + nTot_CycleNum, arr_name);
+    strcpy(arr_name, "fKTCycle");
+    fKT_Cycle = Create1DFloat(1 + nTot_CycleNum, arr_name);
 
-    strcpy (arr_name, "naList");
-    naList = Create1DInt (2 + tot_chains, arr_name);
+    strcpy(arr_name, "naList");
+    naList = Create1DInt(2 + tot_chains, arr_name);
 
-    strcpy (arr_name, "naCluster");
-    naCluster = Create2DInt (tot_chains + 2, tot_chains + 2, arr_name);
+    strcpy(arr_name, "naCluster");
+    naCluster = Create2DInt(tot_chains + 2, tot_chains + 2, arr_name);
 
     if ( nReport[REPORT_NETWORK] != 0 ) {
-        strcpy (arr_name, "ldTotClusArr");
-        ld_TOTCLUS_ARR = Create2DLongdouble (2 + tot_chains, nTot_CycleNum, arr_name);
+        strcpy(arr_name, "ldTotClusArr");
+        ld_TOTCLUS_ARR = Create2DLongdouble(2 + tot_chains, nTot_CycleNum, arr_name);
 
-        strcpy (arr_name, "ldMolClusArr");
-        ldMOLCLUS_ARR = Create1DLongdouble (((tot_chains+1) * tot_chain_types), arr_name);
+        strcpy(arr_name, "ldMolClusArr");
+        ldMOLCLUS_ARR = Create1DLongdouble(((tot_chains + 1) * tot_chain_types), arr_name);
 
-        strcpy (arr_name, "ldTotMolClusArr");
-        ld_TOTMOLCLUS_ARR = Create1DLongdouble ((tot_chains * tot_chain_types * nTot_CycleNum), arr_name);
+        strcpy(arr_name, "ldTotMolClusArr");
+        ld_TOTMOLCLUS_ARR = Create1DLongdouble((tot_chains * tot_chain_types * nTot_CycleNum), arr_name);
 
-        strcpy (arr_name, "ldTotGyrRad");
-        ld_TOTGYRRAD_ARR = Create2DLongdouble (2, nTot_CycleNum, arr_name);
+        strcpy(arr_name, "ldTotGyrRad");
+        ld_TOTGYRRAD_ARR = Create2DLongdouble(2, nTot_CycleNum, arr_name);
     }
     nRDF_TotComps = 2 + nBeadTypes + nBeadTypes * nBeadTypes;
     nRDF_TotComps /= 2;
     if ( nReport[REPORT_RDFTOT] != 0 ) {
 
-        strcpy (arr_name, "ldTotRDFArr");
-        ld_TOTRDF_Arr = Create1DLongdouble ((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins), arr_name);
+        strcpy(arr_name, "ldTotRDFArr");
+        ld_TOTRDF_Arr = Create1DLongdouble((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins), arr_name);
 
-        strcpy (arr_name, "ldRDFArr");
-        ldRDF_Arr = Create1DLongdouble ((nRDF_TotComps * nRDF_TotBins), arr_name);
+        strcpy(arr_name, "ldRDFArr");
+        ldRDF_Arr = Create1DLongdouble((nRDF_TotComps * nRDF_TotBins), arr_name);
     }
 
     if ( nReport[REPORT_COMDEN] != 0 ) {
         nRadDen_TotComps  = 2 * tot_chain_types * (tot_chain_types + 1);
         nRadDen_CompShift = tot_chain_types * (tot_chain_types + 1);
 
-        strcpy (arr_name, "ldRadDenArr");
-        ldRadDen_Arr = Create1DLongdouble (nRadDen_TotComps * nRDF_TotBins, arr_name);
+        strcpy(arr_name, "ldRadDenArr");
+        ldRadDen_Arr = Create1DLongdouble(nRadDen_TotComps * nRDF_TotBins, arr_name);
 
-        strcpy (arr_name, "ldTotRadDenArr");
-        ld_TOTRadDen_Arr = Create1DLongdouble (nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins, arr_name);
+        strcpy(arr_name, "ldTotRadDenArr");
+        ld_TOTRadDen_Arr = Create1DLongdouble(nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins, arr_name);
     }
     if ( nTrajMode != 0 ) {
         nTraj_FramesPerCycle = nMCStepsPerCycle / nReport[REPORT_CONFIG];
-        printf ("\n***********************************************\n");
-        printf ("This feature is still experimental!\n");
-        printf ("\n***********************************************\n");
+        printf("\n***********************************************\n");
+        printf("This feature is still experimental!\n");
+        printf("\n***********************************************\n");
 
-        strcpy (arr_name, "nTotTrajArr");
-        n_TOTTRAJ_ARR = Create1DInt (nTraj_FramesPerCycle * tot_beads * BEADINFO_MAX, arr_name);
+        strcpy(arr_name, "nTotTrajArr");
+        n_TOTTRAJ_ARR = Create1DInt(nTraj_FramesPerCycle * tot_beads * BEADINFO_MAX, arr_name);
     }
     //    Memory_VerifyMalloc();
-    printf ("Successfully allocated memory! Arrays initialized.\n");
+    printf("Successfully allocated memory! Arrays initialized.\n");
 }
 
 void
-Memory_Allocate_NeighborLists (void) {
+Memory_Allocate_NeighborLists(void) {
     char arr_name[50];
 
     int num_of_points;
 
     num_of_points = 1 * 2 + 1;
     num_of_points = num_of_points * num_of_points * num_of_points;
-    strcpy (arr_name, "oldOvlpNeighs");
-    oldOvlpNeighs = Create1DInt (num_of_points, arr_name);
-    strcpy (arr_name, "newOvlpNeighs");
-    newOvlpNeighs = Create1DInt (num_of_points, arr_name);
+    strcpy(arr_name, "oldOvlpNeighs");
+    oldOvlpNeighs = Create1DInt(num_of_points, arr_name);
+    strcpy(arr_name, "newOvlpNeighs");
+    newOvlpNeighs = Create1DInt(num_of_points, arr_name);
 
     num_of_points = LARGEST_RADIUS * 2 + 1;
     num_of_points = num_of_points * num_of_points * num_of_points;
-    strcpy (arr_name, "oldContNeighs");
-    oldContNeighs = Create1DInt (num_of_points, arr_name);
-    strcpy (arr_name, "newContNeighs");
-    newContNeighs = Create1DInt (num_of_points, arr_name);
+    strcpy(arr_name, "oldContNeighs");
+    oldContNeighs = Create1DInt(num_of_points, arr_name);
+    strcpy(arr_name, "newContNeighs");
+    newContNeighs = Create1DInt(num_of_points, arr_name);
 
-    strcpy (arr_name, "allDists");
-    allDists = Create1DFloat (num_of_points, arr_name);
-    strcpy (arr_name, "oldDists");
-    oldDists = Create1DFloat (num_of_points, arr_name);
-    strcpy (arr_name, "newDists");
-    newDists = Create1DFloat (num_of_points, arr_name);
+    strcpy(arr_name, "allDists");
+    allDists = Create1DFloat(num_of_points, arr_name);
+    strcpy(arr_name, "oldDists");
+    oldDists = Create1DFloat(num_of_points, arr_name);
+    strcpy(arr_name, "newDists");
+    newDists = Create1DFloat(num_of_points, arr_name);
 }
 
 void
-Memory_VerifyMalloc (void) {
+Memory_VerifyMalloc(void) {
     if ( naClusHistList == NULL ) {
-        printf ("naClusHistList malloc failed\n");
-        exit (1);
+        printf("naClusHistList malloc failed\n");
+        exit(1);
     }
     if ( naChainCheckList == NULL ) {
-        printf ("naChainCheckList malloc failed\n");
-        exit (1);
+        printf("naChainCheckList malloc failed\n");
+        exit(1);
     }
     if ( ldRDF_Arr == NULL && nReport[REPORT_RDFTOT] != 0 ) {
-        printf ("ldRDF_Arr malloc failed\n");
-        exit (1);
+        printf("ldRDF_Arr malloc failed\n");
+        exit(1);
     }
     if ( ld_TOTRDF_Arr == NULL && nReport[REPORT_RDFTOT] != 0 ) {
-        printf ("ld_TOTRDF_Arr malloc failed\n");
-        exit (1);
+        printf("ld_TOTRDF_Arr malloc failed\n");
+        exit(1);
     }
     if ( ldRadDen_Arr == NULL && nReport[REPORT_COMDEN] != 0 ) {
-        printf ("ldRadDen_Arr malloc failed\n");
-        exit (1);
+        printf("ldRadDen_Arr malloc failed\n");
+        exit(1);
     }
     if ( ld_TOTRadDen_Arr == NULL && nReport[REPORT_COMDEN] != 0 ) {
-        printf ("ld_TOTRadDen_Arr malloc failed\n");
-        exit (1);
+        printf("ld_TOTRadDen_Arr malloc failed\n");
+        exit(1);
     }
     if ( ldMOLCLUS_ARR == NULL && nReport[REPORT_NETWORK] != 0 ) {
-        printf ("ldMOLCLUS_ARR malloc failed\n");
-        exit (1);
+        printf("ldMOLCLUS_ARR malloc failed\n");
+        exit(1);
     }
     if ( ld_TOTMOLCLUS_ARR == NULL && nReport[REPORT_NETWORK] != 0 ) {
-        printf ("ld_TOTMOLCLUS_ARR malloc failed\n");
-        exit (1);
+        printf("ld_TOTMOLCLUS_ARR malloc failed\n");
+        exit(1);
     }
     if ( n_TOTTRAJ_ARR == NULL && nTrajMode != 0 ) {
-        printf ("n_TOTTRAJ_ARR malloc failed\n");
-        exit (1);
+        printf("n_TOTTRAJ_ARR malloc failed\n");
+        exit(1);
     }
 }
 
 void
-Global_Array_Initialization_AtStart (void) {
+Global_Array_Initialization_AtStart(void) {
     int i, j, k, xTemp, yTemp, zTemp; // Indecies
     int myCubeLen = 3;
 
@@ -190,9 +190,9 @@ Global_Array_Initialization_AtStart (void) {
     if ( nReport[REPORT_NETWORK] != 0 ) {
         for ( i = 0; i < tot_chains; i++ ) { // For MolWise Clus arrays
             for ( j = 0; j < tot_chain_types; j++ ) {
-                ldMOLCLUS_ARR[MolClusArr_Index (0, j, i)] = 0.;
+                ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] = 0.;
                 for ( k = 0; k < nTot_CycleNum; k++ ) {
-                    ld_TOTMOLCLUS_ARR[MolClusArr_Index (k, j, i)] = 0.;
+                    ld_TOTMOLCLUS_ARR[MolClusArr_Index(k, j, i)] = 0.;
                 }
             }
         }
@@ -210,9 +210,9 @@ Global_Array_Initialization_AtStart (void) {
     if ( nReport[REPORT_RDFTOT] != 0 ) {
         for ( i = 0; i < nRDF_TotBins; i++ ) {      // For Radial distributions
             for ( j = 0; j < nRDF_TotComps; j++ ) { // For RDFs
-                ld_TOTRDF_Arr[RDFArr_Index (0, j, i)] = 0.;
+                ld_TOTRDF_Arr[RDFArr_Index(0, j, i)] = 0.;
                 for ( k = 0; k < nTot_CycleNum; k++ ) {
-                    ld_TOTRDF_Arr[RDFArr_Index (k, j, i)] = 0.;
+                    ld_TOTRDF_Arr[RDFArr_Index(k, j, i)] = 0.;
                 }
             }
         }
@@ -220,9 +220,9 @@ Global_Array_Initialization_AtStart (void) {
     if ( nReport[REPORT_COMDEN] != 0 ) {
         for ( j = 0; j < nRadDen_TotComps; j++ ) { // For Density Dists wrt COM
             for ( i = 0; i < nRDF_TotBins; i++ ) { // For Radial distributions
-                ldRadDen_Arr[RadDenArr_Index (0, j, i)] = 0.;
+                ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
                 for ( k = 0; k < nTot_CycleNum; k++ ) {
-                    ld_TOTRadDen_Arr[RadDenArr_Index (k, j, i)] = 0.;
+                    ld_TOTRadDen_Arr[RadDenArr_Index(k, j, i)] = 0.;
                 }
             }
         }
@@ -277,7 +277,7 @@ Global_Array_Initialization_AtStart (void) {
     }
 
     if ( RotBias_Mode == 1 ) {
-        fRot_Bias = expf (-fRot_Bias / fKT_Cycle[0]);
+        fRot_Bias = expf(-fRot_Bias / fKT_Cycle[0]);
     }
 
     if ( nTemp_inv == 1 ) {
@@ -289,25 +289,25 @@ Global_Array_Initialization_AtStart (void) {
     float VolumeConst = 4.f / 3.f * (float) M_PI;
     float IntendedVol = 0.2f;
     // fSquishRad =  (float) nBoxSize[0]/2.;
-    fSquishRad = cbrtf ((float) tot_beads / VolumeConst / IntendedVol);
+    fSquishRad = cbrtf((float) tot_beads / VolumeConst / IntendedVol);
     // fSquishRad =  fSquishRad*fSquishRad/4.;
-    ld_LogOfSmallestPossibleProb = logl ((lLDub) 1. / (lLDub) RAND_MAX);
+    ld_LogOfSmallestPossibleProb = logl((lLDub) 1. / (lLDub) RAND_MAX);
 
     nLimitedClusterSize = tot_chains > 15 ? 15 : tot_chains / 2;
 
-    Calculate_Distances_For_Radius (allDists, LARGEST_RADIUS);
-    Calculate_Distances_For_Radius (newDists, LARGEST_RADIUS);
+    Calculate_Distances_For_Radius(allDists, LARGEST_RADIUS);
+    Calculate_Distances_For_Radius(newDists, LARGEST_RADIUS);
 
     //    for(i=0; i<LARGEST_RADIUS*LARGEST_RADIUS*LARGEST_RADIUS*8; i++){
     //        printf("%2.2f ", allDists[i]);
     //    }
     //    printf("\n");
     //    exit(1);
-    printf ("All setup has been completed!\n");
+    printf("All setup has been completed!\n");
 }
 
 void
-Reset_Counters (void) {
+Reset_Counters(void) {
     fSysGyrRad              = 0.f;
     nTotGyrRadCounter       = 0;
     nRDFCounter             = 0;
@@ -320,7 +320,7 @@ Reset_Counters (void) {
 /// Reset_Global_Arrays - resets the various global counters and arrays for
 /// system analysis.
 void
-Reset_Global_Arrays (void) {
+Reset_Global_Arrays(void) {
     // Zero-ing out all the arrays used for data tracking!
     int i, j;
     for ( i = 0; i <= tot_chains; i++ ) {
@@ -331,7 +331,7 @@ Reset_Global_Arrays (void) {
         }
         if ( nReport[REPORT_NETWORK] != 0 ) {
             for ( j = 0; j < tot_chain_types; j++ ) {
-                ldMOLCLUS_ARR[MolClusArr_Index (0, j, i)] = 0.;
+                ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] = 0.;
             }
         }
     }
@@ -339,7 +339,7 @@ Reset_Global_Arrays (void) {
     if ( nReport[REPORT_RDFTOT] != 0 ) {
         for ( j = 0; j < nRDF_TotComps; j++ ) {
             for ( i = 0; i < nRDF_TotBins; i++ ) {
-                ldRDF_Arr[RDFArr_Index (0, j, i)] = 0.;
+                ldRDF_Arr[RDFArr_Index(0, j, i)] = 0.;
             }
         }
     }
@@ -347,7 +347,7 @@ Reset_Global_Arrays (void) {
         // Initalizing for density histograms wrt to the COM
         for ( j = 0; j < nRadDen_TotComps; j++ ) {
             for ( i = 0; i < nRDF_TotBins; i++ ) {
-                ldRadDen_Arr[RadDenArr_Index (0, j, i)] = 0.;
+                ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
             }
         }
     }
@@ -364,7 +364,7 @@ Reset_Global_Arrays (void) {
 
 /// Initial_Conditions_Simple - randomly place all the molecules.
 void
-Initial_Conditions_Simple (void) {
+Initial_Conditions_Simple(void) {
     /*
     Generates initial conditions for a system with topology information. The
     idea is to see if the selected bead has been placed or not. If it has been
@@ -450,7 +450,7 @@ Initial_Conditions_Simple (void) {
                     tmpR2[j] = tmpR[j];
                 }
                 TlCnt = 0; // Reset this counter.
-                while ( naTotLattice[Lat_Ind_FromVec (tmpR2)] != -1 && TlCnt < 5000000 ) {
+                while ( naTotLattice[Lat_Ind_FromVec(tmpR2)] != -1 && TlCnt < 5000000 ) {
                     for ( j = 0; j < POS_MAX; j++ ) {
                         tmpR2[j] = (rand() % radUp) - radLow;
                         tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
@@ -458,16 +458,16 @@ Initial_Conditions_Simple (void) {
                     TlCnt++;
                 }
                 if ( TlCnt == 5000000 ) {
-                    printf ("Not enough space in the lattice. Crashing. Maybe "
-                            "try increasing max trials, "
-                            "or make the box bigger!\t\n");
-                    exit (1);
+                    printf("Not enough space in the lattice. Crashing. Maybe "
+                           "try increasing max trials, "
+                           "or make the box bigger!\t\n");
+                    exit(1);
                 }
                 for ( j = 0; j < POS_MAX; j++ ) {
                     bead_info[i][j] = tmpR2[j];
-                }                                          // Placing bead
-                naTotLattice[Lat_Ind_FromVec (tmpR2)] = i; // Putting on lattice
-                temp_list[list_it]                    = i;
+                }                                         // Placing bead
+                naTotLattice[Lat_Ind_FromVec(tmpR2)] = i; // Putting on lattice
+                temp_list[list_it]                   = i;
                 list_it++; // Remembering in hash list.
                 // The bead has been placed around an appropriate anchor.
             } else { // There was no appropriate anchor. So we can put this bead
@@ -477,26 +477,26 @@ Initial_Conditions_Simple (void) {
                 }
                 // This usually means this is the first bead in the chain.
                 TlCnt = 0;
-                while ( naTotLattice[Lat_Ind_FromVec (tmpR)] != -1 && TlCnt < 5000000 ) { // Keep looping till we find
-                                                                                          // an empty lattice site.
+                while ( naTotLattice[Lat_Ind_FromVec(tmpR)] != -1 && TlCnt < 5000000 ) { // Keep looping till we find
+                                                                                         // an empty lattice site.
                     TlCnt++;
                     for ( j = 0; j < POS_MAX; j++ ) { // Generate a random point in the lattice.
                         tmpR[j] = rand() % nBoxSize[j];
                     }
                 }
                 if ( TlCnt == 5000000 ) {
-                    printf ("\n\nNot enough space in the lattice for first "
-                            "bead, bruh. Maybe try increasing max trials, "
-                            "or make the box bigger!\n\n");
-                    exit (1);
+                    printf("\n\nNot enough space in the lattice for first "
+                           "bead, bruh. Maybe try increasing max trials, "
+                           "or make the box bigger!\n\n");
+                    exit(1);
                 }
                 // Placing this bead wherever there is space, and using it as
                 // anchor. Also updating the lattice, and temp_list
                 for ( j = 0; j < POS_MAX; j++ ) {
                     bead_info[i][j] = tmpR[j];
                 }
-                naTotLattice[Lat_Ind_FromVec (tmpR)] = i; // Placing on lattice!
-                temp_list[list_it]                   = i;
+                naTotLattice[Lat_Ind_FromVec(tmpR)] = i; // Placing on lattice!
+                temp_list[list_it]                  = i;
                 list_it++; // Remembering that this bead has been placed.
             }
         SproutForth:
@@ -525,7 +525,7 @@ Initial_Conditions_Simple (void) {
                     tmpR2[j] = tmpR[j];
                 }
                 TlCnt = 0; // Reset this counter.
-                while ( naTotLattice[Lat_Ind_FromVec (tmpR2)] != -1 && TlCnt < 5000000 ) {
+                while ( naTotLattice[Lat_Ind_FromVec(tmpR2)] != -1 && TlCnt < 5000000 ) {
                     for ( j = 0; j < POS_MAX; j++ ) {
                         tmpR2[j] = (rand() % radUp) - radLow;
                         tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
@@ -534,18 +534,18 @@ Initial_Conditions_Simple (void) {
                     TlCnt++;
                 }
                 if ( TlCnt == 5000000 ) {
-                    printf ("\n\nNot enough space in the lattice. Crashing. "
-                            "Maybe try increasing max trials, "
-                            "or make the box bigger!\t %d\t%d %d\n\n",
-                            TlCnt, i, naTotLattice[Lat_Ind_FromVec (tmpR2)]);
-                    exit (1);
+                    printf("\n\nNot enough space in the lattice. Crashing. "
+                           "Maybe try increasing max trials, "
+                           "or make the box bigger!\t %d\t%d %d\n\n",
+                           TlCnt, i, naTotLattice[Lat_Ind_FromVec(tmpR2)]);
+                    exit(1);
                 }
                 for ( j = 0; j < POS_MAX; j++ ) { // Placing bead
                     bead_info[bondPart][j] = tmpR2[j];
                 }
 
-                naTotLattice[Lat_Ind_FromVec (tmpR2)] = bondPart; // Putting on lattice
-                temp_list[list_it]                    = bondPart;
+                naTotLattice[Lat_Ind_FromVec(tmpR2)] = bondPart; // Putting on lattice
+                temp_list[list_it]                   = bondPart;
                 list_it++; // Remembering in hash list.
             SkipThisPartner:
                 idx++;
@@ -564,70 +564,70 @@ Initial_Conditions_Simple (void) {
 /// Initial_Conditions_FromFile - reads the restart file and sets the initial
 /// conditions for the system
 void
-Initial_Conditions_FromFile (void) {
-    printf ("Reading file to generate initial configuration\n");
+Initial_Conditions_FromFile(void) {
+    printf("Reading file to generate initial configuration\n");
     char strLine[1000];
     int i, j;
     int tmp_beadinfo[BEADINFO_MAX];
     FILE* infile;
-    infile       = fopen (strRestartFile, "r");
+    infile       = fopen(strRestartFile, "r");
     int tmpBeads = 0;
-    while ( fgets (strLine, sizeof (strLine), infile) != NULL ) {
+    while ( fgets(strLine, sizeof(strLine), infile) != NULL ) {
         tmpBeads++;
-        if ( strcmp (strLine, "ITEM: ATOMS id type mol x y z bP\n") == 0 ) {
+        if ( strcmp(strLine, "ITEM: ATOMS id type mol x y z bP\n") == 0 ) {
             break;
         }
     }
     tmpBeads = 0;
-    while ( fgets (strLine, sizeof (strLine), infile) != NULL ) {
-        sscanf (strLine, "%d %d %d %d %d %d %d", &i, &tmp_beadinfo[BEAD_TYPE], &tmp_beadinfo[BEAD_CHAINID],
-                &tmp_beadinfo[POS_X], &tmp_beadinfo[POS_Y], &tmp_beadinfo[POS_Z], &tmp_beadinfo[BEAD_FACE]);
+    while ( fgets(strLine, sizeof(strLine), infile) != NULL ) {
+        sscanf(strLine, "%d %d %d %d %d %d %d", &i, &tmp_beadinfo[BEAD_TYPE], &tmp_beadinfo[BEAD_CHAINID],
+               &tmp_beadinfo[POS_X], &tmp_beadinfo[POS_Y], &tmp_beadinfo[POS_Z], &tmp_beadinfo[BEAD_FACE]);
         tmpBeads++;
         for ( j = 0; j < BEADINFO_MAX; j++ ) {
             bead_info[i][j] = tmp_beadinfo[j];
         }
     }
-    fclose (infile);
+    fclose(infile);
     if ( tmpBeads != tot_beads ) {
-        printf ("Given restart file does not have the same number of beads as "
-                "the provided structure.");
-        printf ("Crashing!\n");
-        exit (1);
+        printf("Given restart file does not have the same number of beads as "
+               "the provided structure.");
+        printf("Crashing!\n");
+        exit(1);
     }
     for ( i = 0; i < tot_beads; i++ ) {
-        naTotLattice[Lat_Ind_OfBead (i)] = i;
+        naTotLattice[Lat_Ind_OfBead(i)] = i;
     }
-    printf ("File read successfully and initial configuration set.\n");
+    printf("File read successfully and initial configuration set.\n");
 }
 
 /// Initial_Conditions_BreakBonds - glorified for loop to break every bond. Is
 /// used when a restart file with thermalization steps.
 void
-Initial_Conditions_BreakBonds (void) {
+Initial_Conditions_BreakBonds(void) {
     int i;
     for ( i = 0; i < tot_beads; i++ ) {
         bead_info[i][BEAD_FACE] = -1;
     }
-    printf ("Since system has thermalization cycle, deleting all physical "
-            "bonds!\n");
+    printf("Since system has thermalization cycle, deleting all physical "
+           "bonds!\n");
 }
 
 /// Calculate_Rot_Bias - calculates the possible anisotropic Boltzmann weights
 /// at the beginning so that we have a look-up table. \param CurrentTemp
 void
-Calculate_Rot_Bias (float CurrentTemp) {
+Calculate_Rot_Bias(float CurrentTemp) {
 
     int i, j;
     for ( i = 0; i < MAX_AA; i++ ) {
         for ( j = 0; j < MAX_AA; j++ ) {
-            dbias_bolt_fac[i][j] = (lLDub) expl (-(lLDub) fEnergy[i][j][E_SC_SC] / (lLDub) CurrentTemp);
+            dbias_bolt_fac[i][j] = (lLDub) expl(-(lLDub) fEnergy[i][j][E_SC_SC] / (lLDub) CurrentTemp);
             // printf("%LE; ", dbias_bolt_fac[i][j]);
         }
         // printf("\n");
     }
     // TODO: Make sure that fRot_Bias can be used in the future to set a solvent
     // 'anisotropy'
-    fRot_Bias = expf (-f_globRotBias / CurrentTemp);
+    fRot_Bias = expf(-f_globRotBias / CurrentTemp);
 }
 
 /// Temperature_Function - used to calculate what fCuTemp should (current
@@ -643,7 +643,7 @@ Calculate_Rot_Bias (float CurrentTemp) {
 /// Exponential decay from the beginning. \param nGen - basically 'time' or how
 /// many MC Steps have been done. \return end_val - the current temperature.
 float
-Temperature_Function (int mode, long nGen) {
+Temperature_Function(int mode, long nGen) {
 
     float x_val;
     float y_val;
@@ -653,7 +653,7 @@ Temperature_Function (int mode, long nGen) {
         case 0:
             x_val   = (float) (nMCPreSteps - nGen);
             x_val   = x_val / 1250. / fPreKT;
-            x_val   = fPreKT * (tanhf (x_val) + 1.);
+            x_val   = fPreKT * (tanhf(x_val) + 1.);
             end_val = fKT + x_val;
 
             break;
@@ -661,8 +661,8 @@ Temperature_Function (int mode, long nGen) {
         case 1:
             x_val   = (float) (nGen - nMCPreSteps) / (float) nMCPreSteps;
             y_val   = -x_val;
-            x_val   = fabsf (sinf (x_val));
-            y_val   = expf (y_val / 4.);
+            x_val   = fabsf(sinf(x_val));
+            y_val   = expf(y_val / 4.);
             end_val = fKT + 5. * fKT * x_val * y_val;
 
             break;
@@ -671,7 +671,7 @@ Temperature_Function (int mode, long nGen) {
             x_val   = (float) (nGen - 10 * nMCPreSteps);
             x_val   = x_val * x_val;
             y_val   = (float) (nMCPreSteps * nMCPreSteps) * 10.;
-            end_val = fKT + expf (-x_val / y_val) / fKT / 10.;
+            end_val = fKT + expf(-x_val / y_val) / fKT / 10.;
 
             break;
 
@@ -679,7 +679,7 @@ Temperature_Function (int mode, long nGen) {
             x_val   = -(float) (nGen);
             x_val   = 4. * x_val;
             x_val   = x_val / (float) (nMCPreSteps);
-            end_val = fKT + expf (x_val);
+            end_val = fKT + expf(x_val);
 
             break;
 
@@ -687,7 +687,7 @@ Temperature_Function (int mode, long nGen) {
             x_val   = -(float) (nGen);
             x_val   = fMC_Temp_Rate * x_val;
             x_val   = x_val / (float) (nMCPreSteps);
-            end_val = fKT + expf (x_val);
+            end_val = fKT + expf(x_val);
 
             break;
 
@@ -705,19 +705,19 @@ Temperature_Function (int mode, long nGen) {
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
 int*
-Create1DInt (const size_t xDim, const char* ArrName) {
+Create1DInt(const size_t xDim, const char* ArrName) {
     int* dumPtr;
 #if DEBUG
-    printf ("%s is being allocated ... ", ArrName);
+    printf("%s is being allocated ... ", ArrName);
 #endif
-    dumPtr = (int*) malloc (xDim * sizeof (int));
+    dumPtr = (int*) malloc(xDim * sizeof(int));
 
     if ( dumPtr == NULL ) {
-        printf ("Not enough memory!\n%s\nCrashing!\n", ArrName);
-        exit (1);
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
     }
 #if DEBUG
-    printf (" ... and allocated!\n");
+    printf(" ... and allocated!\n");
 #endif
     return dumPtr;
 }
@@ -727,19 +727,19 @@ Create1DInt (const size_t xDim, const char* ArrName) {
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
 long*
-Create1DLong (const size_t xDim, const char* ArrName) {
+Create1DLong(const size_t xDim, const char* ArrName) {
     long* dumPtr;
 #if DEBUG
-    printf ("%s is being allocated ... ", ArrName);
+    printf("%s is being allocated ... ", ArrName);
 #endif
-    dumPtr = (long*) malloc (xDim * sizeof (long));
+    dumPtr = (long*) malloc(xDim * sizeof(long));
 
     if ( dumPtr == NULL ) {
-        printf ("Not enough memory!\n%s\nCrashing!\n", ArrName);
-        exit (1);
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
     }
 #if DEBUG
-    printf (" ... and allocated!\n");
+    printf(" ... and allocated!\n");
 #endif
     return dumPtr;
 }
@@ -749,19 +749,19 @@ Create1DLong (const size_t xDim, const char* ArrName) {
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
 float*
-Create1DFloat (const size_t xDim, const char* ArrName) {
+Create1DFloat(const size_t xDim, const char* ArrName) {
     float* dumPtr;
 #if DEBUG
-    printf ("%s is being allocated ... ", ArrName);
+    printf("%s is being allocated ... ", ArrName);
 #endif
-    dumPtr = (float*) malloc (xDim * sizeof (float));
+    dumPtr = (float*) malloc(xDim * sizeof(float));
 
     if ( dumPtr == NULL ) {
-        printf ("Not enough memory!\n%s\nCrashing!\n", ArrName);
-        exit (1);
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
     }
 #if DEBUG
-    printf (" ... and allocated!\n");
+    printf(" ... and allocated!\n");
 #endif
     return dumPtr;
 }
@@ -771,19 +771,19 @@ Create1DFloat (const size_t xDim, const char* ArrName) {
 /// \param ArrName Dummy name of the array for debugging.
 /// \return The pointer to the array.
 long double*
-Create1DLongdouble (const size_t xDim, const char* ArrName) {
+Create1DLongdouble(const size_t xDim, const char* ArrName) {
     long double* dumPtr;
 #if DEBUG
-    printf ("%s is being allocated ... ", ArrName);
+    printf("%s is being allocated ... ", ArrName);
 #endif
-    dumPtr = (long double*) malloc (xDim * sizeof (long double));
+    dumPtr = (long double*) malloc(xDim * sizeof(long double));
 
     if ( dumPtr == NULL ) {
-        printf ("Not enough memory!\n%s\nCrashing!\n", ArrName);
-        exit (1);
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
     }
 #if DEBUG
-    printf (" ... and allocated!\n");
+    printf(" ... and allocated!\n");
 #endif
     return dumPtr;
 }
@@ -797,21 +797,21 @@ Create1DLongdouble (const size_t xDim, const char* ArrName) {
 /// the array, for debugging. \return Pointer to array-of-pointers, or a 2D
 /// array.
 int**
-Create2DInt (const size_t xDim, const size_t yDim, const char* ArrName) {
+Create2DInt(const size_t xDim, const size_t yDim, const char* ArrName) {
 #if DEBUG
-    printf ("%s is being allocated ... ", ArrName);
+    printf("%s is being allocated ... ", ArrName);
 #endif
     int** dumPtr;
-    dumPtr = (int**) malloc (yDim * sizeof (int*));
+    dumPtr = (int**) malloc(yDim * sizeof(int*));
     if ( dumPtr == NULL ) {
-        printf ("Not enough memory!\n%s\nCrashing!\n", ArrName);
-        exit (1);
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
     }
 #
-    dumPtr[0] = (int*) malloc (xDim * yDim * sizeof (int));
+    dumPtr[0] = (int*) malloc(xDim * yDim * sizeof(int));
     if ( dumPtr[0] == NULL ) {
-        printf ("Not enough memory!\n%s\nCrashing!\n", ArrName);
-        exit (1);
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
     }
 
     size_t i;
@@ -819,7 +819,7 @@ Create2DInt (const size_t xDim, const size_t yDim, const char* ArrName) {
         dumPtr[i] = &dumPtr[0][i * xDim];
     }
 #if DEBUG
-    printf (" ... and allocated!\n");
+    printf(" ... and allocated!\n");
 #endif
     return dumPtr;
 }
@@ -833,21 +833,21 @@ Create2DInt (const size_t xDim, const size_t yDim, const char* ArrName) {
 /// \param ArrName: Dummy name for the array, for debugging.
 /// \return Pointer to array-of-pointers, or a 2D array.
 long double**
-Create2DLongdouble (const size_t xDim, const size_t yDim, const char* ArrName) {
+Create2DLongdouble(const size_t xDim, const size_t yDim, const char* ArrName) {
 #if DEBUG
-    printf ("%s is being allocated ... ", ArrName);
+    printf("%s is being allocated ... ", ArrName);
 #endif
     long double** dumPtr;
-    dumPtr = (long double**) malloc (yDim * sizeof (long double*));
+    dumPtr = (long double**) malloc(yDim * sizeof(long double*));
     if ( dumPtr == NULL ) {
-        printf ("Not enough memory!\n%s\nCrashing!\n", ArrName);
-        exit (1);
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
     }
 #
-    dumPtr[0] = (long double*) malloc (xDim * yDim * sizeof (long double));
+    dumPtr[0] = (long double*) malloc(xDim * yDim * sizeof(long double));
     if ( dumPtr[0] == NULL ) {
-        printf ("Not enough memory!\n%s\nCrashing!\n", ArrName);
-        exit (1);
+        printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
+        exit(1);
     }
 
     size_t i;
@@ -855,7 +855,7 @@ Create2DLongdouble (const size_t xDim, const size_t yDim, const char* ArrName) {
         dumPtr[i] = &dumPtr[0][i * xDim];
     }
 #if DEBUG
-    printf (" ... and allocated!\n");
+    printf(" ... and allocated!\n");
 #endif
     return dumPtr;
 }

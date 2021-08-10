@@ -7,7 +7,7 @@
 /// \param k
 /// \return the 1D index location for (i,j,k) position
 int
-Lat_Ind_FromCoords (const int i, const int j, const int k) { // Lattice index from 3D to 1D array
+Lat_Ind_FromCoords(const int i, const int j, const int k) { // Lattice index from 3D to 1D array
     return i + nBoxSize[POS_X] * (j + nBoxSize[POS_Y] * k);
 }
 
@@ -15,7 +15,7 @@ Lat_Ind_FromCoords (const int i, const int j, const int k) { // Lattice index fr
 /// \param xArr
 /// \return
 int
-Lat_Ind_FromVec (const int* xArr) { // Just the vector form of the above function. Easier to read sometimes.
+Lat_Ind_FromVec(const int* xArr) { // Just the vector form of the above function. Easier to read sometimes.
     return xArr[POS_X] + nBoxSize[POS_X] * (xArr[POS_Y] + nBoxSize[POS_Y] * xArr[POS_Z]);
 }
 
@@ -23,7 +23,7 @@ Lat_Ind_FromVec (const int* xArr) { // Just the vector form of the above functio
 /// \param beadID
 /// \return
 int
-Lat_Ind_OfBead (const int beadID) {
+Lat_Ind_OfBead(const int beadID) {
     return bead_info[beadID][POS_X] +
            nBoxSize[POS_X] * (bead_info[beadID][POS_Y] + nBoxSize[POS_Y] * bead_info[beadID][POS_Z]);
 }
@@ -35,15 +35,15 @@ Lat_Ind_OfBead (const int beadID) {
 /// \param f2
 /// \return
 float
-Dist_PointToPoint_Float (const float* f1, const float* f2) {
+Dist_PointToPoint_Float(const float* f1, const float* f2) {
     float d[POS_MAX];
     int i;
     for ( i = 0; i < POS_MAX; i++ ) {
-        d[i] = fabsf (f1[i] - f2[i]);
+        d[i] = fabsf(f1[i] - f2[i]);
         d[i] = d[i] > (float) nBoxSize[i] / 2. ? (float) nBoxSize[i] - d[i] : d[i];
     }
 
-    return sqrtf (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]);
+    return sqrtf(d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]);
 }
 
 /// Dist_PointToPoint - euclidean distance between the vectors (arrays) f1 and f2 where f1 and f2 are integer points.
@@ -51,15 +51,15 @@ Dist_PointToPoint_Float (const float* f1, const float* f2) {
 /// \param f2
 /// \return
 float
-Dist_PointToPoint (const int* f1, const int* f2) {
+Dist_PointToPoint(const int* f1, const int* f2) {
     int d[POS_MAX];
     int i;
     for ( i = 0; i < POS_MAX; i++ ) {
-        d[i] = abs (f1[i] - f2[i]);
+        d[i] = abs(f1[i] - f2[i]);
         d[i] = d[i] > nBoxSize[i] / 2 ? nBoxSize[i] - d[i] : d[i];
     }
 
-    return sqrtf ((float) (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
+    return sqrtf((float) (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
 }
 
 /// Dist_BeadToPoint - euclidean distance between beadID and the vector f1.
@@ -67,14 +67,14 @@ Dist_PointToPoint (const int* f1, const int* f2) {
 /// \param f1
 /// \return
 float
-Dist_BeadToPoint (const int beadID, const int* f1) {
+Dist_BeadToPoint(const int beadID, const int* f1) {
     int d[POS_MAX];
     int i;
     for ( i = 0; i < POS_MAX; i++ ) {
-        d[i] = abs (bead_info[beadID][i] - f1[i]);
+        d[i] = abs(bead_info[beadID][i] - f1[i]);
         d[i] = d[i] > nBoxSize[i] / 2 ? nBoxSize[i] - d[i] : d[i];
     }
-    return sqrtf ((float) (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
+    return sqrtf((float) (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
 }
 
 /// Dist_BeadToPoint_Double - euclidean distance between beadID and the double array f1.
@@ -82,14 +82,14 @@ Dist_BeadToPoint (const int beadID, const int* f1) {
 /// \param f1
 /// \return
 float
-Dist_BeadToPoint_Double (const int beadID, const lDub* f1) {
+Dist_BeadToPoint_Double(const int beadID, const lDub* f1) {
     lDub d[POS_MAX];
     int i;
     for ( i = 0; i < POS_MAX; i++ ) {
-        d[i] = fabs ((lDub) bead_info[beadID][i] - f1[i]);
+        d[i] = fabs((lDub) bead_info[beadID][i] - f1[i]);
         d[i] = d[i] > (lDub) nBoxSize[i] / 2. ? (lDub) nBoxSize[i] - d[i] : d[i];
     }
-    return sqrtf ((float) (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
+    return sqrtf((float) (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
 }
 
 /// Dist_BeadToPoint_Float - euclidean distance between beadID and the float array f1.
@@ -97,14 +97,14 @@ Dist_BeadToPoint_Double (const int beadID, const lDub* f1) {
 /// \param f1
 /// \return
 float
-Dist_BeadToPoint_Float (const int beadID, const float* f1) {
+Dist_BeadToPoint_Float(const int beadID, const float* f1) {
     float d[POS_MAX];
     int i;
     for ( i = 0; i < POS_MAX; i++ ) {
-        d[i] = fabsf ((float) bead_info[beadID][i] - f1[i]);
+        d[i] = fabsf((float) bead_info[beadID][i] - f1[i]);
         d[i] = d[i] > (float) nBoxSize[i] / 2. ? (float) nBoxSize[i] - d[i] : d[i];
     }
-    return sqrtf ((d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
+    return sqrtf((d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
 }
 
 /// Dist_BeadToBead - euclidean distance between the two beads.
@@ -112,16 +112,16 @@ Dist_BeadToPoint_Float (const int beadID, const float* f1) {
 /// \param n2
 /// \return
 float
-Dist_BeadToBead (const int n1, const int n2) {
+Dist_BeadToBead(const int n1, const int n2) {
     lInt d[POS_MAX];
     lInt i;
 
     for ( i = 0; i < POS_MAX; i++ ) {
-        d[i] = abs (bead_info[n1][i] - bead_info[n2][i]);
+        d[i] = abs(bead_info[n1][i] - bead_info[n2][i]);
         d[i] = d[i] > nBoxSize[i] / 2 ? nBoxSize[i] - d[i] : d[i];
     }
 
-    return sqrtf ((float) (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
+    return sqrtf((float) (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
 }
 
 /// Check_System_Structure - performs a intensive and extensive sanity check. Check:
@@ -132,7 +132,7 @@ Dist_BeadToBead (const int n1, const int n2) {
 /// 5. Bonds are not between beads that are too far apart.
 /// \return 0 if everything is okay, beadID+1 if failed.
 int
-Check_System_Structure (void) {
+Check_System_Structure(void) {
     int i, j;          // Looping variables
     int idx;           // Internal iterators for covalent bonds.
     int tmpR[POS_MAX]; // Just a vector to store coordinates
@@ -143,52 +143,52 @@ Check_System_Structure (void) {
         for ( j = 0; j < POS_MAX; j++ ) {
             tmpR[j] = bead_info[i][j];
         }
-        if ( naTotLattice[Lat_Ind_FromVec (tmpR)] == -1 ) {
-            printf ("Lattice Position for bead %d is empty! Chain: %d\n", i, bead_info[i][BEAD_CHAINID]);
+        if ( naTotLattice[Lat_Ind_FromVec(tmpR)] == -1 ) {
+            printf("Lattice Position for bead %d is empty! Chain: %d\n", i, bead_info[i][BEAD_CHAINID]);
             return i + 1;
         }
-        if ( i - naTotLattice[Lat_Ind_FromVec (tmpR)] !=
+        if ( i - naTotLattice[Lat_Ind_FromVec(tmpR)] !=
              0 ) { // This means there is a mismatch between where the bead is and where the lattice thinks the bead is
-            printf ("Bead position and lattice value not the same. Crashing\t\t");
-            printf ("B1:%d B2:%d\t C1:%d C2:%d\n", i, naTotLattice[Lat_Ind_FromVec (tmpR)], bead_info[i][BEAD_CHAINID],
-                    bead_info[naTotLattice[Lat_Ind_FromVec (tmpR)]][BEAD_CHAINID]);
+            printf("Bead position and lattice value not the same. Crashing\t\t");
+            printf("B1:%d B2:%d\t C1:%d C2:%d\n", i, naTotLattice[Lat_Ind_FromVec(tmpR)], bead_info[i][BEAD_CHAINID],
+                   bead_info[naTotLattice[Lat_Ind_FromVec(tmpR)]][BEAD_CHAINID]);
             return i + 1;
         }
         while ( topo_info[i][idx] != -1 && idx < MAX_BONDS ) {
             bondPart = topo_info[i][idx];
-            if ( Dist_BeadToBead (i, bondPart) > LINKER_RSCALE * linker_len[i][idx] ) {
-                printf ("Bad beads! %d\t(%d %d %d)\t\tTopo:(%d %d %d)\t\tLinkers:(%.5f\t%.5f\t%.5f)\n", i,
-                        bead_info[i][0], bead_info[i][1], bead_info[i][2], topo_info[i][0], topo_info[i][1],
-                        topo_info[i][2], (float) linker_len[i][0], (float) linker_len[i][1], (float) linker_len[i][2]);
-                printf ("\t\t\t\t\t-------------------->\t\t%f\tSHOULD BE\t%f\n", Dist_BeadToBead (i, bondPart),
-                        LINKER_RSCALE * (float) linker_len[i][idx]);
-                printf ("Bad beads! %d\t(%d %d %d)\t\tTopo:(%d %d %d)\t\tLinkers:(%.5f\t%.5f\t%.5f)\n\n", bondPart,
-                        bead_info[bondPart][0], bead_info[bondPart][1], bead_info[bondPart][2], topo_info[bondPart][0],
-                        topo_info[bondPart][1], topo_info[bondPart][2], (float) linker_len[bondPart][0],
-                        (float) linker_len[bondPart][1], (float) linker_len[bondPart][2]);
+            if ( Dist_BeadToBead(i, bondPart) > LINKER_RSCALE * linker_len[i][idx] ) {
+                printf("Bad beads! %d\t(%d %d %d)\t\tTopo:(%d %d %d)\t\tLinkers:(%.5f\t%.5f\t%.5f)\n", i,
+                       bead_info[i][0], bead_info[i][1], bead_info[i][2], topo_info[i][0], topo_info[i][1],
+                       topo_info[i][2], (float) linker_len[i][0], (float) linker_len[i][1], (float) linker_len[i][2]);
+                printf("\t\t\t\t\t-------------------->\t\t%f\tSHOULD BE\t%f\n", Dist_BeadToBead(i, bondPart),
+                       LINKER_RSCALE * (float) linker_len[i][idx]);
+                printf("Bad beads! %d\t(%d %d %d)\t\tTopo:(%d %d %d)\t\tLinkers:(%.5f\t%.5f\t%.5f)\n\n", bondPart,
+                       bead_info[bondPart][0], bead_info[bondPart][1], bead_info[bondPart][2], topo_info[bondPart][0],
+                       topo_info[bondPart][1], topo_info[bondPart][2], (float) linker_len[bondPart][0],
+                       (float) linker_len[bondPart][1], (float) linker_len[bondPart][2]);
                 return i + 1;
             }
             idx++;
         }
         if ( bead_info[i][BEAD_FACE] != -1 ) {
             if ( nBeadTypeIsSticker[bead_info[i][BEAD_TYPE]] == 0 ) {
-                printf ("This bead -- %d -- should not have a bond. Crashing.\n", i);
+                printf("This bead -- %d -- should not have a bond. Crashing.\n", i);
                 return i + 1;
             }
             if ( bead_info[i][BEAD_FACE] == i ) {
-                printf ("Self bonded.\n");
+                printf("Self bonded.\n");
                 return i + 1;
             }
             if ( i != bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] ) {
-                printf ("Bad bond!\n\t%d %d %d %f\nCrashing.\n", i, bead_info[i][BEAD_FACE],
-                        bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE],
-                        fEnergy[bead_info[i][BEAD_TYPE]][bead_info[bead_info[i][BEAD_FACE]][BEAD_TYPE]][E_SC_SC]);
+                printf("Bad bond!\n\t%d %d %d %f\nCrashing.\n", i, bead_info[i][BEAD_FACE],
+                       bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE],
+                       fEnergy[bead_info[i][BEAD_TYPE]][bead_info[bead_info[i][BEAD_FACE]][BEAD_TYPE]][E_SC_SC]);
                 return i + 1;
             }
-            if ( Dist_BeadToBead (i, bead_info[i][BEAD_FACE]) > LINKER_RSCALE ) {
-                printf ("Bad bond! Distance is wrong\n\t%d %d %d\n Distance is %f. Crashing.\n", i,
-                        bead_info[i][BEAD_FACE], bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE],
-                        Dist_BeadToBead (i, bead_info[i][BEAD_FACE]));
+            if ( Dist_BeadToBead(i, bead_info[i][BEAD_FACE]) > LINKER_RSCALE ) {
+                printf("Bad bond! Distance is wrong\n\t%d %d %d\n Distance is %f. Crashing.\n", i,
+                       bead_info[i][BEAD_FACE], bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE],
+                       Dist_BeadToBead(i, bead_info[i][BEAD_FACE]));
                 return i + 1;
             }
         }
@@ -200,15 +200,15 @@ Check_System_Structure (void) {
 /// \param f1: The array where indicies 0,1 and 3 correspond to x y and z.
 /// \return
 float
-Dist_Vec3n (const int* f1) { // Outputs the magnitude of the vector
-    return sqrtf ((float) (f1[0] * f1[0] + f1[1] * f1[1] + f1[2] * f1[2]));
+Dist_Vec3n(const int* f1) { // Outputs the magnitude of the vector
+    return sqrtf((float) (f1[0] * f1[0] + f1[1] * f1[1] + f1[2] * f1[2]));
 }
 
 /// Dist_VecMagSq - non periodic boundary euclidean magnitude of vector
 /// \param f1: The array where indicies 0,1 and 3 correspond to x y and z.
 /// \return Square of magnitude: x^2 + y^2 + z^2
 int
-Dist_VecMagSq (const int* f1) { // Outputs the magnitude of the vector
+Dist_VecMagSq(const int* f1) { // Outputs the magnitude of the vector
     return (f1[0] * f1[0] + f1[1] * f1[1] + f1[2] * f1[2]);
 }
 
@@ -218,7 +218,7 @@ Dist_VecMagSq (const int* f1) { // Outputs the magnitude of the vector
 /// THIS IS VERY OLD AND HASN'T BEEN LOOKED AT IN A WHILE
 /// TODO: Update this for the new version
 void
-GyrTensor_ClusterSpecific (int ClusSize, int ClusIndex) {
+GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex) {
     // Calculate the components of the gyration tensor for a given cluster.
     // ClusSize is the size of the cluster -- obviously -- whereas ClusIndex tell us
     // where in naCluster the chain indecies are located. naCluster[ClusIndex][0-ClusSize] is all the chainID's I need
@@ -249,8 +249,8 @@ GyrTensor_ClusterSpecific (int ClusSize, int ClusIndex) {
             NumRes++; // Adding a residue to the total
             for ( j = 0; j < POS_MAX; j++ ) {
                 dumArg = 2. * PI * ((float) bead_info[k][j] / (float) nBoxSize[j]);
-                theta[j] += cosf (dumArg);
-                zeta[j] += sinf (dumArg); // Since I am taking the average just keep adding
+                theta[j] += cosf(dumArg);
+                zeta[j] += sinf(dumArg); // Since I am taking the average just keep adding
             }
         }
         // printf("Next bead\n");
@@ -260,7 +260,7 @@ GyrTensor_ClusterSpecific (int ClusSize, int ClusIndex) {
     for ( j = 0; j < POS_MAX; j++ ) {
         theta[j]   = theta[j] / (float) NumRes;
         zeta[j]    = zeta[j] / (float) NumRes;
-        tot_COM[j] = atan2f (-theta[j], -zeta[j]) + PI;
+        tot_COM[j] = atan2f(-theta[j], -zeta[j]) + PI;
         tot_COM[j] = nBoxSize[j] * (tot_COM[j] / 2. / PI);
     }
 
@@ -273,14 +273,14 @@ GyrTensor_ClusterSpecific (int ClusSize, int ClusIndex) {
         for ( k = firstB; k < lastB; k++ ) {
             for ( j = 0; j < POS_MAX; j++ ) {
                 for ( j2 = j; j2 < POS_MAX; j2++ ) {
-                    dumArg  = fabsf ((float) bead_info[k][j] - tot_COM[j]) <
-                                     (float) nBoxSize[j] - fabsf ((float) bead_info[k][j] - tot_COM[j])
-                                  ? fabsf ((float) bead_info[k][j] - tot_COM[j])
-                                  : (float) nBoxSize[j] - fabsf ((float) bead_info[k][j] - tot_COM[j]);
-                    dumArg2 = fabsf ((float) bead_info[k][j2] - tot_COM[j2]) <
-                                      (float) nBoxSize[j2] - fabsf ((float) bead_info[k][j2] - tot_COM[j2])
-                                  ? fabsf ((float) bead_info[k][j2] - tot_COM[j2])
-                                  : (float) nBoxSize[j2] - fabsf ((float) bead_info[k][j2] - tot_COM[j2]);
+                    dumArg  = fabsf((float) bead_info[k][j] - tot_COM[j]) <
+                                     (float) nBoxSize[j] - fabsf((float) bead_info[k][j] - tot_COM[j])
+                                  ? fabsf((float) bead_info[k][j] - tot_COM[j])
+                                  : (float) nBoxSize[j] - fabsf((float) bead_info[k][j] - tot_COM[j]);
+                    dumArg2 = fabsf((float) bead_info[k][j2] - tot_COM[j2]) <
+                                      (float) nBoxSize[j2] - fabsf((float) bead_info[k][j2] - tot_COM[j2])
+                                  ? fabsf((float) bead_info[k][j2] - tot_COM[j2])
+                                  : (float) nBoxSize[j2] - fabsf((float) bead_info[k][j2] - tot_COM[j2]);
                     fGyrTensor[j + 3 * (j2 - j)] += dumArg * dumArg2;
                     // 0 = xx; 1 = yy; 2 = zz; 3 = xy; 6 = xz; 4 = yz; Need smarter indexing
                 }
@@ -302,8 +302,8 @@ GyrTensor_ClusterSpecific (int ClusSize, int ClusIndex) {
 /// THIS IS VERY OLD AND HASN'T BEEN LOOKED AT IN A WHILE
 /// TODO: Update this for the new version
 void
-GyrTensor_GyrRad (void) { // Calculates the gyration tensor for the whole system
-    int i, k, j, j2;      // Basic indecies for loops
+GyrTensor_GyrRad(void) { // Calculates the gyration tensor for the whole system
+    int i, k, j, j2;     // Basic indecies for loops
     for ( i = 0; i < 7; i++ ) {
         fGyrTensor[i] = 0.;
     }                              // Initializing
@@ -351,7 +351,7 @@ GyrTensor_GyrRad (void) { // Calculates the gyration tensor for the whole system
 /// periodic boundaries. This is used as a proxy to detect phase separation, but is a relic of the old formalism. The
 /// RDF should be used in general. Although this can be used without the need for a non-interacting prior.
 void
-GyrTensor_GyrRad_Avg (void) {
+GyrTensor_GyrRad_Avg(void) {
     /*
     Only calculates the diagonals of the gyration tensor, and calculates the sum of the
     diagonals. Remember that Rg^2 = Tr(GyrTen) so we only need to calculate the diagonals, and then then sum.
@@ -360,7 +360,7 @@ GyrTensor_GyrRad_Avg (void) {
     int i, j; // Loop indecies
     lDub tot_COM[POS_MAX] = {0.};
 
-    Calc_SystemCenterOfMass (tot_COM);
+    Calc_SystemCenterOfMass(tot_COM);
     int dumArg[POS_MAX] = {0};
     for ( i = 0; i < 7; i++ ) { // Initializing to 0
         fGyrTensor[i] = 0.;
@@ -368,14 +368,14 @@ GyrTensor_GyrRad_Avg (void) {
 
     for ( i = 0; i < tot_beads; i++ ) {
         for ( j = 0; j < POS_MAX; j++ ) {
-            dumArg[j] = abs (bead_info[i][j] - (int) tot_COM[j]);
+            dumArg[j] = abs(bead_info[i][j] - (int) tot_COM[j]);
             dumArg[j] = dumArg[j] > nBoxSize[i] / 2 ? nBoxSize[i] - dumArg[j] : dumArg[j];
             fGyrTensor[j] += (float) (dumArg[j] * dumArg[j]);
         }
     }
 
-    fSysGyrRad += sqrtf ((fGyrTensor[0] + fGyrTensor[1] + fGyrTensor[2]) /
-                         (float) tot_beads); // Adding to the total fSysGyrRad to be averaged at the end.
+    fSysGyrRad += sqrtf((fGyrTensor[0] + fGyrTensor[1] + fGyrTensor[2]) /
+                        (float) tot_beads); // Adding to the total fSysGyrRad to be averaged at the end.
     nTotGyrRadCounter++; // Remembering that we have calculated the radius; this will be used to average the final
                          // value.
 }
@@ -386,9 +386,9 @@ GyrTensor_GyrRad_Avg (void) {
 /// \return The index of the array
 /// The way it is set up, the indexing goes through the diagonal and then 0-1, 0-2, ... 0-N, 1-2, ... 1-N and so on
 int
-RDF_ComponentIndex (const int i, const int j) {
+RDF_ComponentIndex(const int i, const int j) {
     if ( i > j ) {
-        return RDF_ComponentIndex (j, i);
+        return RDF_ComponentIndex(j, i);
     } else {
         return i == j ? 1 + i : nBeadTypes + j - (i * (3 + i - 2 * nBeadTypes)) / 2;
     }
@@ -400,12 +400,12 @@ RDF_ComponentIndex (const int i, const int j) {
 /// \param x_pos
 /// \return 1D index for the totalRDFArray
 int
-RDFArr_Index (const int run_cycle, const int rdf_comp, const int x_pos) {
+RDFArr_Index(const int run_cycle, const int rdf_comp, const int x_pos) {
     return x_pos + nRDF_TotBins * (rdf_comp + nRDF_TotComps * run_cycle);
 }
 
 int
-RadDen_ComponentIndex (const int i, const int j) {
+RadDen_ComponentIndex(const int i, const int j) {
     if ( i < 0 ) {
         return j;
     } else {
@@ -414,19 +414,19 @@ RadDen_ComponentIndex (const int i, const int j) {
 }
 
 int
-RadDenArr_Index (const int run_cycle, const int rad_comp, const int x_pos) {
+RadDenArr_Index(const int run_cycle, const int rad_comp, const int x_pos) {
     return x_pos + nRDF_TotBins * (rad_comp + nRadDen_TotComps * run_cycle);
 }
 
 int
-MolClusArr_Index (const int run_cycle, const int chain_type, const int clus_size) {
+MolClusArr_Index(const int run_cycle, const int chain_type, const int clus_size) {
     return clus_size + tot_chains * (chain_type + tot_chain_types * run_cycle);
 }
 
 /// RDF_ComponentWise_Avg - calculates the pair-distribution of the system where every bead acts as the center
 /// of a radial histogram of pairs. Note that dr = 1/4 lattice units.
 void
-RDF_ComponentWise_Avg (void) {
+RDF_ComponentWise_Avg(void) {
     /*
     Calculates the RDF and adds it all up so that it can be averaged out at the end of the run.
     */
@@ -441,12 +441,12 @@ RDF_ComponentWise_Avg (void) {
         resi = bead_info[i][BEAD_TYPE];
         for ( j = i + 1; j < tot_beads; j++ ) {
             resj = bead_info[j][BEAD_TYPE];
-            x    = Dist_BeadToBead (i, j);
+            x    = Dist_BeadToBead(i, j);
             // Note that Dist_BeadToBead(i,j) automatically ensures no distance is greater than (L/2)*sqrt(3)
-            myBin = (int) floor (4. * x);                 // I am assuming for now that dr=1/4
-            ldRDF_Arr[RDFArr_Index (0, 0, myBin)] += 2.0; // Adding a pair to that bin
-            array_pos = RDF_ComponentIndex (resi, resj);
-            ldRDF_Arr[RDFArr_Index (0, array_pos, myBin)] += 2.0;
+            myBin = (int) floor(4. * x);                 // I am assuming for now that dr=1/4
+            ldRDF_Arr[RDFArr_Index(0, 0, myBin)] += 2.0; // Adding a pair to that bin
+            array_pos = RDF_ComponentIndex(resi, resj);
+            ldRDF_Arr[RDFArr_Index(0, array_pos, myBin)] += 2.0;
         }
     }
     nRDFCounter++;
@@ -459,7 +459,7 @@ RDF_ComponentWise_Avg (void) {
 /// \param tmpR
 /// \return 1 means all is good, 0 means bad.
 int
-Check_LinkerConstraint (const int beadID, const int* tmpR) {
+Check_LinkerConstraint(const int beadID, const int* tmpR) {
     // Check if the proposed new location for beadID is such that all the linkers are unbroken.
     int idx;         // Iterator to loop over bond Partners
     int bondPartner; // It is what it is.
@@ -467,7 +467,7 @@ Check_LinkerConstraint (const int beadID, const int* tmpR) {
     bondPartner = topo_info[beadID][idx];                       // Initializing the two.
     while ( idx < MAX_BONDS && topo_info[beadID][idx] != -1 ) { // Keep going till we run out of partners
         bondPartner = topo_info[beadID][idx];
-        if ( Dist_PointToPoint (bead_info[bondPartner], tmpR) > LINKER_RSCALE * (float) linker_len[beadID][idx] ) {
+        if ( Dist_PointToPoint(bead_info[bondPartner], tmpR) > LINKER_RSCALE * (float) linker_len[beadID][idx] ) {
             return 0; // This means that we have broken one of the linkers.
         }
         idx++;
@@ -481,7 +481,7 @@ Check_LinkerConstraint (const int beadID, const int* tmpR) {
 /// \param tmpR
 /// \return
 int
-Check_MTLinkerConstraint_OLD (int beadID, int (*tmpR)[POS_MAX]) {
+Check_MTLinkerConstraint_OLD(int beadID, int (*tmpR)[POS_MAX]) {
 
     int curID = beadID;
     int idx, bPart;
@@ -502,7 +502,7 @@ Check_MTLinkerConstraint_OLD (int beadID, int (*tmpR)[POS_MAX]) {
         idx   = 0;
         bPart = topo_info[curID][idx];
         while ( bPart != -1 && idx < MAX_BONDS ) {
-            if ( Dist_BeadToBead (curID, bPart) > LINKER_RSCALE * (float) linker_len[curID][idx] ) {
+            if ( Dist_BeadToBead(curID, bPart) > LINKER_RSCALE * (float) linker_len[curID][idx] ) {
                 canI = 0;
                 break;
             }
@@ -529,7 +529,7 @@ Check_MTLinkerConstraint_OLD (int beadID, int (*tmpR)[POS_MAX]) {
 /// \param tmpR
 /// \return
 int
-Check_LinkerConstraints_ForBeadList (const int listSize, const int* beadList) {
+Check_LinkerConstraints_ForBeadList(const int listSize, const int* beadList) {
 
     int i, j, bead1, bead2;
     int dumBonds[MAX_BONDS + 1];
@@ -537,10 +537,10 @@ Check_LinkerConstraints_ForBeadList (const int listSize, const int* beadList) {
     float xDis;
     for ( i = 0; i < listSize; i++ ) {
         bead1  = beadList[i];
-        dumNum = OP_GetTopoBonds (bead1, dumBonds);
+        dumNum = OP_GetTopoBonds(bead1, dumBonds);
         for ( j = 1; j < dumNum; j++ ) { // No need for self-distance = 0.
             bead2 = dumBonds[j];
-            xDis  = Dist_BeadToBead (bead1, bead2);
+            xDis  = Dist_BeadToBead(bead1, bead2);
             if ( xDis > LINKER_RSCALE * (float) linker_len[bead1][j - 1] ) {
                 return 0;
             }
@@ -557,7 +557,7 @@ Check_LinkerConstraints_ForBeadList (const int listSize, const int* beadList) {
 /// \param beadList
 /// \return
 int
-Check_BeadID_InList (const int thisBeadID, const int listSize, const int beadList[MAX_BONDS + 1]) {
+Check_BeadID_InList(const int thisBeadID, const int listSize, const int beadList[MAX_BONDS + 1]) {
     int i;
     for ( i = 0; i < listSize; i++ ) {
         if ( thisBeadID == beadList[i] ) {
@@ -568,7 +568,7 @@ Check_BeadID_InList (const int thisBeadID, const int listSize, const int beadLis
 }
 
 void
-Calc_SystemCenterOfMass (lDub* tmpR) {
+Calc_SystemCenterOfMass(lDub* tmpR) {
 
     int i, j;                     // Iterators
     lDub tot_COM[POS_MAX] = {0.}; // This is where the COM will be stored
@@ -585,8 +585,8 @@ Calc_SystemCenterOfMass (lDub* tmpR) {
     for ( i = 0; i < tot_beads; i++ ) {
         for ( j = 0; j < POS_MAX; j++ ) {
             dumArg = dumConst[j] * (lDub) bead_info[i][j];
-            zeta[j] += sin (dumArg);
-            xi[j] += cos (dumArg);
+            zeta[j] += sin(dumArg);
+            xi[j] += cos(dumArg);
         }
     }
 
@@ -604,7 +604,7 @@ Calc_SystemCenterOfMass (lDub* tmpR) {
         if ( nCheck[j] == 1 ) {
             xi[j] /= (lDub) tot_beads;
             zeta[j] /= (lDub) tot_beads;
-            tot_COM[j] = atan2 (-zeta[j], -xi[j]) + M_PI;
+            tot_COM[j] = atan2(-zeta[j], -xi[j]) + M_PI;
             tot_COM[j] /= dumConst[j];
         } else {
             tot_COM[j] = 0.;
@@ -620,7 +620,7 @@ Calc_SystemCenterOfMass (lDub* tmpR) {
 }
 
 void
-Calc_CenterOfMass_OfCluster (lDub* tmpR, const int cluster_size, const int* ClusList) {
+Calc_CenterOfMass_OfCluster(lDub* tmpR, const int cluster_size, const int* ClusList) {
     // This version measures the COM of a cluster of size c
     //  cluster size, given the molecule ID's in naList.
     // The COM from this is not necessarily the COM of the system as a whole.
@@ -646,8 +646,8 @@ Calc_CenterOfMass_OfCluster (lDub* tmpR, const int cluster_size, const int* Clus
             bead_total_now++;
             for ( j = 0; j < POS_MAX; j++ ) {
                 dumArg = dumConst[j] * (lDub) bead_info[i][j];
-                zeta[j] += sin (dumArg);
-                xi[j] += cos (dumArg);
+                zeta[j] += sin(dumArg);
+                xi[j] += cos(dumArg);
             }
         }
     }
@@ -665,7 +665,7 @@ Calc_CenterOfMass_OfCluster (lDub* tmpR, const int cluster_size, const int* Clus
         if ( nCheck[j] == 1 ) {
             xi[j] /= (lLDub) bead_total_now;
             zeta[j] /= (lLDub) bead_total_now;
-            tot_COM[j] = atan2 (-zeta[j], -xi[j]) + M_PI;
+            tot_COM[j] = atan2(-zeta[j], -xi[j]) + M_PI;
             tot_COM[j] /= dumConst[j];
         }
     }
@@ -676,7 +676,7 @@ Calc_CenterOfMass_OfCluster (lDub* tmpR, const int cluster_size, const int* Clus
 }
 
 void
-Calc_SystemCenterOfMass_OfMolType (lDub* tmpR, const int thisType) {
+Calc_SystemCenterOfMass_OfMolType(lDub* tmpR, const int thisType) {
     // This version measures the COM of only type thisType
     // The COM from this is not necessarily the COM of the system as a whole.
     int thisMol, i, j, k;         // Iterators
@@ -704,8 +704,8 @@ Calc_SystemCenterOfMass_OfMolType (lDub* tmpR, const int thisType) {
             bead_total_now++;
             for ( j = 0; j < POS_MAX; j++ ) {
                 dumArg = dumConst[j] * (lDub) bead_info[i][j];
-                zeta[j] += sin (dumArg);
-                xi[j] += cos (dumArg);
+                zeta[j] += sin(dumArg);
+                xi[j] += cos(dumArg);
             }
         }
     }
@@ -723,7 +723,7 @@ Calc_SystemCenterOfMass_OfMolType (lDub* tmpR, const int thisType) {
         if ( nCheck[j] == 1 ) {
             xi[j] /= (lDub) bead_total_now;
             zeta[j] /= (lDub) bead_total_now;
-            tot_COM[j] = atan2 (-zeta[j], -xi[j]) + M_PI;
+            tot_COM[j] = atan2(-zeta[j], -xi[j]) + M_PI;
             tot_COM[j] /= dumConst[j];
         }
     }
@@ -737,7 +737,7 @@ Calc_SystemCenterOfMass_OfMolType (lDub* tmpR, const int thisType) {
 }
 
 void
-Calc_SystemCenterOfMass_WithoutMolType (lDub* tmpR, const int thisType) {
+Calc_SystemCenterOfMass_WithoutMolType(lDub* tmpR, const int thisType) {
     // This version measures the COM of everything except type thisType
     // The COM from this is not necessarily the COM of the system as a whole.
     int thisMol, i, j, k;         // Iterators
@@ -765,8 +765,8 @@ Calc_SystemCenterOfMass_WithoutMolType (lDub* tmpR, const int thisType) {
             bead_total_now++;
             for ( j = 0; j < POS_MAX; j++ ) {
                 dumArg = dumConst[j] * (lDub) bead_info[i][j];
-                zeta[j] += sin (dumArg);
-                xi[j] += cos (dumArg);
+                zeta[j] += sin(dumArg);
+                xi[j] += cos(dumArg);
             }
         }
     }
@@ -784,7 +784,7 @@ Calc_SystemCenterOfMass_WithoutMolType (lDub* tmpR, const int thisType) {
         if ( nCheck[j] == 1 ) {
             xi[j] /= (lDub) bead_total_now;
             zeta[j] /= (lDub) bead_total_now;
-            tot_COM[j] = atan2 (-zeta[j], -xi[j]) + PI;
+            tot_COM[j] = atan2(-zeta[j], -xi[j]) + PI;
             tot_COM[j] /= dumConst[j];
         }
     }
@@ -795,7 +795,7 @@ Calc_SystemCenterOfMass_WithoutMolType (lDub* tmpR, const int thisType) {
 }
 
 void
-RadDen_Avg_MolTypeWise_FromSysCen (void) {
+RadDen_Avg_MolTypeWise_FromSysCen(void) {
 
     int i;        // Iterator for loop
     int thisType; // Tracks the type of the chain
@@ -803,20 +803,20 @@ RadDen_Avg_MolTypeWise_FromSysCen (void) {
     int myBin;
     float xDis = 0.; // Tracks the distance between the COM and the specific bead
 
-    Calc_SystemCenterOfMass (sysCOM);
+    Calc_SystemCenterOfMass(sysCOM);
     // printf("SYS COM = (%d, %d, %d) \n", sysCOM[0], sysCOM[1], sysCOM[2]);
     for ( i = 0; i < tot_beads; i++ ) {
         thisType = bead_info[i][BEAD_CHAINID];
         thisType = chain_info[thisType][CHAIN_TYPE];
-        xDis     = Dist_BeadToPoint_Double (i, sysCOM);
-        myBin    = (int) floor (4. * xDis);
-        ldRadDen_Arr[RadDenArr_Index (0, thisType, myBin)] += 1.0;
+        xDis     = Dist_BeadToPoint_Double(i, sysCOM);
+        myBin    = (int) floor(4. * xDis);
+        ldRadDen_Arr[RadDenArr_Index(0, thisType, myBin)] += 1.0;
     }
     nRadDenCounter++;
 }
 
 void
-RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion (void) {
+RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void) {
 
     int i, j;     // Iterators for loop
     int thisType; // Tracks the type of the chain
@@ -827,31 +827,31 @@ RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion (void) {
     float xDis   = 0.; // Tracks the distance between the COM and the specific bead
     int cur_type = 0;
 
-    Calc_SystemCenterOfMass (typeCOM);
+    Calc_SystemCenterOfMass(typeCOM);
     for ( j = 0; j < POS_MAX; j++ ) {
         COM_int[j] = (int) typeCOM[j];
     }
     for ( i = 0; i < tot_beads; i++ ) {
         thisType = bead_info[i][BEAD_CHAINID];
         thisType = chain_info[thisType][CHAIN_TYPE];
-        thisComp = RadDen_ComponentIndex (-1, thisType);
-        xDis     = Dist_BeadToPoint (i, COM_int);
+        thisComp = RadDen_ComponentIndex(-1, thisType);
+        xDis     = Dist_BeadToPoint(i, COM_int);
         myBin    = (int) (4. * xDis);
-        ldRadDen_Arr[RadDenArr_Index (0, thisComp, myBin)] += 1.0;
+        ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
     }
 
     for ( cur_type = 0; cur_type < tot_chain_types; cur_type++ ) { // Go through each molType's center
-        Calc_SystemCenterOfMass_OfMolType (typeCOM, cur_type);
+        Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type);
         for ( j = 0; j < POS_MAX; j++ ) {
             COM_int[j] = (int) typeCOM[j];
         }
         for ( i = 0; i < tot_beads; i++ ) {
             thisType = bead_info[i][BEAD_CHAINID];
             thisType = chain_info[thisType][CHAIN_TYPE];
-            thisComp = RadDen_ComponentIndex (cur_type, thisType);
-            xDis     = Dist_BeadToPoint (i, COM_int);
+            thisComp = RadDen_ComponentIndex(cur_type, thisType);
+            xDis     = Dist_BeadToPoint(i, COM_int);
             myBin    = (int) (4. * xDis);
-            ldRadDen_Arr[RadDenArr_Index (0, thisComp, myBin)] += 1.0;
+            ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
         }
     }
 
@@ -888,7 +888,7 @@ RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion (void) {
 }
 
 void
-RadDen_Avg_MolTypeWise_FromMolTypeCen (void) {
+RadDen_Avg_MolTypeWise_FromMolTypeCen(void) {
 
     int i, j, k;  // Iterators for loop
     int thisType; // Tracks the type of the chain
@@ -902,7 +902,7 @@ RadDen_Avg_MolTypeWise_FromMolTypeCen (void) {
     int clus_size = 0;
     int clus_id   = -1;
     int* clus_id_list; // Tracks the cluster ID's after the clustering analysis.
-    clus_id_list = malloc ((tot_chain_types + 1) * sizeof (lInt));
+    clus_id_list = malloc((tot_chain_types + 1) * sizeof(lInt));
     for ( i = 0; i <= tot_chain_types; i++ ) {
         clus_id_list[i] = -1;
     }
@@ -922,7 +922,7 @@ RadDen_Avg_MolTypeWise_FromMolTypeCen (void) {
             naList[i] = naCluster[clus_id][i + 1];
         }
 
-        Calc_CenterOfMass_OfCluster (typeCOM, clus_size, naList);
+        Calc_CenterOfMass_OfCluster(typeCOM, clus_size, naList);
         for ( j = 0; j < POS_MAX; j++ ) {
             COM_int[j] = (int) typeCOM[j];
         }
@@ -933,19 +933,19 @@ RadDen_Avg_MolTypeWise_FromMolTypeCen (void) {
             for ( i = fB; i < lB; i++ ) {
                 thisType = bead_info[i][BEAD_CHAINID];
                 thisType = chain_info[thisType][CHAIN_TYPE];
-                thisComp = RadDen_ComponentIndex (cur_type - 1, thisType);
-                xDis     = Dist_BeadToPoint (i, COM_int);
+                thisComp = RadDen_ComponentIndex(cur_type - 1, thisType);
+                xDis     = Dist_BeadToPoint(i, COM_int);
                 myBin    = (int) (4. * xDis);
-                ldRadDen_Arr[RadDenArr_Index (0, thisComp, myBin)] += 1.0;
+                ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
             }
         }
     }
 
     for ( cur_type = 0; cur_type <= tot_chain_types; cur_type++ ) {
         if ( cur_type == 0 ) {
-            Calc_SystemCenterOfMass (typeCOM);
+            Calc_SystemCenterOfMass(typeCOM);
         } else {
-            Calc_SystemCenterOfMass_OfMolType (typeCOM, cur_type - 1);
+            Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type - 1);
         }
         for ( j = 0; j < POS_MAX; j++ ) {
             COM_int[j] = (int) typeCOM[j];
@@ -954,10 +954,10 @@ RadDen_Avg_MolTypeWise_FromMolTypeCen (void) {
         for ( i = 0; i < tot_beads; i++ ) {
             thisType = bead_info[i][BEAD_CHAINID];
             thisType = chain_info[thisType][CHAIN_TYPE];
-            thisComp = nRadDen_CompShift + RadDen_ComponentIndex (cur_type - 1, thisType);
-            xDis     = Dist_BeadToPoint (i, COM_int);
+            thisComp = nRadDen_CompShift + RadDen_ComponentIndex(cur_type - 1, thisType);
+            xDis     = Dist_BeadToPoint(i, COM_int);
             myBin    = (int) (4. * xDis);
-            ldRadDen_Arr[RadDenArr_Index (0, thisComp, myBin)] += 1.0;
+            ldRadDen_Arr[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
         }
     }
 
@@ -965,11 +965,11 @@ RadDen_Avg_MolTypeWise_FromMolTypeCen (void) {
 
     nRadDenCounter++;
 
-    free (clus_id_list);
+    free(clus_id_list);
 }
 
 void
-Calculate_Distances_For_Radius (float* thisList, const int nRad) {
+Calculate_Distances_For_Radius(float* thisList, const int nRad) {
     int r_disp[POS_MAX] = {0};
 
     int dum_iter = 0;
@@ -977,7 +977,7 @@ Calculate_Distances_For_Radius (float* thisList, const int nRad) {
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                thisList[dum_iter++] = Dist_Vec3n (r_disp);
+                thisList[dum_iter++] = Dist_Vec3n(r_disp);
             }
         }
     }
@@ -992,7 +992,7 @@ Calculate_Distances_For_Radius (float* thisList, const int nRad) {
 /// \param neighList
 /// \return Number of neighbors.
 int
-NeighborSearch_ForOvlp (int const beadID, const int* startVec, int* neighList) {
+NeighborSearch_ForOvlp(int const beadID, const int* startVec, int* neighList) {
     int neigh_num = 0;
 
     int tmpBead;
@@ -1001,13 +1001,13 @@ NeighborSearch_ForOvlp (int const beadID, const int* startVec, int* neighList) {
     const int nRad      = 1;
 
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
-        LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_X);
+        LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_X);
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
-            LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Y);
+            LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_Y);
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Z);
+                LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_Z);
                 //                LatPos_add_wPBC(r_chck, startVec, r_disp);
-                tmpBead = naTotLattice[Lat_Ind_FromVec (r_chck)];
+                tmpBead = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if ( tmpBead != -1 && tmpBead != beadID ) {
                     neighList[neigh_num++] = tmpBead;
                 }
@@ -1025,7 +1025,7 @@ NeighborSearch_ForOvlp (int const beadID, const int* startVec, int* neighList) {
 /// \param neighList
 /// \return Number of neighbors.
 int
-NeighborSearch_ForCont (int const beadID, const int* startVec, int* contList, int* ovlpList, int* ovlpNum) {
+NeighborSearch_ForCont(int const beadID, const int* startVec, int* contList, int* ovlpList, int* ovlpNum) {
     int neigh_num = 0;
 
     int tmpBead;
@@ -1036,14 +1036,14 @@ NeighborSearch_ForCont (int const beadID, const int* startVec, int* contList, in
     *ovlpNum = 0;
 
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
-        LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_X);
+        LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_X);
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
-            LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Y);
+            LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_Y);
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                LatPos_add_wPBC_ofComp (r_chck, startVec, r_disp, POS_Z);
-                tmpBead = naTotLattice[Lat_Ind_FromVec (r_chck)];
+                LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_Z);
+                tmpBead = naTotLattice[Lat_Ind_FromVec(r_chck)];
                 if ( tmpBead != -1 && tmpBead != beadID ) {
-                    if ( (abs (r_disp[0]) <= 1) && (abs (r_disp[1]) <= 1) && (abs (r_disp[2]) <= 1) ) {
+                    if ( (abs(r_disp[0]) <= 1) && (abs(r_disp[1]) <= 1) && (abs(r_disp[2]) <= 1) ) {
                         ovlpList[*ovlpNum] = tmpBead;
                         *ovlpNum           = *ovlpNum + 1;
                     }
@@ -1063,7 +1063,7 @@ NeighborSearch_ForCont (int const beadID, const int* startVec, int* contList, in
 /// \param nRad
 /// \return Number of empty lattice-sites around startVec
 int
-NeighborSearch_EmptySitesAround_wRad (const int* startVec, const int nRad) {
+NeighborSearch_EmptySitesAround_wRad(const int* startVec, const int nRad) {
     int empty_num = 0;
     int tmpBead;
     int r_disp[POS_MAX]   = {0};
@@ -1072,8 +1072,8 @@ NeighborSearch_EmptySitesAround_wRad (const int* startVec, const int nRad) {
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                LatPos_add_wPBC (r_search, startVec, r_disp);
-                tmpBead = naTotLattice[Lat_Ind_FromVec (r_search)];
+                LatPos_add_wPBC(r_search, startVec, r_disp);
+                tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
                 if ( tmpBead == -1 ) {
                     empty_num++;
                 }
@@ -1088,12 +1088,12 @@ NeighborSearch_EmptySitesAround_wRad (const int* startVec, const int nRad) {
 /// \param startVec
 /// \return Empty sites around this point.
 int
-NeighborSearch_SolSitesAround (const int* startVec) {
-    return NeighborSearch_EmptySitesAround_wRad (startVec, 1);
+NeighborSearch_SolSitesAround(const int* startVec) {
+    return NeighborSearch_EmptySitesAround_wRad(startVec, 1);
 }
 
 int
-NeighborSearch_AroundPoint_UptoIndex (const int beadID, const int* startVec, const int upTO, int* neighList) {
+NeighborSearch_AroundPoint_UptoIndex(const int beadID, const int* startVec, const int upTO, int* neighList) {
     int i;
     int neigh_num = 0;
     int tmpBead;
@@ -1103,8 +1103,8 @@ NeighborSearch_AroundPoint_UptoIndex (const int beadID, const int* startVec, con
     int r_all[100][POS_MAX] = {0};
 
     for ( i = 0; i < upTO; ++i ) {
-        LatPos_add_wPBC (r_search, startVec, r_all[i]);
-        tmpBead = naTotLattice[Lat_Ind_FromVec (r_search)];
+        LatPos_add_wPBC(r_search, startVec, r_all[i]);
+        tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
         if ( tmpBead != -1 ) {
             neighList[neigh_num++] = tmpBead;
         }
@@ -1114,7 +1114,7 @@ NeighborSearch_AroundPoint_UptoIndex (const int beadID, const int* startVec, con
 }
 
 int
-NeighborSearch_AroundPoint_wRad_IgnBead (const int beadID, const int* startVec, const int nRad, int* neighList) {
+NeighborSearch_AroundPoint_wRad_IgnBead(const int beadID, const int* startVec, const int nRad, int* neighList) {
 
     int neigh_num = 0;
     int tmpBead;
@@ -1124,8 +1124,8 @@ NeighborSearch_AroundPoint_wRad_IgnBead (const int beadID, const int* startVec, 
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                LatPos_add_wPBC (r_search, startVec, r_disp);
-                tmpBead = naTotLattice[Lat_Ind_FromVec (r_search)];
+                LatPos_add_wPBC(r_search, startVec, r_disp);
+                tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
                 if ( tmpBead != -1 && tmpBead != beadID ) {
                     neighList[neigh_num++] = tmpBead;
                 }
@@ -1136,8 +1136,8 @@ NeighborSearch_AroundPoint_wRad_IgnBead (const int beadID, const int* startVec, 
 }
 
 int
-NeighborSearch_AroundPoint_wRad_wDists (const int beadID, const int* startVec, const int nRad, int* neighList,
-                                        float* distList) {
+NeighborSearch_AroundPoint_wRad_wDists(const int beadID, const int* startVec, const int nRad, int* neighList,
+                                       float* distList) {
 
     int neigh_num = 0;
     int tmpBead;
@@ -1148,11 +1148,11 @@ NeighborSearch_AroundPoint_wRad_wDists (const int beadID, const int* startVec, c
     for ( r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++ ) {
         for ( r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++ ) {
             for ( r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++ ) {
-                LatPos_add_wPBC (r_search, startVec, r_disp);
-                tmpBead = naTotLattice[Lat_Ind_FromVec (r_search)];
+                LatPos_add_wPBC(r_search, startVec, r_disp);
+                tmpBead = naTotLattice[Lat_Ind_FromVec(r_search)];
                 if ( tmpBead != -1 && tmpBead != beadID ) {
                     neighList[neigh_num] = tmpBead;
-                    distList[neigh_num]  = Dist_Vec3n (r_disp);
+                    distList[neigh_num]  = Dist_Vec3n(r_disp);
                     neigh_num++;
                 }
             }
@@ -1165,7 +1165,7 @@ NeighborSearch_AroundPoint_wRad_wDists (const int beadID, const int* startVec, c
 /// \param copy_vec
 /// \param in_vec
 void
-LatPos_copy (int* copy_vec, const int* in_vec) {
+LatPos_copy(int* copy_vec, const int* in_vec) {
     copy_vec[0] = in_vec[0];
     copy_vec[1] = in_vec[1];
     copy_vec[2] = in_vec[2];
@@ -1176,7 +1176,7 @@ LatPos_copy (int* copy_vec, const int* in_vec) {
 /// \param outVec
 /// \param nRadius
 void
-LatPos_gen_rand_wRad (int* outVec, const int nRadius) {
+LatPos_gen_rand_wRad(int* outVec, const int nRadius) {
     int j;
     int radUp = 2 * nRadius + 1;
     for ( j = 0; j < POS_MAX; j++ ) {
@@ -1194,7 +1194,7 @@ LatPos_gen_rand_wRad (int* outVec, const int nRadius) {
 /// \param firVec
 /// \param secVec
 void
-LatPos_add_wPBC (int* outVec, const int* firVec, const int* secVec) {
+LatPos_add_wPBC(int* outVec, const int* firVec, const int* secVec) {
     short j;
     for ( j = 0; j < POS_MAX; j++ ) {
         outVec[j] = firVec[j] + secVec[j];
@@ -1215,7 +1215,7 @@ LatPos_add_wPBC (int* outVec, const int* firVec, const int* secVec) {
 /// \param firVec
 /// \param secVec
 inline void
-LatPos_add_wPBC_ofComp (int* outVec, const int* firVec, const int* secVec, const int compNum) {
+LatPos_add_wPBC_ofComp(int* outVec, const int* firVec, const int* secVec, const int compNum) {
     outVec[compNum] = firVec[compNum] + secVec[compNum];
     outVec[compNum] = outVec[compNum] < 0 ? outVec[compNum] + nBoxSize[compNum] : outVec[compNum];
     outVec[compNum] = outVec[compNum] >= nBoxSize[compNum] ? outVec[compNum] - nBoxSize[compNum] : outVec[compNum];
@@ -1226,13 +1226,12 @@ LatPos_add_wPBC_ofComp (int* outVec, const int* firVec, const int* secVec, const
 /// \param firVec
 /// \param secVec
 void
-LatPos_add_noPBC (int* outVec, const int* firVec, const int* secVec) {
+LatPos_add_noPBC(int* outVec, const int* firVec, const int* secVec) {
     short j;
     for ( j = 0; j < POS_MAX; j++ ) {
         outVec[j] = firVec[j] + secVec[j];
     }
 }
-
 
 /// BeadPos_sub_wPBC: Given firVec and secVec, we subtract second from first, and take care of PBCs, storing in outVec.
 /// The implementation assumes that the sum of any coordinate can not be larger than the lattice size
@@ -1242,17 +1241,17 @@ LatPos_add_noPBC (int* outVec, const int* firVec, const int* secVec) {
 /// \param firVec
 /// \param secVec
 void
-BeadPos_sub_wPBC (int* outVec, const int* firVec, const int* secVec) {
-  short j;
-  for ( j = 0; j < POS_MAX; j++ ) {
-    outVec[j] = firVec[j] - secVec[j];
-  }
-  for ( j = 0; j < POS_MAX; j++ ) {
-    outVec[j] = outVec[j] < -nBoxSize[j] / 2 ? outVec[j] + nBoxSize[j] / 2 : outVec[j];
-  }
-  for ( j = 0; j < POS_MAX; j++ ) {
-    outVec[j] = outVec[j] >= nBoxSize[j] / 2 ? outVec[j] - nBoxSize[j] / 2 : outVec[j];
-  }
+BeadPos_sub_wPBC(int* outVec, const int* firVec, const int* secVec) {
+    short j;
+    for ( j = 0; j < POS_MAX; j++ ) {
+        outVec[j] = firVec[j] - secVec[j];
+    }
+    for ( j = 0; j < POS_MAX; j++ ) {
+        outVec[j] = outVec[j] < -nBoxSize[j] / 2 ? outVec[j] + nBoxSize[j] / 2 : outVec[j];
+    }
+    for ( j = 0; j < POS_MAX; j++ ) {
+        outVec[j] = outVec[j] >= nBoxSize[j] / 2 ? outVec[j] - nBoxSize[j] / 2 : outVec[j];
+    }
 }
 
 /// OP_GetTopoBonds - including beadID, get all the beads that are covalently bonded to beadID.
@@ -1260,7 +1259,7 @@ BeadPos_sub_wPBC (int* outVec, const int* firVec, const int* secVec) {
 /// \param dum_list
 /// \return Number_of_bonds+1. Can be used to loop over list which includes beadID.
 int
-OP_GetTopoBonds (const int beadID, int* dum_list) {
+OP_GetTopoBonds(const int beadID, int* dum_list) {
     int top_it = 0;
     int curID  = beadID;
 
@@ -1273,8 +1272,8 @@ OP_GetTopoBonds (const int beadID, int* dum_list) {
 }
 
 int
-Vec3n_DotProd (const int* vec_1, const int* vec_2){
-    return vec_1[0]*vec_2[0] + vec_1[1]*vec_2[1] + vec_1[2]*vec_2[2];
+Vec3n_DotProd(const int* vec_1, const int* vec_2) {
+    return vec_1[0] * vec_2[0] + vec_1[1] * vec_2[1] + vec_1[2] * vec_2[2];
 }
 
 /// Vec3n_CosTheta - calculates the Cos(theta) between the vectors v1 and v2.
@@ -1283,35 +1282,29 @@ Vec3n_DotProd (const int* vec_1, const int* vec_2){
 /// \param v2
 /// \return
 float
-Vec3n_CosTheta(const int* v1, const int* v2){
-  const int dotProd   = Vec3n_DotProd (v1, v2);
-  const int vec1MagSq = Vec3n_DotProd (v1, v1);
-  const int vec2MagSq = Vec3n_DotProd (v2, v2);
-  const float dumDenom  = (float) vec1MagSq * (float) vec2MagSq;
-  const float dumCosTheta = (float) dotProd / sqrtf(dumDenom);
+Vec3n_CosTheta(const int* v1, const int* v2) {
+    const int dotProd       = Vec3n_DotProd(v1, v2);
+    const int vec1MagSq     = Vec3n_DotProd(v1, v1);
+    const int vec2MagSq     = Vec3n_DotProd(v2, v2);
+    const float dumDenom    = (float) vec1MagSq * (float) vec2MagSq;
+    const float dumCosTheta = (float) dotProd / sqrtf(dumDenom);
 
-  return dumCosTheta;
+    return dumCosTheta;
 }
 
-
 float
-Vec3n_AngleBetweenVecs (const int* vec_1, const int* vec_2){
+Vec3n_AngleBetweenVecs(const int* vec_1, const int* vec_2) {
 
     const float dumAng = Vec3n_CosTheta(vec_1, vec_2);
     return acosf(dumAng);
 }
 
-
 float
-BeadPos_CosThetaOfBeads(const int bead1, const int bead2){
+BeadPos_CosThetaOfBeads(const int bead1, const int bead2) {
 
-    const int r_pos1[POS_MAX] = {bead_info[bead1][0],
-                                 bead_info[bead1][1],
-                                 bead_info[bead1][2]};
+    const int r_pos1[POS_MAX] = {bead_info[bead1][0], bead_info[bead1][1], bead_info[bead1][2]};
 
-    const int r_pos2[POS_MAX] = {bead_info[bead2][0],
-                                 bead_info[bead2][1],
-                                 bead_info[bead2][2]};
+    const int r_pos2[POS_MAX] = {bead_info[bead2][0], bead_info[bead2][1], bead_info[bead2][2]};
 
     return Vec3n_CosTheta(r_pos1, r_pos2);
 }

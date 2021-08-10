@@ -10,7 +10,7 @@
 /// This version isn't used yet, but was before when the Cluster move moved a
 /// cluster, rather than the two new moves.
 int
-Clus_Network_ChainCluster_General (int const chainID) {
+Clus_Network_ChainCluster_General(int const chainID) {
     // Updates naList to have all proteins bound to  chainID and it's cluster
     // The idea is to check every bead and see if there is a unique bonded
     // chain, and to add it to naList
@@ -60,7 +60,7 @@ Clus_Network_ChainCluster_General (int const chainID) {
 /// initialization of naList can take too long, so it is only done once before
 /// this function is used repeatedly. \param chainID \return
 int
-Clus_Network_ChainCluster_ForTotal (int const chainID) {
+Clus_Network_ChainCluster_ForTotal(int const chainID) {
     // Updates naList to have all proteins bound to  chainID and it's cluster
     // The idea is to check every bead and see if there is a unique bonded
     // chain, and to add it to naList This one is specifically made to be used
@@ -103,7 +103,7 @@ Clus_Network_ChainCluster_ForTotal (int const chainID) {
 /// Clus_TotalAnalysis - calculates the total networking/clustering of the
 /// system and stores cluster information in naCluster[][]
 void
-Clus_Network_TotalAnalysis (void) {
+Clus_Network_TotalAnalysis(void) {
     int curID, Cluster_length, currentLargest, i, j;
     int ClusNum  = 0;
     int IsUnique = 1;
@@ -115,7 +115,7 @@ Clus_Network_TotalAnalysis (void) {
     currentLargest = 0;
     j              = 0;
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Network_ChainCluster_ForTotal (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Network_ChainCluster_ForTotal(curID); // This is the length of curID cluster
         if ( Cluster_length > currentLargest ) {
             currentLargest = Cluster_length;
             j              = ClusNum;
@@ -144,7 +144,7 @@ Clus_Network_TotalAnalysis (void) {
 /// if we have multiple smallest clusters, randomly pick one. \return
 /// naCluster[clusID][0] - the size of the second largest cluster
 int
-Clus_Network_SecondLargestCluster (void) {
+Clus_Network_SecondLargestCluster(void) {
     /*
     Calculates the complete networking for the system and returns naList which
     contains the chainIDs for the second largest cluster, if it exists.
@@ -161,7 +161,7 @@ Clus_Network_SecondLargestCluster (void) {
     currentLargest = 0;
     j              = 0;
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Network_ChainCluster_ForTotal (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Network_ChainCluster_ForTotal(curID); // This is the length of curID cluster
         if ( Cluster_length > currentLargest ) {
             currentLargest = Cluster_length;
             j              = ClusNum;
@@ -213,7 +213,7 @@ Clus_Network_SecondLargestCluster (void) {
 /// of a hash table! \param chainID \return clusSize - the size of the cluster;
 /// also naList[] now has the chainIDs. -1 if clusSize >= 5
 int
-Clus_Network_LimitedCluster (int const chainID) {
+Clus_Network_LimitedCluster(int const chainID) {
     // Updates naList to have all proteins bound to  chainID and it's cluster
     // The idea is to check every bead and see if there is a unique bonded
     // chain, and to add it to naList If Cluster becomes larger than 5, exit and
@@ -273,7 +273,7 @@ Clus_Network_LimitedCluster (int const chainID) {
 /// remembering clusters in naCluster, update naClusHistList[] and keep making
 /// the total cluster histogram for the system.
 void
-Clus_Network_Distribution_Avg (void) {
+Clus_Network_Distribution_Avg(void) {
     /*
     Calculates the cluster distribution using total_network_analysis framework,
     but keeps adding to naClusHistList for total averaging at the end. Read
@@ -288,7 +288,7 @@ Clus_Network_Distribution_Avg (void) {
     curID          = 0; // Start with the 0th chain
     currentLargest = 0;
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Network_ChainCluster_ForTotal (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Network_ChainCluster_ForTotal(curID); // This is the length of curID cluster
         // printf("Clus Len: %d\n", Cluster_length);
         naClusHistList[Cluster_length]++; // Adding to that cluster-size bin
         if ( Cluster_length > currentLargest ) {
@@ -314,7 +314,7 @@ Clus_Network_Distribution_Avg (void) {
 /// of remembering clusters in naCluster, update naClusHistList[] and keep
 /// making the total cluster histogram for the system.
 void
-Clus_Network_Distribution_MolWise_Avg (void) {
+Clus_Network_Distribution_MolWise_Avg(void) {
     /*
     Calculates the cluster distribution using total_network_analysis framework,
     but keeps adding to naClusHistList for total averaging at the end. Read
@@ -330,7 +330,7 @@ Clus_Network_Distribution_MolWise_Avg (void) {
     curID          = 0; // Start with the 0th chain
     currentLargest = 0;
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Network_ChainCluster_ForTotal (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Network_ChainCluster_ForTotal(curID); // This is the length of curID cluster
         // printf("Clus Len: %d\n", Cluster_length);
         naClusHistList[Cluster_length]++; // Adding to that cluster-size bin
         if ( Cluster_length > currentLargest ) {
@@ -338,7 +338,7 @@ Clus_Network_Distribution_MolWise_Avg (void) {
         }
         for ( i = 0; i < Cluster_length; i++ ) { // Recording the chains in this cluster
             thisType = chain_info[naList[i]][CHAIN_TYPE];
-            ldMOLCLUS_ARR[MolClusArr_Index (0, thisType, Cluster_length - 1)]++;
+            ldMOLCLUS_ARR[MolClusArr_Index(0, thisType, Cluster_length - 1)]++;
             naList[i] = -1;
             // printf("%d\n", thisType);
         }
@@ -362,7 +362,7 @@ Clus_Network_Distribution_MolWise_Avg (void) {
 /// is for molType=0 and so on.
 ///
 void
-Clus_Network_MolWise_LargestClusters (void) {
+Clus_Network_MolWise_LargestClusters(void) {
     int curID, Cluster_length, i;
     int ClusNum  = 0;
     int IsUnique = 1;
@@ -377,9 +377,9 @@ Clus_Network_MolWise_LargestClusters (void) {
     int* clusID_of_type;      // Tracks the clusterID of largest of each type
     int* largestClus_of_type; // Tracks the largest number seen for each type
 
-    clus_numof_MolType  = malloc ((tot_chain_types + 1) * sizeof (lInt));
-    clusID_of_type      = malloc ((tot_chain_types + 1) * sizeof (lInt));
-    largestClus_of_type = malloc ((tot_chain_types + 1) * sizeof (lInt));
+    clus_numof_MolType  = malloc((tot_chain_types + 1) * sizeof(lInt));
+    clusID_of_type      = malloc((tot_chain_types + 1) * sizeof(lInt));
+    largestClus_of_type = malloc((tot_chain_types + 1) * sizeof(lInt));
 
     for ( i = 0; i <= tot_chain_types; i++ ) {
         clus_numof_MolType[i]  = 0;
@@ -388,7 +388,7 @@ Clus_Network_MolWise_LargestClusters (void) {
     }
 
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Network_ChainCluster_ForTotal (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Network_ChainCluster_ForTotal(curID); // This is the length of curID cluster
 
         for ( i = 0; i < tot_chain_types; i++ ) {
             clus_numof_MolType[i] = 0;
@@ -425,13 +425,13 @@ Clus_Network_MolWise_LargestClusters (void) {
         naList[i] = clusID_of_type[i]; // Now naList contains the cluster ID's.
     }
     // printf("\n");
-    free (clus_numof_MolType);
-    free (clusID_of_type);
-    free (largestClus_of_type);
+    free(clus_numof_MolType);
+    free(clusID_of_type);
+    free(largestClus_of_type);
 }
 
 int
-Clus_Proximity_ChainCluster_ForTotal_IntOnly (int const chainID) {
+Clus_Proximity_ChainCluster_ForTotal_IntOnly(int const chainID) {
     // Updates naList to have all proteins close to chainID
     // The idea is to check every bead and see if there is a unique chain in the
     // (+-1,+-1) cube, and to add it to naList This one is specifically made to
@@ -479,7 +479,7 @@ Clus_Proximity_ChainCluster_ForTotal_IntOnly (int const chainID) {
                 for ( j = 0; j < POS_MAX; j++ ) {
                     tmpR2[j] = (tmpR[j] + LocalArr[tmpBead][j] + nBoxSize[j]) % nBoxSize[j];
                 }
-                tmpBead = Lat_Ind_FromVec (tmpR2);
+                tmpBead = Lat_Ind_FromVec(tmpR2);
                 tmpBead = naTotLattice[tmpBead];
                 if ( tmpBead != -1 ) {
                     resj = bead_info[tmpBead][BEAD_TYPE];
@@ -506,7 +506,7 @@ Clus_Proximity_ChainCluster_ForTotal_IntOnly (int const chainID) {
 }
 
 int
-Clus_Proximity_ChainCluster_ForTotal_All (int const chainID) {
+Clus_Proximity_ChainCluster_ForTotal_All(int const chainID) {
     // Updates naList to have all proteins close to chainID
     // The idea is to check every bead and see if there is a unique chain in the
     // (+-1,+-1) cube, and to add it to naList This one is specifically made to
@@ -541,7 +541,7 @@ Clus_Proximity_ChainCluster_ForTotal_All (int const chainID) {
                 for ( j = 0; j < POS_MAX; j++ ) {
                     tmpR2[j] = (tmpR[j] + LocalArr[tmpBead][j] + nBoxSize[j]) % nBoxSize[j];
                 }
-                tmpBead = Lat_Ind_FromVec (tmpR2);
+                tmpBead = Lat_Ind_FromVec(tmpR2);
                 tmpBead = naTotLattice[tmpBead];
                 if ( tmpBead != -1 ) {
                     chainPart = bead_info[tmpBead][BEAD_CHAINID];
@@ -563,7 +563,7 @@ Clus_Proximity_ChainCluster_ForTotal_All (int const chainID) {
 }
 
 void
-Clus_Proximity_TotalAnalysis (void) {
+Clus_Proximity_TotalAnalysis(void) {
     int curID, Cluster_length, currentLargest, i, j;
     int ClusNum  = 0;
     int IsUnique = 1;
@@ -575,7 +575,7 @@ Clus_Proximity_TotalAnalysis (void) {
     currentLargest = 0;
     j              = 0;
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly(curID); // This is the length of curID cluster
         if ( Cluster_length > currentLargest ) {
             currentLargest = Cluster_length;
             j              = ClusNum;
@@ -598,7 +598,7 @@ Clus_Proximity_TotalAnalysis (void) {
 }
 
 int
-Clus_Proximity_SecondLargestCluster (void) {
+Clus_Proximity_SecondLargestCluster(void) {
     /*
     Calculates the complete networking for the system and returns naList which
     contains the chainIDs for the second largest cluster, if it exists.
@@ -615,7 +615,7 @@ Clus_Proximity_SecondLargestCluster (void) {
     currentLargest = 0;
     j              = 0;
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly(curID); // This is the length of curID cluster
         if ( Cluster_length > currentLargest ) {
             currentLargest = Cluster_length;
             j              = ClusNum;
@@ -660,7 +660,7 @@ Clus_Proximity_SecondLargestCluster (void) {
 }
 
 int
-Clus_Proximity_LimitedCluster_IntOnly (int const chainID) {
+Clus_Proximity_LimitedCluster_IntOnly(int const chainID) {
     // Updates naList to have all proteins bound to  chainID and it's cluster
     // The idea is to check every bead and see if there is a unique bonded
     // chain, and to add it to naList If Cluster becomes larger than 15, exit
@@ -722,7 +722,7 @@ Clus_Proximity_LimitedCluster_IntOnly (int const chainID) {
                 for ( j = 0; j < POS_MAX; j++ ) {
                     tmpR2[j] = (tmpR[j] + LocalArr[tmpBead][j] + nBoxSize[j]) % nBoxSize[j];
                 }
-                tmpBead = Lat_Ind_FromVec (tmpR2);
+                tmpBead = Lat_Ind_FromVec(tmpR2);
                 tmpBead = naTotLattice[tmpBead];
                 if ( tmpBead != -1 ) {
                     resj = bead_info[tmpBead][BEAD_TYPE];
@@ -759,7 +759,7 @@ Clus_Proximity_LimitedCluster_IntOnly (int const chainID) {
 }
 
 int
-Clus_Proximity_LimitedCluster_IntOnly_Check (int const chainID, int const* OldList) {
+Clus_Proximity_LimitedCluster_IntOnly_Check(int const chainID, int const* OldList) {
     // Updates naList to have all proteins bound to  chainID and it's cluster
     // The idea is to check every bead and see if there is a unique bonded
     // chain, and to add it to naList If Cluster becomes larger than 15, exit
@@ -825,7 +825,7 @@ Clus_Proximity_LimitedCluster_IntOnly_Check (int const chainID, int const* OldLi
                 for ( j = 0; j < POS_MAX; j++ ) {
                     tmpR2[j] = (tmpR[j] + LocalArr[tmpBead][j] + nBoxSize[j]) % nBoxSize[j];
                 }
-                tmpBead = Lat_Ind_FromVec (tmpR2);
+                tmpBead = Lat_Ind_FromVec(tmpR2);
                 tmpBead = naTotLattice[tmpBead];
                 if ( tmpBead != -1 ) {
                     resj = bead_info[tmpBead][BEAD_TYPE];
@@ -866,7 +866,7 @@ Clus_Proximity_LimitedCluster_IntOnly_Check (int const chainID, int const* OldLi
 }
 
 int
-Clus_Proximity_LimitedCluster_All (int const chainID) {
+Clus_Proximity_LimitedCluster_All(int const chainID) {
     // Updates naList to have all proteins bound to  chainID and it's cluster
     // The idea is to check every bead and see if there is a unique bonded
     // chain, and to add it to naList If Cluster becomes larger than 15, exit
@@ -908,7 +908,7 @@ Clus_Proximity_LimitedCluster_All (int const chainID) {
                 for ( j = 0; j < POS_MAX; j++ ) {
                     tmpR2[j] = (tmpR[j] + LocalArr[tmpBead][j] + nBoxSize[j]) % nBoxSize[j];
                 }
-                tmpBead = Lat_Ind_FromVec (tmpR2);
+                tmpBead = Lat_Ind_FromVec(tmpR2);
                 tmpBead = naTotLattice[tmpBead];
                 if ( tmpBead != -1 ) {
                     resj      = bead_info[tmpBead][BEAD_TYPE];
@@ -941,7 +941,7 @@ Clus_Proximity_LimitedCluster_All (int const chainID) {
 }
 
 int
-Clus_Proximity_LimitedCluster_All_Check (int const chainID, int const* OldList) {
+Clus_Proximity_LimitedCluster_All_Check(int const chainID, int const* OldList) {
     // Updates naList to have all proteins bound to  chainID and it's cluster
     // The idea is to check every bead and see if there is a unique bonded
     // chain, and to add it to naList If Cluster becomes larger than 15, exit
@@ -983,7 +983,7 @@ Clus_Proximity_LimitedCluster_All_Check (int const chainID, int const* OldList) 
                 for ( j = 0; j < POS_MAX; j++ ) {
                     tmpR2[j] = (tmpR[j] + LocalArr[tmpBead][j] + nBoxSize[j]) % nBoxSize[j];
                 }
-                tmpBead = Lat_Ind_FromVec (tmpR2);
+                tmpBead = Lat_Ind_FromVec(tmpR2);
                 tmpBead = naTotLattice[tmpBead];
                 if ( tmpBead != -1 ) {
                     chainPart = bead_info[tmpBead][BEAD_CHAINID];
@@ -1019,7 +1019,7 @@ Clus_Proximity_LimitedCluster_All_Check (int const chainID, int const* OldList) 
 }
 
 void
-Clus_Proximity_Distribution_Avg (void) {
+Clus_Proximity_Distribution_Avg(void) {
     /*
     Calculates the cluster distribution using total_network_analysis framework,
     but keeps adding to naClusHistList for total averaging at the end. Read
@@ -1034,7 +1034,7 @@ Clus_Proximity_Distribution_Avg (void) {
     curID          = 0; // Start with the 0th chain
     currentLargest = 0;
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly(curID); // This is the length of curID cluster
         // printf("Clus Len: %d\n", Cluster_length);
         naClusHistList[Cluster_length]++; // Adding to that cluster-size bin
         if ( Cluster_length > currentLargest ) {
@@ -1057,7 +1057,7 @@ Clus_Proximity_Distribution_Avg (void) {
 }
 
 void
-Clus_Proximity_Distribution_IntOnly_MolWise_Avg (void) {
+Clus_Proximity_Distribution_IntOnly_MolWise_Avg(void) {
     /*
     Calculates the cluster distribution using total_network_analysis framework,
     but keeps adding to naClusHistList for total averaging at the end. Read
@@ -1073,7 +1073,7 @@ Clus_Proximity_Distribution_IntOnly_MolWise_Avg (void) {
     curID          = 0; // Start with the 0th chain
     currentLargest = 0;
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly(curID); // This is the length of curID cluster
         // printf("Clus Len: %d\n", Cluster_length);
         naClusHistList[Cluster_length]++; // Adding to that cluster-size bin
         if ( Cluster_length > currentLargest ) {
@@ -1081,7 +1081,7 @@ Clus_Proximity_Distribution_IntOnly_MolWise_Avg (void) {
         }
         for ( i = 0; i < Cluster_length; i++ ) { // Recording the chains in this cluster
             thisType = chain_info[naList[i]][CHAIN_TYPE];
-            ldMOLCLUS_ARR[MolClusArr_Index (0, thisType, Cluster_length - 1)]++;
+            ldMOLCLUS_ARR[MolClusArr_Index(0, thisType, Cluster_length - 1)]++;
             naList[i] = -1;
             // printf("%d\n", thisType);
         }
@@ -1099,7 +1099,7 @@ Clus_Proximity_Distribution_IntOnly_MolWise_Avg (void) {
 }
 
 void
-Clus_Proximity_Distribution_All_MolWise_Avg (void) {
+Clus_Proximity_Distribution_All_MolWise_Avg(void) {
     /*
     Calculates the cluster distribution using total_network_analysis framework,
     but keeps adding to naClusHistList for total averaging at the end. Read
@@ -1115,7 +1115,7 @@ Clus_Proximity_Distribution_All_MolWise_Avg (void) {
     curID          = 0; // Start with the 0th chain
     currentLargest = 0;
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_All (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_All(curID); // This is the length of curID cluster
         // printf("Clus Len: %d\n", Cluster_length);
         naClusHistList[Cluster_length]++; // Adding to that cluster-size bin
         if ( Cluster_length > currentLargest ) {
@@ -1123,7 +1123,7 @@ Clus_Proximity_Distribution_All_MolWise_Avg (void) {
         }
         for ( i = 0; i < Cluster_length; i++ ) { // Recording the chains in this cluster
             thisType = chain_info[naList[i]][CHAIN_TYPE];
-            ldMOLCLUS_ARR[MolClusArr_Index (0, thisType, Cluster_length - 1)]++;
+            ldMOLCLUS_ARR[MolClusArr_Index(0, thisType, Cluster_length - 1)]++;
             naList[i] = -1;
             // printf("%d\n", thisType);
         }
@@ -1141,7 +1141,7 @@ Clus_Proximity_Distribution_All_MolWise_Avg (void) {
 }
 
 void
-Clus_Proximity_IntOnly_MolWise_LargestClusters (void) {
+Clus_Proximity_IntOnly_MolWise_LargestClusters(void) {
     int curID, Cluster_length, i;
     int ClusNum  = 0;
     int IsUnique = 1;
@@ -1156,9 +1156,9 @@ Clus_Proximity_IntOnly_MolWise_LargestClusters (void) {
     int* clusID_of_type;      // Tracks the clusterID of largest of each type
     int* largestClus_of_type; // Tracks the largest number seen for each type
 
-    clus_numof_MolType  = malloc (tot_chain_types * sizeof (lInt));
-    clusID_of_type      = malloc (tot_chain_types * sizeof (lInt));
-    largestClus_of_type = malloc (tot_chain_types * sizeof (lInt));
+    clus_numof_MolType  = malloc(tot_chain_types * sizeof(lInt));
+    clusID_of_type      = malloc(tot_chain_types * sizeof(lInt));
+    largestClus_of_type = malloc(tot_chain_types * sizeof(lInt));
 
     for ( i = 0; i < tot_chain_types; i++ ) {
         clus_numof_MolType[i]  = 0;
@@ -1167,7 +1167,7 @@ Clus_Proximity_IntOnly_MolWise_LargestClusters (void) {
     }
 
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly(curID); // This is the length of curID cluster
 
         for ( i = 0; i < tot_chain_types; i++ ) {
             clus_numof_MolType[i] = 0;
@@ -1204,13 +1204,13 @@ Clus_Proximity_IntOnly_MolWise_LargestClusters (void) {
         naList[i] = clusID_of_type[i]; // Now naList contains the cluster ID's.
     }
     // printf("\n");
-    free (clus_numof_MolType);
-    free (clusID_of_type);
-    free (largestClus_of_type);
+    free(clus_numof_MolType);
+    free(clusID_of_type);
+    free(largestClus_of_type);
 }
 
 void
-Clus_Proximity_All_MolWise_LargestClusters (void) {
+Clus_Proximity_All_MolWise_LargestClusters(void) {
     int curID, Cluster_length, i;
     int ClusNum  = 0;
     int IsUnique = 1;
@@ -1225,9 +1225,9 @@ Clus_Proximity_All_MolWise_LargestClusters (void) {
     int* clusID_of_type;      // Tracks the clusterID of largest of each type
     int* largestClus_of_type; // Tracks the largest number seen for each type
 
-    clus_numof_MolType  = malloc (tot_chain_types * sizeof (lInt));
-    clusID_of_type      = malloc (tot_chain_types * sizeof (lInt));
-    largestClus_of_type = malloc (tot_chain_types * sizeof (lInt));
+    clus_numof_MolType  = malloc(tot_chain_types * sizeof(lInt));
+    clusID_of_type      = malloc(tot_chain_types * sizeof(lInt));
+    largestClus_of_type = malloc(tot_chain_types * sizeof(lInt));
 
     for ( i = 0; i < tot_chain_types; i++ ) {
         clus_numof_MolType[i]  = 0;
@@ -1236,7 +1236,7 @@ Clus_Proximity_All_MolWise_LargestClusters (void) {
     }
 
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_All (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Proximity_ChainCluster_ForTotal_All(curID); // This is the length of curID cluster
 
         for ( i = 0; i < tot_chain_types; i++ ) {
             clus_numof_MolType[i] = 0;
@@ -1273,13 +1273,13 @@ Clus_Proximity_All_MolWise_LargestClusters (void) {
         naList[i] = clusID_of_type[i]; // Now naList contains the cluster ID's.
     }
     // printf("\n");
-    free (clus_numof_MolType);
-    free (clusID_of_type);
-    free (largestClus_of_type);
+    free(clus_numof_MolType);
+    free(clusID_of_type);
+    free(largestClus_of_type);
 }
 
 void
-Clus_Perform_Analysis (void) {
+Clus_Perform_Analysis(void) {
     // Just a function that picks the right analysis routine given the mode
 
     switch ( nClusteringMode ) {
@@ -1296,18 +1296,18 @@ Clus_Perform_Analysis (void) {
 }
 
 int
-Clus_Perform_ChainCluster_ForTotal (int const chainID) {
+Clus_Perform_ChainCluster_ForTotal(int const chainID) {
     int clus_size;
 
     switch ( nClusteringMode ) {
         case 1:
-            clus_size = Clus_Proximity_ChainCluster_ForTotal_IntOnly (chainID);
+            clus_size = Clus_Proximity_ChainCluster_ForTotal_IntOnly(chainID);
             break;
         case 2:
-            clus_size = Clus_Proximity_ChainCluster_ForTotal_All (chainID);
+            clus_size = Clus_Proximity_ChainCluster_ForTotal_All(chainID);
             break;
         default:
-            clus_size = Clus_Network_ChainCluster_ForTotal (chainID);
+            clus_size = Clus_Network_ChainCluster_ForTotal(chainID);
             break;
     }
     return clus_size;
@@ -1321,7 +1321,7 @@ Clus_Perform_ChainCluster_ForTotal (int const chainID) {
 /// size, and naCluster[1:ClusterSize] are all the chainID's that comprise the
 /// particular cluster.
 void
-Clus_Perform_MolWise_LargestClusters (void) {
+Clus_Perform_MolWise_LargestClusters(void) {
     int curID, Cluster_length, i;
     int ClusNum  = 0;
     int IsUnique = 1;
@@ -1335,9 +1335,9 @@ Clus_Perform_MolWise_LargestClusters (void) {
     int* clus_numof_MolType;  // Tracks the number breakdown in each cluster
     int* clusID_of_type;      // Tracks the clusterID of largest of each type
     int* largestClus_of_type; // Tracks the largest number seen for each type
-    clus_numof_MolType  = (int*) calloc ((tot_chain_types + 1), sizeof (int));
-    clusID_of_type      = (int*) calloc ((tot_chain_types + 1), sizeof (int));
-    largestClus_of_type = (int*) calloc ((tot_chain_types + 1), sizeof (int));
+    clus_numof_MolType  = (int*) calloc((tot_chain_types + 1), sizeof(int));
+    clusID_of_type      = (int*) calloc((tot_chain_types + 1), sizeof(int));
+    largestClus_of_type = (int*) calloc((tot_chain_types + 1), sizeof(int));
 
     for ( i = 0; i <= tot_chain_types; i++ ) {
         clus_numof_MolType[i]  = 0;
@@ -1346,7 +1346,7 @@ Clus_Perform_MolWise_LargestClusters (void) {
     }
 
     while ( curID < tot_chains && IsUnique == 1 ) {
-        Cluster_length = Clus_Perform_ChainCluster_ForTotal (curID); // This is the length of curID cluster
+        Cluster_length = Clus_Perform_ChainCluster_ForTotal(curID); // This is the length of curID cluster
 
         for ( i = 0; i <= tot_chain_types; i++ ) {
             clus_numof_MolType[i] = 0;
@@ -1382,13 +1382,13 @@ Clus_Perform_MolWise_LargestClusters (void) {
     for ( i = 0; i <= tot_chain_types; i++ ) {
         naList[i] = clusID_of_type[i]; // Now naList contains the cluster ID's.
     }
-    free (clus_numof_MolType);
-    free (clusID_of_type);
-    free (largestClus_of_type);
+    free(clus_numof_MolType);
+    free(clusID_of_type);
+    free(largestClus_of_type);
 }
 
 void
-Clus_Find_LargestClusters (void) {
+Clus_Find_LargestClusters(void) {
     // Just a function that picks the right analysis routine given the
     // clustering mode
 
