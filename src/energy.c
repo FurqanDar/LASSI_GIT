@@ -5,109 +5,136 @@
 /// thermalization/equilibration The function calculates (T_current - T_final)
 /// and if < 0.001, sets nThermalization_Mode = 0. \param beadID \return The
 /// energy, given the nThermalization_Mode
-float
-Energy_InitPotential(const int beadID) {
+float Energy_InitPotential(const int beadID)
+{
     int j;
     float totEn = 0.;
     int tmpR[POS_MAX];
-    if ( fCuTemp - fKT > 0.005 ) {
-        switch ( nThermalization_Mode ) {
-            case 1:
-                for ( j = 0; j < POS_MAX; j++ ) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                totEn = (fCuTemp - fKT) * totEn;
-                break;
+    if (fCuTemp - fKT > 0.005)
+        {
+            switch (nThermalization_Mode)
+                {
+                    case 1:
+                        for (j = 0; j < POS_MAX; j++)
+                            {
+                                tmpR[j] = bead_info[beadID][j];
+                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                                totEn += (float) (tmpR[j] * tmpR[j]);
+                            }
+                        totEn = (fCuTemp - fKT) * totEn;
+                        break;
 
-            case 2:
-                for ( j = 0; j < POS_MAX; j++ ) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if ( totEn >= 250. ) {
-                    totEn = (fCuTemp - fKT) * (totEn);
-                } else if ( totEn <= 600. ) {
-                    totEn = (fCuTemp - fKT) * ((float) tot_beads + 1. / (totEn + 0.02));
-                } else {
-                    totEn = 0.;
-                }
-                break;
+                    case 2:
+                        for (j = 0; j < POS_MAX; j++)
+                            {
+                                tmpR[j] = bead_info[beadID][j];
+                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                                totEn += (float) (tmpR[j] * tmpR[j]);
+                            }
+                        if (totEn >= 250.)
+                            {
+                                totEn = (fCuTemp - fKT) * (totEn);
+                            }
+                        else if (totEn <= 600.)
+                            {
+                                totEn = (fCuTemp - fKT) * ((float) tot_beads + 1. / (totEn + 0.02));
+                            }
+                        else
+                            {
+                                totEn = 0.;
+                            }
+                        break;
 
-            case 3:
-                for ( j = 0; j < POS_MAX; j++ ) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if ( totEn >= 35 * 35 ) {
-                    totEn = (fCuTemp) *totEn;
-                } else {
-                    totEn = 0.;
-                }
-                break;
-            case 4:
-                for ( j = 0; j < POS_MAX; j++ ) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if ( totEn <= 100. ) {
-                    totEn = (fCuTemp - fKT) * (totEn + 0.2);
-                } /*else if (totEn <= 2000.) {
-                    totEn = ;(fCuTemp - fKT*0.) * ((float) tot_beads + 1. /
-                (totEn + 0.02));
-                }*/
-                else {
-                    totEn = 0.;
-                }
-                break;
-            case 5:
-                for ( j = 0; j < 1; j++ ) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                totEn = (fCuTemp - fKT) * totEn;
-                break;
+                    case 3:
+                        for (j = 0; j < POS_MAX; j++)
+                            {
+                                tmpR[j] = bead_info[beadID][j];
+                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                                totEn += (float) (tmpR[j] * tmpR[j]);
+                            }
+                        if (totEn >= 35 * 35)
+                            {
+                                totEn = (fCuTemp) *totEn;
+                            }
+                        else
+                            {
+                                totEn = 0.;
+                            }
+                        break;
+                    case 4:
+                        for (j = 0; j < POS_MAX; j++)
+                            {
+                                tmpR[j] = bead_info[beadID][j];
+                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                                totEn += (float) (tmpR[j] * tmpR[j]);
+                            }
+                        if (totEn <= 100.)
+                            {
+                                totEn = (fCuTemp - fKT) * (totEn + 0.2);
+                            } /*else if (totEn <= 2000.) {
+                                totEn = ;(fCuTemp - fKT*0.) * ((float) tot_beads + 1. /
+                            (totEn + 0.02));
+                            }*/
+                        else
+                            {
+                                totEn = 0.;
+                            }
+                        break;
+                    case 5:
+                        for (j = 0; j < 1; j++)
+                            {
+                                tmpR[j] = bead_info[beadID][j];
+                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                                totEn += (float) (tmpR[j] * tmpR[j]);
+                            }
+                        totEn = (fCuTemp - fKT) * totEn;
+                        break;
 
-            case 6:
+                    case 6:
 
-                for ( j = 0; j < POS_MAX; j++ ) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if ( totEn > fSquishRad * fSquishRad ) {
-                    totEn = (fCuTemp - fKT) * totEn;
-                } else {
-                    totEn = 0.;
-                }
-                break;
+                        for (j = 0; j < POS_MAX; j++)
+                            {
+                                tmpR[j] = bead_info[beadID][j];
+                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                                totEn += (float) (tmpR[j] * tmpR[j]);
+                            }
+                        if (totEn > fSquishRad * fSquishRad)
+                            {
+                                totEn = (fCuTemp - fKT) * totEn;
+                            }
+                        else
+                            {
+                                totEn = 0.;
+                            }
+                        break;
 
-            case 7:
+                    case 7:
 
-                for ( j = 0; j < 1; j++ ) {
-                    tmpR[j] = bead_info[beadID][j];
-                    tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                    totEn += (float) (tmpR[j] * tmpR[j]);
-                }
-                if ( totEn > 100 ) {
-                    totEn = (fCuTemp - fKT) * totEn;
-                } else {
-                    totEn = 0.;
-                }
-                break;
+                        for (j = 0; j < 1; j++)
+                            {
+                                tmpR[j] = bead_info[beadID][j];
+                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
+                                totEn += (float) (tmpR[j] * tmpR[j]);
+                            }
+                        if (totEn > 100)
+                            {
+                                totEn = (fCuTemp - fKT) * totEn;
+                            }
+                        else
+                            {
+                                totEn = 0.;
+                            }
+                        break;
 
-            default:
-                totEn = 0.;
-                break;
+                    default:
+                        totEn = 0.;
+                        break;
+                }
         }
-    } else {
-        nThermalization_Mode = -1;
-    }
+    else
+        {
+            nThermalization_Mode = -1;
+        }
 
     return totEn;
 }
@@ -115,31 +142,36 @@ Energy_InitPotential(const int beadID) {
 /// Energy_Anisotropic - returns the bond energy for beadID if it is bonded.
 /// \param beadID
 /// \return
-inline float
-Energy_Anisotropic(const int beadID) { // Calculates the SC-SC energy of the bead in question.
+inline float Energy_Anisotropic(const int beadID)
+{ // Calculates the SC-SC energy of the bead in question.
     const int bP   = bead_info[beadID][BEAD_FACE];
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj;
-    if ( bP != -1 ) {
-        resj = bead_info[bP][BEAD_TYPE];
-        return fEnergy[resi][resj][E_SC_SC];
-    } else {
-        return 0.f;
-    }
+    if (bP != -1)
+        {
+            resj = bead_info[bP][BEAD_TYPE];
+            return fEnergy[resi][resj][E_SC_SC];
+        }
+    else
+        {
+            return 0.f;
+        }
 }
 
 /// Energy_Anisotropic_Self - returns the bond energy for beadID only if it is
 /// bonded to a bead in the same chain. Note that this does not account for
 /// double counting \param beadID \return
-float
-Energy_Anisotropic_Self(const int beadID) { // Calculates the SC-SC energy of the bead in question.
-    float totEn = 0.0;                      // Storing total overlap energy
+float Energy_Anisotropic_Self(const int beadID)
+{                      // Calculates the SC-SC energy of the bead in question.
+    float totEn = 0.0; // Storing total overlap energy
     int bP      = bead_info[beadID][BEAD_FACE];
-    if ( bP != -1 ) { // This bead does have a bond
-        if ( bead_info[beadID][BEAD_CHAINID] == bead_info[bP][BEAD_CHAINID] ) {
-            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
+    if (bP != -1)
+        { // This bead does have a bond
+            if (bead_info[beadID][BEAD_CHAINID] == bead_info[bP][BEAD_CHAINID])
+                {
+                    totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
+                }
         }
-    }
     return totEn;
 }
 
@@ -148,17 +180,21 @@ Energy_Anisotropic_Self(const int beadID) { // Calculates the SC-SC energy of th
 /// This should only be used when calculating the energy of an entire chain!
 /// \param beadID
 /// \return
-float
-Energy_Anisotropic_For_Chain(const int beadID) { // Calculates the SC-SC energy of the bead in question.
-    float totEn  = 0.f;                          // Storing total overlap energy
+float Energy_Anisotropic_For_Chain(const int beadID)
+{                       // Calculates the SC-SC energy of the bead in question.
+    float totEn  = 0.f; // Storing total overlap energy
     const int bP = bead_info[beadID][BEAD_FACE];
-    if ( bP != -1 ) { // This bead does have a bond
-        if ( bead_info[beadID][BEAD_CHAINID] == bead_info[bP][BEAD_CHAINID] ) {
-            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC] * 0.5f;
-        } else {
-            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
+    if (bP != -1)
+        { // This bead does have a bond
+            if (bead_info[beadID][BEAD_CHAINID] == bead_info[bP][BEAD_CHAINID])
+                {
+                    totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC] * 0.5f;
+                }
+            else
+                {
+                    totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
+                }
         }
-    }
     return totEn;
 }
 
@@ -167,17 +203,21 @@ Energy_Anisotropic_For_Chain(const int beadID) { // Calculates the SC-SC energy 
 /// largest_bead], and that we will loop over every bead in this range. So if
 /// the bead partner is within this range, we divide by 2 to account for double
 /// counting. \param beadID \param smBead \param lgBead \return
-float
-Energy_Anisotropic_For_Range(const int beadID, const int smBead, const int lgBead) {
+float Energy_Anisotropic_For_Range(const int beadID, const int smBead, const int lgBead)
+{
     float totEn  = 0.f;
     const int bP = bead_info[beadID][BEAD_FACE];
-    if ( bP != -1 ) {
-        if ( (beadID <= lgBead) && (beadID >= smBead) ) {
-            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC] * 0.5f;
-        } else {
-            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
+    if (bP != -1)
+        {
+            if ((beadID <= lgBead) && (beadID >= smBead))
+                {
+                    totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC] * 0.5f;
+                }
+            else
+                {
+                    totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
+                }
         }
-    }
     return totEn;
 }
 
@@ -186,21 +226,28 @@ Energy_Anisotropic_For_Range(const int beadID, const int smBead, const int lgBea
 /// [smallest_bead, largest_bead], and that we will loop over every bead in this
 /// range. So if the bead partner is within this range, we divide by 2 to
 /// account for double counting. \param beadID \return
-float
-Energy_Anisotropic_Contiguous_Range(const int beadID, const int smallest_bead, const int largest_bead) {
+float Energy_Anisotropic_Contiguous_Range(const int beadID, const int smallest_bead, const int largest_bead)
+{
     float totEn = 0.0; // Storing total overlap energy
     int bP      = bead_info[beadID][BEAD_FACE];
-    if ( bP != -1 ) {                                                           // This bead does have a bond
-        if ( bead_info[beadID][BEAD_CHAINID] == bead_info[bP][BEAD_CHAINID] ) { // Intra-molecular
-            if ( bP >= smallest_bead && bP <= largest_bead ) {                  // Within subset
-                totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC] / 2.;
-            } else {
-                totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
-            }
-        } else {
-            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
+    if (bP != -1)
+        { // This bead does have a bond
+            if (bead_info[beadID][BEAD_CHAINID] == bead_info[bP][BEAD_CHAINID])
+                { // Intra-molecular
+                    if (bP >= smallest_bead && bP <= largest_bead)
+                        { // Within subset
+                            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC] / 2.;
+                        }
+                    else
+                        {
+                            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
+                        }
+                }
+            else
+                {
+                    totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
+                }
         }
-    }
     return totEn;
 }
 
@@ -209,43 +256,55 @@ Energy_Anisotropic_Contiguous_Range(const int beadID, const int smallest_bead, c
 /// list_size, but that the last bead is at list_size-1. This also assumes that
 /// we will loop over the entire list So if the bead partner is within this
 /// list, we divide by 2 to account for double counting. \param beadID \return
-float
-Energy_Anisotropic_With_List(const int beadID, const int* bead_list, const int list_size) {
+float Energy_Anisotropic_With_List(const int beadID, const int* bead_list, const int list_size)
+{
     float totEn    = 0.0; // Storing total overlap energy
     int bP         = bead_info[beadID][BEAD_FACE];
     int check_bead = 0;
     int i;
-    if ( bP != -1 ) {                       // This bead does have a bond
-        for ( i = 0; i < list_size; i++ ) { // Checking if we should worry about double counting
-            if ( bP == bead_list[i] ) {
-                check_bead = 1;
-                break;
-            }
+    if (bP != -1)
+        { // This bead does have a bond
+            for (i = 0; i < list_size; i++)
+                { // Checking if we should worry about double counting
+                    if (bP == bead_list[i])
+                        {
+                            check_bead = 1;
+                            break;
+                        }
+                }
+            if (check_bead == 1)
+                {
+                    totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC] / 2.;
+                }
+            else
+                {
+                    totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
+                }
         }
-        if ( check_bead == 1 ) {
-            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC] / 2.;
-        } else {
-            totEn += fEnergy[bead_info[beadID][BEAD_TYPE]][bead_info[bP][BEAD_TYPE]][E_SC_SC];
-        }
-    }
     return totEn;
 }
 
-float
-Energy_Anisotropic_For_List(const int beadID, const int listSize, const int beadList[MAX_BONDS + 1]) {
+float Energy_Anisotropic_For_List(const int beadID, const int listSize, const int beadList[MAX_BONDS + 1])
+{
     const int bP   = bead_info[beadID][BEAD_FACE];
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj;
-    if ( bP != -1 ) {
-        resj = bead_info[bP][BEAD_TYPE];
-        if ( Check_BeadID_InList(bP, listSize, beadList) ) {
-            return fEnergy[resi][resj][E_SC_SC] * 0.5f;
-        } else {
-            return fEnergy[resi][resj][E_SC_SC];
+    if (bP != -1)
+        {
+            resj = bead_info[bP][BEAD_TYPE];
+            if (Check_BeadID_InList(bP, listSize, beadList))
+                {
+                    return fEnergy[resi][resj][E_SC_SC] * 0.5f;
+                }
+            else
+                {
+                    return fEnergy[resi][resj][E_SC_SC];
+                }
         }
-    } else {
-        return 0.f;
-    }
+    else
+        {
+            return 0.f;
+        }
 }
 
 /// Energy_Iso_Ovlp - calculate the OVLP interaction between two beads of types
@@ -253,8 +312,8 @@ Energy_Anisotropic_For_List(const int beadID, const int listSize, const int bead
 /// \param beadType2: Type of second bead.
 /// \param xDis: Distance between the two beads.
 /// \return fEnergy[beadType1][beadType2][E_OVLP].
-float
-Energy_Iso_Ovlp(int const beadType1, int const beadType2, float const xDis) {
+float Energy_Iso_Ovlp(int const beadType1, int const beadType2, float const xDis)
+{
     return fEnergy[beadType1][beadType2][E_OVLP];
 }
 
@@ -263,8 +322,8 @@ Energy_Iso_Ovlp(int const beadType1, int const beadType2, float const xDis) {
 /// \param beadType2: Type of second bead.
 /// \param xDis: Distance between the two beads.
 /// \return fEnergy[beadType1][beadType2][E_CONT]/xDis.
-float
-Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis) {
+float Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis)
+{
     return fEnergy[beadType1][beadType2][E_CONT] / xDis;
 }
 
@@ -272,18 +331,19 @@ Energy_Iso_Cont(int const beadType1, int const beadType2, float const xDis) {
 /// \param beadType
 /// \param xDis
 /// \return
-inline float
-Energy_Iso_fSol(int const beadType) {
+inline float Energy_Iso_fSol(int const beadType)
+{
     return fEnergy[beadType][beadType][E_F_SOL];
 }
 
-float
-Energy_Topo_Angle(int const beadID) {
+float Energy_Topo_Angle(int const beadID)
+{
     //    return 0.f;
     const int frontBead = topo_info[beadID][1];
-    if ( frontBead == -1 ) {
-        return 0.f;
-    }
+    if (frontBead == -1)
+        {
+            return 0.f;
+        }
     const int backBead = topo_info[beadID][0];
 
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
@@ -308,20 +368,21 @@ Energy_Topo_Angle(int const beadID) {
 /// \param neighList
 /// \param neighNum
 /// \return
-float
-Energy_OfOvlp_wNeighList(int const beadID, const int* neighList, int const neighNum) {
+float Energy_OfOvlp_wNeighList(int const beadID, const int* neighList, int const neighNum)
+{
     float totEn = 0.f;
     int i;
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj, tmpID;
     float xDis;
 
-    for ( i = 0; i < neighNum; i++ ) {
-        tmpID = neighList[i];
-        resj  = bead_info[tmpID][BEAD_TYPE];
-        xDis  = Dist_BeadToBead(beadID, tmpID);
-        totEn += Energy_Iso_Ovlp(resi, resj, xDis);
-    }
+    for (i = 0; i < neighNum; i++)
+        {
+            tmpID = neighList[i];
+            resj  = bead_info[tmpID][BEAD_TYPE];
+            xDis  = Dist_BeadToBead(beadID, tmpID);
+            totEn += Energy_Iso_Ovlp(resi, resj, xDis);
+        }
 
     return totEn;
 }
@@ -332,20 +393,21 @@ Energy_OfOvlp_wNeighList(int const beadID, const int* neighList, int const neigh
 /// \param neighList
 /// \param neighNum
 /// \return
-float
-Energy_OfCont_wNeighList(int const beadID, const int* neighList, int const neighNum) {
+float Energy_OfCont_wNeighList(int const beadID, const int* neighList, int const neighNum)
+{
     float totEn = 0.f;
     int i;
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj, tmpID;
     float xDis;
 
-    for ( i = 0; i < neighNum; i++ ) {
-        tmpID = neighList[i];
-        resj  = bead_info[tmpID][BEAD_TYPE];
-        xDis  = Dist_BeadToBead(beadID, tmpID);
-        totEn += Energy_Iso_Cont(resi, resj, xDis);
-    }
+    for (i = 0; i < neighNum; i++)
+        {
+            tmpID = neighList[i];
+            resj  = bead_info[tmpID][BEAD_TYPE];
+            xDis  = Dist_BeadToBead(beadID, tmpID);
+            totEn += Energy_Iso_Cont(resi, resj, xDis);
+        }
 
     return totEn;
 }
@@ -355,21 +417,22 @@ Energy_OfCont_wNeighList(int const beadID, const int* neighList, int const neigh
 /// energies. This function _only_ calculate the pairwise energies so the
 /// solvation energy has to be handled somewhere else. \param beadID \param
 /// neighList \param neighNum \return
-float
-Energy_ofPairs_wNeighList(int const beadID, const int* neighList, int const neighNum) {
+float Energy_ofPairs_wNeighList(int const beadID, const int* neighList, int const neighNum)
+{
     float totEn = 0.f;
     int i;
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj, tmpID;
     float xDis;
 
-    for ( i = 0; i < neighNum; i++ ) {
-        tmpID = neighList[i];
-        resj  = bead_info[tmpID][BEAD_TYPE];
-        xDis  = Dist_BeadToBead(beadID, tmpID);
-        totEn += Energy_Iso_Ovlp(resi, resj, xDis);
-        totEn += Energy_Iso_Cont(resi, resj, xDis);
-    }
+    for (i = 0; i < neighNum; i++)
+        {
+            tmpID = neighList[i];
+            resj  = bead_info[tmpID][BEAD_TYPE];
+            xDis  = Dist_BeadToBead(beadID, tmpID);
+            totEn += Energy_Iso_Ovlp(resi, resj, xDis);
+            totEn += Energy_Iso_Cont(resi, resj, xDis);
+        }
 
     return totEn;
 }
@@ -377,17 +440,18 @@ Energy_ofPairs_wNeighList(int const beadID, const int* neighList, int const neig
 /// Energy_ofSol_wNeighList: Given the neighbor list, we calculate the total
 /// solvation energy at the lattice-site where beadID is, but if the site was
 /// empty. \param neighList \param neighNum \return
-float
-Energy_ofSol_wNeighList(const int* neighList, int const neighNum) {
+float Energy_ofSol_wNeighList(const int* neighList, int const neighNum)
+{
     float totEn = 0.f;
     int i;
     int resj, tmpID;
 
-    for ( i = 0; i < neighNum; i++ ) {
-        tmpID = neighList[i];
-        resj  = bead_info[tmpID][BEAD_TYPE];
-        totEn += Energy_Iso_fSol(resj);
-    }
+    for (i = 0; i < neighNum; i++)
+        {
+            tmpID = neighList[i];
+            resj  = bead_info[tmpID][BEAD_TYPE];
+            totEn += Energy_Iso_fSol(resj);
+        }
 
     return totEn;
 }
@@ -397,8 +461,8 @@ Energy_ofSol_wNeighList(const int* neighList, int const neighNum) {
 /// the energies, taking care of intra-chain double-counting. This function
 /// _only_ calculates the Ovlp energies! \param beadID \param neighList \param
 /// neighNum \return
-float
-Energy_OfOvlp_wNeighList_ForChains(int const beadID, const int* neighList, int const neighNum) {
+float Energy_OfOvlp_wNeighList_ForChains(int const beadID, const int* neighList, int const neighNum)
+{
     float totEn = 0.f;
     int i;
     const int resi    = bead_info[beadID][BEAD_TYPE];
@@ -406,17 +470,21 @@ Energy_OfOvlp_wNeighList_ForChains(int const beadID, const int* neighList, int c
     int resj, chain_j, tmpID;
     float xDis;
 
-    for ( i = 0; i < neighNum; i++ ) {
-        tmpID   = neighList[i];
-        resj    = bead_info[tmpID][BEAD_TYPE];
-        chain_j = bead_info[tmpID][BEAD_CHAINID];
-        xDis    = Dist_BeadToBead(beadID, tmpID);
-        if ( chain_i == chain_j ) {
-            totEn += Energy_Iso_Ovlp(resi, resj, xDis) * 0.5f;
-        } else {
-            totEn += Energy_Iso_Ovlp(resi, resj, xDis);
+    for (i = 0; i < neighNum; i++)
+        {
+            tmpID   = neighList[i];
+            resj    = bead_info[tmpID][BEAD_TYPE];
+            chain_j = bead_info[tmpID][BEAD_CHAINID];
+            xDis    = Dist_BeadToBead(beadID, tmpID);
+            if (chain_i == chain_j)
+                {
+                    totEn += Energy_Iso_Ovlp(resi, resj, xDis) * 0.5f;
+                }
+            else
+                {
+                    totEn += Energy_Iso_Ovlp(resi, resj, xDis);
+                }
         }
-    }
 
     return totEn;
 }
@@ -430,8 +498,8 @@ Energy_OfOvlp_wNeighList_ForChains(int const beadID, const int* neighList, int c
 /// \param neighList
 /// \param neighNum
 /// \return
-float
-Energy_OfCont_wNeighList_ForChains(int const beadID, const int* neighList, int const neighNum) {
+float Energy_OfCont_wNeighList_ForChains(int const beadID, const int* neighList, int const neighNum)
+{
     float totEn = 0.f;
     int i;
     const int resi    = bead_info[beadID][BEAD_TYPE];
@@ -439,17 +507,21 @@ Energy_OfCont_wNeighList_ForChains(int const beadID, const int* neighList, int c
     int resj, chain_j, tmpID;
     float xDis;
 
-    for ( i = 0; i < neighNum; i++ ) {
-        tmpID   = neighList[i];
-        resj    = bead_info[tmpID][BEAD_TYPE];
-        chain_j = bead_info[tmpID][BEAD_CHAINID];
-        xDis    = Dist_BeadToBead(beadID, tmpID);
-        if ( chain_i == chain_j ) {
-            totEn += Energy_Iso_Cont(resi, resj, xDis) * 0.5f;
-        } else {
-            totEn += Energy_Iso_Cont(resi, resj, xDis);
+    for (i = 0; i < neighNum; i++)
+        {
+            tmpID   = neighList[i];
+            resj    = bead_info[tmpID][BEAD_TYPE];
+            chain_j = bead_info[tmpID][BEAD_CHAINID];
+            xDis    = Dist_BeadToBead(beadID, tmpID);
+            if (chain_i == chain_j)
+                {
+                    totEn += Energy_Iso_Cont(resi, resj, xDis) * 0.5f;
+                }
+            else
+                {
+                    totEn += Energy_Iso_Cont(resi, resj, xDis);
+                }
         }
-    }
 
     return totEn;
 }
@@ -459,25 +531,29 @@ Energy_OfCont_wNeighList_ForChains(int const beadID, const int* neighList, int c
 /// the energies, taking care of intra-range double-counting. Note that the
 /// range is [loBead, hiBead]. This function _only_ calculates the Ovlp
 /// energies! \param beadID \param neighList \param neighNum \return
-float
-Energy_OfOvlp_wNeighList_ForRange(int const beadID, const int loBead, const int hiBead, const int* neighList,
-                                  int const neighNum) {
+float Energy_OfOvlp_wNeighList_ForRange(int const beadID, const int loBead, const int hiBead, const int* neighList,
+                                        int const neighNum)
+{
     float totEn = 0.f;
     int i;
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj, tmpID;
     float xDis;
 
-    for ( i = 0; i < neighNum; i++ ) {
-        tmpID = neighList[i];
-        resj  = bead_info[tmpID][BEAD_TYPE];
-        xDis  = Dist_BeadToBead(beadID, tmpID);
-        if ( (i >= loBead) && (i <= hiBead) ) {
-            totEn += Energy_Iso_Ovlp(resi, resj, xDis) * 0.5f;
-        } else {
-            totEn += Energy_Iso_Ovlp(resi, resj, xDis);
+    for (i = 0; i < neighNum; i++)
+        {
+            tmpID = neighList[i];
+            resj  = bead_info[tmpID][BEAD_TYPE];
+            xDis  = Dist_BeadToBead(beadID, tmpID);
+            if ((i >= loBead) && (i <= hiBead))
+                {
+                    totEn += Energy_Iso_Ovlp(resi, resj, xDis) * 0.5f;
+                }
+            else
+                {
+                    totEn += Energy_Iso_Ovlp(resi, resj, xDis);
+                }
         }
-    }
 
     return totEn;
 }
@@ -487,25 +563,29 @@ Energy_OfOvlp_wNeighList_ForRange(int const beadID, const int loBead, const int 
 /// the energies, taking care of intra-range double-counting. Note that the
 /// range is [loBead, hiBead]. This function _only_ calculates the Cont
 /// energies! \param beadID \param neighList \param neighNum \return
-float
-Energy_OfCont_wNeighList_ForRange(int const beadID, const int loBead, const int hiBead, const int* neighList,
-                                  int const neighNum) {
+float Energy_OfCont_wNeighList_ForRange(int const beadID, const int loBead, const int hiBead, const int* neighList,
+                                        int const neighNum)
+{
     float totEn = 0.f;
     int i;
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj, tmpID;
     float xDis;
 
-    for ( i = 0; i < neighNum; i++ ) {
-        tmpID = neighList[i];
-        resj  = bead_info[tmpID][BEAD_TYPE];
-        xDis  = Dist_BeadToBead(beadID, tmpID);
-        if ( (i >= loBead) && (i <= hiBead) ) {
-            totEn += Energy_Iso_Cont(resi, resj, xDis) * 0.5f;
-        } else {
-            totEn += Energy_Iso_Cont(resi, resj, xDis);
+    for (i = 0; i < neighNum; i++)
+        {
+            tmpID = neighList[i];
+            resj  = bead_info[tmpID][BEAD_TYPE];
+            xDis  = Dist_BeadToBead(beadID, tmpID);
+            if ((i >= loBead) && (i <= hiBead))
+                {
+                    totEn += Energy_Iso_Cont(resi, resj, xDis) * 0.5f;
+                }
+            else
+                {
+                    totEn += Energy_Iso_Cont(resi, resj, xDis);
+                }
         }
-    }
 
     return totEn;
 }
@@ -516,25 +596,29 @@ Energy_OfCont_wNeighList_ForRange(int const beadID, const int loBead, const int 
 /// energies! \param beadID \param listSize \param beadList \param neighList
 /// \param neighNum
 /// \return
-float
-Energy_OfOvlp_wNeighList_ForLists(const int beadID, const int listSize, const int beadList[MAX_BONDS + 1],
-                                  const int* neighList, const int neighNum) {
+float Energy_OfOvlp_wNeighList_ForLists(const int beadID, const int listSize, const int beadList[MAX_BONDS + 1],
+                                        const int* neighList, const int neighNum)
+{
     float totEn = 0.f;
     int i;
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj, tmpID;
     float xDis;
 
-    for ( i = 0; i < neighNum; i++ ) {
-        tmpID = neighList[i];
-        resj  = bead_info[tmpID][BEAD_TYPE];
-        xDis  = Dist_BeadToBead(beadID, tmpID);
-        if ( Check_BeadID_InList(tmpID, listSize, beadList) ) {
-            totEn += Energy_Iso_Ovlp(resi, resj, xDis) * 0.5f;
-        } else {
-            totEn += Energy_Iso_Ovlp(resi, resj, xDis);
+    for (i = 0; i < neighNum; i++)
+        {
+            tmpID = neighList[i];
+            resj  = bead_info[tmpID][BEAD_TYPE];
+            xDis  = Dist_BeadToBead(beadID, tmpID);
+            if (Check_BeadID_InList(tmpID, listSize, beadList))
+                {
+                    totEn += Energy_Iso_Ovlp(resi, resj, xDis) * 0.5f;
+                }
+            else
+                {
+                    totEn += Energy_Iso_Ovlp(resi, resj, xDis);
+                }
         }
-    }
 
     return totEn;
 }
@@ -545,25 +629,29 @@ Energy_OfOvlp_wNeighList_ForLists(const int beadID, const int listSize, const in
 /// energies! \param beadID \param listSize \param beadList \param neighList
 /// \param neighNum
 /// \return
-float
-Energy_OfCont_wNeighList_ForLists(const int beadID, const int listSize, const int beadList[MAX_BONDS + 1],
-                                  const int* neighList, const int neighNum) {
+float Energy_OfCont_wNeighList_ForLists(const int beadID, const int listSize, const int beadList[MAX_BONDS + 1],
+                                        const int* neighList, const int neighNum)
+{
     float totEn = 0.f;
     int i;
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj, tmpID;
     float xDis;
 
-    for ( i = 0; i < neighNum; i++ ) {
-        tmpID = neighList[i];
-        resj  = bead_info[tmpID][BEAD_TYPE];
-        xDis  = Dist_BeadToBead(beadID, tmpID);
-        if ( Check_BeadID_InList(tmpID, listSize, beadList) ) {
-            totEn += Energy_Iso_Cont(resi, resj, xDis) * 0.5f;
-        } else {
-            totEn += Energy_Iso_Cont(resi, resj, xDis);
+    for (i = 0; i < neighNum; i++)
+        {
+            tmpID = neighList[i];
+            resj  = bead_info[tmpID][BEAD_TYPE];
+            xDis  = Dist_BeadToBead(beadID, tmpID);
+            if (Check_BeadID_InList(tmpID, listSize, beadList))
+                {
+                    totEn += Energy_Iso_Cont(resi, resj, xDis) * 0.5f;
+                }
+            else
+                {
+                    totEn += Energy_Iso_Cont(resi, resj, xDis);
+                }
         }
-    }
 
     return totEn;
 }
@@ -573,10 +661,10 @@ Energy_OfCont_wNeighList_ForLists(const int beadID, const int listSize, const in
 /// where $epislon$ represents the overlap cost for total overlap, which is
 /// forbidden explicitly in LASSI, so we have $epislon/2$,$epislon/4$ and
 /// $epislon/8$ with increasing distance. \param beadID \return
-float
-Energy_Isotropic_Old(const int beadID) { // Calculate Contact and Overlap energy of bead beadID
-    float totEn = 0.f;                   // Storing total overlap energy
-    int i, j;                            // Indecies
+float Energy_Isotropic_Old(const int beadID)
+{                      // Calculate Contact and Overlap energy of bead beadID
+    float totEn = 0.f; // Storing total overlap energy
+    int i, j;          // Indecies
     int r_pos_0[POS_MAX], r_chck[POS_MAX], r_disp[POS_MAX];
     int x, y, z;      // Lattice indecies
     int secBi, resj;  // Second bead index
@@ -584,51 +672,68 @@ Energy_Isotropic_Old(const int beadID) { // Calculate Contact and Overlap energy
     int resi   = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    if ( nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-         nBeadTypeCanTInd[resi] == 0 ) {
-        return totEn;
-    } // No need to do anything if there's no isotropic interactions.
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0)
+        {
+            return totEn;
+        } // No need to do anything if there's no isotropic interactions.
 
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
-    for ( j = 0; j < POS_MAX; j++ ) {
-        r_pos_0[j] = bead_info[beadID][j];
-    }
-    for ( x = -BoxRad; x <= BoxRad; x++ ) {
-        r_disp[0] = x;
-        for ( y = -BoxRad; y <= BoxRad; y++ ) {
-            r_disp[1] = y;
-            for ( z = -BoxRad; z <= BoxRad; z++ ) {
-                r_disp[2] = z;
-                for ( j = 0; j < POS_MAX; j++ ) {
-                    r_chck[j] = r_pos_0[j] + r_disp[j];
-                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
-                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
-                }
-                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
-                if ( secBi != -1 && secBi != beadID ) {
-                    resj = bead_info[secBi][BEAD_TYPE];
-                    totEn += Energy_Iso_Ovlp(resi, resj, xDis);
-                    xDis = sqrtf((float) (x * x + y * y + z * z));
-                    // xDis = Dist_BeadToBead(beadID, secBi);
-                    if ( xDis <= 1.0 ) {
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.0f;
-                    } else if ( xDis <= 1.42 ) { // sqrt(2)
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 4.0f;
-                    } else if ( xDis <= 1.74 ) { // sqrt(3)
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 8.0f;
-                    } else { // This way, contact is only outside ovlp
-                        totEn += Energy_Iso_Cont(resi, resj, xDis);
-                    }
-                } else if ( secBi == -1 ) {
-                    if ( abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1 ) { // Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                        totEn += fEnergy[resi][resi][E_T_IND] * fCuTemp;
-                    }
-                }
-            }
+    for (j = 0; j < POS_MAX; j++)
+        {
+            r_pos_0[j] = bead_info[beadID][j];
         }
-    }
+    for (x = -BoxRad; x <= BoxRad; x++)
+        {
+            r_disp[0] = x;
+            for (y = -BoxRad; y <= BoxRad; y++)
+                {
+                    r_disp[1] = y;
+                    for (z = -BoxRad; z <= BoxRad; z++)
+                        {
+                            r_disp[2] = z;
+                            for (j = 0; j < POS_MAX; j++)
+                                {
+                                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
+                                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
+                                }
+                            secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
+                            if (secBi != -1 && secBi != beadID)
+                                {
+                                    resj = bead_info[secBi][BEAD_TYPE];
+                                    totEn += Energy_Iso_Ovlp(resi, resj, xDis);
+                                    xDis = sqrtf((float) (x * x + y * y + z * z));
+                                    // xDis = Dist_BeadToBead(beadID, secBi);
+                                    if (xDis <= 1.0)
+                                        {
+                                            totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.0f;
+                                        }
+                                    else if (xDis <= 1.42)
+                                        { // sqrt(2)
+                                            totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 4.0f;
+                                        }
+                                    else if (xDis <= 1.74)
+                                        { // sqrt(3)
+                                            totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 8.0f;
+                                        }
+                                    else
+                                        { // This way, contact is only outside ovlp
+                                            totEn += Energy_Iso_Cont(resi, resj, xDis);
+                                        }
+                                }
+                            else if (secBi == -1)
+                                {
+                                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1)
+                                        { // Want solvation radius to be 1
+                                            totEn += fEnergy[resi][resi][E_F_SOL];
+                                            totEn += fEnergy[resi][resi][E_T_IND] * fCuTemp;
+                                        }
+                                }
+                        }
+                }
+        }
 
     return totEn;
 }
@@ -640,10 +745,10 @@ Energy_Isotropic_Old(const int beadID) { // Calculate Contact and Overlap energy
 /// distance.
 /// \param beadID
 /// \return
-float
-Energy_Isotropic(const int beadID) { // Calculate Contact and Overlap energy of bead beadID
-    float totEn = 0.0;               // Storing total overlap energy
-    int i, j;                        // Indecies
+float Energy_Isotropic(const int beadID)
+{                      // Calculate Contact and Overlap energy of bead beadID
+    float totEn = 0.0; // Storing total overlap energy
+    int i, j;          // Indecies
     int r_pos_0[POS_MAX], r_chck[POS_MAX], r_disp[POS_MAX];
     int x, y, z;     // Lattice indecies
     int secBi, resj; // Second bead index
@@ -651,46 +756,55 @@ Energy_Isotropic(const int beadID) { // Calculate Contact and Overlap energy of 
     int resi   = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-    if ( nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-         nBeadTypeCanTInd[resi] == 0 ) {
-        return totEn;
-    } // No need to do anything if there's no isotropic interactions.
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0)
+        {
+            return totEn;
+        } // No need to do anything if there's no isotropic interactions.
 
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
-    for ( j = 0; j < POS_MAX; j++ ) {
-        r_pos_0[j] = bead_info[beadID][j];
-    }
-    for ( x = -BoxRad; x <= BoxRad; x++ ) {
-        r_disp[0] = x;
-        for ( y = -BoxRad; y <= BoxRad; y++ ) {
-            r_disp[1] = y;
-            for ( z = -BoxRad; z <= BoxRad; z++ ) {
-                r_disp[2] = z;
-                LatPos_add_wPBC(r_chck, r_pos_0, r_disp);
-                //                for (j = 0; j < POS_MAX; j++){
-                //                    r_chck[j] = r_pos_0[j] + r_disp[j];
-                //                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] +
-                //                    nBoxSize[j] : r_chck[j]; r_chck[j] =
-                //                    r_chck[j] >= nBoxSize[j] ? r_chck[j] -
-                //                    nBoxSize[j] : r_chck[j];
-                //                }
-                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
-                if ( secBi != -1 && secBi != beadID ) {
-                    resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float) (x * x + y * y + z * z));
-                    totEn += Energy_Iso_Ovlp(resi, resj,
-                                             xDis); /// xDis / xDis / xDis;
-
-                    totEn += Energy_Iso_Cont(resi, resj, xDis);
-                } else if ( secBi == -1 ) {
-                    if ( abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1 ) { // Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                    }
-                }
-            }
+    for (j = 0; j < POS_MAX; j++)
+        {
+            r_pos_0[j] = bead_info[beadID][j];
         }
-    }
+    for (x = -BoxRad; x <= BoxRad; x++)
+        {
+            r_disp[0] = x;
+            for (y = -BoxRad; y <= BoxRad; y++)
+                {
+                    r_disp[1] = y;
+                    for (z = -BoxRad; z <= BoxRad; z++)
+                        {
+                            r_disp[2] = z;
+                            LatPos_add_wPBC(r_chck, r_pos_0, r_disp);
+                            //                for (j = 0; j < POS_MAX; j++){
+                            //                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                            //                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] +
+                            //                    nBoxSize[j] : r_chck[j]; r_chck[j] =
+                            //                    r_chck[j] >= nBoxSize[j] ? r_chck[j] -
+                            //                    nBoxSize[j] : r_chck[j];
+                            //                }
+                            secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
+                            if (secBi != -1 && secBi != beadID)
+                                {
+                                    resj = bead_info[secBi][BEAD_TYPE];
+                                    xDis = sqrtf((float) (x * x + y * y + z * z));
+                                    totEn += Energy_Iso_Ovlp(resi, resj,
+                                                             xDis); /// xDis / xDis / xDis;
+
+                                    totEn += Energy_Iso_Cont(resi, resj, xDis);
+                                }
+                            else if (secBi == -1)
+                                {
+                                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1)
+                                        { // Want solvation radius to be 1
+                                            totEn += fEnergy[resi][resi][E_F_SOL];
+                                        }
+                                }
+                        }
+                }
+        }
 
     return totEn;
 }
@@ -698,9 +812,9 @@ Energy_Isotropic(const int beadID) { // Calculate Contact and Overlap energy of 
 /// Energy_Isotropic_Self - returns the bond energy for beadID only if it is
 /// interacting with a bead within the same molecule. Note that it does not
 /// account for double counting \param beadID \return
-float
-Energy_Isotropic_Self(const int beadID) { // Calculate Contact and Overlap energy of beadID but
-                                          // only intra-molecular
+float Energy_Isotropic_Self(const int beadID)
+{ // Calculate Contact and Overlap energy of beadID but
+  // only intra-molecular
     // interactions
     float totEn = 0.0; // Storing total overlap energy
     int i, j;          // Indecies
@@ -711,45 +825,56 @@ Energy_Isotropic_Self(const int beadID) { // Calculate Contact and Overlap energ
     int resi   = bead_info[beadID][BEAD_TYPE];
     // totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-    if ( nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-         nBeadTypeCanTInd[resi] == 0 ) {
-        return totEn;
-    } // No need to do anything if there's no isotropic interactions.
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0)
+        {
+            return totEn;
+        } // No need to do anything if there's no isotropic interactions.
 
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
-    for ( j = 0; j < POS_MAX; j++ ) {
-        r_pos_0[j] = bead_info[beadID][j];
-    }
-    for ( x = -BoxRad; x <= BoxRad; x++ ) {
-        r_disp[0] = x;
-        for ( y = -BoxRad; y <= BoxRad; y++ ) {
-            r_disp[1] = y;
-            for ( z = -BoxRad; z <= BoxRad; z++ ) {
-                r_disp[2] = z;
-                for ( j = 0; j < POS_MAX; j++ ) {
-                    r_chck[j] = r_pos_0[j] + r_disp[j];
-                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
-                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
-                }
-                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
-                if ( secBi != -1 && secBi != beadID ) {
-                    if ( bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID] ) {
-                        resj = bead_info[secBi][BEAD_TYPE];
-                        xDis = sqrtf((float) (x * x + y * y + z * z));
-                        totEn += Energy_Iso_Ovlp(resi, resj,
-                                                 xDis); /// xDis / xDis / xDis;
-
-                        totEn += Energy_Iso_Cont(resi, resj, xDis);
-                    }
-                } else if ( secBi == -1 ) {
-                    if ( abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1 ) { // Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                    }
-                }
-            }
+    for (j = 0; j < POS_MAX; j++)
+        {
+            r_pos_0[j] = bead_info[beadID][j];
         }
-    }
+    for (x = -BoxRad; x <= BoxRad; x++)
+        {
+            r_disp[0] = x;
+            for (y = -BoxRad; y <= BoxRad; y++)
+                {
+                    r_disp[1] = y;
+                    for (z = -BoxRad; z <= BoxRad; z++)
+                        {
+                            r_disp[2] = z;
+                            for (j = 0; j < POS_MAX; j++)
+                                {
+                                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
+                                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
+                                }
+                            secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
+                            if (secBi != -1 && secBi != beadID)
+                                {
+                                    if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID])
+                                        {
+                                            resj = bead_info[secBi][BEAD_TYPE];
+                                            xDis = sqrtf((float) (x * x + y * y + z * z));
+                                            totEn += Energy_Iso_Ovlp(resi, resj,
+                                                                     xDis); /// xDis / xDis / xDis;
+
+                                            totEn += Energy_Iso_Cont(resi, resj, xDis);
+                                        }
+                                }
+                            else if (secBi == -1)
+                                {
+                                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1)
+                                        { // Want solvation radius to be 1
+                                            totEn += fEnergy[resi][resi][E_F_SOL];
+                                        }
+                                }
+                        }
+                }
+        }
 
     return totEn;
 }
@@ -759,8 +884,8 @@ Energy_Isotropic_Self(const int beadID) { // Calculate Contact and Overlap energ
 /// This should only be used when calculating the energy of an entire chain!
 /// \param beadID
 /// \return
-float
-Energy_Isotropic_For_Chain(const int beadID) { // Calculate Contact and Overlap energy of beadID
+float Energy_Isotropic_For_Chain(const int beadID)
+{ // Calculate Contact and Overlap energy of beadID
     // Takes care of intra-molecular double counting
     float totEn = 0.0; // Storing total overlap energy
     int i, j;          // Indecies
@@ -771,49 +896,63 @@ Energy_Isotropic_For_Chain(const int beadID) { // Calculate Contact and Overlap 
     int resi   = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-    if ( nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-         nBeadTypeCanTInd[resi] == 0 ) {
-        return totEn;
-    } // No need to do anything if there's no isotropic interactions.
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0)
+        {
+            return totEn;
+        } // No need to do anything if there's no isotropic interactions.
 
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
-    for ( j = 0; j < POS_MAX; j++ ) {
-        r_pos_0[j] = bead_info[beadID][j];
-    }
-    for ( x = -BoxRad; x <= BoxRad; x++ ) {
-        r_disp[0] = x;
-        for ( y = -BoxRad; y <= BoxRad; y++ ) {
-            r_disp[1] = y;
-            for ( z = -BoxRad; z <= BoxRad; z++ ) {
-                r_disp[2] = z;
-                for ( j = 0; j < POS_MAX; j++ ) {
-                    r_chck[j] = r_pos_0[j] + r_disp[j];
-                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
-                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
-                }
-                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
-                if ( secBi != -1 && secBi != beadID ) {
-                    resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float) (x * x + y * y + z * z));
-                    if ( bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID] ) { // Intra-molecular
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.; // / xDis / xDis / xDis /2.;
-
-                        totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.;
-                    } else { // Inter-molecular
-                        totEn += Energy_Iso_Ovlp(resi, resj,
-                                                 xDis); // xDis / xDis / xDis;
-
-                        totEn += Energy_Iso_Cont(resi, resj, xDis);
-                    }
-                } else if ( secBi == -1 ) {
-                    if ( abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1 ) { // Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                    }
-                }
-            }
+    for (j = 0; j < POS_MAX; j++)
+        {
+            r_pos_0[j] = bead_info[beadID][j];
         }
-    }
+    for (x = -BoxRad; x <= BoxRad; x++)
+        {
+            r_disp[0] = x;
+            for (y = -BoxRad; y <= BoxRad; y++)
+                {
+                    r_disp[1] = y;
+                    for (z = -BoxRad; z <= BoxRad; z++)
+                        {
+                            r_disp[2] = z;
+                            for (j = 0; j < POS_MAX; j++)
+                                {
+                                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
+                                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
+                                }
+                            secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
+                            if (secBi != -1 && secBi != beadID)
+                                {
+                                    resj = bead_info[secBi][BEAD_TYPE];
+                                    xDis = sqrtf((float) (x * x + y * y + z * z));
+                                    if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID])
+                                        { // Intra-molecular
+                                            totEn +=
+                                                Energy_Iso_Ovlp(resi, resj, xDis) / 2.; // / xDis / xDis / xDis /2.;
+
+                                            totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.;
+                                        }
+                                    else
+                                        { // Inter-molecular
+                                            totEn += Energy_Iso_Ovlp(resi, resj,
+                                                                     xDis); // xDis / xDis / xDis;
+
+                                            totEn += Energy_Iso_Cont(resi, resj, xDis);
+                                        }
+                                }
+                            else if (secBi == -1)
+                                {
+                                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1)
+                                        { // Want solvation radius to be 1
+                                            totEn += fEnergy[resi][resi][E_F_SOL];
+                                        }
+                                }
+                        }
+                }
+        }
 
     return totEn;
 }
@@ -823,9 +962,8 @@ Energy_Isotropic_For_Chain(const int beadID) { // Calculate Contact and Overlap 
 /// largest_bead], and that we will loop over every bead in this range. So if
 /// the interactor is within this range, we divide by 2 to account for double
 /// counting. \param beadID \return
-float
-Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bead,
-                                  const int largest_bead) { // Calculate Contact and Overlap energy of beadID
+float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bead, const int largest_bead)
+{ // Calculate Contact and Overlap energy of beadID
     // Takes care of intra-molecular double counting
     // If the bead is between smallest_bead and largest_bead, we divide by two.
     // This assumes that every bead between smallest_bead and largest_bead will
@@ -839,54 +977,71 @@ Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bead,
     int resi   = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-    if ( nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-         nBeadTypeCanTInd[resi] == 0 ) {
-        return totEn;
-    } // No need to do anything if there's no isotropic interactions.
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0)
+        {
+            return totEn;
+        } // No need to do anything if there's no isotropic interactions.
 
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
-    for ( j = 0; j < POS_MAX; j++ ) {
-        r_pos_0[j] = bead_info[beadID][j];
-    }
-    for ( x = -BoxRad; x <= BoxRad; x++ ) {
-        r_disp[0] = x;
-        for ( y = -BoxRad; y <= BoxRad; y++ ) {
-            r_disp[1] = y;
-            for ( z = -BoxRad; z <= BoxRad; z++ ) {
-                r_disp[2] = z;
-                for ( j = 0; j < POS_MAX; j++ ) {
-                    r_chck[j] = r_pos_0[j] + r_disp[j];
-                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
-                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
-                }
-                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
-                if ( secBi != -1 && secBi != beadID ) {
-                    resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float) (x * x + y * y + z * z));
-                    if ( bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID] ) { // Intra-molecular
-                        if ( secBi >= smallest_bead && secBi <= largest_bead ) {               // Within subset
-                            totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.; // xDis / xDis / xDis / 2.;
-
-                            totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.;
-                        } else {
-                            totEn += Energy_Iso_Ovlp(resi, resj, xDis); // xDis / xDis / xDis;
-
-                            totEn += Energy_Iso_Cont(resi, resj, xDis);
-                        }
-                    } else {                                        // Inter-molecular
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis); // / xDis / xDis / xDis;
-
-                        totEn += Energy_Iso_Cont(resi, resj, xDis);
-                    }
-                } else if ( secBi == -1 ) {
-                    if ( abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1 ) { // Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                    }
-                }
-            }
+    for (j = 0; j < POS_MAX; j++)
+        {
+            r_pos_0[j] = bead_info[beadID][j];
         }
-    }
+    for (x = -BoxRad; x <= BoxRad; x++)
+        {
+            r_disp[0] = x;
+            for (y = -BoxRad; y <= BoxRad; y++)
+                {
+                    r_disp[1] = y;
+                    for (z = -BoxRad; z <= BoxRad; z++)
+                        {
+                            r_disp[2] = z;
+                            for (j = 0; j < POS_MAX; j++)
+                                {
+                                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] + nBoxSize[j] : r_chck[j];
+                                    r_chck[j] = r_chck[j] >= nBoxSize[j] ? r_chck[j] - nBoxSize[j] : r_chck[j];
+                                }
+                            secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
+                            if (secBi != -1 && secBi != beadID)
+                                {
+                                    resj = bead_info[secBi][BEAD_TYPE];
+                                    xDis = sqrtf((float) (x * x + y * y + z * z));
+                                    if (bead_info[secBi][BEAD_CHAINID] == bead_info[beadID][BEAD_CHAINID])
+                                        { // Intra-molecular
+                                            if (secBi >= smallest_bead && secBi <= largest_bead)
+                                                { // Within subset
+                                                    totEn += Energy_Iso_Ovlp(resi, resj, xDis) /
+                                                             2.; // xDis / xDis / xDis / 2.;
+
+                                                    totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.;
+                                                }
+                                            else
+                                                {
+                                                    totEn += Energy_Iso_Ovlp(resi, resj, xDis); // xDis / xDis / xDis;
+
+                                                    totEn += Energy_Iso_Cont(resi, resj, xDis);
+                                                }
+                                        }
+                                    else
+                                        {                                               // Inter-molecular
+                                            totEn += Energy_Iso_Ovlp(resi, resj, xDis); // / xDis / xDis / xDis;
+
+                                            totEn += Energy_Iso_Cont(resi, resj, xDis);
+                                        }
+                                }
+                            else if (secBi == -1)
+                                {
+                                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1)
+                                        { // Want solvation radius to be 1
+                                            totEn += fEnergy[resi][resi][E_F_SOL];
+                                        }
+                                }
+                        }
+                }
+        }
 
     return totEn;
 }
@@ -896,9 +1051,8 @@ Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bead,
 /// that the last bead is at list_size-1. This also assumes that we will loop
 /// over the entire list So if the interactor is within this list, we divide by
 /// 2 to account for double counting. \param beadID \return
-float
-Energy_Isotropic_With_List(const int beadID, const int* bead_list,
-                           const int list_size) { // Calculate Contact and Overlap energy of beadID
+float Energy_Isotropic_With_List(const int beadID, const int* bead_list, const int list_size)
+{ // Calculate Contact and Overlap energy of beadID
     // Takes care of intra-molecular double counting
     float totEn = 0.0; // Storing total overlap energy
     int i, j;          // Indecies
@@ -910,117 +1064,141 @@ Energy_Isotropic_With_List(const int beadID, const int* bead_list,
     int resi   = bead_info[beadID][BEAD_TYPE];
     totEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    if ( nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-         nBeadTypeCanTInd[resi] == 0 ) {
-        return totEn;
-    } // No need to do anything if there's no isotropic interactions.
+    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
+        nBeadTypeCanTInd[resi] == 0)
+        {
+            return totEn;
+        } // No need to do anything if there's no isotropic interactions.
 
     int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
-    for ( j = 0; j < POS_MAX; j++ ) {
-        r_pos_0[j] = bead_info[beadID][j];
-    }
-    for ( x = -BoxRad; x <= BoxRad; x++ ) {
-        r_disp[0] = x;
-        for ( y = -BoxRad; y <= BoxRad; y++ ) {
-            r_disp[1] = y;
-            for ( z = -BoxRad; z <= BoxRad; z++ ) {
-                r_disp[2] = z;
-                LatPos_add_wPBC(r_chck, r_pos_0, r_disp);
-                //                for (j = 0; j < POS_MAX; j++){
-                //                    r_chck[j] = r_pos_0[j] + r_disp[j];
-                //                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] +
-                //                    nBoxSize[j] : r_chck[j]; r_chck[j] =
-                //                    r_chck[j] >= nBoxSize[j] ? r_chck[j] -
-                //                    nBoxSize[j] : r_chck[j];
-                //                }
-                secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
-                if ( secBi != -1 && secBi != beadID ) {
-                    resj = bead_info[secBi][BEAD_TYPE];
-                    xDis = sqrtf((float) (x * x + y * y + z * z));
-
-                    bead_check = 0;
-                    for ( i = 0; i < list_size; i++ ) {
-                        if ( secBi == bead_list[i] ) {
-                            bead_check = 1;
-                            break;
-                        }
-                    }
-                    if ( bead_check == 1 ) {                             // Intra-list
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.; // / xDis / xDis / xDis /2.;
-
-                        totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.;
-                    } else {                                        // Inter-list
-                        totEn += Energy_Iso_Ovlp(resi, resj, xDis); // / xDis / xDis / xDis;
-
-                        totEn += Energy_Iso_Cont(resi, resj, xDis);
-                    }
-                } else if ( secBi == -1 ) {
-                    if ( abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1 ) { // Want solvation radius to be 1
-                        totEn += fEnergy[resi][resi][E_F_SOL];
-                    }
-                }
-            }
+    for (j = 0; j < POS_MAX; j++)
+        {
+            r_pos_0[j] = bead_info[beadID][j];
         }
-    }
+    for (x = -BoxRad; x <= BoxRad; x++)
+        {
+            r_disp[0] = x;
+            for (y = -BoxRad; y <= BoxRad; y++)
+                {
+                    r_disp[1] = y;
+                    for (z = -BoxRad; z <= BoxRad; z++)
+                        {
+                            r_disp[2] = z;
+                            LatPos_add_wPBC(r_chck, r_pos_0, r_disp);
+                            //                for (j = 0; j < POS_MAX; j++){
+                            //                    r_chck[j] = r_pos_0[j] + r_disp[j];
+                            //                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] +
+                            //                    nBoxSize[j] : r_chck[j]; r_chck[j] =
+                            //                    r_chck[j] >= nBoxSize[j] ? r_chck[j] -
+                            //                    nBoxSize[j] : r_chck[j];
+                            //                }
+                            secBi = naTotLattice[Lat_Ind_FromVec(r_chck)];
+                            if (secBi != -1 && secBi != beadID)
+                                {
+                                    resj = bead_info[secBi][BEAD_TYPE];
+                                    xDis = sqrtf((float) (x * x + y * y + z * z));
+
+                                    bead_check = 0;
+                                    for (i = 0; i < list_size; i++)
+                                        {
+                                            if (secBi == bead_list[i])
+                                                {
+                                                    bead_check = 1;
+                                                    break;
+                                                }
+                                        }
+                                    if (bead_check == 1)
+                                        { // Intra-list
+                                            totEn +=
+                                                Energy_Iso_Ovlp(resi, resj, xDis) / 2.; // / xDis / xDis / xDis /2.;
+
+                                            totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.;
+                                        }
+                                    else
+                                        {                                               // Inter-list
+                                            totEn += Energy_Iso_Ovlp(resi, resj, xDis); // / xDis / xDis / xDis;
+
+                                            totEn += Energy_Iso_Cont(resi, resj, xDis);
+                                        }
+                                }
+                            else if (secBi == -1)
+                                {
+                                    if (abs(x) <= 1 && abs(y) <= 1 && abs(z) <= 1)
+                                        { // Want solvation radius to be 1
+                                            totEn += fEnergy[resi][resi][E_F_SOL];
+                                        }
+                                }
+                        }
+                }
+        }
 
     return totEn;
 }
 
 /// Energy_Total_System: Calculate the total energy of the system.
-void
-Energy_Total_System(void) {
+void Energy_Total_System(void)
+{
     int i; // Indecies
     // initialization
-    for ( i = 0; i < MAX_E; i++ ) {
-        faCurrEn[i] = 0.0f;
-    }
+    for (i = 0; i < MAX_E; i++)
+        {
+            faCurrEn[i] = 0.0f;
+        }
     // printf("We have %d beads and %d chains", tot_beads, tot_chains);
 
-    for ( i = 0; i < tot_beads; i++ ) {
-        faCurrEn[E_SC_SC] += Energy_Anisotropic(i);
-    }
+    for (i = 0; i < tot_beads; i++)
+        {
+            faCurrEn[E_SC_SC] += Energy_Anisotropic(i);
+        }
 
     int resi, ovlp_num, cont_num;
 
-    for ( i = 0; i < tot_beads; i++ ) {
-        resi = bead_info[i][BEAD_TYPE];
-        if ( nBeadTypeCanCont[resi] ) {
-            cont_num = NeighborSearch_ForCont(i, bead_info[i], oldContNeighs, oldOvlpNeighs, &ovlp_num);
-            faCurrEn[E_CONT] += Energy_OfCont_wNeighList(i, oldContNeighs, cont_num);
-        } else {
-            ovlp_num = NeighborSearch_ForOvlp(i, bead_info[i], oldOvlpNeighs);
+    for (i = 0; i < tot_beads; i++)
+        {
+            resi = bead_info[i][BEAD_TYPE];
+            if (nBeadTypeCanCont[resi])
+                {
+                    cont_num = NeighborSearch_ForCont(i, bead_info[i], oldContNeighs, oldOvlpNeighs, &ovlp_num);
+                    faCurrEn[E_CONT] += Energy_OfCont_wNeighList(i, oldContNeighs, cont_num);
+                }
+            else
+                {
+                    ovlp_num = NeighborSearch_ForOvlp(i, bead_info[i], oldOvlpNeighs);
+                }
+            faCurrEn[E_OVLP] += Energy_OfOvlp_wNeighList(i, oldOvlpNeighs, ovlp_num);
+            faCurrEn[E_F_SOL] += (float) (26 - ovlp_num) * fEnergy[resi][resi][E_F_SOL];
         }
-        faCurrEn[E_OVLP] += Energy_OfOvlp_wNeighList(i, oldOvlpNeighs, ovlp_num);
-        faCurrEn[E_F_SOL] += (float) (26 - ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-    }
 
-    for ( i = 0; i < tot_beads; i++ ) {
-        faCurrEn[E_STIFF] += Energy_Topo_Angle(i);
-    }
+    for (i = 0; i < tot_beads; i++)
+        {
+            faCurrEn[E_STIFF] += Energy_Topo_Angle(i);
+        }
 
     // Taking care of double-counting energies.
     faCurrEn[E_SC_SC] *= 0.5f;
     faCurrEn[E_OVLP] *= 0.5f;
     faCurrEn[E_CONT] *= 0.5f;
-    for ( i = 1; i < MAX_E; i++ ) {
-        faCurrEn[E_TOT] += faCurrEn[i];
-    }
+    for (i = 1; i < MAX_E; i++)
+        {
+            faCurrEn[E_TOT] += faCurrEn[i];
+        }
 }
 
 /// Energy_Of_Chain - calculates the total energy of a molecule. Takes care of
 /// double-counting intra interactions \param chainID - ID of the molecule to
 /// calculate the energy. \return The total aniso + isotropic energy of this
 /// chain.
-float
-Energy_Of_Chain(const int chainID) { // Calculates the energy of the given chain.
+float Energy_Of_Chain(const int chainID)
+{ // Calculates the energy of the given chain.
     float totEn = 0.0;
     int i; // Looping index
     int fB = chain_info[chainID][CHAIN_START];
     int lB = chain_info[chainID][CHAIN_START] + chain_info[chainID][CHAIN_LENGTH];
-    for ( i = fB; i < lB; i++ ) {
-        totEn += Energy_Anisotropic_For_Chain(i) + Energy_Isotropic_For_Chain(i);
-    }
+    for (i = fB; i < lB; i++)
+        {
+            totEn += Energy_Anisotropic_For_Chain(i) + Energy_Isotropic_For_Chain(i);
+        }
 
     return totEn;
 }
@@ -1028,15 +1206,16 @@ Energy_Of_Chain(const int chainID) { // Calculates the energy of the given chain
 /// Energy_Of_Chain_Self - only calculates the intra-molecular energy of this
 /// molecule \param chainID - ID of the molecule to calculate the energy.
 /// \return The total aniso + isotropic energy of this chain.
-float
-Energy_Of_Chain_Self(const int chainID) { // Calculates only intra-molecular interactions
+float Energy_Of_Chain_Self(const int chainID)
+{ // Calculates only intra-molecular interactions
     float totEn = 0.0;
     int i; // Looping index
     int fB = chain_info[chainID][CHAIN_START];
     int lB = chain_info[chainID][CHAIN_START] + chain_info[chainID][CHAIN_LENGTH];
-    for ( i = fB; i < lB; i++ ) {
-        totEn += Energy_Anisotropic_Self(i) + Energy_Isotropic_Self(i);
-    }
+    for (i = fB; i < lB; i++)
+        {
+            totEn += Energy_Anisotropic_Self(i) + Energy_Isotropic_Self(i);
+        }
 
     return totEn / 2.;
 }
@@ -1048,162 +1227,193 @@ Energy_Of_Chain_Self(const int chainID) { // Calculates only intra-molecular int
 /// counting within the same chain. As such, this function should be used in
 /// both the old and new energy calculations so that the energy difference is
 /// still correct.
-float
-Energy_Of_Chain_OLD(const int chainID) { // Calculates the energy of the given chain
+float Energy_Of_Chain_OLD(const int chainID)
+{ // Calculates the energy of the given chain
     float totEn = 0.0;
     int i; // Looping index
 
-    for ( i = chain_info[chainID][CHAIN_START];
-          i < chain_info[chainID][CHAIN_START] + chain_info[chainID][CHAIN_LENGTH]; i++ ) {
-        totEn += Energy_Anisotropic(i) + Energy_Isotropic(i);
-    }
+    for (i = chain_info[chainID][CHAIN_START]; i < chain_info[chainID][CHAIN_START] + chain_info[chainID][CHAIN_LENGTH];
+         i++)
+        {
+            totEn += Energy_Anisotropic(i) + Energy_Isotropic(i);
+        }
 
     return totEn;
 }
 
-void
-Energy_Iso_ForLocal(const int beadID, const int resi, const int* r_pos0, long double* oldEn, long double* newEn,
-                    int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs) {
+void Energy_Iso_ForLocal(const int beadID, const int resi, const int* r_pos0, long double* oldEn, long double* newEn,
+                         int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs)
+{
 
     *ovlp_num = 0;
     *cont_num = 0;
-    if ( nBeadTypeCanCont[resi] ) { // CONT neighbors.
-        *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
-    } else if ( nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi] ) {
-        // OVLP neighbors.
-        *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT neighbors.
+            *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
+        }
+    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+        {
+            // OVLP neighbors.
+            *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
+        }
 
-    if ( nBeadTypeCanCont[resi] ) { // CONT energy.
-        *oldEn = *oldEn + Energy_OfCont_wNeighList(beadID, cont_neighs, *cont_num);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT energy.
+            *oldEn = *oldEn + Energy_OfCont_wNeighList(beadID, cont_neighs, *cont_num);
+        }
 
-    if ( nBeadTypeCanOvlp[resi] ) { // OVLP energy.
-        *oldEn = *oldEn + Energy_OfOvlp_wNeighList(beadID, ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanOvlp[resi])
+        { // OVLP energy.
+            *oldEn = *oldEn + Energy_OfOvlp_wNeighList(beadID, ovlp_neighs, *ovlp_num);
+        }
 
-    if ( nBeadTypeCanFSol[resi] ) { // Solvation energy.
-        *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanFSol[resi])
+        { // Solvation energy.
+            *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+            *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
+        }
 }
 
-void
-Energy_Iso_ForLocalEquil(const int beadID, const int resi, const int* r_pos0, long double* oldEn, long double* newEn,
-                         int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs) {
+void Energy_Iso_ForLocalEquil(const int beadID, const int resi, const int* r_pos0, long double* oldEn,
+                              long double* newEn, int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs)
+{
 
     *ovlp_num = 0;
     *cont_num = 0;
-    if ( nBeadTypeCanCont[resi] ) { // CONT neighbors.
-        *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
-    } else if ( nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi] ) {
-        // OVLP neighbors.
-        *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT neighbors.
+            *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
+        }
+    else if (nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+        {
+            // OVLP neighbors.
+            *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
+        }
 
-    if ( nBeadTypeCanCont[resi] ) { // CONT energy.
-        *oldEn = *oldEn + Energy_OfCont_wNeighList(beadID, cont_neighs, *cont_num);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT energy.
+            *oldEn = *oldEn + Energy_OfCont_wNeighList(beadID, cont_neighs, *cont_num);
+        }
 
-    if ( nBeadTypeCanOvlp[resi] ) { // OVLP energy.
-        *oldEn = *oldEn + Energy_OfOvlp_wNeighList(beadID, ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanOvlp[resi])
+        { // OVLP energy.
+            *oldEn = *oldEn + Energy_OfOvlp_wNeighList(beadID, ovlp_neighs, *ovlp_num);
+        }
 
-    if ( nBeadTypeCanFSol[resi] ) { // Solvation energy.
-        *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanFSol[resi])
+        { // Solvation energy.
+            *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+            *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
+        }
 }
 
-void
-Energy_Iso_ForChains(const int beadID, long double* oldEn, long double* newEn, int* ovlp_num, int* cont_num,
-                     int* ovlp_neighs, int* cont_neighs) {
+void Energy_Iso_ForChains(const int beadID, long double* oldEn, long double* newEn, int* ovlp_num, int* cont_num,
+                          int* ovlp_neighs, int* cont_neighs)
+{
     const int resi            = bead_info[beadID][BEAD_TYPE];
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
     *ovlp_num                 = 0;
     *cont_num                 = 0;
-    if ( nBeadTypeCanCont[resi] ) { // CONT neighbors.
-        *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
-    } else if ( nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi] ) {
-        // OVLP neighbors.
-        *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT neighbors.
+            *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
+        }
+    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+        {
+            // OVLP neighbors.
+            *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
+        }
 
-    if ( nBeadTypeCanCont[resi] ) { // CONT energy.
-        *oldEn = *oldEn + Energy_OfCont_wNeighList_ForChains(beadID, cont_neighs, *cont_num);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT energy.
+            *oldEn = *oldEn + Energy_OfCont_wNeighList_ForChains(beadID, cont_neighs, *cont_num);
+        }
 
-    if ( nBeadTypeCanOvlp[resi] ) { // OVLP energy.
-        *oldEn = *oldEn + Energy_OfOvlp_wNeighList_ForChains(beadID, ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanOvlp[resi])
+        { // OVLP energy.
+            *oldEn = *oldEn + Energy_OfOvlp_wNeighList_ForChains(beadID, ovlp_neighs, *ovlp_num);
+        }
 
-    if ( nBeadTypeCanFSol[resi] ) { // Solvation energy.
-        *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanFSol[resi])
+        { // Solvation energy.
+            *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+            *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
+        }
 }
 
-void
-Energy_Iso_ForChainsEquil(const int beadID, long double* oldEn, long double* newEn, int* ovlp_num, int* cont_num,
-                          int* ovlp_neighs, int* cont_neighs) {
+void Energy_Iso_ForChainsEquil(const int beadID, long double* oldEn, long double* newEn, int* ovlp_num, int* cont_num,
+                               int* ovlp_neighs, int* cont_neighs)
+{
     const int resi            = bead_info[beadID][BEAD_TYPE];
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
     *ovlp_num                 = 0;
     *cont_num                 = 0;
-    if ( nBeadTypeCanCont[resi] ) { // CONT neighbors.
-        *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
-    } else if ( nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi] ) {
-        // OVLP neighbors.
-        *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT neighbors.
+            *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
+        }
+    else if (nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+        {
+            // OVLP neighbors.
+            *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
+        }
 
-    if ( nBeadTypeCanCont[resi] ) { // CONT energy.
-        *oldEn = *oldEn + Energy_OfCont_wNeighList_ForChains(beadID, cont_neighs, *cont_num);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT energy.
+            *oldEn = *oldEn + Energy_OfCont_wNeighList_ForChains(beadID, cont_neighs, *cont_num);
+        }
 
-    if ( nBeadTypeCanOvlp[resi] ) { // OVLP energy.
-        *oldEn = *oldEn + Energy_OfOvlp_wNeighList_ForChains(beadID, ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanOvlp[resi])
+        { // OVLP energy.
+            *oldEn = *oldEn + Energy_OfOvlp_wNeighList_ForChains(beadID, ovlp_neighs, *ovlp_num);
+        }
 
-    if ( nBeadTypeCanFSol[resi] ) { // Solvation energy.
-        *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanFSol[resi])
+        { // Solvation energy.
+            *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+            *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
+        }
 }
 
-void
-Energy_Iso_ForCoLocal(const int thisBeadID, const int otherBeadID, const int* r_pos0, long double* oldEn,
-                      long double* newEn, int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs) {
+void Energy_Iso_ForCoLocal(const int thisBeadID, const int otherBeadID, const int* r_pos0, long double* oldEn,
+                           long double* newEn, int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs)
+{
     *ovlp_num      = 0;
     *cont_num      = 0;
     const int resi = bead_info[thisBeadID][BEAD_TYPE];
-    if ( nBeadTypeCanCont[resi] ) { // CONT neighbors.
-        *cont_num = NeighborSearch_ForCont(thisBeadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
-    } else { // Since CoLocal assumes bonded beads, it is a sticker.
-        // OVLP neighbors.
-        *ovlp_num = NeighborSearch_ForOvlp(thisBeadID, r_pos0, ovlp_neighs);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT neighbors.
+            *cont_num = NeighborSearch_ForCont(thisBeadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
+        }
+    else
+        { // Since CoLocal assumes bonded beads, it is a sticker.
+            // OVLP neighbors.
+            *ovlp_num = NeighborSearch_ForOvlp(thisBeadID, r_pos0, ovlp_neighs);
+        }
 
-    if ( nBeadTypeCanCont[resi] ) { // CONT energy.
-        *oldEn =
-            *oldEn + Energy_OfCont_wNeighList_ForRange(thisBeadID, otherBeadID, otherBeadID, cont_neighs, *cont_num);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT energy.
+            *oldEn = *oldEn +
+                     Energy_OfCont_wNeighList_ForRange(thisBeadID, otherBeadID, otherBeadID, cont_neighs, *cont_num);
+        }
 
-    if ( nBeadTypeCanOvlp[resi] ) { // OVLP energy.
-        *oldEn =
-            *oldEn + Energy_OfOvlp_wNeighList_ForRange(thisBeadID, otherBeadID, otherBeadID, ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanOvlp[resi])
+        { // OVLP energy.
+            *oldEn = *oldEn +
+                     Energy_OfOvlp_wNeighList_ForRange(thisBeadID, otherBeadID, otherBeadID, ovlp_neighs, *ovlp_num);
+        }
 
-    if ( nBeadTypeCanFSol[resi] ) { // Solvation energy.
-        *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanFSol[resi])
+        { // Solvation energy.
+            *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+            *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
+        }
 }
 
-void
-Energy_Iso_ForLists(const int beadIdx, int const listSize, const int beadList[MAX_BONDS + 1],
-                    const int beadPos[MAX_BONDS + 1][POS_MAX], long double* oldEn, long double* newEn, int* ovlp_num,
-                    int* cont_num, int* ovlp_neighs, int* cont_neighs) {
+void Energy_Iso_ForLists(const int beadIdx, int const listSize, const int beadList[MAX_BONDS + 1],
+                         const int beadPos[MAX_BONDS + 1][POS_MAX], long double* oldEn, long double* newEn,
+                         int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs)
+{
 
     *ovlp_num                 = 0;
     *cont_num                 = 0;
@@ -1211,84 +1421,105 @@ Energy_Iso_ForLists(const int beadIdx, int const listSize, const int beadList[MA
     const int resi            = bead_info[beadID][BEAD_TYPE];
     const int r_pos0[POS_MAX] = {beadPos[beadIdx][0], beadPos[beadIdx][1], beadPos[beadIdx][2]};
 
-    if ( nBeadTypeCanCont[resi] ) { // CONT neighbors.
-        *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
-    } else if ( nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi] ) {
-        // OVLP neighbors.
-        *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT neighbors.
+            *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
+        }
+    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+        {
+            // OVLP neighbors.
+            *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
+        }
 
-    if ( nBeadTypeCanFSol[resi] ) { // Solvation energy.
-        *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanFSol[resi])
+        { // Solvation energy.
+            *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+            *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
+        }
 
-    if ( nBeadTypeCanCont[resi] ) { // CONT energy.
-        *oldEn = *oldEn + Energy_OfCont_wNeighList_ForLists(beadID, listSize, beadList, cont_neighs, *cont_num);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT energy.
+            *oldEn = *oldEn + Energy_OfCont_wNeighList_ForLists(beadID, listSize, beadList, cont_neighs, *cont_num);
+        }
 
-    if ( nBeadTypeCanOvlp[resi] ) { // OVLP energy.
-        *oldEn = *oldEn + Energy_OfOvlp_wNeighList_ForLists(beadID, listSize, beadList, ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanOvlp[resi])
+        { // OVLP energy.
+            *oldEn = *oldEn + Energy_OfOvlp_wNeighList_ForLists(beadID, listSize, beadList, ovlp_neighs, *ovlp_num);
+        }
 }
 
-void
-Energy_Iso_ForRange(const int beadID, const int smallestBead, const int largestBead, long double* oldEn,
-                    long double* newEn, int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs) {
+void Energy_Iso_ForRange(const int beadID, const int smallestBead, const int largestBead, long double* oldEn,
+                         long double* newEn, int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs)
+{
     *ovlp_num                 = 0;
     *cont_num                 = 0;
     const int resi            = bead_info[beadID][BEAD_TYPE];
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
 
-    if ( nBeadTypeCanCont[resi] ) { // CONT neighbors.
-        *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
-    } else if ( nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] ||
-                nBeadTypeCanFSol[resi] ) { // Since CoLocal assumes bonded
-                                           // beads, it is a sticker.
-        // OVLP neighbors.
-        *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT neighbors.
+            *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
+        }
+    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+        { // Since CoLocal assumes bonded
+          // beads, it is a sticker.
+            // OVLP neighbors.
+            *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
+        }
 
-    if ( nBeadTypeCanCont[resi] ) { // CONT energy.
-        *oldEn = *oldEn + Energy_OfCont_wNeighList_ForRange(beadID, smallestBead, largestBead, cont_neighs, *cont_num);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT energy.
+            *oldEn =
+                *oldEn + Energy_OfCont_wNeighList_ForRange(beadID, smallestBead, largestBead, cont_neighs, *cont_num);
+        }
 
-    if ( nBeadTypeCanOvlp[resi] ) { // OVLP energy.
-        *oldEn = *oldEn + Energy_OfOvlp_wNeighList_ForRange(beadID, smallestBead, largestBead, ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanOvlp[resi])
+        { // OVLP energy.
+            *oldEn =
+                *oldEn + Energy_OfOvlp_wNeighList_ForRange(beadID, smallestBead, largestBead, ovlp_neighs, *ovlp_num);
+        }
 
-    if ( nBeadTypeCanFSol[resi] ) { // Solvation energy.
-        *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanFSol[resi])
+        { // Solvation energy.
+            *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+            *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
+        }
 }
 
-void
-Energy_Iso_ForRangeEquil(const int beadID, const int smallestBead, const int largestBead, long double* oldEn,
-                         long double* newEn, int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs) {
+void Energy_Iso_ForRangeEquil(const int beadID, const int smallestBead, const int largestBead, long double* oldEn,
+                              long double* newEn, int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs)
+{
     *ovlp_num                 = 0;
     *cont_num                 = 0;
     const int resi            = bead_info[beadID][BEAD_TYPE];
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
 
-    if ( nBeadTypeCanCont[resi] ) { // CONT neighbors.
-        *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
-    } else if ( nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi] ) { // Since CoLocal assumes bonded
-                                                                     // beads, it is a sticker.
-        // OVLP neighbors.
-        *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT neighbors.
+            *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
+        }
+    else if (nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+        { // Since CoLocal assumes bonded
+          // beads, it is a sticker.
+            // OVLP neighbors.
+            *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
+        }
 
-    if ( nBeadTypeCanCont[resi] ) { // CONT energy.
-        *oldEn = *oldEn + Energy_OfCont_wNeighList_ForRange(beadID, smallestBead, largestBead, cont_neighs, *cont_num);
-    }
+    if (nBeadTypeCanCont[resi])
+        { // CONT energy.
+            *oldEn =
+                *oldEn + Energy_OfCont_wNeighList_ForRange(beadID, smallestBead, largestBead, cont_neighs, *cont_num);
+        }
 
-    if ( nBeadTypeCanOvlp[resi] ) { // OVLP energy.
-        *oldEn = *oldEn + Energy_OfOvlp_wNeighList_ForRange(beadID, smallestBead, largestBead, ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanOvlp[resi])
+        { // OVLP energy.
+            *oldEn =
+                *oldEn + Energy_OfOvlp_wNeighList_ForRange(beadID, smallestBead, largestBead, ovlp_neighs, *ovlp_num);
+        }
 
-    if ( nBeadTypeCanFSol[resi] ) { // Solvation energy.
-        *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-        *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
-    }
+    if (nBeadTypeCanFSol[resi])
+        { // Solvation energy.
+            *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
+            *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
+        }
 }
