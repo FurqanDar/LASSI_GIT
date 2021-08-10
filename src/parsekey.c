@@ -407,7 +407,7 @@ int Parse_EnergyFile(char* strEnFile)
                     // nBeadType numbers
                     nRow = 0;
                 } // The line did not contain a keyword. Either empty or has numbers.
-            else if (strcmp(strLine, "\r\n") || strcmp(strLine, "\n"))
+            else if (strcmp(strLine, "\r\n") && strcmp(strLine, "\n"))
                 { // ignore empty lines
                     if (nFlag == -1)
                         { // sticker
@@ -746,11 +746,10 @@ void Parse_StructureFile(char* filename)
 
 /// Parse_StructureFile_CalcBeadsAndChains - reads the structure-file filename,
 /// and records the total number of beads, chains, bead-types, and chain-types.
-/// \param filename: Full path of the file, or name of file if in the same
-/// directory. \param n_bead_num: Stores how many total beads are in the
-/// structure file. \param n_chain_num: Stores how many total chains are in the
-/// structure file. \param n_chain_types: Stores how many different chain-types
-/// are in the file.
+/// \param filename: Full path of the file, or name of file if in the same directory.
+/// \param n_bead_num: Stores how many total beads are in the structure file.
+/// \param n_chain_num: Stores how many total chains are in the structure file.
+/// \param n_chain_types: Stores how many different chain-types are in the file.
 void Parse_StructureFile_CalcBeadsAndChains(char* filename, size_t* n_bead_num, size_t* n_chain_num,
                                             size_t* n_chain_types)
 {
