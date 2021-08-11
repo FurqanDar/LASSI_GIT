@@ -523,11 +523,9 @@ void Write_TopFile(char* filename)
     fprintf(fp, "0\tdihedrals\n");        // Systems don't have dihedrals  yet
     fprintf(fp, "0\timpropers\n");        // Systems don't have imporopers yet
     fprintf(fp, "\n");                    // Empty line.
-    fprintf(fp,
-            "6\tatom types\n");     // Just hard coded to have 6 sticker types for now
+    fprintf(fp, "%d\tatom types\n", nBeadTypes);     // This many bead-types
     fprintf(fp, "1\tbond types\n"); // System can have multiple bond-lengths
-    fprintf(fp,
-            "0\tangle types\n"); // Systems don't have any angular forces yet
+    fprintf(fp, "0\tangle types\n"); // Systems don't have any angular forces yet
     fprintf(fp, "\n");           // Empty line.
     fprintf(fp, "0 %d xlo xhi\n", nBoxSize[0]);
     fprintf(fp, "0 %d ylo yhi\n", nBoxSize[1]);
@@ -535,9 +533,10 @@ void Write_TopFile(char* filename)
     fprintf(fp, "\n");       // Empty line.
     fprintf(fp, "Masses\n"); // These don't really mean anything
     fprintf(fp, "\n");       // Empty line.
-    fprintf(fp,
-            "1\t1.0\n2\t1.0\n3\t1.0\n4\t1.0\n5\t1.0\n6\t1.0\n"); // Dummy masses for
-                                                                 // the 6 types.
+    for (i=0; i < nBeadTypes; i++){
+            fprintf(fp, "%d\t1.0\n", i);
+        }
+
     fprintf(fp, "\n");                                           // Empty line.
     fprintf(fp, "Atoms\n");                                      // Signifying the beginning of atom coordinates.
     fprintf(fp, "\n");                                           // Empty line.

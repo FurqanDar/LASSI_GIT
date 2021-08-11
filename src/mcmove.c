@@ -332,6 +332,8 @@ int Move_Local(int beadID, float MyTemp)
             oldEn += Energy_Topo_Angle(tmpBead);
         }
 
+//    oldEn += Energy_Topo_Angle_ForLocal(tmpBead, bondList, bondNum);
+
     lLDub BWRos = MC_RosenbluthSampling_ForLocal_AtOld(beadID, resi, &oldEn, old_ovlp_num);
 
     OP_System_MoveBeadTo(beadID, r_posNew);
@@ -2109,7 +2111,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp)
 
     for (i = 0; i < beadNum; i++)
         {
-            tmpBead = beadsList[i];
+          tmpBead = beadsList[i];
             // Use anchorbead as origin, and check what happens after the rotation
             // to every bead
             OP_Rotation(PivotM, tmpBead, anchorPos);
