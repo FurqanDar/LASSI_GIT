@@ -324,13 +324,8 @@ int Move_Local(int beadID, float MyTemp)
                         oldContNeighs);
 
     int bondList[MAX_BONDS + 1];
-    const int bondNum = OP_GetTopoBonds(beadID, bondList);
-    int i, tmpBead;
-    for (i = 0; i < bondNum; ++i)
-        {
-            tmpBead = bondList[i];
-            oldEn += Energy_Topo_Angle(tmpBead);
-        }
+    const int bondNum = fEnergy[resi][resi][E_STIFF] ? OP_GetTopoBonds(beadID, bondList) : 0;
+    oldEn += bondNum ? Energy_Topo_Angle_ForList(bondNum, bondList) : 0.;
 
 //    oldEn += Energy_Topo_Angle_ForLocal(tmpBead, bondList, bondNum);
 
@@ -342,11 +337,9 @@ int Move_Local(int beadID, float MyTemp)
 
     Energy_Iso_ForLocal(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs,
                         newContNeighs);
-    for (i = 0; i < bondNum; ++i)
-        {
-            tmpBead = bondList[i];
-            newEn += Energy_Topo_Angle(tmpBead);
-        }
+
+    newEn += bondNum ? Energy_Topo_Angle_ForList(bondNum, bondList) : 0.;
+
     lLDub FWRos = MC_RosenbluthSampling_ForLocal_AtNew(beadID, resi, &yTemp, &newEn, new_ovlp_num);
     int resj;
     if (yTemp != -1)
@@ -433,15 +426,18 @@ int Move_Snake(int chainID, float MyTemp)
     int yTemp; // Random numbers to store things
     int r_posNew[POS_MAX], r_posTmp1[POS_MAX],
         r_posTmp2[POS_MAX]; // Vectors to store positions.
-
+    int angBead;
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX; // To decide if we slither forwards or backwards
-    if (MCProb < 0.5)
+    const char SnakeFwd = MCProb < 0.5f ? 1 : 0; //1 for Fwds, and 0 for Bkwds.
+
+    if (SnakeFwd)
         { // Forwards slither, so lastB-1 (last bead) is anchor
             LatPos_gen_rand_wRad(r_posTmp1,
                                  linker_len[lastB - 1][0]); // lastB-1 will be replaced by lastB-2
             LatPos_copy(r_posTmp2, bead_info[lastB - 1]);
             LatPos_add_wPBC(r_posNew, r_posTmp1, r_posTmp2);
             yTemp = Check_MoveBeadTo(r_posNew); // 0: there is no space, 1: there is space
+            angBead = lastB-2;
         }
     else
         { // Backwards slither, so firstB is anchor
@@ -450,6 +446,7 @@ int Move_Snake(int chainID, float MyTemp)
             LatPos_copy(r_posTmp2, bead_info[firstB]);
             LatPos_add_wPBC(r_posNew, r_posTmp1, r_posTmp2);
             yTemp = Check_MoveBeadTo(r_posNew); // 0: there is no space, 1: there is space
+            angBead = firstB+1;
         }
 
     if (yTemp == 0)
@@ -481,7 +478,9 @@ int Move_Snake(int chainID, float MyTemp)
             BSum += MC_RosenbluthSampling_ForChains_AtOld(i, resi, &oldEn, old_ovlp_num);
         }
 
-    if (MCProb < 0.5)
+    oldEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead) : 0.;
+
+    if (SnakeFwd)
         { // Slithering the chain forwards in ID-space
             OP_System_Snake_SlitherFwd(firstB, lastB, r_posNew);
         }
@@ -523,6 +522,8 @@ int Move_Snake(int chainID, float MyTemp)
                     newEn += Energy_Anisotropic_For_Chain(i);
                 }
         }
+
+    newEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead) : 0.;
 
     // Doing the Metropolis-Hastings thing
     MCProb      = (lLDub) rand() / (lLDub) RAND_MAX;
@@ -1362,7 +1363,8 @@ int Move_Pivot(int chainID, float MyTemp)
             BSum += MC_RosenbluthSampling_ForRange_AtOld(tmpBead, resi, smBead, lgBead, &oldEn, old_ovlp_num);
         }
 
-    oldEn += Energy_Topo_Angle(anchorBead);
+    resi = bead_info[anchorBead][BEAD_TYPE];
+    oldEn += fEnergy[resi][resi][E_STIFF] ? Energy_Topo_Angle(anchorBead) : 0.;
 
     for (i = 0; i < beadNum; i++)
         {
@@ -1402,9 +1404,10 @@ int Move_Pivot(int chainID, float MyTemp)
                 }
         }
 
-    newEn += Energy_Topo_Angle(anchorBead);
+    resi = bead_info[anchorBead][BEAD_TYPE];
+    newEn += fEnergy[resi][resi][E_STIFF] ? Energy_Topo_Angle(anchorBead) : 0.;
 
-    lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
+    const lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc  = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub) MyTemp);
     if (MCProb < MHAcc)
         { // Accept the move. Remember that the bonds were
@@ -1702,24 +1705,17 @@ int Move_Local_Equil(int beadID, float MyTemp)
                              oldContNeighs);
 
     int bondList[MAX_BONDS + 1];
-    const int bondNum = OP_GetTopoBonds(beadID, bondList);
-    int i, tmpBead;
-    for (i = 0; i < bondNum; ++i)
-        {
-            tmpBead = bondList[i];
-            oldEn += Energy_Topo_Angle(tmpBead);
-        }
+    const int bondNum = fEnergy[resi][resi][E_STIFF] ? OP_GetTopoBonds(beadID, bondList) : 0;
+    oldEn += bondNum ? Energy_Topo_Angle_ForList(bondNum, bondList) : 0.;
+
     OP_System_MoveBeadTo(beadID, r_posNew);
 
     newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
     Energy_Iso_ForLocalEquil(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs,
                              newContNeighs);
-    for (i = 0; i < bondNum; ++i)
-        {
-            tmpBead = bondList[i];
-            newEn += Energy_Topo_Angle(tmpBead);
-        }
+
+    newEn += bondNum ? Energy_Topo_Angle_ForList(bondNum, bondList) : 0.;
 
     MCProb      = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
@@ -1767,15 +1763,18 @@ int Move_Snake_Equil(int chainID, float MyTemp)
     int yTemp; // Random numbers to store things
     int r_posNew[POS_MAX], r_posTmp1[POS_MAX],
         r_posTmp2[POS_MAX]; // Vectors to store positions.
+    int angBead; // BeadID for angular energies.
 
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX; // To decide if we slither forwards or backwards
-    if (MCProb < 0.5)
+    const char SnakeFwd = MCProb < 0.5f ? 1 : 0; // 1 For forwards, 0 for backwards.
+    if (SnakeFwd)
         { // Forwards slither, so lastB-1 (last bead) is anchor
             LatPos_gen_rand_wRad(r_posNew,
                                  linker_len[lastB - 1][0]); // lastB-1 will be replaced by lastB-2
             LatPos_copy(r_posTmp1, r_posNew);
             LatPos_add_wPBC(r_posNew, bead_info[lastB - 1], r_posTmp1);
             yTemp = Check_MoveBeadTo(r_posNew); // 0: there is no space, 1: there is space
+            angBead = lastB-2;
         }
     else
         { // Backwards slither, so firstB is anchor
@@ -1784,6 +1783,7 @@ int Move_Snake_Equil(int chainID, float MyTemp)
             LatPos_copy(r_posTmp1, r_posNew);
             LatPos_add_wPBC(r_posNew, bead_info[firstB], r_posTmp1);
             yTemp = Check_MoveBeadTo(r_posNew); // 0: there is no space, 1: there is space
+            angBead = firstB+1;
         }
 
     if (yTemp == 0)
@@ -1813,7 +1813,9 @@ int Move_Snake_Equil(int chainID, float MyTemp)
             Energy_Iso_ForChainsEquil(i, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
         }
 
-    if (MCProb < 0.5)
+    oldEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead) : 0.;
+
+    if (SnakeFwd)
         { // Slithering the chain forwards in ID-space
             OP_System_Snake_SlitherFwd(firstB, lastB, r_posNew);
         }
@@ -1835,6 +1837,8 @@ int Move_Snake_Equil(int chainID, float MyTemp)
         {
             Energy_Iso_ForChainsEquil(i, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs, newContNeighs);
         }
+
+    newEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead) : 0.;
 
     // Doing the Metropolis-Hastings thing
     MCProb      = (lLDub) rand() / (lLDub) RAND_MAX;
@@ -2148,7 +2152,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp)
                                      oldOvlpNeighs, oldContNeighs);
         }
 
-    oldEn += Energy_Topo_Angle(anchorBead);
+    oldEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(anchorBead) : 0.;
 
     for (i = 0; i < beadNum; i++)
         {
@@ -2176,7 +2180,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp)
                                      newOvlpNeighs, newContNeighs);
         }
 
-    newEn += Energy_Topo_Angle(anchorBead);
+    newEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(anchorBead) : 0.;
 
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc  = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub) MyTemp);

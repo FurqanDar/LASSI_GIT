@@ -92,4 +92,6 @@ void Energy_Iso_ForRange(const int beadID, const int smallestBead, const int lar
 void Energy_Iso_ForRangeEquil(const int beadID, const int smallestBead, const int largestBead, long double* oldEn,
                               long double* newEn, int* ovlp_num, int* cont_num, int* ovlp_neighs, int* cont_neighs);
 
+float Energy_Topo_Angle_ForList(const int bondNum, const int *bondList);
+
 #endif // _ENERGY_H_

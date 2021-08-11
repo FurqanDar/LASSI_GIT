@@ -1523,3 +1523,15 @@ void Energy_Iso_ForRangeEquil(const int beadID, const int smallestBead, const in
             *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
         }
 }
+
+float Energy_Topo_Angle_ForList(const int bondNum, const int *bondList){
+    float totEn = 0.f;
+    int i, tmpBead;
+
+    for (i = 0; i < bondNum; ++i) {
+            tmpBead = bondList[i];
+            totEn+= Energy_Topo_Angle(tmpBead);
+        }
+
+    return totEn;
+}
