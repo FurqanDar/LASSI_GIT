@@ -505,7 +505,7 @@ void Write_TopFile(char* filename)
     printf("Writing the topology file!\n");
     fprintf(fp, "LAMMPS Description\n");    // The file must start with this.
     fprintf(fp, "\n");                      // Empty line.
-    fprintf(fp, "%ld\tatoms\n", tot_beads); // Listing total number of atoms
+    fprintf(fp, "\t%ld\tatoms\n", tot_beads); // Listing total number of atoms
     numBonds = 0;
     for (i = 0; i < tot_beads; i++)
         {
@@ -518,18 +518,18 @@ void Write_TopFile(char* filename)
                 }
         }
 
-    fprintf(fp, "%d\tbonds\n", numBonds); // Listing number of bonds
-    fprintf(fp, "0\tangles\n");           // Systems don't have angle depenece yet
-    fprintf(fp, "0\tdihedrals\n");        // Systems don't have dihedrals  yet
-    fprintf(fp, "0\timpropers\n");        // Systems don't have imporopers yet
+    fprintf(fp, "\t%d\tbonds\n", numBonds); // Listing number of bonds
+    fprintf(fp, "\t0\tangles\n");           // Systems don't have angle depenece yet
+    fprintf(fp, "\t0\tdihedrals\n");        // Systems don't have dihedrals  yet
+    fprintf(fp, "\t0\timpropers\n");        // Systems don't have imporopers yet
     fprintf(fp, "\n");                    // Empty line.
     fprintf(fp, "%d\tatom types\n", nBeadTypes);     // This many bead-types
     fprintf(fp, "1\tbond types\n"); // System can have multiple bond-lengths
     fprintf(fp, "0\tangle types\n"); // Systems don't have any angular forces yet
     fprintf(fp, "\n");           // Empty line.
-    fprintf(fp, "0 %d xlo xhi\n", nBoxSize[0]);
-    fprintf(fp, "0 %d ylo yhi\n", nBoxSize[1]);
-    fprintf(fp, "0 %d zlo zhi\n", nBoxSize[2]);
+    fprintf(fp, " 0 %d xlo xhi\n", nBoxSize[0]);
+    fprintf(fp, " 0 %d ylo yhi\n", nBoxSize[1]);
+    fprintf(fp, " 0 %d zlo zhi\n", nBoxSize[2]);
     fprintf(fp, "\n");       // Empty line.
     fprintf(fp, "Masses\n"); // These don't really mean anything
     fprintf(fp, "\n");       // Empty line.
@@ -538,11 +538,11 @@ void Write_TopFile(char* filename)
         }
 
     fprintf(fp, "\n");                                           // Empty line.
-    fprintf(fp, "Atoms\n");                                      // Signifying the beginning of atom coordinates.
+    fprintf(fp, "Atoms # bond\n");                                      // Signifying the beginning of atom coordinates.
     fprintf(fp, "\n");                                           // Empty line.
     for (i = 0; i < tot_beads; i++)
         {
-            fprintf(fp, "%d %d %d 0.0 %d %d %d\n", i, bead_info[i][BEAD_CHAINID], bead_info[i][BEAD_TYPE],
+            fprintf(fp, "%d %d %d %d %d %d\n", i, bead_info[i][BEAD_CHAINID], bead_info[i][BEAD_TYPE],
                     bead_info[i][POS_X], bead_info[i][POS_Y], bead_info[i][POS_Z]);
         }                   // Done with the coordinates
     fprintf(fp, "\n");      // Empty line.

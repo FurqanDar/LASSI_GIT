@@ -358,7 +358,7 @@ float Energy_Topo_Angle(int const beadID)
 
     const float dumCosTheta = (1.f - Vec3n_CosTheta(vec1, vec2));
 
-    return fEnergy[0][0][E_STIFF] * dumCosTheta * dumCosTheta;
+    return -fEnergy[0][0][E_STIFF] * dumCosTheta * dumCosTheta;
 }
 
 /// Energy_OfOvlp_wNeighList: Given this bead, and a supplied list of neighbors
