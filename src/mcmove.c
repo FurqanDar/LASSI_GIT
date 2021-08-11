@@ -426,7 +426,7 @@ int Move_Snake(int chainID, float MyTemp)
     int yTemp; // Random numbers to store things
     int r_posNew[POS_MAX], r_posTmp1[POS_MAX],
         r_posTmp2[POS_MAX]; // Vectors to store positions.
-    int angBead;
+    int angBead_old, angBead_new;
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX; // To decide if we slither forwards or backwards
     const char SnakeFwd = MCProb < 0.5f ? 1 : 0; //1 for Fwds, and 0 for Bkwds.
 
@@ -437,7 +437,8 @@ int Move_Snake(int chainID, float MyTemp)
             LatPos_copy(r_posTmp2, bead_info[lastB - 1]);
             LatPos_add_wPBC(r_posNew, r_posTmp1, r_posTmp2);
             yTemp = Check_MoveBeadTo(r_posNew); // 0: there is no space, 1: there is space
-            angBead = lastB-2;
+            angBead_old = firstB + 1;
+            angBead_new = lastB - 2;
         }
     else
         { // Backwards slither, so firstB is anchor
@@ -446,7 +447,8 @@ int Move_Snake(int chainID, float MyTemp)
             LatPos_copy(r_posTmp2, bead_info[firstB]);
             LatPos_add_wPBC(r_posNew, r_posTmp1, r_posTmp2);
             yTemp = Check_MoveBeadTo(r_posNew); // 0: there is no space, 1: there is space
-            angBead = firstB+1;
+            angBead_new = firstB + 1;
+            angBead_old = lastB - 2;
         }
 
     if (yTemp == 0)
@@ -478,7 +480,7 @@ int Move_Snake(int chainID, float MyTemp)
             BSum += MC_RosenbluthSampling_ForChains_AtOld(i, resi, &oldEn, old_ovlp_num);
         }
 
-    oldEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead) : 0.;
+    oldEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead_old) : 0.;
 
     if (SnakeFwd)
         { // Slithering the chain forwards in ID-space
@@ -523,7 +525,7 @@ int Move_Snake(int chainID, float MyTemp)
                 }
         }
 
-    newEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead) : 0.;
+    newEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead_new) : 0.;
 
     // Doing the Metropolis-Hastings thing
     MCProb      = (lLDub) rand() / (lLDub) RAND_MAX;
@@ -1763,7 +1765,7 @@ int Move_Snake_Equil(int chainID, float MyTemp)
     int yTemp; // Random numbers to store things
     int r_posNew[POS_MAX], r_posTmp1[POS_MAX],
         r_posTmp2[POS_MAX]; // Vectors to store positions.
-    int angBead; // BeadID for angular energies.
+    int angBead_old, angBead_new; // BeadIDs for angular energies.
 
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX; // To decide if we slither forwards or backwards
     const char SnakeFwd = MCProb < 0.5f ? 1 : 0; // 1 For forwards, 0 for backwards.
@@ -1774,7 +1776,8 @@ int Move_Snake_Equil(int chainID, float MyTemp)
             LatPos_copy(r_posTmp1, r_posNew);
             LatPos_add_wPBC(r_posNew, bead_info[lastB - 1], r_posTmp1);
             yTemp = Check_MoveBeadTo(r_posNew); // 0: there is no space, 1: there is space
-            angBead = lastB-2;
+            angBead_old = firstB + 1;
+            angBead_new = lastB - 2;
         }
     else
         { // Backwards slither, so firstB is anchor
@@ -1783,7 +1786,8 @@ int Move_Snake_Equil(int chainID, float MyTemp)
             LatPos_copy(r_posTmp1, r_posNew);
             LatPos_add_wPBC(r_posNew, bead_info[firstB], r_posTmp1);
             yTemp = Check_MoveBeadTo(r_posNew); // 0: there is no space, 1: there is space
-            angBead = firstB+1;
+            angBead_new = firstB + 1;
+            angBead_old = lastB - 2;
         }
 
     if (yTemp == 0)
@@ -1813,7 +1817,7 @@ int Move_Snake_Equil(int chainID, float MyTemp)
             Energy_Iso_ForChainsEquil(i, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
         }
 
-    oldEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead) : 0.;
+    oldEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead_old) : 0.;
 
     if (SnakeFwd)
         { // Slithering the chain forwards in ID-space
@@ -1838,7 +1842,7 @@ int Move_Snake_Equil(int chainID, float MyTemp)
             Energy_Iso_ForChainsEquil(i, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs, newContNeighs);
         }
 
-    newEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead) : 0.;
+    newEn += fEnergy[0][0][E_STIFF] ? Energy_Topo_Angle(angBead_new) : 0.;
 
     // Doing the Metropolis-Hastings thing
     MCProb      = (lLDub) rand() / (lLDub) RAND_MAX;
