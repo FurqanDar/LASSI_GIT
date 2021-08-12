@@ -324,7 +324,9 @@ int Parse_Keyfile(char* filename)
 
 /// Parse_EnergyFile - reads the energy file
 /// Have to painstakingly go through every different keyword that exists in the
-/// energy file. Reads all the matrices \param strEnFile \return
+/// energy file. Reads all the matrices
+/// \param strEnFile
+/// \return
 int Parse_EnergyFile(char* strEnFile)
 {
     int nRes = 0;
@@ -407,7 +409,7 @@ int Parse_EnergyFile(char* strEnFile)
                     // nBeadType numbers
                     nRow = 0;
                 } // The line did not contain a keyword. Either empty or has numbers.
-            else if (strcmp(strLine, "\r\n") != 0)
+            else if (strcmp(strLine, "\r\n") && strcmp(strLine, "\n"))
                 { // ignore empty lines
                     if (nFlag == -1)
                         { // sticker
