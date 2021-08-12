@@ -2328,67 +2328,53 @@ int Check_ChainDisp(const int chainID, const int* vec_disp)
 /// \param movR
 void OP_DispChain(int chainID, const int* movR)
 {
-    // Displaces current chain by movR and handles the lattice
-    // Also remembers where everything was moved and saves into old_bead
-
     int i, l;
-    int fB = chain_info[chainID][CHAIN_START];
-    int lB = fB + chain_info[chainID][CHAIN_LENGTH];
-    int tmpR[POS_MAX], tmpR2[POS_MAX];
+    const int fB = chain_info[chainID][CHAIN_START];
+    const int lB = fB + chain_info[chainID][CHAIN_LENGTH];
+    int r_pos0[POS_MAX], r_posNew[POS_MAX];
+
+    // Copy beads to old.
+    OP_CopyBeadsToOld(fB, lB);
+
     for (i = fB; i < lB; i++)
-        {
-            for (l = 0; l < BEADINFO_MAX; l++)
-                {
-                    old_bead[i][l] = bead_info[i][l];
-                    if (l < POS_MAX)
-                        {
-                            tmpR[l]         = old_bead[i][l]; // Where we were
-                            bead_info[i][l] = (tmpR[l] + movR[l] + nBoxSize[l]) % nBoxSize[l];
-                            tmpR2[l]        = bead_info[i][l]; // Where we are now
-                        }
-                }
-            naTotLattice[Lat_Ind_FromVec(tmpR)]  = -1; // Removing from old place
-            naTotLattice[Lat_Ind_FromVec(tmpR2)] = i;
-        }
+    {
+        LatPos_copy(r_pos0, bead_info[i]);
+        LatPos_add_wPBC(bead_info[i], r_pos0, movR);
+        LatPos_copy(r_posNew, bead_info[i]);
+
+        naTotLattice[Lat_Ind_FromVec(r_pos0)]  = -1; // Removing from old place
+        naTotLattice[Lat_Ind_FromVec(r_posNew)] = i;  // Adding to new place
+    }
 }
 
 /// OP_DispChain_ForTrans - displaced chainID by movR[POS_MAX], while
 /// remembering the chain in old_beads. Also handles the lattice placement.
 /// Move_Trans variant where I break all the physical bonds. \param chainID
 /// \param movR
-void OP_DispChain_ForTrans(int chainID, const int* movR)
+void OP_DispChain_ForTrans(const int chainID, const int* movR)
 {
     // Displaces current chain by movR and handles lattice
     // Specific for Move_Trans because it breaks old bonds!
     // Also remembers where everything was moved and saves into old_bead
 
     int i, l;
-    int fB = chain_info[chainID][CHAIN_START];
-    int lB = fB + chain_info[chainID][CHAIN_LENGTH];
-    int tmpR[POS_MAX], tmpR2[POS_MAX];
+    const int fB = chain_info[chainID][CHAIN_START];
+    const int lB = fB + chain_info[chainID][CHAIN_LENGTH];
+    int r_pos0[POS_MAX], r_posNew[POS_MAX];
+
+    // Copy beads to old.
+    OP_CopyBeadsToOld(fB, lB);
+
     for (i = fB; i < lB; i++)
-        {
-            for (l = 0; l < BEADINFO_MAX; l++)
-                {
-                    old_bead[i][l] = bead_info[i][l];
-                    if (l < POS_MAX)
-                        {
-                            tmpR[l]         = old_bead[i][l]; // Where we were
-                            bead_info[i][l] = (tmpR[l] + movR[l] + nBoxSize[l]) % nBoxSize[l];
-                            tmpR2[l]        = bead_info[i][l]; // Where we are now
-                        }
-                }
-            naTotLattice[Lat_Ind_FromVec(tmpR)]  = -1; // Removing from old place
-            naTotLattice[Lat_Ind_FromVec(tmpR2)] = i;  // Adding to new place
-        }
-    for (i = fB; i < lB; i++)
-        { // Delete bonds AFTER old_bead has remembered things
-            if (old_bead[i][BEAD_FACE] != -1)
-                {
-                    bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1; // Break old bond
-                    bead_info[i][BEAD_FACE]                       = -1; // Breaking this bond
-                }
-        }
+    {
+        LatPos_copy(r_pos0, bead_info[i]);
+        LatPos_add_wPBC(bead_info[i], r_pos0, movR);
+        LatPos_copy(r_posNew, bead_info[i]);
+
+        naTotLattice[Lat_Ind_FromVec(r_pos0)]  = -1; // Removing from old place
+        naTotLattice[Lat_Ind_FromVec(r_posNew)] = i;  // Adding to new place
+        OP_Beads_BreakBond(i);
+    }
 }
 
 /// OP_RestoreChain - uses old_bead to undo what OP_DispChain does.
