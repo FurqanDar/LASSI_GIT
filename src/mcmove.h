@@ -19,7 +19,7 @@ int Move_Clus_Network(float MyTemp);
 
 int Move_SmallClus_Network(int chainID, float MyTemp);
 
-int Move_DbPvt(int beadID);
+int Move_DbPvt(int beadID, float myTemp);
 
 int Move_CoLocal(int thisBeadID, float MyTemp);
 
@@ -158,5 +158,19 @@ void OP_Beads_BreakBond(const int beadID);
 void OP_Beads_RestoreBondsInList(const int listSize, const int* beadList);
 
 void OP_Beads_RestoreBond(const int beadID);
+
+void BeadListOP_GetChainIDs(const int beadNum, const int* beadList, int* chainList);
+
+void BeadListOP_GetChainTypes(const int beadNum, const int* beadList, int* chainList);
+
+int BeadListOP_Filter_wrt_SecondList(const int beadNum, int* beadList, const int* propList, const int prop_val);
+
+int BeadListOP_InvFilter_wrt_SecondList(const int beadNum, int* beadList, const int* propList, const int prop_val);
+
+void BeadListOP_GetIntraChainID(const int beadNum, const int* beadList, int* chainList);
+
+int BeadListOP_Filter_DbPvtLinkerConFwd(const int beadNum, int* beadList, const int thisBead);
+
+int BeadListOP_Filter_DbPvtLinkerConBck(const int beadNum, int* beadList, const int thisBead);
 
 #endif // _MCMOVE_H_

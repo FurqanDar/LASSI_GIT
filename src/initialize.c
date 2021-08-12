@@ -100,12 +100,6 @@ void Memory_Allocate_NeighborLists(void)
     strcpy(arr_name, "newContNeighs");
     newContNeighs = Create1DInt(num_of_points, arr_name);
 
-    strcpy(arr_name, "allDists");
-    allDists = Create1DFloat(num_of_points, arr_name);
-    strcpy(arr_name, "oldDists");
-    oldDists = Create1DFloat(num_of_points, arr_name);
-    strcpy(arr_name, "newDists");
-    newDists = Create1DFloat(num_of_points, arr_name);
 }
 
 void Memory_VerifyMalloc(void)
@@ -346,14 +340,6 @@ void Global_Array_Initialization_AtStart(void)
 
     nLimitedClusterSize = tot_chains > 15 ? 15 : tot_chains / 2;
 
-    Calculate_Distances_For_Radius(allDists, LARGEST_RADIUS);
-    Calculate_Distances_For_Radius(newDists, LARGEST_RADIUS);
-
-    //    for(i=0; i<LARGEST_RADIUS*LARGEST_RADIUS*LARGEST_RADIUS*8; i++){
-    //        printf("%2.2f ", allDists[i]);
-    //    }
-    //    printf("\n");
-    //    exit(1);
     printf("All setup has been completed!\n");
 }
 

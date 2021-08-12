@@ -338,7 +338,6 @@ inline float Energy_Iso_fSol(int const beadType)
 
 float Energy_Topo_Angle(int const beadID)
 {
-    //    return 0.f;
     const int frontBead = topo_info[beadID][1];
     if (frontBead == -1)
         {

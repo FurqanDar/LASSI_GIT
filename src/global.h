@@ -170,9 +170,6 @@ lInt* oldOvlpNeighs;
 lInt* newOvlpNeighs;
 lInt* oldContNeighs;
 lInt* newContNeighs;
-float* allDists;
-float* oldDists;
-float* newDists;
 
 // Radial Densities and PDFs
 lLDub* ld_TOTRDF_Arr;
