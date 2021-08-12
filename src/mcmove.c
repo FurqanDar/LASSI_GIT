@@ -599,7 +599,7 @@ int Move_Trans(int chainID, float MyTemp)
             BSum += MC_RosenbluthSampling_ForChains_AtOld(i, resi, &oldEn, old_ovlp_num);
         }
 
-    OP_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff.
+    OP_System_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff.
 
     if (nThermalization_Mode != -1)
         {
@@ -634,7 +634,7 @@ int Move_Trans(int chainID, float MyTemp)
         }
     else
         {
-            OP_RestoreChain_ForTrans(chainID);
+            OP_System_RestoreChain_ForTrans(chainID);
             bAccept = 0;
             return bAccept;
         }
@@ -694,7 +694,7 @@ int Move_Clus_Network(float MyTemp)
                 }
             for (i = 0; i < ClusSize; i++)
                 {
-                    OP_DispChain(naList[i], nTemp); // Moving the cluster properly
+                    OP_System_DispChain(naList[i], nTemp); // Moving the cluster properly
                 }
             for (i = 0; i < ClusSize; i++)
                 {
@@ -714,7 +714,7 @@ int Move_Clus_Network(float MyTemp)
                     bAccept = 0; // Reject the move so I have to restore cluster back
                     for (i = 0; i < ClusSize; i++)
                         {
-                            OP_RestoreChain(naList[i]); // Placing  the cluster back properly
+                            OP_System_RestoreChain(naList[i]); // Placing  the cluster back properly
                         }
                     // printf("End CLUS - Failed.\n");
                 }
@@ -782,7 +782,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
                 }
             for (i = 0; i < ClusSize; i++)
                 {
-                    OP_DispChain(naList[i], nTemp); // Moving the cluster properly
+                    OP_System_DispChain(naList[i], nTemp); // Moving the cluster properly
                 }
             for (i = 0; i < ClusSize; i++)
                 {
@@ -800,7 +800,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
                     bAccept = 0; // Reject the move so I have to restore cluster back
                     for (i = 0; i < ClusSize; i++)
                         {
-                            OP_RestoreChain(naList[i]); // Placing  the cluster back properly
+                            OP_System_RestoreChain(naList[i]); // Placing  the cluster back properly
                         }
                     // printf("End CLUS - Failed.\n");
                 }
@@ -1591,7 +1591,7 @@ int Move_SmallClus_Proximity(int chainID)
                 }
             for (i = 0; i < ClusSize; i++)
                 {
-                    OP_DispChain(naList[i], nTemp); // Moving the cluster properly
+                    OP_System_DispChain(naList[i], nTemp); // Moving the cluster properly
                     naClusList[i] = naList[i];
                 }
             // Recalculating cluster to see if we have the same cluster or not. If
@@ -1607,7 +1607,7 @@ int Move_SmallClus_Proximity(int chainID)
                     bAccept = 0; // Reject the move so I have to restore cluster back
                     for (i = 0; i < ClusSize; i++)
                         {
-                            OP_RestoreChain(naClusList[i]); // Placing  the cluster back properly
+                            OP_System_RestoreChain(naClusList[i]); // Placing  the cluster back properly
                         }
                     // printf("End pCLUS - Failed.\n");
                 }
@@ -1862,7 +1862,7 @@ int Move_Trans_Equil(int chainID, float MyTemp)
             Energy_Iso_ForChainsEquil(i, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs, oldContNeighs);
         }
 
-    OP_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff
+    OP_System_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff
 
     newEn = 0.;
     if (nThermalization_Mode != -1)
@@ -1888,7 +1888,7 @@ int Move_Trans_Equil(int chainID, float MyTemp)
         }
     else
         {
-            OP_RestoreChain_ForTrans(chainID);
+            OP_System_RestoreChain_ForTrans(chainID);
             bAccept = 0;
             return bAccept;
         }
@@ -2323,10 +2323,10 @@ int Check_ChainDisp(const int chainID, const int* vec_disp)
     return 1;
 }
 
-/// OP_DispChain - displaced chainID by movR[POS_MAX], while remembering the
+/// OP_System_DispChain - displaced chainID by movR[POS_MAX], while remembering the
 /// chain in old_beads. Also handles the lattice placement. \param chainID
 /// \param movR
-void OP_DispChain(int chainID, const int* movR)
+void OP_System_DispChain(int chainID, const int* movR)
 {
     int i, l;
     const int fB = chain_info[chainID][CHAIN_START];
@@ -2347,11 +2347,11 @@ void OP_DispChain(int chainID, const int* movR)
     }
 }
 
-/// OP_DispChain_ForTrans - displaced chainID by movR[POS_MAX], while
+/// OP_System_DispChain_ForTrans - displaced chainID by movR[POS_MAX], while
 /// remembering the chain in old_beads. Also handles the lattice placement.
 /// Move_Trans variant where I break all the physical bonds. \param chainID
 /// \param movR
-void OP_DispChain_ForTrans(const int chainID, const int* movR)
+void OP_System_DispChain_ForTrans(const int chainID, const int* movR)
 {
     // Displaces current chain by movR and handles lattice
     // Specific for Move_Trans because it breaks old bonds!
@@ -2377,28 +2377,32 @@ void OP_DispChain_ForTrans(const int chainID, const int* movR)
     }
 }
 
-/// OP_RestoreChain - uses old_bead to undo what OP_DispChain does.
+/// OP_System_RestoreChain - uses old_bead to undo what OP_System_DispChain does.
 /// \param chainID
-void OP_RestoreChain(int chainID)
-{ // Uses old_bead to undo what OP_DispChain does.
+void OP_System_RestoreChain(int chainID)
+{ // Uses old_bead to undo what OP_System_DispChain does.
     int i, l;
-    int fB = chain_info[chainID][CHAIN_START];
-    int lB = fB + chain_info[chainID][CHAIN_LENGTH];
-    int tmpR[POS_MAX], tmpR2[POS_MAX];
-    for (i = fB; i < lB; i++)
-        {
-            for (l = 0; l < BEADINFO_MAX; l++)
-                {
-                    if (l < POS_MAX)
-                        {
-                            tmpR[l]  = bead_info[i][l]; // Where we now are and must be removed from
-                            tmpR2[l] = old_bead[i][l];  // Where we were and will be moved back to
-                        }
-                    bead_info[i][l] = old_bead[i][l]; // Moving back
-                }
-            naTotLattice[Lat_Ind_FromVec(tmpR)]  = -1; // Removing from old place
-            naTotLattice[Lat_Ind_FromVec(tmpR2)] = i;
-        }
+    const int fB = chain_info[chainID][CHAIN_START];
+    const int lB = fB + chain_info[chainID][CHAIN_LENGTH];
+
+
+    // Removing from 'new' place.
+    for (i = fB; i < lB; ++i)
+    {
+        naTotLattice[Lat_Ind_OfBead(i)]  = -1;
+    }
+
+    // Remembering where we were.
+    for (i = fB; i < lB; ++i)
+    {
+        OP_CopyBead(bead_info[i], old_bead[i]);
+    }
+
+    // Placing back.
+    for (i = fB; i < lB; ++i)
+    {
+        naTotLattice[Lat_Ind_OfBead(i)]  = i;
+    }
 }
 
 /// OP_CopyBead: Copies BEADINFO_MAX elements of orig_arr into copy_arr
@@ -2435,46 +2439,45 @@ inline void OP_RestoreBeadsFromOld(const int firstB, const int lastB)
         }
 }
 
-/// OP_RestoreChain_ForTrans - translation variant to restore chainID.
+/// OP_System_RestoreChain_ForTrans - translation variant to restore chainID.
 /// \param chainID
-void OP_RestoreChain_ForTrans(int chainID)
-{ // Uses old_bead to undo what OP_DispChain_ForTrans does.
+void OP_System_RestoreChain_ForTrans(int chainID)
+{ // Uses old_bead to undo what OP_System_DispChain_ForTrans does.
     // Note that removing and placing separately makes sure that no incorrect
     // bonds are formed, or unformed.
     int i, l;
-    int fB = chain_info[chainID][CHAIN_START];
-    int lB = fB + chain_info[chainID][CHAIN_LENGTH];
-    int tmpR[POS_MAX], tmpR2[POS_MAX];
-    for (i = fB; i < lB; i++)
-        { // Let's remove from the new state
-            if (bead_info[i][BEAD_FACE] != -1)
-                { // Destroying the newly proposed bond
-                    bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = -1;
-                    bead_info[i][BEAD_FACE]                       = -1;
-                }
-            for (l = 0; l < POS_MAX; l++)
-                {
-                    tmpR[l]  = bead_info[i][l]; // Where we now are and must be removed from
-                    tmpR2[l] = old_bead[i][l];  // This is where we should be
-                }
-            naTotLattice[Lat_Ind_FromVec(tmpR)]  = -1; // Removing from old place
-            naTotLattice[Lat_Ind_FromVec(tmpR2)] = i;  // Removing from old place
-        }
-    for (i = fB; i < lB; i++)
+    const int fB = chain_info[chainID][CHAIN_START];
+    const int lB = fB + chain_info[chainID][CHAIN_LENGTH];
+
+    //Breaking all current bonds
+    for (i = fB; i < lB; ++i)
         {
-            for (l = 0; l < BEADINFO_MAX; l++)
-                {
-                    bead_info[i][l] = old_bead[i][l]; // Moving back
-                }
+            OP_Beads_BreakBond(i);
         }
-    for (i = fB; i < lB; i++)
+
+    // Removing from 'new' place.
+    for (i = fB; i < lB; ++i)
         {
-            if (old_bead[i][BEAD_FACE] != -1)
-                { // Restoring the old bond
-                    bead_info[i][BEAD_FACE]                       = old_bead[i][BEAD_FACE];
-                    bead_info[bead_info[i][BEAD_FACE]][BEAD_FACE] = i;
-                }
+            naTotLattice[Lat_Ind_OfBead(i)]  = -1;
         }
+
+    // Remembering where we were.
+    for (i = fB; i < lB; ++i)
+    {
+        OP_CopyBead(bead_info[i], old_bead[i]);
+    }
+
+    // Placing back.
+    for (i = fB; i < lB; ++i)
+    {
+        naTotLattice[Lat_Ind_OfBead(i)]  = i;
+    }
+
+    // Restoring older bonds.
+    for (i = fB; i < lB; ++i)
+    {
+        OP_Beads_RestoreBond(i);
+    }
 }
 
 /// OP_RestoreChain_ForSnake - restores the chain: beadID's betweem fB and lB-1,

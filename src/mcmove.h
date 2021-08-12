@@ -47,13 +47,13 @@ int Check_ChainDisp(const int chainID, const int* vec_disp);
 
 int Check_MoveBeadTo(const int* newPos);
 
-void OP_DispChain(int chainID, const int* movR);
+void OP_System_DispChain(int chainID, const int* movR);
 
-void OP_DispChain_ForTrans(int chainID, const int* movR);
+void OP_System_DispChain_ForTrans(int chainID, const int* movR);
 
-void OP_RestoreChain(int chainID);
+void OP_System_RestoreChain(int chainID);
 
-void OP_RestoreChain_ForTrans(int chainID);
+void OP_System_RestoreChain_ForTrans(int chainID);
 
 void OP_CopyBead(int* copy_arr, const int* orig_arr);
 
