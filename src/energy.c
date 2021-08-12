@@ -348,7 +348,7 @@ float Energy_Topo_Angle(int const beadID)
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
     const int r_posB[POS_MAX] = {bead_info[backBead][0], bead_info[backBead][1], bead_info[backBead][2]};
     const int r_posF[POS_MAX] = {bead_info[frontBead][0], bead_info[frontBead][1], bead_info[frontBead][2]};
-
+    const int resi = bead_info[beadID][BEAD_TYPE];
     int vec1[POS_MAX];
     int vec2[POS_MAX];
 
@@ -357,7 +357,7 @@ float Energy_Topo_Angle(int const beadID)
 
     const float dumCosTheta = (1.f - Vec3n_CosTheta(vec1, vec2));
 
-    return -fEnergy[0][0][E_STIFF] * dumCosTheta * dumCosTheta;
+    return -fEnergy[resi][resi][E_STIFF] * dumCosTheta * dumCosTheta;
 }
 
 /// Energy_OfOvlp_wNeighList: Given this bead, and a supplied list of neighbors

@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
     printf("Thermalizing system.\n");
     printf("---------------------\n\n");
     fEnergy[0][0][E_STIFF] = -5.0f;
-    fEnergy[1][1][E_STIFF] = -5.0f;
+    fEnergy[1][1][E_STIFF] = 5.0f;
     // Thermalizing the system.
     fCuTemp = fPreKT;
     Print_Data(-1, -1); // Initialization of files
