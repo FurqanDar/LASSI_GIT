@@ -823,7 +823,7 @@ int Move_DbPvt(const int beadID, const float myTemp)
 { // Performs a double-pivot move.
     /* Molecule MUST be LINEAR
   The move requires selecting a random bead, which is beadID. Then, we'll search
-  the lattice in +-2 sites around beadID. Let i be the position of beadID along
+  the lattice in +-min(l,3) sites around beadID. Let i be the position of beadID along
   it's chain. Let i' denote same position along another chain of the same type.
   We want dist(i,i'+1) < linker_len[i] && Dist_BeadToBead (i',i+1) <
   linker_len[i']. We'll count however many candidates there are and select one
@@ -883,7 +883,7 @@ int Move_DbPvt(const int beadID, const float myTemp)
             return bAccept;
         }
 
-    // For detailed balance, we need the reverse move. So we look at i'+1, and find suitable i candidates.
+    // For detailed balance, we need the reverse move. So we look at i', and find suitable i+1 candidates.
 
     const int nextBead_P         = candList[rand() % fwd_cand_num];
     const int thisBead_P         = nextBead_P - 1;
