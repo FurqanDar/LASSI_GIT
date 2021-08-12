@@ -49,7 +49,7 @@ int Check_MoveBeadTo(const int* newPos);
 
 void OP_DispChain(int chainID, const int* movR);
 
-void OP_DispChain_ForTrans(int chainID, const int* movR);
+void OP_DispChain_ForTrans(const int chainID, const int* movR);
 
 void OP_RestoreChain(int chainID);
 
