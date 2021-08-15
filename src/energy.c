@@ -336,6 +336,7 @@ inline float Energy_Iso_fSol(int const beadType)
     return fEnergy[beadType][beadType][E_F_SOL];
 }
 
+
 float Energy_Topo_Angle(int const beadID)
 {
     const int resi = bead_info[beadID][BEAD_TYPE];
@@ -1169,9 +1170,12 @@ void Energy_Total_System(void)
             faCurrEn[E_F_SOL] += (float) (26 - ovlp_num) * fEnergy[resi][resi][E_F_SOL];
         }
 
-    for (i = 0; i < tot_beads; i++)
+    if (bSystemHasTopo)
         {
-            faCurrEn[E_STIFF] += Energy_Topo_Angle(i);
+            for (i = 0; i < tot_beads; i++)
+                {
+                    faCurrEn[E_STIFF] += Energy_Topo_Angle(i);
+                }
         }
 
     // Taking care of double-counting energies.

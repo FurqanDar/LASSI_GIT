@@ -1165,6 +1165,28 @@ int Move_MultiLocal(int beadID, float MyTemp)
             BSum += MC_RosenbluthSampling_ForLists_AtOld(i, beadNum, beadsList, &oldEn, old_ovlp_num);
         }
 
+    int bondAngNum = 0;
+    int tmpAngList[MAX_BONDS + 1];
+    int bondAngList[(MAX_BONDS + 1) * (MAX_BONDS + 1)];
+    if (bSystemHasTopo)
+        {
+            bondAngNum = BeadList_AppendBeads(0, bondAngList, beadsList, beadNum);
+            for (i = 1; i < beadNum; i++)
+                {
+                    tmpBead    = beadsList[i];
+                    yTemp      = OP_GetTopoBonds(tmpBead, tmpAngList);
+                    bondAngNum = BeadList_AppendBeads(bondAngNum, bondAngList, tmpAngList, yTemp);
+                }
+            qsort(bondAngList, bondAngNum, sizeof(int), compare_int);
+            bondAngNum = BeadList_UniqueElements(bondAngNum, bondAngList);
+        }
+    else
+        {
+            bondAngNum = 0;
+        }
+
+    oldEn += bondAngNum ? Energy_Topo_Angle_ForList(bondAngNum, bondAngList) : 0.;
+
     OP_System_MoveBeadsInListToPos(beadNum, beadsList, beads_posNew);
     OP_Beads_BreakBondsInList(beadNum, beadsList);
 
@@ -1198,8 +1220,10 @@ int Move_MultiLocal(int beadID, float MyTemp)
                 }
         }
 
-    lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
-    lLDub MHAcc  = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub) MyTemp);
+    newEn += bondAngNum ? Energy_Topo_Angle_ForList(bondAngNum, bondAngList) : 0.;
+
+    const lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
+    const lLDub MHAcc  = OP_GenMHValue(FSum, BSum, oldEn - newEn, (lLDub) MyTemp);
 
     if (MCProb < MHAcc)
         { // Accept the move. Remember that the bonds were
@@ -1994,6 +2018,28 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp)
                                 oldOvlpNeighs, oldContNeighs);
         }
 
+    int bondAngNum = 0;
+    int tmpAngList[MAX_BONDS + 1];
+    int bondAngList[(MAX_BONDS + 1) * (MAX_BONDS + 1)];
+    if (bSystemHasTopo)
+    {
+        bondAngNum = BeadList_AppendBeads(0, bondAngList, beadsList, beadNum);
+        for (i = 1; i < beadNum; i++)
+        {
+            tmpBead    = beadsList[i];
+            yTemp      = OP_GetTopoBonds(tmpBead, tmpAngList);
+            bondAngNum = BeadList_AppendBeads(bondAngNum, bondAngList, tmpAngList, yTemp);
+        }
+        qsort(bondAngList, bondAngNum, sizeof(int), compare_int);
+        bondAngNum = BeadList_UniqueElements(bondAngNum, bondAngList);
+    }
+    else
+    {
+        bondAngNum = 0;
+    }
+
+    oldEn += bondAngNum ? Energy_Topo_Angle_ForList(bondAngNum, bondAngList) : 0.;
+
     OP_System_MoveBeadsInListToPos(beadNum, beadsList, beads_posNew);
 
     if (nThermalization_Mode != -1)
@@ -2010,6 +2056,8 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp)
             Energy_Iso_ForLists(i, beadNum, beadsList, beads_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num,
                                 newOvlpNeighs, newContNeighs);
         }
+
+    newEn += bondAngNum ? Energy_Topo_Angle_ForList(bondAngNum, bondAngList) : 0.;
 
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc  = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
