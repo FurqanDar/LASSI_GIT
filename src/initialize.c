@@ -6,7 +6,6 @@
 /// various global arrays.
 void Memory_Initialization_AtStart(void)
 {
-    int i, j;
     char arr_name[100];
 
     strcpy(arr_name, "naTotLattice");
@@ -76,7 +75,7 @@ void Memory_Initialization_AtStart(void)
             strcpy(arr_name, "nTotTrajArr");
             n_TOTTRAJ_ARR = Create1DInt(nTraj_FramesPerCycle * tot_beads * BEADINFO_MAX, arr_name);
         }
-    //    Memory_VerifyMalloc();
+
     printf("Successfully allocated memory! Arrays initialized.\n");
 }
 
@@ -262,13 +261,6 @@ void Global_Array_Initialization_AtStart(void)
 
     // Setting counters
     Reset_Counters();
-    //    fSysGyrRad = 0.f;
-    //    nTotGyrRadCounter = 0;
-    //    nRDFCounter = 0;
-    //    nRadDenCounter = 0;
-    //    nTotClusCounter = 0;
-    //    nLargestClusterRightNow = 0;
-    //    nTrajCurFrame = 0;
 
     // Checking which bead types interact rotationally and via overlap,
     // separately.
@@ -280,6 +272,7 @@ void Global_Array_Initialization_AtStart(void)
             nBeadTypeCanFSol[i]   = 0;
             nBeadTypeCanTInd[i]   = 0;
         }
+    bSystemHasTopo = 0;
 
     for (i = 0; i < MAX_AA; i++)
         {
@@ -305,14 +298,17 @@ void Global_Array_Initialization_AtStart(void)
                         { // Seeing if this beadType has solvation energy
                             nBeadTypeCanTInd[i] = 1;
                         }
+                    if (fEnergy[i][j][E_STIFF] != 0.0)
+                        { // If there are any stiffness energy
+                            bSystemHasTopo = 1;
+                        }
                 }
         }
     for (i = MV_NULL + 2; i < MAX_MV; i++)
         {
             fMCFreq[i] += fMCFreq[i - 1]; // Cumulative Frequencies
         }
-    //    printf("%d %d %d\n", tot_beads, tot_chains, tot_chain_types);
-    //    exit(1);
+
     for (i = 0; i < nTot_CycleNum; i++)
         {
             fKT_Cycle[i] = fKT + (float) i * fdelta_temp;

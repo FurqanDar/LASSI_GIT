@@ -324,10 +324,10 @@ int Move_Local(int beadID, float MyTemp)
                         oldContNeighs);
 
     int bondList[MAX_BONDS + 1];
-    const int bondNum = fEnergy[resi][resi][E_STIFF] ? OP_GetTopoBonds(beadID, bondList) : 0;
-    oldEn += bondNum ? Energy_Topo_Angle_ForList(bondNum, bondList) : 0.;
+    int bondNum = bSystemHasTopo ? OP_GetTopoBonds(beadID, bondList) : 0;
+    bondNum = BeadList_CanTopoAngle(bondNum, bondList);
 
-//    oldEn += Energy_Topo_Angle_ForLocal(tmpBead, bondList, bondNum);
+    oldEn += bondNum ? Energy_Topo_Angle_ForList(bondNum, bondList) : 0.;
 
     lLDub BWRos = MC_RosenbluthSampling_ForLocal_AtOld(beadID, resi, &oldEn, old_ovlp_num);
 
@@ -526,7 +526,7 @@ int Move_Snake(int chainID, float MyTemp)
                 }
         }
 
-    resi = bead_info[angBead_old][BEAD_TYPE];
+    resi = bead_info[angBead_new][BEAD_TYPE];
     newEn += fEnergy[resi][resi][E_STIFF] ? Energy_Topo_Angle(angBead_new) : 0.;
 
     // Doing the Metropolis-Hastings thing
@@ -1021,6 +1021,28 @@ int Move_CoLocal(int thisBeadID, float MyTemp)
     Energy_Iso_ForCoLocal(otherBeadID, thisBeadID, r_pos2, &oldEn, &newEn, &ovlp_num, &cont_num, oldOvlpNeighs,
                           oldContNeighs);
 
+
+    int bondList[2 * (MAX_BONDS + 1)];
+    int bond_tmpList[MAX_BONDS+1];
+    int bondNum, bond_tmpNum;
+
+    if (bSystemHasTopo)
+        {
+            bond_tmpNum = OP_GetTopoBonds(thisBeadID, bond_tmpList);
+            bondNum     = BeadList_AppendBeads(0, bondList, bond_tmpList, bond_tmpNum);
+            bond_tmpNum = OP_GetTopoBonds(otherBeadID, bond_tmpList);
+            bondNum     = BeadList_AppendBeads(bondNum, bondList, bond_tmpList, bond_tmpNum);
+            qsort(bondList, bondNum, sizeof (int), compare_int);
+            bondNum = BeadList_UniqueElements(bondNum, bondList);
+            bondNum = BeadList_CanTopoAngle(bondNum, bondList);
+        }
+    else
+        {
+            bondNum = 0;
+        }
+
+    oldEn += bondNum ? Energy_Topo_Angle_ForList(bondNum, bondList) : 0.;
+
     OP_System_MoveBeadTo(thisBeadID, r_posNew1);
     OP_System_MoveBeadTo(otherBeadID, r_posNew2);
 
@@ -1034,6 +1056,8 @@ int Move_CoLocal(int thisBeadID, float MyTemp)
                           oldContNeighs);
     Energy_Iso_ForCoLocal(otherBeadID, thisBeadID, r_posNew2, &newEn, &oldEn, &ovlp_num, &cont_num, oldOvlpNeighs,
                           oldContNeighs);
+
+    newEn += bondNum ? Energy_Topo_Angle_ForList(bondNum, bondList) : 0.;
 
     lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
     lLDub MHAcc  = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
@@ -1666,7 +1690,9 @@ int Move_Local_Equil(int beadID, float MyTemp)
                              oldContNeighs);
 
     int bondList[MAX_BONDS + 1];
-    const int bondNum = fEnergy[resi][resi][E_STIFF] ? OP_GetTopoBonds(beadID, bondList) : 0;
+    int bondNum = bSystemHasTopo ? OP_GetTopoBonds(beadID, bondList) : 0;
+    bondNum = BeadList_CanTopoAngle(bondNum, bondList);
+
     oldEn += bondNum ? Energy_Topo_Angle_ForList(bondNum, bondList) : 0.;
 
     OP_System_MoveBeadTo(beadID, r_posNew);
@@ -3547,6 +3573,77 @@ int BeadListOP_Filter_DbPvtLinkerConBck(const int beadNum, int* beadList, const 
             newSize++;
         }
     }
+
+    return newSize;
+}
+
+/// BeadList_UniqueElements: Overwrite the provided _sorted_ list of integers with only the unique elements, and
+/// return the size of the new array.
+/// The overwritten list is also sorted.
+/// The implementation only works on sorted lists.
+/// \param dum_list: Sorted list of beadID's (or integers)
+/// \return number of unique elements.
+int BeadList_UniqueElements(const int size, int* sorted_list)
+{
+    int* first  = sorted_list;
+    int* second = first;
+    int newSize = 1;
+    while (++second != (sorted_list + size))
+        {
+            if (*second != *first)
+                {
+                    *(++first) = *second;
+                    newSize++;
+                }
+        }
+    return newSize;
+}
+
+/// BeadList_AppendBeads
+/// Note that old_list should be at least as big as old_size + app_size. No bounds checking is done since
+/// this dumb implementation has no idea about the size of the array.
+/// \param old_size Number of elements in old_list.
+/// \param old_list
+/// \param app_list
+/// \param app_size Number of elements of app_list to be appended to old_list.
+/// \return old_size + app_size. Size of the new array.
+int BeadList_AppendBeads(const int old_size, int* old_list, const int* app_list, const int app_size)
+{
+    int i;
+    for (i = 0; i < app_size; i++)
+        {
+            old_list[i + old_size] = app_list[i];
+        }
+
+    return old_size+app_size;
+}
+
+/// compare_int: A simple function that is used in CSTDLIB qsort for integers.
+/// \param a
+/// \param b
+/// \return
+int compare_int(const void* a, const void* b){
+    return ( *(int*)a - *(int*)b  );
+}
+
+/// BeadList_CanTopoAngle: For a list of beadIDs, we only keep the ones that have TopoAngle energies.
+/// \param size
+/// \param beadList
+/// \return An overwritten list containing only beads that have a TopoAngle energy
+int BeadList_CanTopoAngle(const int size, int* beadList)
+{
+
+    int i, tmpBead, resi;
+    int newSize = 0;
+    for (i = 0; i < size; i++)
+        {
+            tmpBead = beadList[i];
+            resi    = bead_info[tmpBead][BEAD_TYPE];
+            if (fEnergy[resi][resi][E_STIFF])
+                {
+                    beadList[newSize++] = tmpBead;
+                }
+        }
 
     return newSize;
 }

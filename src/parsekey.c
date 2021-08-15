@@ -332,13 +332,13 @@ int Parse_EnergyFile(char* strEnFile)
     FILE* infile;
     infile = fopen(strEnFile, "r");
 
-    char strLine[100];
+    char strLine[250];
     int nFlag   = 0;
     char bOrder = 0;
-    char strKey[100];
+    char strKey[250];
     int nRow;
     float fTemp[MAX_AA] = {0.f};
-    int i, j, k;
+    int i, j;
     int nEntry = 0;
 
     while (fgets(strLine, sizeof(strLine), infile) != NULL)
@@ -382,6 +382,10 @@ int Parse_EnergyFile(char* strEnFile)
                             else if (strcmp(strKey, "T_IND_POT") == 0)
                                 {
                                     nFlag = 2 * (E_T_IND);
+                                }
+                            else if (strcmp(strKey, "STIFF_POT") == 0)
+                                {
+                                    nFlag = 2 * (E_STIFF);
                                 }
                             else if (strcmp(strKey, "LINKER_LENGTH") == 0)
                                 {

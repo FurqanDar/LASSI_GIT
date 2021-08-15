@@ -338,6 +338,7 @@ inline float Energy_Iso_fSol(int const beadType)
 
 float Energy_Topo_Angle(int const beadID)
 {
+    const int resi = bead_info[beadID][BEAD_TYPE];
     const int frontBead = topo_info[beadID][1];
     if (frontBead == -1)
         {
@@ -348,7 +349,6 @@ float Energy_Topo_Angle(int const beadID)
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
     const int r_posB[POS_MAX] = {bead_info[backBead][0], bead_info[backBead][1], bead_info[backBead][2]};
     const int r_posF[POS_MAX] = {bead_info[frontBead][0], bead_info[frontBead][1], bead_info[frontBead][2]};
-    const int resi = bead_info[beadID][BEAD_TYPE];
     int vec1[POS_MAX];
     int vec2[POS_MAX];
 

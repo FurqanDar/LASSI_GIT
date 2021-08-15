@@ -173,4 +173,12 @@ int BeadListOP_Filter_DbPvtLinkerConFwd(const int beadNum, int* beadList, const 
 
 int BeadListOP_Filter_DbPvtLinkerConBck(const int beadNum, int* beadList, const int thisBead);
 
+int BeadList_AppendBeads(const int old_size, int* old_list, const int* app_list, const int app_size);
+
+int BeadList_UniqueElements(const int size, int* sorted_list);
+
+int BeadList_CanTopoAngle(const int size, int* beadList);
+
+int compare_int(const void* a, const void* b);
+
 #endif // _MCMOVE_H_
