@@ -91,7 +91,6 @@ int main(int argc, char* argv[])
     printf("_____________________\n");
     printf("Thermalizing system.\n");
     printf("---------------------\n\n");
-    fEnergy[0][0][E_STIFF] = -2.0f;
     // Thermalizing the system.
     fCuTemp = fPreKT;
     Print_Data(-1, -1); // Initialization of files
@@ -113,7 +112,6 @@ int main(int argc, char* argv[])
     // Going through the MC cycles.
     for (run_cycle = 0; run_cycle < nTot_CycleNum; run_cycle++)
         {
-            fEnergy[0][0][E_STIFF] = ((float) run_cycle - 2.0f) * 1.0f;
             fKT                    = fKT_Cycle[run_cycle];
             Calculate_Rot_Bias(fKT);
             Print_Data(-1, run_cycle);

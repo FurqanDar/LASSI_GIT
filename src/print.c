@@ -146,6 +146,7 @@ void Print_LogToScreen(long nGen, int run_it)
     printf("Cont: %.2e| ", faCurrEn[E_CONT]);
     printf("Aniso: %.2e| ", faCurrEn[E_SC_SC]);
     printf("FSol: %.2e| ", faCurrEn[E_F_SOL]);
+    printf("Stiff: %.2e| ", faCurrEn[E_STIFF]);
     printf("\n");
 
     printf("Percolation Parameter Is: %.3f\n",
@@ -154,7 +155,7 @@ void Print_LogToScreen(long nGen, int run_it)
     printf("Acceptance Ratios:\n");
     for (i = 1; i < MAX_MV; i++)
         {
-            printf("%5.2f ",
+            printf("%-5.2f ",
                    100. * (float) MCAccepMat[1][i] / ((float) MCAccepMat[0][i] + 0.00001 + (float) MCAccepMat[1][i]));
         }
     printf("\n\n");
@@ -504,7 +505,7 @@ void Write_TopFile(char* filename)
     printf("Writing the topology file!\n");
     fprintf(fp, "LAMMPS Description\n");    // The file must start with this.
     fprintf(fp, "\n");                      // Empty line.
-    fprintf(fp, "%ld\tatoms\n", tot_beads); // Listing total number of atoms
+    fprintf(fp, "\t%ld\tatoms\n", tot_beads); // Listing total number of atoms
     numBonds = 0;
     for (i = 0; i < tot_beads; i++)
         {
@@ -517,32 +518,31 @@ void Write_TopFile(char* filename)
                 }
         }
 
-    fprintf(fp, "%d\tbonds\n", numBonds); // Listing number of bonds
-    fprintf(fp, "0\tangles\n");           // Systems don't have angle depenece yet
-    fprintf(fp, "0\tdihedrals\n");        // Systems don't have dihedrals  yet
-    fprintf(fp, "0\timpropers\n");        // Systems don't have imporopers yet
+    fprintf(fp, "\t%d\tbonds\n", numBonds); // Listing number of bonds
+    fprintf(fp, "\t0\tangles\n");           // Systems don't have angle depenece yet
+    fprintf(fp, "\t0\tdihedrals\n");        // Systems don't have dihedrals  yet
+    fprintf(fp, "\t0\timpropers\n");        // Systems don't have imporopers yet
     fprintf(fp, "\n");                    // Empty line.
-    fprintf(fp,
-            "6\tatom types\n");     // Just hard coded to have 6 sticker types for now
+    fprintf(fp, "%d\tatom types\n", nBeadTypes);     // This many bead-types
     fprintf(fp, "1\tbond types\n"); // System can have multiple bond-lengths
-    fprintf(fp,
-            "0\tangle types\n"); // Systems don't have any angular forces yet
+    fprintf(fp, "0\tangle types\n"); // Systems don't have any angular forces yet
     fprintf(fp, "\n");           // Empty line.
-    fprintf(fp, "0 %d xlo xhi\n", nBoxSize[0]);
-    fprintf(fp, "0 %d ylo yhi\n", nBoxSize[1]);
-    fprintf(fp, "0 %d zlo zhi\n", nBoxSize[2]);
+    fprintf(fp, " 0 %d xlo xhi\n", nBoxSize[0]);
+    fprintf(fp, " 0 %d ylo yhi\n", nBoxSize[1]);
+    fprintf(fp, " 0 %d zlo zhi\n", nBoxSize[2]);
     fprintf(fp, "\n");       // Empty line.
     fprintf(fp, "Masses\n"); // These don't really mean anything
     fprintf(fp, "\n");       // Empty line.
-    fprintf(fp,
-            "1\t1.0\n2\t1.0\n3\t1.0\n4\t1.0\n5\t1.0\n6\t1.0\n"); // Dummy masses for
-                                                                 // the 6 types.
+    for (i=0; i < nBeadTypes; i++){
+            fprintf(fp, "%d\t1.0\n", i);
+        }
+
     fprintf(fp, "\n");                                           // Empty line.
-    fprintf(fp, "Atoms\n");                                      // Signifying the beginning of atom coordinates.
+    fprintf(fp, "Atoms # bond\n");                                      // Signifying the beginning of atom coordinates.
     fprintf(fp, "\n");                                           // Empty line.
     for (i = 0; i < tot_beads; i++)
         {
-            fprintf(fp, "%d %d %d 0.0 %d %d %d\n", i, bead_info[i][BEAD_CHAINID], bead_info[i][BEAD_TYPE],
+            fprintf(fp, "%d %d %d %d %d %d\n", i, bead_info[i][BEAD_CHAINID], bead_info[i][BEAD_TYPE],
                     bead_info[i][POS_X], bead_info[i][POS_Y], bead_info[i][POS_Z]);
         }                   // Done with the coordinates
     fprintf(fp, "\n");      // Empty line.

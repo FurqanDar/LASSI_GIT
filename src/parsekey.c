@@ -324,9 +324,7 @@ int Parse_Keyfile(char* filename)
 
 /// Parse_EnergyFile - reads the energy file
 /// Have to painstakingly go through every different keyword that exists in the
-/// energy file. Reads all the matrices
-/// \param strEnFile
-/// \return
+/// energy file. Reads all the matrices \param strEnFile \return
 int Parse_EnergyFile(char* strEnFile)
 {
     int nRes = 0;
@@ -334,13 +332,13 @@ int Parse_EnergyFile(char* strEnFile)
     FILE* infile;
     infile = fopen(strEnFile, "r");
 
-    char strLine[100];
+    char strLine[250];
     int nFlag   = 0;
     char bOrder = 0;
-    char strKey[100];
+    char strKey[250];
     int nRow;
     float fTemp[MAX_AA] = {0.f};
-    int i, j, k;
+    int i, j;
     int nEntry = 0;
 
     while (fgets(strLine, sizeof(strLine), infile) != NULL)
@@ -384,6 +382,10 @@ int Parse_EnergyFile(char* strEnFile)
                             else if (strcmp(strKey, "T_IND_POT") == 0)
                                 {
                                     nFlag = 2 * (E_T_IND);
+                                }
+                            else if (strcmp(strKey, "STIFF_POT") == 0)
+                                {
+                                    nFlag = 2 * (E_STIFF);
                                 }
                             else if (strcmp(strKey, "LINKER_LENGTH") == 0)
                                 {
@@ -748,11 +750,10 @@ void Parse_StructureFile(char* filename)
 
 /// Parse_StructureFile_CalcBeadsAndChains - reads the structure-file filename,
 /// and records the total number of beads, chains, bead-types, and chain-types.
-/// \param filename: Full path of the file, or name of file if in the same
-/// directory. \param n_bead_num: Stores how many total beads are in the
-/// structure file. \param n_chain_num: Stores how many total chains are in the
-/// structure file. \param n_chain_types: Stores how many different chain-types
-/// are in the file.
+/// \param filename: Full path of the file, or name of file if in the same directory.
+/// \param n_bead_num: Stores how many total beads are in the structure file.
+/// \param n_chain_num: Stores how many total chains are in the structure file.
+/// \param n_chain_types: Stores how many different chain-types are in the file.
 void Parse_StructureFile_CalcBeadsAndChains(char* filename, size_t* n_bead_num, size_t* n_chain_num,
                                             size_t* n_chain_types)
 {

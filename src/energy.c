@@ -336,9 +336,10 @@ inline float Energy_Iso_fSol(int const beadType)
     return fEnergy[beadType][beadType][E_F_SOL];
 }
 
+
 float Energy_Topo_Angle(int const beadID)
 {
-    //    return 0.f;
+    const int resi = bead_info[beadID][BEAD_TYPE];
     const int frontBead = topo_info[beadID][1];
     if (frontBead == -1)
         {
@@ -349,14 +350,15 @@ float Energy_Topo_Angle(int const beadID)
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
     const int r_posB[POS_MAX] = {bead_info[backBead][0], bead_info[backBead][1], bead_info[backBead][2]};
     const int r_posF[POS_MAX] = {bead_info[frontBead][0], bead_info[frontBead][1], bead_info[frontBead][2]};
-
     int vec1[POS_MAX];
     int vec2[POS_MAX];
 
     BeadPos_sub_wPBC(vec1, r_pos0, r_posB);
     BeadPos_sub_wPBC(vec2, r_posF, r_pos0);
 
-    return fEnergy[0][0][E_STIFF] * (1.f + Vec3n_CosTheta(vec1, vec2));
+    const float dumCosTheta = (1.f - Vec3n_CosTheta(vec1, vec2));
+
+    return -fEnergy[resi][resi][E_STIFF] * dumCosTheta * dumCosTheta;
 }
 
 /// Energy_OfOvlp_wNeighList: Given this bead, and a supplied list of neighbors
@@ -1166,7 +1168,14 @@ void Energy_Total_System(void)
                 }
             faCurrEn[E_OVLP] += Energy_OfOvlp_wNeighList(i, oldOvlpNeighs, ovlp_num);
             faCurrEn[E_F_SOL] += (float) (26 - ovlp_num) * fEnergy[resi][resi][E_F_SOL];
-            //        faCurrEn[E_STIFF] += Energy_Topo_Angle(i);
+        }
+
+    if (bSystemHasTopo)
+        {
+            for (i = 0; i < tot_beads; i++)
+                {
+                    faCurrEn[E_STIFF] += Energy_Topo_Angle(i);
+                }
         }
 
     // Taking care of double-counting energies.
@@ -1516,4 +1525,16 @@ void Energy_Iso_ForRangeEquil(const int beadID, const int smallestBead, const in
             *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
             *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
         }
+}
+
+float Energy_Topo_Angle_ForList(const int bondNum, const int *bondList){
+    float totEn = 0.f;
+    int i, tmpBead;
+
+    for (i = 0; i < bondNum; ++i) {
+            tmpBead = bondList[i];
+            totEn+= Energy_Topo_Angle(tmpBead);
+        }
+
+    return totEn;
 }
