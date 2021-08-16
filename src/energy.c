@@ -336,10 +336,9 @@ inline float Energy_Iso_fSol(int const beadType)
     return fEnergy[beadType][beadType][E_F_SOL];
 }
 
-
 float Energy_Topo_Angle(int const beadID)
 {
-    const int resi = bead_info[beadID][BEAD_TYPE];
+    const int resi      = bead_info[beadID][BEAD_TYPE];
     const int frontBead = topo_info[beadID][1];
     if (frontBead == -1)
         {
@@ -1527,13 +1526,15 @@ void Energy_Iso_ForRangeEquil(const int beadID, const int smallestBead, const in
         }
 }
 
-float Energy_Topo_Angle_ForList(const int bondNum, const int *bondList){
+float Energy_Topo_Angle_ForList(const int bondNum, const int* bondList)
+{
     float totEn = 0.f;
     int i, tmpBead;
 
-    for (i = 0; i < bondNum; ++i) {
+    for (i = 0; i < bondNum; ++i)
+        {
             tmpBead = bondList[i];
-            totEn+= Energy_Topo_Angle(tmpBead);
+            totEn += Energy_Topo_Angle(tmpBead);
         }
 
     return totEn;

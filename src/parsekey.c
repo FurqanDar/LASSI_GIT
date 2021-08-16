@@ -44,7 +44,7 @@ int Parse_Keyfile(char* filename)
 
             if (strKeyword[0] == '#')
                 { // if the first character is #,
-                    // ignore the line
+                  // ignore the line
                 }
             else
                 {

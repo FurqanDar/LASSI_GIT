@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
     // Going through the MC cycles.
     for (run_cycle = 0; run_cycle < nTot_CycleNum; run_cycle++)
         {
-            fKT                    = fKT_Cycle[run_cycle];
+            fKT = fKT_Cycle[run_cycle];
             Calculate_Rot_Bias(fKT);
             Print_Data(-1, run_cycle);
             for (nGen = 0; nGen <= nMCStepsPerCycle; nGen++)

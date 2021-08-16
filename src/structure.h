@@ -92,5 +92,4 @@ float Vec3n_AngleBetweenVecs(const int* vec_1, const int* vec_2);
 
 float BeadPos_CosThetaOfBeads(const int bead1, const int bead2);
 
-
 #endif // _STRUCTURE_H_

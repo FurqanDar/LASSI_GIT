@@ -491,7 +491,6 @@ void Clus_Network_MolWise_LargestClusters(void)
     free(largestClus_of_type);
 }
 
-
 int Clus_Proximity_ChainCluster_ForTotal_IntOnly(int const chainID)
 {
     // Updates naList to have all proteins close to chainID
@@ -579,7 +578,6 @@ int Clus_Proximity_ChainCluster_ForTotal_IntOnly(int const chainID)
     return clusSize;
 }
 
-
 int Clus_Proximity_ChainCluster_ForTotal_All(int const chainID)
 {
     // Updates naList to have all proteins close to chainID
@@ -645,7 +643,6 @@ int Clus_Proximity_ChainCluster_ForTotal_All(int const chainID)
     return clusSize;
 }
 
-
 void Clus_Proximity_TotalAnalysis(void)
 {
     int curID, Cluster_length, currentLargest, i, j;
@@ -686,7 +683,6 @@ void Clus_Proximity_TotalAnalysis(void)
                 }
         }
 }
-
 
 int Clus_Proximity_SecondLargestCluster(void)
 {
@@ -762,7 +758,6 @@ int Clus_Proximity_SecondLargestCluster(void)
         }
     return naCluster[curID][0];
 }
-
 
 int Clus_Proximity_LimitedCluster_IntOnly(int const chainID)
 {
@@ -880,7 +875,6 @@ int Clus_Proximity_LimitedCluster_IntOnly(int const chainID)
     // printf("%d\n", list_it);
     return clusSize;
 }
-
 
 int Clus_Proximity_LimitedCluster_IntOnly_Check(int const chainID, int const* OldList)
 {
@@ -1009,7 +1003,6 @@ int Clus_Proximity_LimitedCluster_IntOnly_Check(int const chainID, int const* Ol
     return clusSize;
 }
 
-
 int Clus_Proximity_LimitedCluster_All(int const chainID)
 {
     // Updates naList to have all proteins bound to  chainID and it's cluster
@@ -1095,7 +1088,6 @@ int Clus_Proximity_LimitedCluster_All(int const chainID)
     // printf("%d\n", list_it);
     return clusSize;
 }
-
 
 int Clus_Proximity_LimitedCluster_All_Check(int const chainID, int const* OldList)
 {
@@ -1187,7 +1179,6 @@ int Clus_Proximity_LimitedCluster_All_Check(int const chainID, int const* OldLis
     return clusSize;
 }
 
-
 void Clus_Proximity_Distribution_Avg(void)
 {
     /*
@@ -1231,7 +1222,6 @@ void Clus_Proximity_Distribution_Avg(void)
     nTotClusCounter++;
     nLargestClusterRightNow += currentLargest;
 }
-
 
 void Clus_Proximity_Distribution_IntOnly_MolWise_Avg(void)
 {
@@ -1281,7 +1271,6 @@ void Clus_Proximity_Distribution_IntOnly_MolWise_Avg(void)
     nLargestClusterRightNow += currentLargest;
 }
 
-
 void Clus_Proximity_Distribution_All_MolWise_Avg(void)
 {
     /*
@@ -1329,7 +1318,6 @@ void Clus_Proximity_Distribution_All_MolWise_Avg(void)
     nTotClusCounter++;
     nLargestClusterRightNow += currentLargest;
 }
-
 
 void Clus_Proximity_IntOnly_MolWise_LargestClusters(void)
 {
@@ -1410,7 +1398,6 @@ void Clus_Proximity_IntOnly_MolWise_LargestClusters(void)
     free(largestClus_of_type);
 }
 
-
 void Clus_Proximity_All_MolWise_LargestClusters(void)
 {
     int curID, Cluster_length, i;
@@ -1490,7 +1477,6 @@ void Clus_Proximity_All_MolWise_LargestClusters(void)
     free(largestClus_of_type);
 }
 
-
 void Clus_Perform_Analysis(void)
 {
     // Just a function that picks the right analysis routine given the mode
@@ -1508,7 +1494,6 @@ void Clus_Perform_Analysis(void)
                 break;
         }
 }
-
 
 int Clus_Perform_ChainCluster_ForTotal(int const chainID)
 {
@@ -1612,7 +1597,6 @@ void Clus_Perform_MolWise_LargestClusters(void)
     free(clusID_of_type);
     free(largestClus_of_type);
 }
-
 
 void Clus_Find_LargestClusters(void)
 {

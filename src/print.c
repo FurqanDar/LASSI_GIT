@@ -503,8 +503,8 @@ void Write_TopFile(char* filename)
     int i, j, k;               // Loop iterators.
     int numBonds;              // Used to count total number of bonds!
     printf("Writing the topology file!\n");
-    fprintf(fp, "LAMMPS Description\n");    // The file must start with this.
-    fprintf(fp, "\n");                      // Empty line.
+    fprintf(fp, "LAMMPS Description\n");      // The file must start with this.
+    fprintf(fp, "\n");                        // Empty line.
     fprintf(fp, "\t%ld\tatoms\n", tot_beads); // Listing total number of atoms
     numBonds = 0;
     for (i = 0; i < tot_beads; i++)
@@ -518,28 +518,29 @@ void Write_TopFile(char* filename)
                 }
         }
 
-    fprintf(fp, "\t%d\tbonds\n", numBonds); // Listing number of bonds
-    fprintf(fp, "\t0\tangles\n");           // Systems don't have angle depenece yet
-    fprintf(fp, "\t0\tdihedrals\n");        // Systems don't have dihedrals  yet
-    fprintf(fp, "\t0\timpropers\n");        // Systems don't have imporopers yet
-    fprintf(fp, "\n");                    // Empty line.
-    fprintf(fp, "%d\tatom types\n", nBeadTypes);     // This many bead-types
-    fprintf(fp, "1\tbond types\n"); // System can have multiple bond-lengths
-    fprintf(fp, "0\tangle types\n"); // Systems don't have any angular forces yet
-    fprintf(fp, "\n");           // Empty line.
+    fprintf(fp, "\t%d\tbonds\n", numBonds);      // Listing number of bonds
+    fprintf(fp, "\t0\tangles\n");                // Systems don't have angle depenece yet
+    fprintf(fp, "\t0\tdihedrals\n");             // Systems don't have dihedrals  yet
+    fprintf(fp, "\t0\timpropers\n");             // Systems don't have imporopers yet
+    fprintf(fp, "\n");                           // Empty line.
+    fprintf(fp, "%d\tatom types\n", nBeadTypes); // This many bead-types
+    fprintf(fp, "1\tbond types\n");              // System can have multiple bond-lengths
+    fprintf(fp, "0\tangle types\n");             // Systems don't have any angular forces yet
+    fprintf(fp, "\n");                           // Empty line.
     fprintf(fp, " 0 %d xlo xhi\n", nBoxSize[0]);
     fprintf(fp, " 0 %d ylo yhi\n", nBoxSize[1]);
     fprintf(fp, " 0 %d zlo zhi\n", nBoxSize[2]);
     fprintf(fp, "\n");       // Empty line.
     fprintf(fp, "Masses\n"); // These don't really mean anything
     fprintf(fp, "\n");       // Empty line.
-    for (i=0; i < nBeadTypes; i++){
+    for (i = 0; i < nBeadTypes; i++)
+        {
             fprintf(fp, "%d\t1.0\n", i);
         }
 
-    fprintf(fp, "\n");                                           // Empty line.
-    fprintf(fp, "Atoms # bond\n");                                      // Signifying the beginning of atom coordinates.
-    fprintf(fp, "\n");                                           // Empty line.
+    fprintf(fp, "\n");             // Empty line.
+    fprintf(fp, "Atoms # bond\n"); // Signifying the beginning of atom coordinates.
+    fprintf(fp, "\n");             // Empty line.
     for (i = 0; i < tot_beads; i++)
         {
             fprintf(fp, "%d %d %d %d %d %d\n", i, bead_info[i][BEAD_CHAINID], bead_info[i][BEAD_TYPE],

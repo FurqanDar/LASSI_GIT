@@ -98,7 +98,6 @@ void Memory_Allocate_NeighborLists(void)
     oldContNeighs = Create1DInt(num_of_points, arr_name);
     strcpy(arr_name, "newContNeighs");
     newContNeighs = Create1DInt(num_of_points, arr_name);
-
 }
 
 void Memory_VerifyMalloc(void)

@@ -1473,4 +1473,3 @@ float BeadPos_CosThetaOfBeads(const int bead1, const int bead2)
 
     return Vec3n_CosTheta(r_pos1, r_pos2);
 }
-
