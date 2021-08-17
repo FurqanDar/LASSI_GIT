@@ -337,7 +337,7 @@ void Global_Array_Initialization_AtStart(void)
     ld_LogOfSmallestPossibleProb = logl((lLDub) 1. / (lLDub) RAND_MAX);
 
     nLimitedClusterSize = 15;
-    nLimitedClusterSize = tot_chains > nLargestClusterRightNow ? nLargestClusterRightNow : tot_chains / 2;
+    nLimitedClusterSize = tot_chains > nLimitedClusterSize ? nLimitedClusterSize : tot_chains / 2;
 
     printf("All setup has been completed!\n");
 }
