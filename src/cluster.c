@@ -1157,7 +1157,6 @@ int Clus_Proximity_LimitedCluster_All_Check(int const chainID, int const* OldLis
                                         }
                                     if (naList[clusSize - 1] != OldList[clusSize - 1])
                                         {
-                                            // printf("OOOOOOP %d\n", clusSize);
                                             return -1;
                                         }
                                     if (clusSize >= ClusterLimit)

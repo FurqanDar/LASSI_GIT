@@ -1783,7 +1783,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         {
             for (i = 0; i < ClusSize; i++)
                 {
-                    OP_System_RestoreChain(naList[i]); // Placing  the cluster back properly
+                    OP_System_RestoreChain(naClusList[i]); // Placing  the cluster back properly
                 }
             bAccept = 0;
             return bAccept;
@@ -1793,7 +1793,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = naList[j];
+                    thisChain = naClusList[j];
                     firstB    = chain_info[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -1807,7 +1807,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = naList[j];
+                    thisChain = naClusList[j];
                     firstB    = chain_info[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -1830,7 +1830,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         {
             for (i = 0; i < ClusSize; i++)
                 {
-                    OP_System_RestoreChain(naList[i]); // Placing  the cluster back properly
+                    OP_System_RestoreChain(naClusList[i]); // Placing  the cluster back properly
                 }
             bAccept = 0;
             return bAccept;
