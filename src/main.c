@@ -95,8 +95,7 @@ int main(int argc, char* argv[])
     fCuTemp = fPreKT;
     Print_Data(-1, -1); // Initialization of files
     for (nGen = 0; nGen < nMCPreSteps; nGen++)
-        { // Intentionally not performing any data acquisition in the
-          // thermalizing phase.
+        { // Intentionally not performing any data acquisition in the thermalization phase.
             nMCInfo = MC_Step_Equil(fCuTemp);
             //        printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
             Print_Data(nGen, -1);

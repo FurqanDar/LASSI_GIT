@@ -29,7 +29,7 @@ int Move_Pivot(int chainID, float MyTemp);
 
 int Move_BranchedRot(int chainID, float MyTemp);
 
-int Move_SmallClus_Proximity(int chainID);
+int Move_SmallClus_Proximity(const int chainID, const float myTemp);
 
 int Move_Local_Equil(int beadID, float MyTemp);
 

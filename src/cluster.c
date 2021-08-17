@@ -249,7 +249,7 @@ int Clus_Network_LimitedCluster(int const chainID)
     // The idea is to check every bead and see if there is a unique bonded
     // chain, and to add it to naList If Cluster becomes larger than 5, exit and
     // return -1
-    int ClusterLimit = 15;
+    const size_t ClusterLimit = nLimitedClusterSize;
     int i, j; // Loop iterators
     for (i = 0; i < ClusterLimit; i++)
         {
@@ -1010,7 +1010,7 @@ int Clus_Proximity_LimitedCluster_All(int const chainID)
     // chain, and to add it to naList If Cluster becomes larger than 15, exit
     // and return -1 If the number of chains is lower than 15, we use
     // tot_chains/2.
-    size_t ClusterLimit = nLimitedClusterSize;
+    const size_t ClusterLimit = nLimitedClusterSize;
     int i, j, k; // Loop iterators
     for (i = 0; i < ClusterLimit; i++)
         {
@@ -1025,8 +1025,7 @@ int Clus_Proximity_LimitedCluster_All(int const chainID)
     int fB, lB;                 // Indecies to track the first and last bead of chains.
     int chainPart;
     int tmpBead = 0;
-    int resi, resj; // Tracking the type of the bead to check if they are
-                    // interacting via E_OVLP
+
     int tmpR[POS_MAX]  = {0};
     int tmpR2[POS_MAX] = {0};
     int IsUnique       = 1; // Tracks if a chain is unique or not. 0 is non-unique,
@@ -1056,7 +1055,6 @@ int Clus_Proximity_LimitedCluster_All(int const chainID)
                             tmpBead = naTotLattice[tmpBead];
                             if (tmpBead != -1)
                                 {
-                                    resj      = bead_info[tmpBead][BEAD_TYPE];
                                     chainPart = bead_info[tmpBead][BEAD_CHAINID];
                                     // Checking if this chain is unique
                                     IsUnique = 1;
@@ -1159,7 +1157,6 @@ int Clus_Proximity_LimitedCluster_All_Check(int const chainID, int const* OldLis
                                         }
                                     if (naList[clusSize - 1] != OldList[clusSize - 1])
                                         {
-                                            // printf("OOOOOOP %d\n", clusSize);
                                             return -1;
                                         }
                                     if (clusSize >= ClusterLimit)
