@@ -97,6 +97,7 @@ char bReadConf;
 char bSystemHasTopo;
 char bSystemHasCont;
 char bSystemHasOvlp;
+char bSystemHasFSol;
 
 // energy matrices for stickers
 lInt nBeadTypes;

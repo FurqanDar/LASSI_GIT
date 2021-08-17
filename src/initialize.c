@@ -274,6 +274,7 @@ void Global_Array_Initialization_AtStart(void)
     bSystemHasTopo = 0;
     bSystemHasOvlp = 0;
     bSystemHasCont = 0;
+    bSystemHasFSol = 0;
     for (i = 0; i < MAX_AA; i++)
         {
             for (j = 0; j < MAX_AA; j++)
@@ -295,6 +296,7 @@ void Global_Array_Initialization_AtStart(void)
                     if (fEnergy[i][j][E_F_SOL] != 0.0)
                         { // Seeing if this beadType has solvation energy
                             nBeadTypeCanFSol[i] = 1;
+                            bSystemHasFSol=1;
                         }
                     if (fEnergy[i][j][E_T_IND] != 0.0)
                         { // Seeing if this beadType has solvation energy

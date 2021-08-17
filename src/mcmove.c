@@ -846,7 +846,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
                 }
         }
 
-    if (bSystemHasCont || bSystemHasOvlp)
+    if (bSystemHasCont || bSystemHasOvlp || bSystemHasFSol)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -880,7 +880,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
                 }
         }
 
-    if (bSystemHasCont || bSystemHasOvlp)
+    if (bSystemHasCont || bSystemHasOvlp || bSystemHasFSol)
         {
             for (j = 0; j < ClusSize; j++)
                 {
