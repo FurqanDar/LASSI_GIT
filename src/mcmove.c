@@ -709,7 +709,7 @@ int Move_Clus_Network(float MyTemp)
                 }
         }
 
-    if (bSystemHasCont || bSystemHasOvlp)
+    if (bSystemHasCont || bSystemHasOvlp || bSystemHasFSol)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -743,7 +743,7 @@ int Move_Clus_Network(float MyTemp)
                 }
         }
 
-    if (bSystemHasCont || bSystemHasOvlp)
+    if (bSystemHasCont || bSystemHasOvlp || bSystemHasFSol)
         {
             for (j = 0; j < ClusSize; j++)
                 {
