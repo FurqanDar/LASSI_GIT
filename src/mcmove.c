@@ -659,16 +659,16 @@ int Move_Clus_Network(float MyTemp)
 
     // Attempts to move the second largest cluster
 
-    int bAccept = 0;    // Used in MC steps, assume that move fails initially.
+    int bAccept = 0; // Used in MC steps, assume that move fails initially.
 
     const int ClusSize = Clus_Network_SecondLargestCluster(); // Finding the second largest cluster
 
     // Remember that naList[] contains the chainID's of the network chainID is part of from 0 to ClusSize-1.
     if (ClusSize < 1)
-    {
-        bAccept = 0;
-        return bAccept;
-    }
+        {
+            bAccept = 0;
+            return bAccept;
+        }
 
     int r_Disp[POS_MAX];
     int yTemp;
@@ -678,16 +678,16 @@ int Move_Clus_Network(float MyTemp)
 
     LatPos_gen_rand_wRad(r_Disp, nBoxSize[0] / 4);
     for (i = 0; i < ClusSize; i++)
-    {
-        // printf("%d\n", naList[i]);
-        yTemp = Check_ChainDisp(naList[i], r_Disp); // Checking for steric clash
-        if (yTemp == 0)
         {
-            bAccept = 0;
-            // printf("End CLUS - No space\n");
-            return bAccept;
+            // printf("%d\n", naList[i]);
+            yTemp = Check_ChainDisp(naList[i], r_Disp); // Checking for steric clash
+            if (yTemp == 0)
+                {
+                    bAccept = 0;
+                    // printf("End CLUS - No space\n");
+                    return bAccept;
+                }
         }
-    }
     // This means that there is no steric clash when the cluster is moved.
 
     int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
@@ -696,18 +696,18 @@ int Move_Clus_Network(float MyTemp)
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
     if (nThermalization_Mode != -1)
-    {
-        for (j = 0; j < ClusSize; j++)
         {
-            thisChain = naList[j];
-            firstB    = chain_info[thisChain][CHAIN_START];
-            lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
-            for (i = firstB; i < lastB; i++)
-            {
-                oldEn += Energy_InitPotential(i);
-            }
+            for (j = 0; j < ClusSize; j++)
+                {
+                    thisChain = naList[j];
+                    firstB    = chain_info[thisChain][CHAIN_START];
+                    lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
+                    for (i = firstB; i < lastB; i++)
+                        {
+                            oldEn += Energy_InitPotential(i);
+                        }
+                }
         }
-    }
 
     if (bSystemHasCont || bSystemHasOvlp)
         {
@@ -725,23 +725,23 @@ int Move_Clus_Network(float MyTemp)
         }
 
     for (j = 0; j < ClusSize; j++)
-    {
-        OP_System_DispChain(naList[j], r_Disp); // Moving the cluster properly
-    }
+        {
+            OP_System_DispChain(naList[j], r_Disp); // Moving the cluster properly
+        }
 
     if (nThermalization_Mode != -1)
-    {
-        for (j = 0; j < ClusSize; j++)
         {
-            thisChain = naList[j];
-            firstB    = chain_info[thisChain][CHAIN_START];
-            lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
-            for (i = firstB; i < lastB; i++)
-            {
-                newEn += Energy_InitPotential(i);
-            }
+            for (j = 0; j < ClusSize; j++)
+                {
+                    thisChain = naList[j];
+                    firstB    = chain_info[thisChain][CHAIN_START];
+                    lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
+                    for (i = firstB; i < lastB; i++)
+                        {
+                            newEn += Energy_InitPotential(i);
+                        }
+                }
         }
-    }
 
     if (bSystemHasCont || bSystemHasOvlp)
         {
@@ -758,24 +758,24 @@ int Move_Clus_Network(float MyTemp)
                 }
         }
 
-    const lLDub MCProb      = (lLDub) rand() / (lLDub) RAND_MAX;
-    const lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
+    const lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
+    const lLDub MHAcc  = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
     if (MCProb < MHAcc)
-    {                // Accept this state
-        bAccept = 1; // Accept the move
-        return bAccept;
-        // printf("End CLUS - Yes\n");
-    }
-    else
-    {
-        for (i = 0; i < ClusSize; i++)
-        {
-            OP_System_RestoreChain(naList[i]); // Placing  the cluster back properly
+        {                // Accept this state
+            bAccept = 1; // Accept the move
+            return bAccept;
+            // printf("End CLUS - Yes\n");
         }
-        bAccept = 0;
-        return bAccept;
-        // printf("End CLUS - Failed.\n");
-    }
+    else
+        {
+            for (i = 0; i < ClusSize; i++)
+                {
+                    OP_System_RestoreChain(naList[i]); // Placing  the cluster back properly
+                }
+            bAccept = 0;
+            return bAccept;
+            // printf("End CLUS - Failed.\n");
+        }
 }
 
 /// Move_SmallClus - translates this cluster only if it is smaller than 5 total
@@ -796,7 +796,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
     // Performs a cluster move where a given chain and it's cluster are moved.
     // No new 'bonds' are made so the move is reversible....
 
-    int bAccept = 0;    // Used in MC steps, assume that move fails initially.
+    int bAccept = 0; // Used in MC steps, assume that move fails initially.
 
     const int ClusSize = Clus_Network_LimitedCluster(chainID); // Looking at everything that is connected to chainID
 
@@ -894,8 +894,8 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
                         }
                 }
         }
-    const lLDub MCProb      = (lLDub) rand() / (lLDub) RAND_MAX;
-    const lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
+    const lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
+    const lLDub MHAcc  = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) MyTemp);
     if (MCProb < MHAcc)
         {                // Accept this state
             bAccept = 1; // Accept the move
@@ -1704,10 +1704,10 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
     // Performs a cluster move where a given chain and it's cluster are moved.
     // No new 'bonds' are made so the move is reversible....
 
-    int bAccept = 0;    // Used in MC steps, assume that move fails initially.
+    int bAccept        = 0; // Used in MC steps, assume that move fails initially.
     int naClusList[15] = {0};
-    // printf("Beginning CLUS\n");
-    const int ClusSize = Clus_Proximity_LimitedCluster_All(chainID); // Looking at everything that is connected to chainID
+    const int ClusSize =
+        Clus_Proximity_LimitedCluster_All(chainID); // Looking at everything that is connected to chainID
     // Remember that naList[] contains the chainID's of the network chainID is
     // part of from 0 - ClusSize-1.
     if (ClusSize < 2)
@@ -1733,41 +1733,42 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         }
     // No  clash
 
-
     int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
     int thisChain, firstB, lastB;
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
     if (nThermalization_Mode != -1)
-    {
-        for (j = 0; j < ClusSize; j++)
         {
-            thisChain = naList[j];
-            firstB    = chain_info[thisChain][CHAIN_START];
-            lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
-            for (i = firstB; i < lastB; i++)
-            {
-                oldEn += Energy_InitPotential(i);
-            }
+            for (j = 0; j < ClusSize; j++)
+                {
+                    thisChain = naList[j];
+                    firstB    = chain_info[thisChain][CHAIN_START];
+                    lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
+                    for (i = firstB; i < lastB; i++)
+                        {
+                            oldEn += Energy_InitPotential(i);
+                        }
+                }
         }
-    }
 
+    // If no CONT interactions, then just checking the cluster is enough. If we have a different cluster, we immediately
+    // reject. Therefore, the clusters are moved as rigid bodies and will have the same OVLP energies before and after.
+    // If we have CONT interactions, we could have different energies. Therefore, we should calculate the energies.
     if (bSystemHasCont)
-    {
-        for (j = 0; j < ClusSize; j++)
         {
-            thisChain = naList[j];
-            firstB    = chain_info[thisChain][CHAIN_START];
-            lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
-            for (i = firstB; i < lastB; i++)
-            {
-                Energy_Iso_ForChains(i, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs,
-                                     oldContNeighs);
-            }
+            for (j = 0; j < ClusSize; j++)
+                {
+                    thisChain = naList[j];
+                    firstB    = chain_info[thisChain][CHAIN_START];
+                    lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
+                    for (i = firstB; i < lastB; i++)
+                        {
+                            Energy_Iso_ForChains(i, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs,
+                                                 oldContNeighs);
+                        }
+                }
         }
-    }
-
 
     for (i = 0; i < ClusSize; i++)
         {
@@ -1789,53 +1790,52 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         }
 
     if (nThermalization_Mode != -1)
-    {
-        for (j = 0; j < ClusSize; j++)
         {
-            thisChain = naList[j];
-            firstB    = chain_info[thisChain][CHAIN_START];
-            lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
-            for (i = firstB; i < lastB; i++)
-            {
-                newEn += Energy_InitPotential(i);
-            }
+            for (j = 0; j < ClusSize; j++)
+                {
+                    thisChain = naList[j];
+                    firstB    = chain_info[thisChain][CHAIN_START];
+                    lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
+                    for (i = firstB; i < lastB; i++)
+                        {
+                            newEn += Energy_InitPotential(i);
+                        }
+                }
         }
-    }
 
     if (bSystemHasCont)
-    {
-        for (j = 0; j < ClusSize; j++)
         {
-            thisChain = naList[j];
-            firstB    = chain_info[thisChain][CHAIN_START];
-            lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
-            for (i = firstB; i < lastB; i++)
-            {
-                Energy_Iso_ForChains(i, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs,
-                                     newContNeighs);
-            }
+            for (j = 0; j < ClusSize; j++)
+                {
+                    thisChain = naList[j];
+                    firstB    = chain_info[thisChain][CHAIN_START];
+                    lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
+                    for (i = firstB; i < lastB; i++)
+                        {
+                            Energy_Iso_ForChains(i, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs,
+                                                 newContNeighs);
+                        }
+                }
         }
-    }
 
-    const lLDub MCProb      = (lLDub) rand() / (lLDub) RAND_MAX;
-    const lLDub MHAcc = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) myTemp);
+    const lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
+    const lLDub MHAcc  = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) myTemp);
     if (MCProb < MHAcc)
-    {                // Accept this state
-        bAccept = 1; // Accept the move
-        return bAccept;
-        // printf("End CLUS - Yes\n");
-    }
-    else
-    {
-        for (i = 0; i < ClusSize; i++)
-        {
-            OP_System_RestoreChain(naList[i]); // Placing  the cluster back properly
+        {                // Accept this state
+            bAccept = 1; // Accept the move
+            return bAccept;
+            // printf("End CLUS - Yes\n");
         }
-        bAccept = 0;
-        return bAccept;
-        // printf("End CLUS - Failed.\n");
-    }
-
+    else
+        {
+            for (i = 0; i < ClusSize; i++)
+                {
+                    OP_System_RestoreChain(naList[i]); // Placing  the cluster back properly
+                }
+            bAccept = 0;
+            return bAccept;
+            // printf("End CLUS - Failed.\n");
+        }
 }
 
 // All the _Equil variants of the moves are spatially the same as their non

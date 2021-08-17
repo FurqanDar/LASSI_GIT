@@ -1493,7 +1493,6 @@ void Clus_Perform_Analysis(void)
         }
 }
 
-
 int Clus_Perform_ChainCluster_ForTotal(int const chainID)
 {
     int clus_size;
