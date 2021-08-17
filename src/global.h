@@ -95,6 +95,8 @@ lInt LocalArr[MAX_ROTSTATES - 1][3]; // Used to quickly iterate over nearby poin
 lInt Rot_IndArr[MAX_ROTSTATES - 1];
 char bReadConf;
 char bSystemHasTopo;
+char bSystemHasCont;
+char bSystemHasOvlp;
 
 // energy matrices for stickers
 lInt nBeadTypes;

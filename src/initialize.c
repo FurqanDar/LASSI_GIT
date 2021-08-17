@@ -272,7 +272,8 @@ void Global_Array_Initialization_AtStart(void)
             nBeadTypeCanTInd[i]   = 0;
         }
     bSystemHasTopo = 0;
-
+    bSystemHasOvlp = 0;
+    bSystemHasCont = 0;
     for (i = 0; i < MAX_AA; i++)
         {
             for (j = 0; j < MAX_AA; j++)
@@ -284,10 +285,12 @@ void Global_Array_Initialization_AtStart(void)
                     if (fEnergy[i][j][E_OVLP] != 0.0)
                         { // Seeing if this beadType interacts via overlap
                             nBeadTypeCanOvlp[i] = 1;
+                            bSystemHasOvlp      = 1;
                         }
                     if (fEnergy[i][j][E_CONT] != 0.0)
                         { // Seeing if this beadType interacts via contact
                             nBeadTypeCanCont[i] = 1;
+                            bSystemHasCont      = 1;
                         }
                     if (fEnergy[i][j][E_F_SOL] != 0.0)
                         { // Seeing if this beadType has solvation energy
@@ -333,7 +336,10 @@ void Global_Array_Initialization_AtStart(void)
     // fSquishRad =  fSquishRad*fSquishRad/4.;
     ld_LogOfSmallestPossibleProb = logl((lLDub) 1. / (lLDub) RAND_MAX);
 
-    nLimitedClusterSize = tot_chains > 15 ? 15 : tot_chains / 2;
+    nLimitedClusterSize = 15;
+    nLimitedClusterSize = tot_chains > nLargestClusterRightNow ?
+                              nLargestClusterRightNow :
+                              tot_chains / 2;
 
     printf("All setup has been completed!\n");
 }
