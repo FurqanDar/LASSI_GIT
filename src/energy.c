@@ -467,14 +467,14 @@ float Energy_OfOvlp_wNeighList_ForChains(int const beadID, const int* neighList,
     const int resi    = bead_info[beadID][BEAD_TYPE];
     const int chain_i = bead_info[beadID][BEAD_CHAINID];
     int resj, chain_j, tmpID;
-    float xDis;
+    const float xDis = 1.f;
 
     for (i = 0; i < neighNum; i++)
         {
             tmpID   = neighList[i];
             resj    = bead_info[tmpID][BEAD_TYPE];
             chain_j = bead_info[tmpID][BEAD_CHAINID];
-            xDis    = Dist_BeadToBead(beadID, tmpID);
+//            xDis    = Dist_BeadToBead(beadID, tmpID);
             if (chain_i == chain_j)
                 {
                     totEn += Energy_Iso_Ovlp(resi, resj, xDis) * 0.5f;
@@ -537,13 +537,13 @@ float Energy_OfOvlp_wNeighList_ForRange(int const beadID, const int loBead, cons
     int i;
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj, tmpID;
-    float xDis;
+    const float xDis = 1.f;
 
     for (i = 0; i < neighNum; i++)
         {
             tmpID = neighList[i];
             resj  = bead_info[tmpID][BEAD_TYPE];
-            xDis  = Dist_BeadToBead(beadID, tmpID);
+//            xDis  = Dist_BeadToBead(beadID, tmpID);
             if ((i >= loBead) && (i <= hiBead))
                 {
                     totEn += Energy_Iso_Ovlp(resi, resj, xDis) * 0.5f;
@@ -602,13 +602,13 @@ float Energy_OfOvlp_wNeighList_ForLists(const int beadID, const int listSize, co
     int i;
     const int resi = bead_info[beadID][BEAD_TYPE];
     int resj, tmpID;
-    float xDis;
+    const float xDis = 1.f;
 
     for (i = 0; i < neighNum; i++)
         {
             tmpID = neighList[i];
             resj  = bead_info[tmpID][BEAD_TYPE];
-            xDis  = Dist_BeadToBead(beadID, tmpID);
+//            xDis  = Dist_BeadToBead(beadID, tmpID);
             if (Check_BeadID_InList(tmpID, listSize, beadList))
                 {
                     totEn += Energy_Iso_Ovlp(resi, resj, xDis) * 0.5f;
