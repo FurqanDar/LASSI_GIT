@@ -1141,7 +1141,6 @@ int NeighborSearch_ForOvlp(int const beadID, const int* startVec, int* neighList
                     for (r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++)
                         {
                             LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_Z);
-                            //                LatPos_add_wPBC(r_chck, startVec, r_disp);
                             tmpBead = naTotLattice[Lat_Ind_FromVec(r_chck)];
                             if (tmpBead != -1 && tmpBead != beadID)
                                 {
