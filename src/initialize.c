@@ -73,7 +73,7 @@ void Memory_Initialization_AtStart(void)
             printf("\n***********************************************\n");
 
             strcpy(arr_name, "nTotTrajArr");
-            n_TOTTRAJ_ARR = Create1DInt(nTraj_FramesPerCycle * tot_beads * BEADINFO_MAX, arr_name);
+            n_TOTTRAJ_Arr = Create1DInt(nTraj_FramesPerCycle * tot_beads * BEADINFO_MAX, arr_name);
         }
 
     printf("Successfully allocated memory! Arrays initialized.\n");
@@ -142,9 +142,9 @@ void Memory_VerifyMalloc(void)
             printf("ld_TOTMOLCLUS_Arr malloc failed\n");
             exit(1);
         }
-    if (n_TOTTRAJ_ARR == NULL && nTrajMode != 0)
+    if (n_TOTTRAJ_Arr == NULL && nTrajMode != 0)
         {
-            printf("n_TOTTRAJ_ARR malloc failed\n");
+            printf("n_TOTTRAJ_Arr malloc failed\n");
             exit(1);
         }
 }

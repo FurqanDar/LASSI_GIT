@@ -109,23 +109,17 @@ lInt rot_trial[MAX_VALENCY][MAX_ROTSTATES]; // Used in orientational-bias MC mov
 lLDub bolt_fac[MAX_ROTSTATES - 1];          // Used in orientational-bias
 lLDub bolt_norm[MAX_VALENCY];
 lLDub dbias_bolt_fac[MAX_AA][MAX_AA]; // For pre-calculating the factors.
-lLDub ld_LogOfSmallestPossibleProb;   // Smallest probability possible
-                                      // logl(1/RAND_MAX)
+lLDub ld_LogOfSmallestPossibleProb;   // Smallest probability possible logl(1/RAND_MAX)
+
 float faCurrEn[MAX_E];                // Vector for current energy
 
 // Arrays to track certain topology and interaction information
-lInt nBeadTypeIsSticker[MAX_AA];         // Used to track if that beadType interacts via
-                                         // rotations.
-lInt nChainTypeIsLinear[MAX_CHAINTYPES]; // Used to track if this chainType is
-                                         // linear.
-lInt nBeadTypeCanOvlp[MAX_AA];           // Used to track if a certain beadType has an
-                                         // overlap cost.
-lInt nBeadTypeCanCont[MAX_AA];           // Used to track if a certain beadType has
-                                         // contact interactions
-lInt nBeadTypeCanFSol[MAX_AA];           // Used to track if a certain beadType has
-                                         // solvation energies
-lInt nBeadTypeCanTInd[MAX_AA];           // Used to track if a certain beadType has
-                                         // temperature independent solvation
+lInt nBeadTypeIsSticker[MAX_AA];         // Used to track if that beadType interacts via rotations.
+lInt nChainTypeIsLinear[MAX_CHAINTYPES]; // Used to track if this chainType is linear.
+lInt nBeadTypeCanOvlp[MAX_AA];           // Used to track if a certain beadType has an overlap cost.
+lInt nBeadTypeCanCont[MAX_AA];           // Used to track if a certain beadType has contact interactions
+lInt nBeadTypeCanFSol[MAX_AA];           // Used to track if a certain beadType has solvation energies
+lInt nBeadTypeCanTInd[MAX_AA];           // Used to track if a certain beadType has temperature independent solvation
 
 float fLinkerLength;
 float fLinkerSprCon;
@@ -151,8 +145,7 @@ char strRestartFile[512];
 lLong nReport[MAX_REPORT]; // Array to store report frequencies.
 lLong nTrajMode;
 // Matrix to store acceptances and rejections 0: Rejected; 1: Accepted
-// TODO: Have a more extensive way to record also where/when a particular move
-// fails -- not just if it fails.
+// TODO: Have a more extensive way to record also where/when a particular move fails -- not just if it fails.
 lLong naMCAccepMat[2][MAX_MV];
 
 // Cluster analysis
@@ -181,8 +174,7 @@ lLDub* ld_TOTRadDen_Arr;
 lLDub* ldRDF_Arr;
 lLDub* ldRadDen_Arr;
 lInt nRDF_TotComps;
-lInt nRDFCounter; // This counts how many times the RDF has been calculated for
-                  // averaging at the end.
+lInt nRDFCounter; // This counts how many times the RDF has been calculated for averaging at the end.
 lInt nRDF_TotBins;
 lInt nRadDen_TotComps;
 lInt nRadDen_CompShift;
@@ -195,7 +187,7 @@ lLDub** ld_TOTRg_Arr;
 lInt nTotGyrRadCounter; // Counter for total averaging
 
 // Trajectory Saving
-lInt* n_TOTTRAJ_ARR;
+lInt* n_TOTTRAJ_Arr;
 lLong nTraj_FramesPerCycle;
 lInt nTrajCurFrame;
 

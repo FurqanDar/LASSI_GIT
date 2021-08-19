@@ -309,7 +309,7 @@ void Save_Trajectory(const long nGen, const long curFrame)
             for (j = 0; j < BEADINFO_MAX; j++)
                 {
                     ar_idx                = TrajArr_Index(i, curFrame, j);
-                    n_TOTTRAJ_ARR[ar_idx] = bead_info[i][j];
+                    n_TOTTRAJ_Arr[ar_idx] = bead_info[i][j];
                 }
         }
 }
@@ -354,17 +354,17 @@ void Write_Saved_Trajectory(char* filename, const int run_it)
                 {
                     fprintf(fp, "%d", j);
                     ar_idx = TrajArr_Index(j, i, BEAD_TYPE);
-                    fprintf(fp, " %d", n_TOTTRAJ_ARR[ar_idx]);
+                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
                     ar_idx = TrajArr_Index(j, i, BEAD_CHAINID);
-                    fprintf(fp, " %d", n_TOTTRAJ_ARR[ar_idx]);
+                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
                     ar_idx = TrajArr_Index(j, i, POS_X);
-                    fprintf(fp, " %d", n_TOTTRAJ_ARR[ar_idx]);
+                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
                     ar_idx = TrajArr_Index(j, i, POS_Y);
-                    fprintf(fp, " %d", n_TOTTRAJ_ARR[ar_idx]);
+                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
                     ar_idx = TrajArr_Index(j, i, POS_Z);
-                    fprintf(fp, " %d", n_TOTTRAJ_ARR[ar_idx]);
+                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
                     ar_idx = TrajArr_Index(j, i, BEAD_FACE);
-                    fprintf(fp, " %d", n_TOTTRAJ_ARR[ar_idx]);
+                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
                     fprintf(fp, "\n");
                 }
         }
