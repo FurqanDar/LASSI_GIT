@@ -149,6 +149,126 @@ void Memory_VerifyMalloc(void)
         }
 }
 
+void Check_BeadTypewiseInteractions(void)
+{
+    int i, j;
+    for (i = 0; i < MAX_AA; i++)
+    {
+        nBeadTypeIsSticker[i] = 0; // Assume beads don't rotationally interact.
+        nBeadTypeCanOvlp[i]   = 0; // Assume beads don't have an overlap cost
+        nBeadTypeCanCont[i]   = 0; // Assume beads don't have contact costs.
+        nBeadTypeCanFSol[i]   = 0; // Assume beads have no stiffness
+        nBeadTypeCanTInd[i]   = 0; // Assume beads have no Temperature independent interactions
+    }
+    //Assume system has no interactions
+    bSystemHasSCSC = 0;
+    bSystemHasOvlp = 0;
+    bSystemHasCont = 0;
+    bSystemHasFSol = 0;
+    bSystemHasTopo = 0;
+
+    // SC-SC Check
+    for (i = 0; i < nBeadTypes; i++)
+        {
+            for (j = i; j < nBeadTypes; j++)
+                {
+                    if (fEnergy[i][j][E_SC_SC])
+                        {
+                            nBeadTypeIsSticker[i] = 1;
+                        }
+                }
+        }
+    for (i = 0; i < nBeadTypes; i++)
+        {
+            if (nBeadTypeIsSticker[i])
+                {
+                    bSystemHasSCSC = 1;
+                }
+        }
+
+    // OVLP Check
+    for (i = 0; i < nBeadTypes; i++)
+        {
+            for (j = i; j < nBeadTypes; j++)
+                {
+                    if (fEnergy[i][j][E_OVLP])
+                        {
+                            nBeadTypeCanOvlp[i] = 1;
+                        }
+                }
+        }
+    for (i = 0; i < nBeadTypes; i++)
+        {
+            if (nBeadTypeCanOvlp[i])
+                {
+                    bSystemHasOvlp = 1;
+                }
+        }
+
+    // CONT Check
+    for (i = 0; i < nBeadTypes; i++)
+    {
+        for (j = i; j < nBeadTypes; j++)
+        {
+            if (fEnergy[i][j][E_CONT])
+            {
+                nBeadTypeCanCont[i] = 1;
+            }
+        }
+    }
+    for (i = 0; i < nBeadTypes; i++)
+    {
+        if (nBeadTypeCanCont[i])
+        {
+            bSystemHasCont = 1;
+        }
+    }
+
+    // FSOL Check
+    for (i = 0; i < nBeadTypes; i++)
+    {
+        for (j = i; j < nBeadTypes; j++)
+        {
+            if (fEnergy[i][j][E_F_SOL])
+            {
+                nBeadTypeCanFSol[i] = 1;
+            }
+        }
+    }
+    for (i = 0; i < nBeadTypes; i++)
+    {
+        if (nBeadTypeCanFSol[i])
+        {
+            bSystemHasFSol = 1;
+        }
+    }
+
+    // T_IND Check
+    for (i = 0; i < nBeadTypes; i++)
+    {
+        for (j = i; j < nBeadTypes; j++)
+        {
+            if (fEnergy[i][j][E_T_IND])
+            {
+                nBeadTypeCanTInd[i] = 1;
+            }
+        }
+    }
+
+    // STIFF Check
+    for (i = 0; i < nBeadTypes; i++)
+    {
+        for (j = i; j < nBeadTypes; j++)
+        {
+            if (fEnergy[i][j][E_STIFF])
+            {
+                bSystemHasTopo = 1;
+            }
+        }
+    }
+
+}
+
 void Global_Array_Initialization_AtStart(void)
 {
     int i, j, k, xTemp, yTemp, zTemp; // Indecies
@@ -243,6 +363,7 @@ void Global_Array_Initialization_AtStart(void)
                         }
                 }
         }
+
     if (nReport[REPORT_COMDEN] != 0)
         {
             for (j = 0; j < nRadDen_TotComps; j++)
@@ -261,55 +382,9 @@ void Global_Array_Initialization_AtStart(void)
     // Setting counters
     Reset_Counters();
 
-    // Checking which bead types interact rotationally and via overlap,
-    // separately.
-    for (i = 0; i < MAX_AA; i++)
-        {
-            nBeadTypeIsSticker[i] = 0; // Assume beads don't rotationally interact.
-            nBeadTypeCanOvlp[i]   = 0; // Assume beads don't have an overlap cost
-            nBeadTypeCanCont[i]   = 0; // Assume beads don't have contact costs.
-            nBeadTypeCanFSol[i]   = 0;
-            nBeadTypeCanTInd[i]   = 0;
-        }
-    bSystemHasTopo = 0;
-    bSystemHasOvlp = 0;
-    bSystemHasCont = 0;
-    bSystemHasFSol = 0;
-    bSystemHasSCSC = 0;
-    for (i = 0; i < MAX_AA; i++)
-        {
-            for (j = 0; j < MAX_AA; j++)
-                {
-                    if (fEnergy[i][j][E_SC_SC] != 0.0)
-                        { // Seeing if this beadType rotationally interacts.
-                            nBeadTypeIsSticker[i] = 1;
-                            bSystemHasSCSC = 1;
-                        }
-                    if (fEnergy[i][j][E_OVLP] != 0.0)
-                        { // Seeing if this beadType interacts via overlap
-                            nBeadTypeCanOvlp[i] = 1;
-                            bSystemHasOvlp      = 1;
-                        }
-                    if (fEnergy[i][j][E_CONT] != 0.0)
-                        { // Seeing if this beadType interacts via contact
-                            nBeadTypeCanCont[i] = 1;
-                            bSystemHasCont      = 1;
-                        }
-                    if (fEnergy[i][j][E_F_SOL] != 0.0)
-                        { // Seeing if this beadType has solvation energy
-                            nBeadTypeCanFSol[i] = 1;
-                            bSystemHasFSol=1;
-                        }
-                    if (fEnergy[i][j][E_T_IND] != 0.0)
-                        { // Seeing if this beadType has solvation energy
-                            nBeadTypeCanTInd[i] = 1;
-                        }
-                    if (fEnergy[i][j][E_STIFF] != 0.0)
-                        { // If there are any stiffness energy
-                            bSystemHasTopo = 1;
-                        }
-                }
-        }
+    // Checking which beads interaction how.
+
+    Check_BeadTypewiseInteractions();
 
     for (i = MV_NULL + 2; i < MAX_MV; i++)
         {

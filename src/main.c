@@ -94,7 +94,6 @@ int main(int argc, char* argv[])
     // Thermalizing the system.
     fCuTemp = fPreKT;
     Print_Data(-1, -1); // Initialization of files
-    exit(1);
 
     for (nGen = 0; nGen < nMCPreSteps; nGen++)
         { // Intentionally not performing any data acquisition in the thermalization phase.

@@ -322,11 +322,31 @@ int Parse_Keyfile(char* filename)
     return nErr;
 }
 
+void ForEnergyMatrix_FillWithZeros()
+{
+    int i, j, k;
+
+    for (i = 0; i < MAX_AA; i++)
+        {
+            for (j = 0; j < MAX_AA; j++)
+                {
+                    for (k = 0; k < MAX_E; k++)
+                        {
+                            fEnergy[i][j][k] = 0.f;
+                        }
+                }
+        }
+}
+
 /// Parse_EnergyFile - reads the energy file
-/// Have to painstakingly go through every different keyword that exists in the
-/// energy file. Reads all the matrices \param strEnFile \return
+/// Have to painstakingly go through every different keyword that exists in the energy file. Reads all the matrices
+/// \param strEnFile
+/// \return
 int Parse_EnergyFile(char* strEnFile)
 {
+
+    ForEnergyMatrix_FillWithZeros();
+
     int nRes = 0;
 
     FILE* infile;
