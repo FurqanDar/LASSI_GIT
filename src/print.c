@@ -1142,7 +1142,8 @@ void Print_Data(const long nGen, const int run_it)
 
 /// Copy_Data - copies data from run_it specific data arrays to the overall
 /// global data arrays that are printed later. Also note that the averaging, or
-/// dividing by the frequency of acquisitions, occurs here. \param run_it
+/// dividing by the frequency of acquisitions, occurs here.
+/// \param run_it
 void Copy_Data(int run_it)
 {
     if (nReport[REPORT_RDFTOT])
