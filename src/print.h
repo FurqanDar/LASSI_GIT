@@ -31,4 +31,10 @@ void Print_Data(long nGen, int run_it);
 
 void Copy_Data(int run_it);
 
+void CopyData_RDF(const int run_it);
+
+void CopyData_COMDen(const int run_it);
+
+void CopyData_Clus(const int run_it);
+
 #endif // _PRINT_H_

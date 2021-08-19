@@ -162,9 +162,9 @@ lInt* naList;
 lLong* naClusHistList;
 lInt* naChainCheckList;
 lInt nTotClusCounter;
-lLDub** ld_TOTCLUS_ARR;
-lLDub* ldMOLCLUS_ARR;
-lLDub* ld_TOTMOLCLUS_ARR;
+lLDub** ld_TOTCLUS_Arr;
+lLDub* ldMOLCLUS_Arr;
+lLDub* ld_TOTMOLCLUS_Arr;
 lInt naTempR[POS_MAX];
 lInt nLargestClusterRightNow;
 size_t nLimitedClusterSize;
@@ -191,7 +191,7 @@ lInt nRadDenCounter; // This counts for the Radial Density histograms
 // Gyration tensor
 float fGyrTensor[7]; // Gyration tensor
 float fSysGyrRad;    // Gyration radius of the system.
-lLDub** ld_TOTGYRRAD_ARR;
+lLDub** ld_TOTRg_Arr;
 lInt nTotGyrRadCounter; // Counter for total averaging
 
 // Trajectory Saving

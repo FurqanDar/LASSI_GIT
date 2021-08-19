@@ -31,16 +31,16 @@ void Memory_Initialization_AtStart(void)
     if (nReport[REPORT_NETWORK] != 0)
         {
             strcpy(arr_name, "ldTotClusArr");
-            ld_TOTCLUS_ARR = Create2DLongdouble(2 + tot_chains, nTot_CycleNum, arr_name);
+            ld_TOTCLUS_Arr = Create2DLongdouble(2 + tot_chains, nTot_CycleNum, arr_name);
 
             strcpy(arr_name, "ldMolClusArr");
-            ldMOLCLUS_ARR = Create1DLongdouble(((tot_chains + 1) * tot_chain_types), arr_name);
+            ldMOLCLUS_Arr = Create1DLongdouble(((tot_chains + 1) * tot_chain_types), arr_name);
 
             strcpy(arr_name, "ldTotMolClusArr");
-            ld_TOTMOLCLUS_ARR = Create1DLongdouble((tot_chains * tot_chain_types * nTot_CycleNum), arr_name);
+            ld_TOTMOLCLUS_Arr = Create1DLongdouble((tot_chains * tot_chain_types * nTot_CycleNum), arr_name);
 
             strcpy(arr_name, "ldTotGyrRad");
-            ld_TOTGYRRAD_ARR = Create2DLongdouble(2, nTot_CycleNum, arr_name);
+            ld_TOTRg_Arr = Create2DLongdouble(2, nTot_CycleNum, arr_name);
         }
     nRDF_TotComps = 2 + nBeadTypes + nBeadTypes * nBeadTypes;
     nRDF_TotComps /= 2;
@@ -132,14 +132,14 @@ void Memory_VerifyMalloc(void)
             printf("ld_TOTRadDen_Arr malloc failed\n");
             exit(1);
         }
-    if (ldMOLCLUS_ARR == NULL && nReport[REPORT_NETWORK] != 0)
+    if (ldMOLCLUS_Arr == NULL && nReport[REPORT_NETWORK] != 0)
         {
-            printf("ldMOLCLUS_ARR malloc failed\n");
+            printf("ldMOLCLUS_Arr malloc failed\n");
             exit(1);
         }
-    if (ld_TOTMOLCLUS_ARR == NULL && nReport[REPORT_NETWORK] != 0)
+    if (ld_TOTMOLCLUS_Arr == NULL && nReport[REPORT_NETWORK] != 0)
         {
-            printf("ld_TOTMOLCLUS_ARR malloc failed\n");
+            printf("ld_TOTMOLCLUS_Arr malloc failed\n");
             exit(1);
         }
     if (n_TOTTRAJ_ARR == NULL && nTrajMode != 0)
@@ -208,23 +208,23 @@ void Global_Array_Initialization_AtStart(void)
                 { // For MolWise Clus arrays
                     for (j = 0; j < tot_chain_types; j++)
                         {
-                            ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] = 0.;
+                            ldMOLCLUS_Arr[MolClusArr_Index(0, j, i)] = 0.;
                             for (k = 0; k < nTot_CycleNum; k++)
                                 {
-                                    ld_TOTMOLCLUS_ARR[MolClusArr_Index(k, j, i)] = 0.;
+                                    ld_TOTMOLCLUS_Arr[MolClusArr_Index(k, j, i)] = 0.;
                                 }
                         }
                 }
             for (k = 0; k < nTot_CycleNum; k++)
                 { // For GyrRad
-                    ld_TOTGYRRAD_ARR[k][0] = 0.;
-                    ld_TOTGYRRAD_ARR[k][1] = 0.;
+                    ld_TOTRg_Arr[k][0] = 0.;
+                    ld_TOTRg_Arr[k][1] = 0.;
                 }
             for (k = 0; k < nTot_CycleNum; k++)
                 { // For ClusterDists
                     for (i = 0; i <= tot_chains; i++)
                         {
-                            ld_TOTCLUS_ARR[k][i] = 0.;
+                            ld_TOTCLUS_Arr[k][i] = 0.;
                         }
                 }
         }
@@ -373,7 +373,7 @@ void Reset_Global_Arrays(void)
                 {
                     for (j = 0; j < tot_chain_types; j++)
                         {
-                            ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] = 0.;
+                            ldMOLCLUS_Arr[MolClusArr_Index(0, j, i)] = 0.;
                         }
                 }
         }

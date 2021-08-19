@@ -1009,8 +1009,8 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void)
     int i, j, k;  // Iterators for loop
     int thisType; // Tracks the type of the chain
     int thisComp; // Tracks which component of ldRadDen
-    lDub typeCOM[POS_MAX] = {0};
-    int COM_int[POS_MAX]  = {0.};
+    lDub typeCOM[POS_MAX] = {0.};
+    int COM_int[POS_MAX]  = {0};
     int myBin;
     float xDis   = 0.; // Tracks the distance between the COM and the specific bead
     int cur_type = 0;

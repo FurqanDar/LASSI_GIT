@@ -387,7 +387,7 @@ void Clus_Network_Distribution_MolWise_Avg(void)
             for (i = 0; i < Cluster_length; i++)
                 { // Recording the chains in this cluster
                     thisType = chain_info[naList[i]][CHAIN_TYPE];
-                    ldMOLCLUS_ARR[MolClusArr_Index(0, thisType, Cluster_length - 1)]++;
+                    ldMOLCLUS_Arr[MolClusArr_Index(0, thisType, Cluster_length - 1)]++;
                     naList[i] = -1;
                     // printf("%d\n", thisType);
                 }
@@ -1249,7 +1249,7 @@ void Clus_Proximity_Distribution_IntOnly_MolWise_Avg(void)
             for (i = 0; i < Cluster_length; i++)
                 { // Recording the chains in this cluster
                     thisType = chain_info[naList[i]][CHAIN_TYPE];
-                    ldMOLCLUS_ARR[MolClusArr_Index(0, thisType, Cluster_length - 1)]++;
+                    ldMOLCLUS_Arr[MolClusArr_Index(0, thisType, Cluster_length - 1)]++;
                     naList[i] = -1;
                     // printf("%d\n", thisType);
                 }
@@ -1297,7 +1297,7 @@ void Clus_Proximity_Distribution_All_MolWise_Avg(void)
             for (i = 0; i < Cluster_length; i++)
                 { // Recording the chains in this cluster
                     thisType = chain_info[naList[i]][CHAIN_TYPE];
-                    ldMOLCLUS_ARR[MolClusArr_Index(0, thisType, Cluster_length - 1)]++;
+                    ldMOLCLUS_Arr[MolClusArr_Index(0, thisType, Cluster_length - 1)]++;
                     naList[i] = -1;
                     // printf("%d\n", thisType);
                 }
@@ -1590,6 +1590,7 @@ void Clus_Perform_MolWise_LargestClusters(void)
         {
             naList[i] = clusID_of_type[i]; // Now naList contains the cluster ID's.
         }
+
     free(clus_numof_MolType);
     free(clusID_of_type);
     free(largestClus_of_type);

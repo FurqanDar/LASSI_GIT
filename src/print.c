@@ -669,7 +669,7 @@ void Write_TotalSysProp(char* filename, int run_it)
                     fprintf(fp, "#Run_Cycle = %d\n", i);
                     for (k = 0; k <= tot_chains; k++)
                         {
-                            fprintf(fp, "%LE\t", ld_TOTCLUS_ARR[i][k]);
+                            fprintf(fp, "%LE\t", ld_TOTCLUS_Arr[i][k]);
                         }
                     fprintf(fp, "\n");
                 }
@@ -689,7 +689,7 @@ void Write_TotalSysProp(char* filename, int run_it)
                         {
                             for (k = 0; k < tot_chains; k++)
                                 {
-                                    fprintf(fp, "%LE\t", ld_TOTMOLCLUS_ARR[MolClusArr_Index(i, j, k)]);
+                                    fprintf(fp, "%LE\t", ld_TOTMOLCLUS_Arr[MolClusArr_Index(i, j, k)]);
                                 }
                             fprintf(fp, "\n");
                         }
@@ -705,8 +705,8 @@ void Write_TotalSysProp(char* filename, int run_it)
             for (i = 0; i < run_it; i++)
                 {
                     fprintf(fp, "#Run_Cycle = %d\n", i);
-                    fprintf(fp, "%LE\t", ld_TOTGYRRAD_ARR[i][0]);
-                    fprintf(fp, "%LE\n", ld_TOTGYRRAD_ARR[i][1]);
+                    fprintf(fp, "%LE\t", ld_TOTRg_Arr[i][0]);
+                    fprintf(fp, "%LE\n", ld_TOTRg_Arr[i][1]);
                 }
             fprintf(fp, "#Done");
             fclose(fp);
@@ -1038,42 +1038,68 @@ void Copy_Data(int run_it)
     int i, j;
     if (nReport[REPORT_RDFTOT] != 0)
         {
-            for (i = 0; i < nRDF_TotComps; i++)
-                {
-                    for (j = 0; j < nRDF_TotBins; j++)
-                        {
-                            ld_TOTRDF_Arr[RDFArr_Index(run_it, i, j)] =
-                                ldRDF_Arr[RDFArr_Index(0, i, j)] / (long double) nRDFCounter;
-                        }
-                }
+            CopyData_RDF(run_it);
         }
     if (nReport[REPORT_COMDEN] != 0)
         {
-            for (i = 0; i < nRadDen_TotComps; i++)
-                {
-                    for (j = 0; j < nRDF_TotBins; j++)
-                        {
-                            ld_TOTRadDen_Arr[RadDenArr_Index(run_it, i, j)] =
-                                ldRadDen_Arr[RadDenArr_Index(0, i, j)] / (long double) nRadDenCounter;
-                        }
-                }
+            CopyData_COMDen(run_it);
         }
     if (nReport[REPORT_NETWORK] != 0)
         {
-            ld_TOTCLUS_ARR[run_it][0] = (long double) nLargestClusterRightNow / (long double) nTotClusCounter;
-            for (i = 1; i <= tot_chains; i++)
-                {
-                    ld_TOTCLUS_ARR[run_it][i] = (long double) naClusHistList[i] / (long double) nTotClusCounter;
-                }
-            for (i = 0; i < tot_chains; i++)
-                {
-                    for (j = 0; j < tot_chain_types; j++)
-                        {
-                            ld_TOTMOLCLUS_ARR[MolClusArr_Index(run_it, j, i)] =
-                                ldMOLCLUS_ARR[MolClusArr_Index(0, j, i)] / (long double) nTotClusCounter;
-                        }
-                }
-            ld_TOTGYRRAD_ARR[run_it][0] = (long double) fSysGyrRad / (long double) nTotGyrRadCounter;
-            ld_TOTGYRRAD_ARR[run_it][1] = (long double) nBoxSize[0] / 2.;
+            CopyData_Clus(run_it);
         }
 }
+
+/// CopyData_RDF: Copies ldRDF_Arr into ld_TOTRDF_Arr
+/// \param run_it: which run cycle we are on. Should be >= 0.
+void CopyData_RDF(const int run_it)
+{
+    int i, j;
+    for (i = 0; i < nRDF_TotComps; i++)
+    {
+        for (j = 0; j < nRDF_TotBins; j++)
+        {
+            ld_TOTRDF_Arr[RDFArr_Index(run_it, i, j)] =
+                ldRDF_Arr[RDFArr_Index(0, i, j)] / (long double) nRDFCounter;
+        }
+    }
+}
+
+/// CopyData_RDF: Copies ldRadDen_Arr into ld_TOTRadDen_Arr
+/// \param run_it: which run cycle we are on. Should be >= 0.
+void CopyData_COMDen(const int run_it)
+{
+    int i, j;
+    for (i = 0; i < nRadDen_TotComps; i++)
+        {
+            for (j = 0; j < nRDF_TotBins; j++)
+                {
+                    ld_TOTRadDen_Arr[RadDenArr_Index(run_it, i, j)] =
+                        ldRadDen_Arr[RadDenArr_Index(0, i, j)] / (long double) nRadDenCounter;
+                }
+        }
+}
+
+/// CopyData_Clus - Copies ldMOLClUS_Arr into ld_TOTMOLCLUS_Arr. Also copies naClusHistList into ld_TOTCLUS_Arr.
+/// And stores the Gyration radius.
+/// \param run_it: which run cycle we are on. Should be >= 0.
+void CopyData_Clus(const int run_it)
+{
+    int i, j;
+    ld_TOTCLUS_Arr[run_it][0] = (long double) nLargestClusterRightNow / (long double) nTotClusCounter;
+    for (i = 1; i <= tot_chains; i++)
+        {
+            ld_TOTCLUS_Arr[run_it][i] = (long double) naClusHistList[i] / (long double) nTotClusCounter;
+        }
+    for (i = 0; i < tot_chains; i++)
+        {
+            for (j = 0; j < tot_chain_types; j++)
+                {
+                    ld_TOTMOLCLUS_Arr[MolClusArr_Index(run_it, j, i)] =
+                        ldMOLCLUS_Arr[MolClusArr_Index(0, j, i)] / (long double) nTotClusCounter;
+                }
+        }
+    ld_TOTRg_Arr[run_it][0] = (long double) fSysGyrRad / (long double) nTotGyrRadCounter;
+    ld_TOTRg_Arr[run_it][1] = (long double) nBoxSize[0] / 2.;
+}
+
