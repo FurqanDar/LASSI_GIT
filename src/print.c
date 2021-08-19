@@ -836,13 +836,13 @@ void FileIO_CreateRunningDataFiles(void)
 /// change that here
 /// \param nGen
 /// \param run_it
-void Print_Data(long nGen, int run_it)
+void Print_Data(const long nGen, const int run_it)
 {
     // This function handles all the data IO.
     int nFlagForEnCalc = 0; // Flag for total energy calculation
 
-    if (run_it == -1) // Thermalization cycle.
-        {
+    if (run_it == -1)
+        { // Thermalization cycle.
             // Open the appropriate files before the thermalization sequence.
             if (nGen == -1)
                 {

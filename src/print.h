@@ -27,7 +27,7 @@ void Write_SysProp(char* filename);
 
 void Write_TotalSysProp(char* filename, int run_it);
 
-void Print_Data(long nGen, int run_it);
+void Print_Data(const long nGen, const int run_it);
 
 void Copy_Data(int run_it);
 
