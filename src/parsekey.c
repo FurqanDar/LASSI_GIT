@@ -128,10 +128,6 @@ int Parse_Keyfile(char* filename)
                         {
                             sscanf(strLine, "%*s %f", &f_globRotBias);
                         }
-                    else if (strcmp(strKeyword, "MC_MAX_TRIALS") == 0)
-                        {
-                            sscanf(strLine, "%*s %d", &nMCMaxTrials);
-                        }
                     else if (strcmp(strKeyword, "MV_TRANS_FREQ") == 0)
                         {
                             sscanf(strLine, "%*s %f", &fMCFreq[MV_TRANS]);
