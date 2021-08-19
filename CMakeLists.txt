@@ -6,11 +6,11 @@ set(CMAKE_C_COMPILER "gcc")
 
 set(CMAKE_C_STANDARD 11)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g3 -masm=intel -march=native -mtune=native -Wall -Wextra -pedantic")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g3 -masm=intel -march=native -mtune=native -Wall -Wextra -pedantic")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g3 -masm=intel -march=native -mtune=native -Wall -Wextra -pedantic")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g3 -masm=intel -march=native -mtune=native -Wall -Wextra -pedantic")
 
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -march=native -mtune=native")
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -march=native -mtune=native")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -march=native -mtune=native")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -march=native -mtune=native")
 
 
 include_directories(./src)

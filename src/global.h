@@ -130,7 +130,7 @@ float fKT, fPreKT, fCuTemp, fRot_Bias, f_globRotBias, fdelta_temp, fMC_Temp_Rate
 float* fKT_Cycle;
 lLong nMCStepsPerCycle, nMCPreSteps;
 float fMCFreq[MAX_MV];
-lInt nMCMaxTrials, nTot_CycleNum;
+lInt  nTot_CycleNum;
 
 // random number generator RNG_Seed
 lInt RNG_Seed;
