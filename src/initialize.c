@@ -275,6 +275,7 @@ void Global_Array_Initialization_AtStart(void)
     bSystemHasOvlp = 0;
     bSystemHasCont = 0;
     bSystemHasFSol = 0;
+    bSystemHasSCSC = 0;
     for (i = 0; i < MAX_AA; i++)
         {
             for (j = 0; j < MAX_AA; j++)
@@ -282,6 +283,7 @@ void Global_Array_Initialization_AtStart(void)
                     if (fEnergy[i][j][E_SC_SC] != 0.0)
                         { // Seeing if this beadType rotationally interacts.
                             nBeadTypeIsSticker[i] = 1;
+                            bSystemHasSCSC = 1;
                         }
                     if (fEnergy[i][j][E_OVLP] != 0.0)
                         { // Seeing if this beadType interacts via overlap
@@ -308,10 +310,16 @@ void Global_Array_Initialization_AtStart(void)
                         }
                 }
         }
+
     for (i = MV_NULL + 2; i < MAX_MV; i++)
         {
             fMCFreq[i] += fMCFreq[i - 1]; // Cumulative Frequencies
         }
+    for (i = 0; i < MAX_MV; i++)
+    { // Zero out all the MCAccepts
+        naMCAccepMat[0][i] = 0;
+        naMCAccepMat[1][i] = 0;
+    }
 
     for (i = 0; i < nTot_CycleNum; i++)
         {
@@ -401,13 +409,12 @@ void Reset_Global_Arrays(void)
         }
     // Setting counters
     Reset_Counters();
-    //    fSysGyrRad = 0.;
-    //    nTotGyrRadCounter = 0;
-    //    nRDFCounter = 0;
-    //    nRadDenCounter = 0;
-    //    nTotClusCounter = 0;
-    //    nLargestClusterRightNow = 0;
-    //    nTrajCurFrame = 0;
+    // MCAccept arrays.
+    for (i = 0; i < MAX_MV; i++)
+    {
+        naMCAccepMat[0][i] = 0;
+        naMCAccepMat[1][i] = 0;
+    }
 }
 
 /// Initial_Conditions_Simple - randomly place all the molecules.

@@ -98,12 +98,12 @@ char bSystemHasTopo;
 char bSystemHasCont;
 char bSystemHasOvlp;
 char bSystemHasFSol;
+char bSystemHasSCSC;
 
 // energy matrices for stickers
 lInt nBeadTypes;
 float fEnergy[MAX_AA][MAX_AA][MAX_E];
 float fEnRad[MAX_AA][MAX_AA][MAX_E];
-// lInt  LARGEST_RADIUS;
 #define LARGEST_RADIUS 3
 lInt rot_trial[MAX_VALENCY][MAX_ROTSTATES]; // Used in orientational-bias MC moves
 lLDub bolt_fac[MAX_ROTSTATES - 1];          // Used in orientational-bias
@@ -144,7 +144,7 @@ lInt RNG_Seed;
 // report-related
 char strReportPrefix[512];
 char fileEnergy[512];
-char fileStruct[512];
+char fileTraj[512];
 char fileMCMove[512];
 char fileSysProp[512];
 char strRestartFile[512];
@@ -153,7 +153,7 @@ lLong nTrajMode;
 // Matrix to store acceptances and rejections 0: Rejected; 1: Accepted
 // TODO: Have a more extensive way to record also where/when a particular move
 // fails -- not just if it fails.
-lLong MCAccepMat[2][MAX_MV];
+lLong naMCAccepMat[2][MAX_MV];
 
 // Cluster analysis
 lInt nClusteringMode;

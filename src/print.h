@@ -15,7 +15,7 @@ void Print_Key(void);
 
 void HandleTrajectory(char* fileStruct, const int run_it, const long nGen);
 
-void Write_Trajectory(char* filename, long nGen);
+void Write_Trajectory(const char* filename, const long nGen);
 
 void Save_Trajectory(const long nGen, const long curFrame);
 
@@ -36,5 +36,9 @@ void CopyData_RDF(const int run_it);
 void CopyData_COMDen(const int run_it);
 
 void CopyData_Clus(const int run_it);
+
+void FileIO_CreateFile(const char* fileName);
+
+void FileIO_CreateRunningDataFiles(void);
 
 #endif // _PRINT_H_

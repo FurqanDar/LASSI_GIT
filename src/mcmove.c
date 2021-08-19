@@ -100,7 +100,7 @@ int MC_Step(float fMCTemp)
                 break;
         }
 
-    MCAccepMat[nAccept][mode]++; // Just adding which move got accepted/rejected.
+    naMCAccepMat[nAccept][mode]++; // Just adding which move got accepted/rejected.
     return mode * 12 + nAccept;
 }
 
@@ -202,7 +202,7 @@ int MC_Step_Equil(float fMCTemp)
                 break;
         }
 
-    MCAccepMat[nAccept][mode]++; // Just adding which move got accepted/rejected.
+    naMCAccepMat[nAccept][mode]++; // Just adding which move got accepted/rejected.
     return mode * 12 + nAccept;
 }
 

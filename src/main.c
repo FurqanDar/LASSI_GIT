@@ -94,6 +94,8 @@ int main(int argc, char* argv[])
     // Thermalizing the system.
     fCuTemp = fPreKT;
     Print_Data(-1, -1); // Initialization of files
+    exit(1);
+
     for (nGen = 0; nGen < nMCPreSteps; nGen++)
         { // Intentionally not performing any data acquisition in the thermalization phase.
             nMCInfo = MC_Step_Equil(fCuTemp);
@@ -114,6 +116,7 @@ int main(int argc, char* argv[])
             fKT = fKT_Cycle[run_cycle];
             Calculate_Rot_Bias(fKT);
             Print_Data(-1, run_cycle);
+            //
             for (nGen = 0; nGen <= nMCStepsPerCycle; nGen++)
                 {
                     fCuTemp = Temperature_Function(Temp_Mode, nGen);

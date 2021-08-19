@@ -4,7 +4,7 @@
 #include "global.h"
 #include "structure.h"
 
-void Print_Matrix(char* strTitle, int nSeqEn, float fArray[MAX_AA][MAX_AA][MAX_E], int param);
+void Print_EnergyMatrix(char* strTitle, int nSeqEn, float fArray[MAX_AA][MAX_AA][MAX_E], int param);
 
 long TrajArr_Index(const int beadID, const int nFrameNumber, const int beadProp)
 {
@@ -85,9 +85,34 @@ void Write_GyrTen(char* filename, long nGen)
     fclose(fp);
 }
 
-/// Write_MCMove - writes the acceptance and rejection ratios of the various
-/// moves. Just keeps appending to that file. Can be used to track the
-/// 'dynamics' during a simulation. \param filename \param nGen \param fMCTemp
+/// FileIO_Write_MCMoveHeader - write the header for the MC move acceptance file.
+/// \param fileName
+void FileIO_Write_MCMoveHeader(const char* fileName)
+{
+    FILE* fp = fopen(fileName, "a");
+    fprintf(fp, "#Steps ,and Temp, are followed by (rej, acc) for each MC Move.\n");
+    fprintf(fp, "#(nStep, T) "
+                "STROT   "
+                "LOCAL   "
+                "COLOCAL "
+                "MTLOCAL "
+                "SNAKE   "
+                "TRANS   "
+                "SM_CLST "
+                "CLST    "
+                "PIVOT   "
+                "BRROT   "
+                "DBPVT   "
+                "PR_CLST "
+                "\n");
+    fclose(fp);
+}
+
+/// Write_MCMove - writes the acceptance and rejection ratios of the various moves. Just keeps appending to that file.
+/// Can be used to track the 'dynamics' during a simulation.
+/// \param filename
+/// \param nGen
+/// \param fMCTemp
 void Write_MCMove(char* filename, long nGen, float fMCTemp)
 {
     FILE* fp;
@@ -107,8 +132,8 @@ void Write_MCMove(char* filename, long nGen, float fMCTemp)
                         "PIVOT BR_ROT\n");
             for (i = 0; i < MAX_MV; i++)
                 {
-                    MCAccepMat[0][i] = 0;
-                    MCAccepMat[1][i] = 0;
+                    naMCAccepMat[0][i] = 0;
+                    naMCAccepMat[1][i] = 0;
                     // This way the print function will initialize the matrix at
                     // startup!
                 }
@@ -118,9 +143,9 @@ void Write_MCMove(char* filename, long nGen, float fMCTemp)
             fprintf(fp, "%ld\t%.2f\t", nGen, fMCTemp); // Step and Temp
             for (i = 1; i < MAX_MV; i++)
                 {
-                    fprintf(fp, "%ld\t%ld\t", MCAccepMat[0][i], MCAccepMat[1][i]);
-                    MCAccepMat[0][i] = 0;
-                    MCAccepMat[1][i] = 0;
+                    fprintf(fp, "%ld\t%ld\t", naMCAccepMat[0][i], naMCAccepMat[1][i]);
+                    naMCAccepMat[0][i] = 0;
+                    naMCAccepMat[1][i] = 0;
                     // This way the print function will zero out the matrix every time
                     // we print to a file!
                 }
@@ -156,9 +181,26 @@ void Print_LogToScreen(long nGen, int run_it)
     for (i = 1; i < MAX_MV; i++)
         {
             printf("%-5.2f ",
-                   100. * (float) MCAccepMat[1][i] / ((float) MCAccepMat[0][i] + 0.00001 + (float) MCAccepMat[1][i]));
+                   100. * (float) naMCAccepMat[1][i] / ((float) naMCAccepMat[0][i] + 0.00001 + (float) naMCAccepMat[1][i]));
         }
     printf("\n\n");
+}
+
+/// FileIO_Write_EnergyHeader - write the header for the energy file.
+/// \param fileName
+void FileIO_Write_EnergyHeader(const char* fileName)
+{
+    FILE* fp = fopen(fileName, "a");
+    fprintf(fp, "# "
+                "STEP  "
+                "TOT   "
+                "OVLP  "
+                "CONT  "
+                "SC-SC "
+                "FSOL  "
+                "T_IND "
+                "STIFF ");
+    fclose(fp);
 }
 
 /// Write_Energy - write the decomposed energy of the system to a file.
@@ -219,11 +261,10 @@ void HandleTrajectory(char* fileStruct, const int run_it, const long nGen)
 /// Appends to the file for this run.
 /// \param filename
 /// \param nGen
-void Write_Trajectory(char* filename, long nGen)
+void Write_Trajectory(const char* filename, const long nGen)
 {
-    // Writes the trajectory in LAMMPS format. To be viewed with VMD
-    // (Hopefully). Read the LAMMPS dump documentation for the actual formate of
-    // the file
+    // Writes the trajectory in LAMMPS format. To be viewed with VMD (hopefully). Read the LAMMPS dump documentation for
+    // the actual format of the file
     FILE* fp;
     if (nGen == -1)
         {
@@ -231,8 +272,7 @@ void Write_Trajectory(char* filename, long nGen)
         }
     else
         {
-            fp = fopen(filename,
-                       "a"); // We will append to the file made for this run
+            fp = fopen(filename, "a"); // We will append to the file made for this run
 
             int i; // Looping index
             fprintf(fp, "ITEM: TIMESTEP\n");
@@ -241,13 +281,10 @@ void Write_Trajectory(char* filename, long nGen)
             fprintf(fp, "ITEM: NUMBER OF ATOMS\n");
             fprintf(fp, "%ld\n", tot_beads); // Total atom number
 
-            fprintf(fp,
-                    "ITEM: BOX BOUNDS pp pp pp\n"); // BCs are always periodic for now
-            fprintf(fp, "0 %d\n0 %d\n0 %d\n", nBoxSize[0], nBoxSize[1],
-                    nBoxSize[2]); // Box dimensions
+            fprintf(fp, "ITEM: BOX BOUNDS pp pp pp\n"); // BCs are always periodic for now
+            fprintf(fp, "0 %d\n0 %d\n0 %d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]); // Box dimensions
 
-            fprintf(fp,
-                    "ITEM: ATOMS id type mol x y z bP\n"); // What we are printing
+            fprintf(fp, "ITEM: ATOMS id type mol x y z bP\n"); // What we are printing
 
             for (i = 0; i < tot_beads; i++)
                 {
@@ -308,13 +345,10 @@ void Write_Saved_Trajectory(char* filename, const int run_it)
             fprintf(fp, "ITEM: NUMBER OF ATOMS\n");
             fprintf(fp, "%ld\n", tot_beads); // Total atom number
 
-            fprintf(fp,
-                    "ITEM: BOX BOUNDS pp pp pp\n"); // BCs are always periodic for now
-            fprintf(fp, "0 %d\n0 %d\n0 %d\n", nBoxSize[0], nBoxSize[1],
-                    nBoxSize[2]); // Box dimensions
+            fprintf(fp, "ITEM: BOX BOUNDS pp pp pp\n"); // BCs are always periodic for now
+            fprintf(fp, "0 %d\n0 %d\n0 %d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]); // Box dimensions
 
-            fprintf(fp,
-                    "ITEM: ATOMS id type mol x y z bP\n"); // What we are printing
+            fprintf(fp, "ITEM: ATOMS id type mol x y z bP\n"); // What we are printing
 
             for (j = 0; j < tot_beads; j++)
                 {
@@ -338,28 +372,85 @@ void Write_Saved_Trajectory(char* filename, const int run_it)
     fclose(fp);
 }
 
+/// PrintToScreen_EnergyMatrices
+void PrintToScreen_EnergyMatrices(void)
+{
+
+    const char lBrace[] = "<======      ";
+    const char rBrace[] = "      ======>";
+
+    printf("%s Energy Matrices %s\n", lBrace, rBrace);
+
+    Print_EnergyMatrix("OVLP ", nBeadTypes, fEnergy, E_OVLP);
+
+    Print_EnergyMatrix("CONT ", nBeadTypes, fEnergy, E_CONT);
+
+    Print_EnergyMatrix("SC_SC", nBeadTypes, fEnergy, E_SC_SC);
+
+    Print_EnergyMatrix("FSOL ", nBeadTypes, fEnergy, E_F_SOL);
+
+    Print_EnergyMatrix("STIFF", nBeadTypes, fEnergy, E_STIFF);
+}
+
+void PrintToScreen_MCMoveFreqs(void)
+{
+    char* MoveName[MAX_MV];
+    MoveName[MV_PIVOT]      = "Pivot           ";
+    MoveName[MV_DBPVT]      = "Double Pivot    ";
+    MoveName[MV_CLSTR]      = "Larger Cluster  ";
+    MoveName[MV_SMCLSTR]    = "Smaller Cluster ";
+    MoveName[MV_STROT]      = "Face Change     ";
+    MoveName[MV_LOCAL]      = "Local           ";
+    MoveName[MV_COLOCAL]    = "Co-local        ";
+    MoveName[MV_MTLOCAL]    = "Shake           ";
+    MoveName[MV_BRROT]      = "Rotate Branched ";
+    MoveName[MV_SNAKE]      = "Slithering Snake";
+    MoveName[MV_TRANS]      = "Translation     ";
+    MoveName[MV_PR_SMCLSTR] = "Pr. Smal Cluster";
+
+    float freqMin = 1e10f;
+    int i;
+    for (i = MV_NULL + 1; i < MAX_MV; i++)
+    {
+        if (freqMin >= fMCFreq[i] && fMCFreq[i] != 0.)
+        {
+            freqMin = fMCFreq[i];
+        }
+    }
+
+    for (i=0; i < 30; i++){
+        printf("-");
+    }
+    printf("\n");
+    printf("| MC Move Frequencies%9s\n", "|");
+    for (i = MV_NULL + 1; i < MAX_MV; i++)
+    {
+        printf("| %-16s %5d %5s\n", MoveName[i], (int) ceilf(fMCFreq[i] / freqMin), "|");
+    }
+    for (i=0; i < 30; i++){
+        printf("-");
+    }
+}
+
 /// Print_Key - print the keyfile that was read in to the screen
 void Print_Key(void)
 { // should be output-dependent (stdout, stderr, other files)
 
     int i;
-    char lBrace[] = "<======      ";
-    char rBrace[] = "      ======>";
+    const char lBrace[] = "<======      ";
+    const char rBrace[] = "      ======>";
     printf("%s System Settings %s\n", lBrace, rBrace);
     printf("Number of Sticker Types = %d\n", nBeadTypes);
     printf("Number of Beads         = %ld\n", tot_beads);
     printf("Number of Chains        = %ld\n", tot_chains);
     printf("Number of Components    = %ld\n", tot_chain_types);
-    printf("Box Size                = %d, %d, %d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]);
+    printf("Box Sizes               = %3d %3d %3d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]);
     printf("Monomer density         = %1.1e\n",
            (float) tot_beads / (float) nBoxSize[0] / (float) nBoxSize[1] / (float) nBoxSize[2]);
     printf("\n");
 
-    printf("%s Energy Matrices %s\n", lBrace, rBrace);
-    Print_Matrix("E_ovlp", nBeadTypes, fEnergy, E_OVLP);
-    Print_Matrix("E_cont", nBeadTypes, fEnergy, E_CONT);
-    // Print_Matrix("R_cont", nBeadTypes, fEnRad, E_CONT);
-    Print_Matrix("SC_SC", nBeadTypes, fEnergy, E_SC_SC);
+    PrintToScreen_EnergyMatrices();
+
     printf("\n");
 
     printf("%s Linker Info %s\n", lBrace, rBrace);
@@ -394,58 +485,45 @@ void Print_Key(void)
     MoveName[MV_SNAKE]      = "Slithering Snake";
     MoveName[MV_TRANS]      = "Translation     ";
     MoveName[MV_PR_SMCLSTR] = "Pr. Smal Cluster";
-    // MoveName[MV_PR_SMCLSTR]   = "Larger Cluster";
-    float freqMin = 1e10;
-    for (i = MV_NULL + 1; i < MAX_MV; i++)
-        {
-            if (freqMin >= fMCFreq[i] && fMCFreq[i] != 0.)
-                {
-                    freqMin = fMCFreq[i];
-                }
-        }
-    printf("MC Move Frequencies:\n");
-    printf("--------------------------\n");
-    for (i = MV_NULL + 1; i < MAX_MV; i++)
-        {
-            printf("|%s  %d\n", MoveName[i], (int) ceilf(fMCFreq[i] / freqMin));
-        }
-    printf("--------------------------\n");
+
+    float freqMin = 1e10f;
+    PrintToScreen_MCMoveFreqs();
     printf("\n");
 }
 
-/// Print_Matrix - fancy function to print symmetric matrices with labels
+/// Print_EnergyMatrix - fancy function to print symmetric matrices with labels
 /// \param strTitle
 /// \param nSeqEn
 /// \param fArray
 /// \param param
-void Print_Matrix(char* strTitle, int nSeqEn, float fArray[MAX_AA][MAX_AA][MAX_E], int param)
+void Print_EnergyMatrix(char* strTitle, int nSeqEn, float fArray[MAX_AA][MAX_AA][MAX_E], int param)
 {
-    int nLen;
-    nLen = nSeqEn;
+    const int nLen = nSeqEn;
+    const int outLen = (nLen+3)*5-2;
     int i, j;
-    for (i = 0; i < nLen + 1; i++)
+    for (i = 0; i < outLen; i++)
         {
-            printf("--------");
+            printf("-");
         }
-    printf("\n|%s", strTitle);
+    printf("\n| %-5s ", strTitle);
     for (i = 0; i < nLen; i++)
         {
-            printf("\t%d", i);
+            printf("%4d  ", i);
         }
-    printf("      |\n");
+    printf("%3s\n", "|");
 
     for (i = 0; i < nLen; i++)
         {
-            printf("|%d", i);
+            printf("| %-5d ", i);
             for (j = 0; j < nLen; j++)
                 {
-                    printf("\t%.2f", fArray[i][j][param]);
+                    printf("%5.2f ", fArray[i][j][param]);
                 }
-            printf("   |\n");
+            printf("%3s\n", "|");
         }
-    for (i = 0; i < nLen + 1; i++)
+    for (i = 0; i < outLen; i++)
         {
-            printf("--------");
+            printf("-");
         }
     printf("\n");
 }
@@ -566,9 +644,9 @@ void Write_TopFile(char* filename)
     fclose(fp);
 }
 
-/// Write_SysProp - writes the RDF, CLUS and GyrTen avg rrays to a file. OLD
-/// implementation that should not be used yet Also, TODO: update this to work
-/// with the new indexing \param filename
+/// Write_SysProp - writes the RDF, CLUS and GyrTen avg rrays to a file. OLD implementation that should not be used yet
+/// Also, TODO: update this to work with the new indexing
+/// \param filename
 void Write_SysProp(char* filename)
 {
     FILE* fp;
@@ -596,6 +674,7 @@ void Write_SysProp(char* filename)
         }
     fprintf(fp, "\n#Done");
 }
+
 /// Write_TotalSysProp - writes the RDF, CLUS and GyrTen arrays to their
 /// respective files. These arrays store the data over the course of an ENTIRE
 /// run, or over all the temp cycles. \param filename \param run_it
@@ -713,35 +792,75 @@ void Write_TotalSysProp(char* filename, int run_it)
         }
 }
 
+/// FileIO_CreateFile - Creates a new overwritten file with the given name.
+/// \param fileName
+void FileIO_CreateFile(const char* fileName)
+{
+
+    FILE* fp = fopen(fileName, "w+");
+    fclose(fp);
+}
+
+/// FileIO_CreateRunningDataFiles - Creates the necessary files that are continuously written to over the course
+/// of a simulation.
+void FileIO_CreateRunningDataFiles(void)
+{
+    if (nReport[REPORT_CONFIG])
+        {
+            sprintf(fileTraj, "%s_topo.lammpstrj", strReportPrefix); // Name of the topology file
+            Write_TopFile(fileTraj);                                 // Write the topology file. Only need to write once
+            if (nTrajMode != 1)
+                {
+                    sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix); // Naming convention for trajectory files.
+                    FileIO_CreateFile(fileTraj); // This opens a new trajectory file; each run_it will have its own
+                }
+        }
+
+    if (nReport[REPORT_ENERGY])
+        {
+            sprintf(fileEnergy, "%s_energy.dat", strReportPrefix);
+            FileIO_CreateFile(fileEnergy); // Open a new energy file; each run_it will have its own
+            FileIO_Write_EnergyHeader(fileEnergy);
+        }
+
+    if (nReport[REPORT_MCMOVE])
+        {
+            sprintf(fileMCMove, "%s_mcmove.dat", strReportPrefix);
+            FileIO_CreateFile(fileMCMove); // Open a new MCInfo file; each run_it will have its own
+            FileIO_Write_MCMoveHeader(fileMCMove);
+        }
+}
+
 /// Print_Data - helper function that decides given nGen and run_it which things
 /// to print. Usually don't print much during the thermalization but could
-/// change that here \param nGen \param run_it
+/// change that here
+/// \param nGen
+/// \param run_it
 void Print_Data(long nGen, int run_it)
 {
     // This function handles all the data IO.
     int nFlagForEnCalc = 0; // Flag for total energy calculation
-    // run_it == -1 corresponds to the thermalization sequence
-    if (run_it == -1)
+
+    if (run_it == -1) // Thermalization cycle.
         {
             // Open the appropriate files before the thermalization sequence.
             if (nGen == -1)
                 {
+//                    FileIO_CreateRunningDataFiles();
                     if (nReport[REPORT_CONFIG] != 0)
                         {
-                            sprintf(fileStruct, "%s_topo.lammpstrj",
-                                    strReportPrefix);  // Name of the topology file
-                            Write_TopFile(fileStruct); // Write the topology file. Only
-                                                       // need to write once
+                            sprintf(fileTraj, "%s_topo.lammpstrj", strReportPrefix); // Name of the topology file
+                            Write_TopFile(fileTraj); // Write the topology file. Only need to write once
                             if (nTrajMode != 1)
                                 {
-                                    sprintf(fileStruct, "%s_trj.lammpstrj",
-                                            strReportPrefix); // Naming convention for
-                                                              // trajectory files.
-                                    Write_Trajectory(fileStruct,
+                                    sprintf(fileTraj, "%s_trj.lammpstrj",
+                                            strReportPrefix); // Naming convention for trajectory files.
+                                    Write_Trajectory(fileTraj,
                                                      -1); // This opens a new trajectory file;
                                                           // each run_it will have its own
                                 }
                         }
+
                     if (nReport[REPORT_ENERGY] != 0)
                         {
                             sprintf(fileEnergy, "%s_energy.dat", strReportPrefix);
@@ -749,18 +868,13 @@ void Print_Data(long nGen, int run_it)
                                          -1); // Open a new energy file; each run_it will
                                               // have its own
                         }
+
                     if (nReport[REPORT_MCMOVE] != 0)
                         {
                             sprintf(fileMCMove, "%s_mcmove.dat", strReportPrefix);
                             Write_MCMove(fileMCMove, -1,
                                          0.0); // Open a new MCInfo file; each run_it will
                                                // have its own
-                        }
-                    if (nReport[REPORT_NETWORK] != 0 || nReport[REPORT_RDFTOT] != 0)
-                        {
-                            sprintf(fileSysProp, "%s_SysProp.dat",
-                                    strReportPrefix); // Naming convention or SysProp files;
-                                                      // each run_it should have its own
                         }
                 }
             else
@@ -788,8 +902,8 @@ void Print_Data(long nGen, int run_it)
                         {
                             if (nGen % nReport[REPORT_CONFIG] == 0)
                                 {
-                                    HandleTrajectory(fileStruct, run_it, nGen);
-                                    // Write_Trajectory(fileStruct, nGen);
+                                    HandleTrajectory(fileTraj, run_it, nGen);
+                                    // Write_Trajectory(fileTraj, nGen);
                                 }
                         }
                     if (nReport[REPORT_ENERGY] != 0)
@@ -813,43 +927,44 @@ void Print_Data(long nGen, int run_it)
                         }
                 }
         }
+
     if (run_it == 0 && nGen == -1)
         { // Write out equilibrium trajectory
             if (nReport[REPORT_CONFIG] != 0)
                 {
                     if (nTrajMode == 1)
                         {
-                            sprintf(fileStruct, "%s_EQ_trj.lammpstrj", strReportPrefix);
+                            sprintf(fileTraj, "%s_EQ_trj.lammpstrj", strReportPrefix);
                             // Naming convention for trajectory files.
-                            Write_Trajectory(fileStruct,
+                            Write_Trajectory(fileTraj,
                                              -1); // This opens a new trajectory file;
                                                   // each run_it will have its own
-                            Write_Saved_Trajectory(fileStruct, -1);
+                            Write_Saved_Trajectory(fileTraj, -1);
                             nTrajCurFrame = 0;
-                            HandleTrajectory(fileStruct, run_it, 0);
+                            HandleTrajectory(fileTraj, run_it, 0);
                         }
                 }
         }
+
     if (run_it >= 0 && nGen == nMCStepsPerCycle)
         {
-            if (nReport[REPORT_CONFIG] != 0)
+            if (nReport[REPORT_CONFIG])
                 {
-                    sprintf(fileStruct, "%s_%d_restart.lammpstrj", strReportPrefix,
+                    sprintf(fileTraj, "%s_%d_restart.lammpstrj", strReportPrefix,
                             run_it); // Naming convention for trajectory files.
-                    Write_Trajectory(fileStruct, -1);
+                    Write_Trajectory(fileTraj, -1);
                     // This opens a new trajectory file; each run_it will have its own
-                    Write_Trajectory(fileStruct,
-                                     0); // End of previous run_it is initial
-                                         // conditions for this one!
+                    Write_Trajectory(fileTraj, 0); // End of previous run_it is initial conditions for this one.
                     if (nTrajMode == 1)
                         {
-                            sprintf(fileStruct, "%s_%d_trj.lammpstrj", strReportPrefix,
+                            sprintf(fileTraj, "%s_%d_trj.lammpstrj", strReportPrefix,
                                     run_it); // Naming convention for trajectory files.
-                            Write_Trajectory(fileStruct, -1);
-                            Write_Saved_Trajectory(fileStruct, run_it);
+                            Write_Trajectory(fileTraj, -1);
+                            Write_Saved_Trajectory(fileTraj, run_it);
                         }
                 }
         }
+
     if (run_it == 0 && nGen > 0)
         {
             if (nReport[REPORT_LOG] != 0)
@@ -875,10 +990,10 @@ void Print_Data(long nGen, int run_it)
                 {
                     if (nGen % nReport[REPORT_CONFIG] == 0)
                         {
-                            sprintf(fileStruct, "%s_trj.lammpstrj",
+                            sprintf(fileTraj, "%s_trj.lammpstrj",
                                     strReportPrefix); // Naming convention for trajectory files.
-                            HandleTrajectory(fileStruct, run_it, nGen);
-                            // Write_Trajectory(fileStruct, nGen + MCPreSteps);
+                            HandleTrajectory(fileTraj, run_it, nGen);
+                            // Write_Trajectory(fileTraj, nGen + MCPreSteps);
                         }
                 }
             if (nReport[REPORT_ENERGY] != 0)
@@ -923,6 +1038,7 @@ void Print_Data(long nGen, int run_it)
                         }
                 }
         }
+
     if (run_it > 0)
         {
             if (nGen == -1)
@@ -943,12 +1059,6 @@ void Print_Data(long nGen, int run_it)
                             Write_MCMove(fileMCMove, -1,
                                          0.0); // Open a new MCInfo file; each run_it will
                                                // have its own
-                        }
-                    if (nReport[REPORT_NETWORK] != 0 || nReport[REPORT_RDFTOT] != 0)
-                        {
-                            sprintf(fileSysProp, "%s_%d_SysProp.dat", strReportPrefix,
-                                    run_it); // Naming convention or SysProp files; each
-                                             // run_it should have its own
                         }
                 }
             else
@@ -976,9 +1086,9 @@ void Print_Data(long nGen, int run_it)
                         {
                             if (nGen % nReport[REPORT_CONFIG] == 0)
                                 {
-                                    sprintf(fileStruct, "%s_trj.lammpstrj", strReportPrefix);
-                                    HandleTrajectory(fileStruct, run_it, nGen);
-                                    // Write_Trajectory(fileStruct, nGen + (run_it *
+                                    sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix);
+                                    HandleTrajectory(fileTraj, run_it, nGen);
+                                    // Write_Trajectory(fileTraj, nGen + (run_it *
                                     // nMCStepsPerCycle));
                                 }
                         }
@@ -1035,16 +1145,15 @@ void Print_Data(long nGen, int run_it)
 /// dividing by the frequency of acquisitions, occurs here. \param run_it
 void Copy_Data(int run_it)
 {
-    int i, j;
-    if (nReport[REPORT_RDFTOT] != 0)
+    if (nReport[REPORT_RDFTOT])
         {
             CopyData_RDF(run_it);
         }
-    if (nReport[REPORT_COMDEN] != 0)
+    if (nReport[REPORT_COMDEN])
         {
             CopyData_COMDen(run_it);
         }
-    if (nReport[REPORT_NETWORK] != 0)
+    if (nReport[REPORT_NETWORK])
         {
             CopyData_Clus(run_it);
         }
@@ -1056,13 +1165,13 @@ void CopyData_RDF(const int run_it)
 {
     int i, j;
     for (i = 0; i < nRDF_TotComps; i++)
-    {
-        for (j = 0; j < nRDF_TotBins; j++)
         {
-            ld_TOTRDF_Arr[RDFArr_Index(run_it, i, j)] =
-                ldRDF_Arr[RDFArr_Index(0, i, j)] / (long double) nRDFCounter;
+            for (j = 0; j < nRDF_TotBins; j++)
+                {
+                    ld_TOTRDF_Arr[RDFArr_Index(run_it, i, j)] =
+                        ldRDF_Arr[RDFArr_Index(0, i, j)] / (long double) nRDFCounter;
+                }
         }
-    }
 }
 
 /// CopyData_RDF: Copies ldRadDen_Arr into ld_TOTRadDen_Arr
@@ -1102,4 +1211,3 @@ void CopyData_Clus(const int run_it)
     ld_TOTRg_Arr[run_it][0] = (long double) fSysGyrRad / (long double) nTotGyrRadCounter;
     ld_TOTRg_Arr[run_it][1] = (long double) nBoxSize[0] / 2.;
 }
-
