@@ -170,7 +170,7 @@ void Check_BeadTypewiseInteractions(void)
     // SC-SC Check
     for (i = 0; i < nBeadTypes; i++)
         {
-            for (j = i; j < nBeadTypes; j++)
+            for (j = 0; j < nBeadTypes; j++)
                 {
                     if (fEnergy[i][j][E_SC_SC])
                         {
@@ -189,7 +189,7 @@ void Check_BeadTypewiseInteractions(void)
     // OVLP Check
     for (i = 0; i < nBeadTypes; i++)
         {
-            for (j = i; j < nBeadTypes; j++)
+            for (j = 0; j < nBeadTypes; j++)
                 {
                     if (fEnergy[i][j][E_OVLP])
                         {
@@ -208,7 +208,7 @@ void Check_BeadTypewiseInteractions(void)
     // CONT Check
     for (i = 0; i < nBeadTypes; i++)
     {
-        for (j = i; j < nBeadTypes; j++)
+        for (j = 0; j < nBeadTypes; j++)
         {
             if (fEnergy[i][j][E_CONT])
             {
@@ -227,7 +227,7 @@ void Check_BeadTypewiseInteractions(void)
     // FSOL Check
     for (i = 0; i < nBeadTypes; i++)
     {
-        for (j = i; j < nBeadTypes; j++)
+        for (j = 0; j < nBeadTypes; j++)
         {
             if (fEnergy[i][j][E_F_SOL])
             {
@@ -246,7 +246,7 @@ void Check_BeadTypewiseInteractions(void)
     // T_IND Check
     for (i = 0; i < nBeadTypes; i++)
     {
-        for (j = i; j < nBeadTypes; j++)
+        for (j = 0; j < nBeadTypes; j++)
         {
             if (fEnergy[i][j][E_T_IND])
             {
@@ -258,7 +258,7 @@ void Check_BeadTypewiseInteractions(void)
     // STIFF Check
     for (i = 0; i < nBeadTypes; i++)
     {
-        for (j = i; j < nBeadTypes; j++)
+        for (j = 0; j < nBeadTypes; j++)
         {
             if (fEnergy[i][j][E_STIFF])
             {
