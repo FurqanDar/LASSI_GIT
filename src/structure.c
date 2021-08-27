@@ -1024,7 +1024,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void)
             clus_id_list[i] = -1;
         }
 
-    // Perform clusering analysis
+    // Perform clustering analysis
     Clus_Perform_MolWise_LargestClusters();
     // Remember the cluster ID's
     for (i = 0; i <= tot_chain_types; i++)
