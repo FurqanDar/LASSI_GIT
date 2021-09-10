@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
         {
             printf("Key file %s was successfully parsed.\n\n", keyfile);
             srand(RNG_Seed);
-            Print_Key();
+            PrintToScreen_KeyFile();
         }
     else
         {
@@ -94,6 +94,7 @@ int main(int argc, char* argv[])
     // Thermalizing the system.
     fCuTemp = fPreKT;
     //FILE Initialization
+    //FileIO_GenerateFiles()
     Print_Data(-1, -1); // Initialization of files
 
     for (nGen = 0; nGen < nMCPreSteps; nGen++)
@@ -101,6 +102,7 @@ int main(int argc, char* argv[])
             nMCInfo = MC_Step_Equil(fCuTemp);
             //        printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
             //PrintToScreen_Log(nGen);
+            //FileIO_WriteData(nGen, run_cycle)
             Print_Data(nGen, -1);
         }
 
@@ -117,12 +119,14 @@ int main(int argc, char* argv[])
             fKT = fKT_Cycle[run_cycle];
             Calculate_Rot_Bias(fKT);
             Print_Data(-1, run_cycle);
-            //
+            //FileIO_GenerateFiles()
             for (nGen = 0; nGen <= nMCStepsPerCycle; nGen++)
                 {
                     fCuTemp = Temperature_Function(Temp_Mode, nGen);
                     nMCInfo = MC_Step(fCuTemp);
                     //            printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
+                    //PrintToScreen_Log(nGen);
+                    //FileIO_WriteData(nGen, run_cycle)
                     Print_Data(nGen, run_cycle);
                 }
             Temp_Mode = -1;
@@ -131,7 +135,7 @@ int main(int argc, char* argv[])
         }
 
     // Writing everything
-    Write_TotalSysProp(fileSysProp, run_cycle);
+    FileIO_Write_TotalSysProp(run_cycle);
 
     tEnd         = clock();
     elapsed_time = (double) (tEnd - tStart) / (double) CLOCKS_PER_SEC;

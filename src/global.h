@@ -7,8 +7,6 @@
 #include <string.h>
 #include <time.h>
 
-#define PI 3.14159
-
 #define MAX_AA         10
 #define MAX_CHAINTYPES 10
 #define MAX_CHAINLEN   1000

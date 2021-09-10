@@ -271,7 +271,7 @@ void GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex)
                     NumRes++; // Adding a residue to the total
                     for (j = 0; j < POS_MAX; j++)
                         {
-                            dumArg = 2. * PI * ((float) bead_info[k][j] / (float) nBoxSize[j]);
+                            dumArg = 2. * M_PI * ((float) bead_info[k][j] / (float) nBoxSize[j]);
                             theta[j] += cosf(dumArg);
                             zeta[j] += sinf(dumArg); // Since I am taking the average just keep adding
                         }
@@ -284,8 +284,8 @@ void GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex)
         {
             theta[j]   = theta[j] / (float) NumRes;
             zeta[j]    = zeta[j] / (float) NumRes;
-            tot_COM[j] = atan2f(-theta[j], -zeta[j]) + PI;
-            tot_COM[j] = nBoxSize[j] * (tot_COM[j] / 2. / PI);
+            tot_COM[j] = atan2f(-theta[j], -zeta[j]) + M_PI;
+            tot_COM[j] = nBoxSize[j] * (tot_COM[j] / 2. / M_PI);
         }
 
     // Using the COM to calculate the Gyration Tensor
@@ -327,8 +327,6 @@ void GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex)
 }
 
 /// GyrTensor_GyrRad - calculates the total Gyration Tensor of the system.
-/// \param ClusSize - the total size of the cluster.
-/// \param ClusIndex - the index on naCluster where the cluster is stored.
 /// THIS IS VERY OLD AND HASN'T BEEN LOOKED AT IN A WHILE
 /// TODO: Update this for the new version
 void GyrTensor_GyrRad(void)
@@ -893,7 +891,7 @@ void Calc_SystemCenterOfMass_WithoutMolType(lDub* tmpR, const int thisType)
                 {
                     xi[j] /= (lDub) bead_total_now;
                     zeta[j] /= (lDub) bead_total_now;
-                    tot_COM[j] = atan2(-zeta[j], -xi[j]) + PI;
+                    tot_COM[j] = atan2(-zeta[j], -xi[j]) + M_PI;
                     tot_COM[j] /= dumConst[j];
                 }
         }
