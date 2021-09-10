@@ -9,9 +9,9 @@ void Print_LogToScreen(long nGen, int run_it);
 
 void Write_MCMove(char* filename, long nGen, float fMCTemp);
 
-void Write_Energy(char* filename, long nGen);
+void FileIO_WriteTo_EnergyFile(char* filename, long nGen);
 
-void Print_Key(void);
+void PrintToScreen_KeyFile(void);
 
 void HandleTrajectory(char* fileStruct, const int run_it, const long nGen);
 
@@ -21,11 +21,11 @@ void Save_Trajectory(const long nGen, const long curFrame);
 
 void Write_Saved_Trajectory(char* filename, const int run_it);
 
-void Write_TopFile(char* filename);
+void FileIO_WriteTo_TopFile(const char* filename);
 
 void Write_SysProp(char* filename);
 
-void Write_TotalSysProp(char* filename, int run_it);
+void FileIO_Write_TotalSysProp(const int run_it);
 
 void Print_Data(const long nGen, const int run_it);
 
