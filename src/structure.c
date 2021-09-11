@@ -400,7 +400,7 @@ void GyrTensor_GyrRad_Avg(void)
     int dumArg[POS_MAX] = {0};
     for (i = 0; i < 7; i++)
         { // Initializing to 0
-            fGyrTensor[i] = 0.;
+            fGyrTensor[i] = 0.f;
         }
 
     for (i = 0; i < tot_beads; i++)
@@ -413,10 +413,9 @@ void GyrTensor_GyrRad_Avg(void)
                 }
         }
 
-    fSysGyrRad += sqrtf((fGyrTensor[0] + fGyrTensor[1] + fGyrTensor[2]) /
-                        (float) tot_beads); // Adding to the total fSysGyrRad to be averaged at the end.
-    nTotGyrRadCounter++; // Remembering that we have calculated the radius; this will be used to average the final
-                         // value.
+    // Adding to the total fSysGyrRad to be averaged at the end.
+    fSysGyrRad += sqrtf((fGyrTensor[0] + fGyrTensor[1] + fGyrTensor[2]) / (float) tot_beads);
+    nTotGyrRadCounter++; // Remembering that we have calculated the radius; for final averaging.
 }
 
 /// RDF_ComponentIndex - 1D index for the symmetric g_{ij} matrix given i and j.
@@ -426,13 +425,17 @@ void GyrTensor_GyrRad_Avg(void)
 /// The way it is set up, the indexing goes through the diagonal and then 0-1, 0-2, ... 0-N, 1-2, ... 1-N and so on
 int RDF_ComponentIndex(const int i, const int j)
 {
-    if (i > j)
+    if (i == j)
         {
-            return RDF_ComponentIndex(j, i);
+            return i + 1;
+        }
+    else if (i < j)
+        {
+            return nBeadTypes + j - (i * (3 + i - 2 * nBeadTypes)) / 2;
         }
     else
         {
-            return i == j ? 1 + i : nBeadTypes + j - (i * (3 + i - 2 * nBeadTypes)) / 2;
+            return nBeadTypes + i - (j * (3 + j - 2 * nBeadTypes)) / 2;
         }
 }
 
@@ -683,9 +686,6 @@ void Calc_SystemCenterOfMass(lDub* tmpR)
                 }
         }
 
-    /*for (j=0; j<POS_MAX; j++){
-        tmpR[j] = (int) tot_COM[j];
-    }*/
     for (j = 0; j < POS_MAX; j++)
         {
             tmpR[j] = tot_COM[j];
