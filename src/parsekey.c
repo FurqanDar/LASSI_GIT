@@ -251,7 +251,7 @@ int Parse_Keyfile(char* filename)
 
     fclose(infile);
 
-    float freq_tot = 0.0;
+    float freq_tot = 0.0f;
     for (i = MV_NULL + 1; i < MAX_MV; i++)
         {
             freq_tot += fMCFreq[i];
@@ -321,6 +321,7 @@ int Parse_Keyfile(char* filename)
 
     return nErr;
 }
+
 
 void ForEnergyMatrix_FillWithZeros()
 {
