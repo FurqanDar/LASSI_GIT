@@ -334,16 +334,16 @@ void GyrTensor_GyrRad(void)
     int i, k, j, j2; // Basic indecies for loops
     for (i = 0; i < 7; i++)
         {
-            fGyrTensor[i] = 0.;
+            fGyrTensor[i] = 0.f;
         }                          // Initializing
-    float tot_COM[POS_MAX] = {0.}; // This is where we shall store the COM of the cluster.
+    float tot_COM[POS_MAX] = {0.f}; // This is where we shall store the COM of the cluster.
 
     // The only thing one needs to be careful about is to take PBC into account; the rest is tedium.
     // Use good old differential geometry to map each coordinate to two new coordinates, and unpack at the end.
-    float theta[POS_MAX] = {0.};
-    float zeta[POS_MAX]  = {0.}; // Extra coordinates for goodness
-    float dumArg         = 0.;   // Just a dummy variable to be more efficient
-    float dumArg2        = 0.;   // Another one
+    float theta[POS_MAX] = {0.f};
+    float zeta[POS_MAX]  = {0.f}; // Extra coordinates for goodness
+    float dumArg         = 0.f;   // Just a dummy variable to be more efficient
+    float dumArg2        = 0.f;   // Another one
 
     for (i = 0; i < tot_beads; i++)
         {
