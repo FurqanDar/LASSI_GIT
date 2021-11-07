@@ -94,15 +94,18 @@ int main(int argc, char* argv[])
     // Thermalizing the system.
     fCuTemp = fPreKT;
     //FILE Initialization
-    //FileIO_GenerateFiles()
-    Print_Data(-1, -1); // Initialization of files
+//    FileIO_GenerateFiles();
+    FileIO_CreateRunningDataFiles();
+//    Print_Data(-1, -1); // Initialization of files
 
     for (nGen = 0; nGen < nMCPreSteps; nGen++)
         { // Intentionally not performing any data acquisition in the thermalization phase.
             nMCInfo = MC_Step_Equil(fCuTemp);
             //        printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
-            //PrintToScreen_Log(nGen);
+//            PrintToScreen_Log(nGen);
             //FileIO_WriteData(nGen, run_cycle)
+
+//            FileIO_Thermalization_WriteData(nGen);
             Print_Data(nGen, -1);
         }
 
