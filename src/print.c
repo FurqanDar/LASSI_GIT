@@ -573,9 +573,9 @@ void PrintToScreen_AcceptanceRatios(void){
     float fAccRatio   = 0.f;
     lLong nMoveSum    = 0;
 
-    char sSectionHead[29];
-    memset(sSectionHead, '-', 27);
-    sSectionHead[28] = NULL;
+    char sSectionHead[32];
+    memset(sSectionHead, '-', 21);
+    sSectionHead[22] = NULL;
 
 
     printf("%s\n", sSectionHead);
@@ -586,11 +586,11 @@ void PrintToScreen_AcceptanceRatios(void){
         if (nMoveSum)
             {
                 fAccRatio = 100.f * (float) naMCAccepMat[1][i] / (float) nMoveSum;
-                printf("%-15s:    %-7.2f|\n", MoveName[i], fAccRatio);
+                printf("%-12s: %-7.2f|\n", MoveName[i], fAccRatio);
             }
         else
             {
-                printf("%-15s:    %-7s|\n", MoveName[i], "NA");
+                printf("%-12s: %-7s|\n", MoveName[i], "NA");
             }
     }
     printf("%s\n", sSectionHead);
