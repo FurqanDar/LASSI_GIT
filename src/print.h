@@ -13,6 +13,12 @@ void FileIO_WriteTo_EnergyFile(char* filename, long nGen);
 
 void PrintToScreen_KeyFile(void);
 
+void PrintToScreen_SystemEnergy(void);
+
+void PrintToScreen_AcceptanceRatios(void);
+
+void PrintToScreen_Log(const long nGen);
+
 void HandleTrajectory(char* fileStruct, const int run_it, const long nGen);
 
 void Write_Trajectory(const char* filename, const long nGen);
