@@ -126,67 +126,44 @@ void Write_GyrTen(char* filename, long nGen)
 void FileIO_Write_MCMoveHeader(const char* fileName)
 {
     FILE* fp = fopen(fileName, "a");
-    fprintf(fp, "#Steps ,and Temp, are followed by (rej, acc) for each MC Move.\n");
+    fprintf(fp, "#Steps, and Temp, are followed by (rej, acc) for each MC Move.\n");
     fprintf(fp, "#(nStep, T) "
-                "STROT   "
-                "LOCAL   "
-                "COLOCAL "
-                "MTLOCAL "
-                "SNAKE   "
-                "TRANS   "
-                "SM_CLST "
-                "CLST    "
-                "PIVOT   "
-                "BRROT   "
-                "DBPVT   "
-                "PR_CLST "
+                "STROT       "
+                "LOCAL       "
+                "COLOCAL     "
+                "MTLOCAL     "
+                "SNAKE       "
+                "TRANS       "
+                "SM_CLST     "
+                "CLST        "
+                "PIVOT       "
+                "BRROT       "
+                "DBPVT       "
+                "PR_CLST     "
                 "\n");
     fclose(fp);
 }
 
-/// Write_MCMove - writes the acceptance and rejection ratios of the various moves. Just keeps appending to that file.
+/// FileIO_WriteTo_MCMoveFile - writes the acceptance and rejection ratios of the various moves. Just keeps appending to that file.
 /// Can be used to track the 'dynamics' during a simulation.
+/// ALSO: Zeros out all the acceptance arrays.
 /// \param filename
 /// \param nGen
 /// \param fMCTemp
-void Write_MCMove(char* filename, long nGen, float fMCTemp)
+void FileIO_WriteTo_MCMoveFile(char* filename, const long nGen, float const fMCTemp)
 {
-    FILE* fp;
+    FILE* fp = fopen(filename, "a");
     int i; // Iterator
-    if (nGen == -1)
+    fprintf(fp, "%-10ld  %-10.2f  ", nGen, fMCTemp); // Step and Temp
+    for (i = 1; i < MAX_MV; i++)
         {
-            fp = fopen(filename, "w"); // overwrite
+            fprintf(fp, "%-10ld  %-10ld  ", naMCAccepMat[0][i], naMCAccepMat[1][i]);
+            naMCAccepMat[0][i] = 0;
+            naMCAccepMat[1][i] = 0;
+            // This way the print function will zero out the matrix every time
+            // we print to a file!
         }
-    else
-        {
-            fp = fopen(filename, "a");
-        }
-    if (nGen == -1)
-        {
-            fprintf(fp, "#Steps ,and Temp, are followed by (rej, acc) for each MC Move.\n");
-            fprintf(fp, "#(nStep, T) TRANS CLSTER SM_CLSTER FACE LOCAL DBPVT "
-                        "PIVOT BR_ROT\n");
-            for (i = 0; i < MAX_MV; i++)
-                {
-                    naMCAccepMat[0][i] = 0;
-                    naMCAccepMat[1][i] = 0;
-                    // This way the print function will initialize the matrix at
-                    // startup!
-                }
-        }
-    else
-        {
-            fprintf(fp, "%ld\t%.2f\t", nGen, fMCTemp); // Step and Temp
-            for (i = 1; i < MAX_MV; i++)
-                {
-                    fprintf(fp, "%ld\t%ld\t", naMCAccepMat[0][i], naMCAccepMat[1][i]);
-                    naMCAccepMat[0][i] = 0;
-                    naMCAccepMat[1][i] = 0;
-                    // This way the print function will zero out the matrix every time
-                    // we print to a file!
-                }
-            fprintf(fp, "\n");
-        }
+    fprintf(fp, "\n");
 
     fclose(fp);
 }
@@ -273,6 +250,7 @@ void FileIO_WriteTo_EnergyFile(char* filename, long nGen)
 
     fclose(fp);
 }
+
 
 void HandleTrajectory(char* fileStruct, const int run_it, const long nGen)
 {
@@ -536,9 +514,9 @@ void PrintToScreen_SystemEnergy(void){
 
     int i;
 
-    char sSectionHead[19];
+    char sSectionHead[32];
     memset(sSectionHead, '-', 17);
-    sSectionHead[18] = NULL;
+    sSectionHead[17] = NULL;
 
 
     printf("%s\n", sSectionHead);
@@ -574,7 +552,7 @@ void PrintToScreen_AcceptanceRatios(void){
     lLong nMoveSum    = 0;
 
     char sSectionHead[32];
-    memset(sSectionHead, '-', 21);
+    memset(sSectionHead, '-', 22);
     sSectionHead[22] = NULL;
 
 
@@ -596,7 +574,6 @@ void PrintToScreen_AcceptanceRatios(void){
     printf("%s\n", sSectionHead);
 }
 
-
 /// PrintToScreen_Log - print the log to the screen.
 void PrintToScreen_Log(const long nGen) {
     printf("Run Cycle: Thermalization\n");
@@ -609,9 +586,7 @@ void PrintToScreen_Log(const long nGen) {
     }
 
     PrintToScreen_SystemEnergy();
-
     PrintToScreen_AcceptanceRatios();
-
 }
 
 /// Write_RDF_ComponentWise - old implementation of printing the RDF, component
@@ -928,7 +903,6 @@ void FileIO_Write_TotalSysProp(const int run_it)
 /// \param fileName
 void FileIO_CreateFile(const char* fileName)
 {
-
     FILE* fp = fopen(fileName, "w+");
     fclose(fp);
 }
@@ -966,6 +940,87 @@ void FileIO_CreateRunningDataFiles(void)
         }
 }
 
+/// ForPrinting_GetReportState. Calculates if the current step is a multiple of the reporting frequency
+/// for this particular report.
+/// Convenient wrapper around some modulo arithmetic.
+/// \param nGen
+/// \param thisReport
+/// \return
+inline char ForPrinting_GetReportState(const long nGen, const long thisReport)
+{
+    char dum_log = (char)((nGen % thisReport) == 0);
+    dum_log = dum_log ? 1 : 0;
+    return dum_log;
+}
+
+/// DataPrinting_Thermalization - helper function for printing out data during the thermalization cycle.
+/// No data analysis is performed during the thermalization procedure.
+/// This function decides if, given the MCStep, it is time to print the following:
+/// 1. The Log - to the screen.
+/// 2. Trajectory - to the file (or saved if in total format)
+/// 3. Energy - to the file.
+/// 4. MCMove - to the file.
+/// \param nGen
+void DataPrinting_Thermalization(const long nGen)
+{
+
+    char cFlagForEnCal = 0;
+    char cLogFlag      = 0;
+    char cEnergyFlag   = 0;
+    char cAccFlag      = 0;
+    char cConfigFlag   = 0;
+
+    if (nReport[REPORT_LOG])
+        {
+            cLogFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_LOG]);
+            if (cLogFlag)
+                {
+                    //TODO: I think this whole business can be abstracted away as well.
+                    if (Check_System_Structure())
+                    {
+                        fprintf(stderr  , "Molecular structure is inconsistent with initial "
+                               "structure.\nCRASHING\n\n");
+                        exit(1);
+                    }
+                    Energy_Total_System();
+                    cFlagForEnCal = 1;
+                    PrintToScreen_Log(nGen);
+                }
+        }
+
+    if (nReport[REPORT_CONFIG])
+        {
+            cConfigFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_CONFIG]);
+            if (cConfigFlag)
+                {
+                    HandleTrajectory(fileTraj, -1, nGen);
+                }
+        }
+
+    if (nReport[REPORT_ENERGY])
+        {
+            // DO ENERGY SHIT
+            cEnergyFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_ENERGY]);
+            if (cEnergyFlag){
+                if (!cFlagForEnCal){
+                        Energy_Total_System();
+                        cFlagForEnCal = 1;
+                    }
+                FileIO_WriteTo_EnergyFile(fileEnergy, nGen);
+                }
+        }
+
+    if (nReport[REPORT_MCMOVE])
+        {
+            // DO MC_ACC SHIT
+            cAccFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_MCMOVE]);
+            if (cAccFlag)
+                {
+                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
+                }
+        }
+}
+
 /// Print_Data - helper function that decides given nGen and run_it which things
 /// to print. Usually don't print much during the thermalization but could
 /// change that here
@@ -997,6 +1052,7 @@ void Print_Data(const long nGen, const int run_it)
                                     Print_LogToScreen(nGen, run_it);
                                 }
                         }
+
             if (nReport[REPORT_CONFIG] != 0)
                 {
                     if (nGen % nReport[REPORT_CONFIG] == 0)
@@ -1021,7 +1077,7 @@ void Print_Data(const long nGen, const int run_it)
                         {
                             if (nGen % nReport[REPORT_MCMOVE] == 0)
                                 {
-                                    Write_MCMove(fileMCMove, nGen, fCuTemp);
+                                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
                                 }
                         }
                 }
@@ -1110,7 +1166,7 @@ void Print_Data(const long nGen, const int run_it)
                 {
                     if (nGen % nReport[REPORT_MCMOVE] == 0)
                         {
-                            Write_MCMove(fileMCMove, nGen + nMCPreSteps, fCuTemp);
+                            FileIO_WriteTo_MCMoveFile(fileMCMove, nGen + nMCPreSteps, fCuTemp);
                         }
                 }
             if (nReport[REPORT_RDFTOT] != 0)
@@ -1154,8 +1210,8 @@ void Print_Data(const long nGen, const int run_it)
                     if (nReport[REPORT_MCMOVE] != 0)
                         {
                             sprintf(fileMCMove, "%s_%d_mcmove.dat", strReportPrefix, run_it);
-                            Write_MCMove(fileMCMove, -1,
-                                         0.0); // Open a new MCInfo file; each run_it will
+                            FileIO_WriteTo_MCMoveFile(fileMCMove, -1,
+                                                      0.0); // Open a new MCInfo file; each run_it will
                                                // have its own
                         }
                 }
@@ -1206,7 +1262,7 @@ void Print_Data(const long nGen, const int run_it)
                         {
                             if (nGen % nReport[REPORT_MCMOVE] == 0)
                                 {
-                                    Write_MCMove(fileMCMove, nGen, fCuTemp);
+                                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
                                 }
                         }
                     if (nReport[REPORT_RDFTOT] != 0)
@@ -1279,8 +1335,8 @@ void Print_Data_New(const long nGen, const int run_it)
                     if (nReport[REPORT_MCMOVE] != 0)
                         {
                             sprintf(fileMCMove, "%s_mcmove.dat", strReportPrefix);
-                            Write_MCMove(fileMCMove, -1,
-                                         0.0); // Open a new MCInfo file; each run_it will
+                            FileIO_WriteTo_MCMoveFile(fileMCMove, -1,
+                                                      0.0); // Open a new MCInfo file; each run_it will
                             // have its own
                         }
                 }
@@ -1329,7 +1385,7 @@ void Print_Data_New(const long nGen, const int run_it)
                         {
                             if (nGen % nReport[REPORT_MCMOVE] == 0)
                                 {
-                                    Write_MCMove(fileMCMove, nGen, fCuTemp);
+                                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
                                 }
                         }
                 }
@@ -1418,7 +1474,7 @@ void Print_Data_New(const long nGen, const int run_it)
                 {
                     if (nGen % nReport[REPORT_MCMOVE] == 0)
                         {
-                            Write_MCMove(fileMCMove, nGen + nMCPreSteps, fCuTemp);
+                            FileIO_WriteTo_MCMoveFile(fileMCMove, nGen + nMCPreSteps, fCuTemp);
                         }
                 }
             if (nReport[REPORT_RDFTOT] != 0)
@@ -1462,8 +1518,8 @@ void Print_Data_New(const long nGen, const int run_it)
                     if (nReport[REPORT_MCMOVE] != 0)
                         {
                             sprintf(fileMCMove, "%s_%d_mcmove.dat", strReportPrefix, run_it);
-                            Write_MCMove(fileMCMove, -1,
-                                         0.0); // Open a new MCInfo file; each run_it will
+                            FileIO_WriteTo_MCMoveFile(fileMCMove, -1,
+                                                      0.0); // Open a new MCInfo file; each run_it will
                             // have its own
                         }
                 }
@@ -1514,7 +1570,7 @@ void Print_Data_New(const long nGen, const int run_it)
                         {
                             if (nGen % nReport[REPORT_MCMOVE] == 0)
                                 {
-                                    Write_MCMove(fileMCMove, nGen, fCuTemp);
+                                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
                                 }
                         }
                     if (nReport[REPORT_RDFTOT] != 0)
