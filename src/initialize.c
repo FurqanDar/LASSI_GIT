@@ -784,7 +784,7 @@ void Initial_Conditions_BreakBonds(void)
 
 /// Calculate_Rot_Bias - calculates the possible anisotropic Boltzmann weights
 /// at the beginning so that we have a look-up table. \param CurrentTemp
-void Calculate_Rot_Bias(float CurrentTemp)
+void Calculate_Rot_Bias(const float CurrentTemp)
 {
 
     int i, j;
@@ -825,8 +825,8 @@ float Temperature_Function(int mode, long nGen)
         {
             case 0:
                 x_val   = (float) (nMCPreSteps - nGen);
-                x_val   = x_val / 1250. / fPreKT;
-                x_val   = fPreKT * (tanhf(x_val) + 1.);
+                x_val   = x_val / 1250.f / fPreKT;
+                x_val   = fPreKT * (tanhf(x_val) + 1.f);
                 end_val = fKT + x_val;
 
                 break;
@@ -835,22 +835,22 @@ float Temperature_Function(int mode, long nGen)
                 x_val   = (float) (nGen - nMCPreSteps) / (float) nMCPreSteps;
                 y_val   = -x_val;
                 x_val   = fabsf(sinf(x_val));
-                y_val   = expf(y_val / 4.);
-                end_val = fKT + 5. * fKT * x_val * y_val;
+                y_val   = expf(y_val / 4.f);
+                end_val = fKT + 5.f * fKT * x_val * y_val;
 
                 break;
 
             case 2:
                 x_val   = (float) (nGen - 10 * nMCPreSteps);
                 x_val   = x_val * x_val;
-                y_val   = (float) (nMCPreSteps * nMCPreSteps) * 10.;
-                end_val = fKT + expf(-x_val / y_val) / fKT / 10.;
+                y_val   = (float) (nMCPreSteps * nMCPreSteps) * 10.f;
+                end_val = fKT + expf(-x_val / y_val) / fKT / 10.f;
 
                 break;
 
             case 3:
                 x_val   = -(float) (nGen);
-                x_val   = 4. * x_val;
+                x_val   = 4.f * x_val;
                 x_val   = x_val / (float) (nMCPreSteps);
                 end_val = fKT + expf(x_val);
 
@@ -985,7 +985,7 @@ int** Create2DInt(const size_t xDim, const size_t yDim, const char* ArrName)
             printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
             exit(1);
         }
-#
+
     dumPtr[0] = (int*) malloc(xDim * yDim * sizeof(int));
     if (dumPtr[0] == NULL)
         {
@@ -1024,7 +1024,7 @@ long double** Create2DLongdouble(const size_t xDim, const size_t yDim, const cha
             printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
             exit(1);
         }
-#
+
     dumPtr[0] = (long double*) malloc(xDim * yDim * sizeof(long double));
     if (dumPtr[0] == NULL)
         {

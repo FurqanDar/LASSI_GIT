@@ -406,12 +406,17 @@ void Clus_Network_Distribution_MolWise_Avg(void)
     nLargestClusterRightNow += currentLargest;
 }
 
+
+/*
+ * TODO: I need to update all the clustering functions with the newer neighbor-search-like functions.
+ */
+
+
 /// Clus_MolWiseLargestCluster - performs a total clustering analysis of the
 /// system. Then finds out the largest cluster for each MolType, where
 /// redundancy is allowed. naList contains the cluster IDs of the chain types.
 /// Note that naList[0] contains the system's overall largest cluster, naList[1]
 /// is for molType=0 and so on.
-///
 void Clus_Network_MolWise_LargestClusters(void)
 {
     int curID, Cluster_length, i;
@@ -1003,6 +1008,9 @@ int Clus_Proximity_LimitedCluster_IntOnly_Check(int const chainID, int const* Ol
     return clusSize;
 }
 
+///
+/// \param chainID
+/// \return
 int Clus_Proximity_LimitedCluster_All(int const chainID)
 {
     // Updates naList to have all proteins bound to  chainID and it's cluster
@@ -1094,7 +1102,7 @@ int Clus_Proximity_LimitedCluster_All_Check(int const chainID, int const* OldLis
     // chain, and to add it to naList If Cluster becomes larger than 15, exit
     // and return -1 Furthermore, it checks while it goes to see if naList[i] ==
     // OldList[i]. If not, return -1.
-    int ClusterLimit = 15;
+    const size_t ClusterLimit = nLimitedClusterSize;
     int i, j, k; // Loop iterators
     for (i = 0; i < ClusterLimit; i++)
         {

@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     if (errorcode == 0)
         {
             printf("Key file %s was successfully parsed.\n\n", keyfile);
-            srand(RNG_Seed);
+            srand(nRNG_Seed);
             PrintToScreen_KeyFile();
         }
     else
@@ -113,20 +113,27 @@ int main(int argc, char* argv[])
     // Going through the MC cycles.
     for (run_cycle = 0; run_cycle < nTot_CycleNum; run_cycle++)
         {
+            /*
+             * Pre run-cycle specific initialization.
+             */
             fKT = fKT_Cycle[run_cycle];
             Calculate_Rot_Bias(fKT);
             Print_Data(-1, run_cycle);
             //FileIO_GenerateFiles()
             for (nGen = 0; nGen <= nMCStepsPerCycle; nGen++)
                 {
-                    fCuTemp = Temperature_Function(Temp_Mode, nGen);
+                    fCuTemp = Temperature_Function(nAnnealing_Mode, nGen);
                     nMCInfo = MC_Step(fCuTemp);
                     //            printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
-                    //PrintToScreen_Log(nGen);
                     //FileIO_WriteData(nGen, run_cycle)
                     Print_Data(nGen, run_cycle);
+//                    DataAnalysis_DuringRun(nGen);
+//                    DataPrinting_DuringRun(nGen);
                 }
-            Temp_Mode = -1;
+            /*
+             * Post run-cycle specific cleanup.
+             */
+            nAnnealing_Mode = -1;
             Copy_Data(run_cycle);
             Reset_Global_Arrays();
         }

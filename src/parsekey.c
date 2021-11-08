@@ -33,8 +33,8 @@ int Parse_Keyfile(char* filename)
         {
             fMCFreq[i] = 0.0; // initialization; to be normalized
         }
-    nThermalization_Mode = 0;
-    Temp_Mode            = -1;
+    nInitialPotential_Mode = 0;
+    nAnnealing_Mode      = -1;
     while (fgets(strLine, sizeof(strLine), infile) != NULL)
         {
             nLine++;
@@ -106,7 +106,7 @@ int Parse_Keyfile(char* filename)
                         }
                     else if (strcmp(strKeyword, "MC_TEMP_MODE") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &Temp_Mode);
+                            sscanf(strLine, "%*s %d", &nAnnealing_Mode);
                         }
                     else if (strcmp(strKeyword, "MC_DELTA_TEMP") == 0)
                         {
@@ -122,7 +122,7 @@ int Parse_Keyfile(char* filename)
                         }
                     else if (strcmp(strKeyword, "MC_INDENT_MODE") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &nThermalization_Mode);
+                            sscanf(strLine, "%*s %d", &nInitialPotential_Mode);
                         }
                     else if (strcmp(strKeyword, "ROT_ENERGY_BIAS") == 0)
                         {
@@ -194,8 +194,8 @@ int Parse_Keyfile(char* filename)
                         }
                     else if (strcmp(strKeyword, "RANDOM_SEED") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &RNG_Seed);
-                            RNG_Seed = RNG_Seed == 0 ? time(NULL) : RNG_Seed;
+                            sscanf(strLine, "%*s %d", &nRNG_Seed);
+                            nRNG_Seed = nRNG_Seed == 0 ? time(NULL) : nRNG_Seed;
                         }
                     else if (strcmp(strKeyword, "REPORT_PREFIX") == 0)
                         {

@@ -283,8 +283,10 @@ int Move_Rot(int beadID, float MyTemp)
 /// 2. Calculating the Rosenbluth weight by searching the 3^3-1=26 possible
 /// bonding locations, and calculate the rest of the energy.
 /// 3. Move the bead. Calculate the Rosenbluth weight, and energy. Propose a
-/// bond and perform Metropolis-Hastings \param beadID \param MyTemp \return 1
-/// if accepted, 0 if rejected.
+/// bond and perform Metropolis-Hastings
+/// \param beadID
+/// \param MyTemp
+/// \return 1 if accepted, 0 if rejected.
 int Move_Local(int beadID, float MyTemp)
 { // Performs a local translation MC-move on beadID
 
@@ -317,7 +319,7 @@ int Move_Local(int beadID, float MyTemp)
 
     const int resi = bead_info[beadID][BEAD_TYPE];
 
-    lLDub oldEn = nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
+    lLDub oldEn = nInitialPotential_Mode == -1 ? 0. : Energy_InitPotential(beadID);
     lLDub newEn = 0.;
 
     Energy_Iso_ForLocal(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs,
@@ -333,7 +335,7 @@ int Move_Local(int beadID, float MyTemp)
 
     OP_System_MoveBeadTo(beadID, r_posNew);
 
-    newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
+    newEn += nInitialPotential_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
     Energy_Iso_ForLocal(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs,
                         newContNeighs);
@@ -462,7 +464,7 @@ int Move_Snake(int chainID, float MyTemp)
 
     lLDub newEn = 0.;
     lLDub oldEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
@@ -503,7 +505,7 @@ int Move_Snake(int chainID, float MyTemp)
                 }
         }
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
@@ -581,7 +583,7 @@ int Move_Trans(int chainID, float MyTemp)
 
     lLDub newEn = 0.;
     lLDub oldEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
@@ -601,7 +603,7 @@ int Move_Trans(int chainID, float MyTemp)
 
     OP_System_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff.
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
@@ -695,7 +697,7 @@ int Move_Clus_Network(float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -729,7 +731,7 @@ int Move_Clus_Network(float MyTemp)
             OP_System_DispChain(naList[j], r_Disp); // Moving the cluster properly
         }
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -832,7 +834,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -866,7 +868,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
             OP_System_DispChain(naList[j], r_Disp); // Moving the cluster properly
         }
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -1117,7 +1119,7 @@ int Move_CoLocal(int thisBeadID, float MyTemp)
 
     lLDub newEn = 0.;
     lLDub oldEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             oldEn += Energy_InitPotential(thisBeadID);
             oldEn += Energy_InitPotential(otherBeadID);
@@ -1153,7 +1155,7 @@ int Move_CoLocal(int thisBeadID, float MyTemp)
     OP_System_MoveBeadTo(thisBeadID, r_posNew1);
     OP_System_MoveBeadTo(otherBeadID, r_posNew2);
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             newEn += Energy_InitPotential(thisBeadID);
             newEn += Energy_InitPotential(otherBeadID);
@@ -1254,7 +1256,7 @@ int Move_MultiLocal(int beadID, float MyTemp)
 
     lLDub oldEn = 0.;
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
@@ -1299,7 +1301,7 @@ int Move_MultiLocal(int beadID, float MyTemp)
     OP_System_MoveBeadsInListToPos(beadNum, beadsList, beads_posNew);
     OP_Beads_BreakBondsInList(beadNum, beadsList);
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
@@ -1459,7 +1461,7 @@ int Move_Pivot(int chainID, float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
@@ -1493,7 +1495,7 @@ int Move_Pivot(int chainID, float MyTemp)
 
     OP_Beads_BreakBondsInList(beadNum, beadsList);
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
@@ -1625,7 +1627,7 @@ int Move_BranchedRot(int chainID, float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
@@ -1656,7 +1658,7 @@ int Move_BranchedRot(int chainID, float MyTemp)
 
     OP_Beads_BreakBondsInList(beadNum, beadsList);
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
@@ -1706,6 +1708,10 @@ int Move_BranchedRot(int chainID, float MyTemp)
         }
 }
 
+/// Move_SmallClus_Proximity
+/// \param chainID
+/// \param myTemp
+/// \return
 int Move_SmallClus_Proximity(const int chainID, const float myTemp)
 {
     // Performs a cluster move where a given chain and it's cluster are moved.
@@ -1745,7 +1751,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -1796,7 +1802,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
             return bAccept;
         }
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -1888,7 +1894,7 @@ int Move_Local_Equil(int beadID, float MyTemp)
 
     const int resi = bead_info[beadID][BEAD_TYPE];
 
-    oldEn = nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
+    oldEn = nInitialPotential_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
     newEn = 0.;
 
     Energy_Iso_ForLocalEquil(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, oldOvlpNeighs,
@@ -1902,7 +1908,7 @@ int Move_Local_Equil(int beadID, float MyTemp)
 
     OP_System_MoveBeadTo(beadID, r_posNew);
 
-    newEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
+    newEn += nInitialPotential_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
     Energy_Iso_ForLocalEquil(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, newOvlpNeighs,
                              newContNeighs);
@@ -1992,7 +1998,7 @@ int Move_Snake_Equil(int chainID, float MyTemp)
 
     lLDub newEn = 0.;
     lLDub oldEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
@@ -2018,7 +2024,7 @@ int Move_Snake_Equil(int chainID, float MyTemp)
             OP_System_Snake_SlitherBck(firstB, lastB, r_posNew);
         }
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
@@ -2080,7 +2086,7 @@ int Move_Trans_Equil(int chainID, float MyTemp)
     int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
 
     oldEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
@@ -2096,7 +2102,7 @@ int Move_Trans_Equil(int chainID, float MyTemp)
     OP_System_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff
 
     newEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
@@ -2181,7 +2187,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp)
 
     lLDub oldEn = 0.;
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
@@ -2223,7 +2229,7 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp)
 
     OP_System_MoveBeadsInListToPos(beadNum, beadsList, beads_posNew);
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
@@ -2351,7 +2357,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
@@ -2380,7 +2386,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp)
             OP_System_MoveBeadTo(tmpBead, naTempR);
         }
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
@@ -2493,7 +2499,7 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
@@ -2519,7 +2525,7 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp)
             OP_System_MoveBeadTo(tmpBead, naTempR);
         }
 
-    if (nThermalization_Mode != -1)
+    if (nInitialPotential_Mode != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {

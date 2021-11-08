@@ -23,7 +23,7 @@ void Initial_Conditions_BreakBonds(void);
 
 float Temperature_Function(int mode, long nGen);
 
-void Calculate_Rot_Bias(float CurrentTemp);
+void Calculate_Rot_Bias(const float CurrentTemp);
 
 int* Create1DInt(const size_t xDim, const char* ArrName);
 

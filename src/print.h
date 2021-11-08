@@ -15,7 +15,9 @@ void PrintToScreen_SystemEnergy(void);
 
 void PrintToScreen_AcceptanceRatios(void);
 
-void PrintToScreen_Log(const long nGen);
+void PrintToScreen_Log_Thermalization(const long nGen);
+
+void PrintToScreen_Log_FullRun(const long nGen, const int run_cycle);
 
 char ForPrinting_GetReportState(const long nGen, const long thisReport);
 
