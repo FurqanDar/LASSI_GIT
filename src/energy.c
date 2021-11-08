@@ -3,8 +3,8 @@
 
 /// Energy_InitPotential calculates the biasing potential used in the
 /// thermalization/equilibration The function calculates (T_current - T_final)
-/// and if < 0.001, sets nThermalization_Mode = 0. \param beadID \return The
-/// energy, given the nThermalization_Mode
+/// and if < 0.001, sets nInitialPotential_Mode = 0. \param beadID \return The
+/// energy, given the nInitialPotential_Mode
 float Energy_InitPotential(const int beadID)
 {
     int j;
@@ -12,7 +12,7 @@ float Energy_InitPotential(const int beadID)
     int tmpR[POS_MAX];
     if (fCuTemp - fKT > 0.005)
         {
-            switch (nThermalization_Mode)
+            switch (nInitialPotential_Mode)
                 {
                     case 1:
                         for (j = 0; j < POS_MAX; j++)
@@ -133,7 +133,7 @@ float Energy_InitPotential(const int beadID)
         }
     else
         {
-            nThermalization_Mode = -1;
+            nInitialPotential_Mode = -1;
         }
 
     return totEn;
@@ -669,7 +669,7 @@ float Energy_Isotropic_Old(const int beadID)
     int secBi, resj;  // Second bead index
     float xDis = 0.f; // Distance between beads.
     int resi   = bead_info[beadID][BEAD_TYPE];
-    totEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
+    totEn += nInitialPotential_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
         nBeadTypeCanTInd[resi] == 0)
@@ -753,7 +753,7 @@ float Energy_Isotropic(const int beadID)
     int secBi, resj; // Second bead index
     float xDis = 0.; // Distance between beads.
     int resi   = bead_info[beadID][BEAD_TYPE];
-    totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
+    totEn += nInitialPotential_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
         nBeadTypeCanTInd[resi] == 0)
@@ -822,7 +822,7 @@ float Energy_Isotropic_Self(const int beadID)
     int secBi, resj; // Second bead index
     float xDis = 0.; // Distance between beads.
     int resi   = bead_info[beadID][BEAD_TYPE];
-    // totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
+    // totEn += nInitialPotential_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
         nBeadTypeCanTInd[resi] == 0)
@@ -893,7 +893,7 @@ float Energy_Isotropic_For_Chain(const int beadID)
     int secBi, resj; // Second bead index
     float xDis = 0.; // Distance between beads.
     int resi   = bead_info[beadID][BEAD_TYPE];
-    totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
+    totEn += nInitialPotential_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
         nBeadTypeCanTInd[resi] == 0)
@@ -974,7 +974,7 @@ float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bea
     int secBi, resj; // Second bead index
     float xDis = 0.; // Distance between beads.
     int resi   = bead_info[beadID][BEAD_TYPE];
-    totEn += nThermalization_Mode == -1 ? 0. : Energy_InitPotential(beadID);
+    totEn += nInitialPotential_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
         nBeadTypeCanTInd[resi] == 0)
@@ -1061,7 +1061,7 @@ float Energy_Isotropic_With_List(const int beadID, const int* bead_list, const i
     int secBi, resj; // Second bead index
     float xDis = 0.; // Distance between beads.
     int resi   = bead_info[beadID][BEAD_TYPE];
-    totEn += nThermalization_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
+    totEn += nInitialPotential_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
     if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
         nBeadTypeCanTInd[resi] == 0)

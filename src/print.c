@@ -41,7 +41,11 @@ void PrintToScreen_EnergyMatrix(char* strTitle, int nSeqEn, float fArray[MAX_AA]
     printf("%s\n", sSectionHead);
 }
 
-
+/// TrajArr_Index
+/// \param beadID
+/// \param nFrameNumber
+/// \param beadProp
+/// \return
 long TrajArr_Index(const int beadID, const int nFrameNumber, const int beadProp)
 {
     return beadProp + BEADINFO_MAX * (beadID + tot_beads * nFrameNumber);
@@ -170,34 +174,9 @@ void FileIO_WriteTo_MCMoveFile(char* filename, const long nGen, float const fMCT
 
 /// Print_LogToScreen - prints current status of the run. Overall move
 /// acceptance ratios, and energies. \param nGen \param run_it
-void Print_LogToScreen(long nGen, int run_it)
+void Print_LogToScreen(long nGen, const int run_it)
 {
-    PrintToScreen_Log(nGen);
-//    printf("Step       %.2e\n", (float) nGen);
-//    printf("Run Cycle: %d\n", run_it);
-//    // printf("MC Temp = %.3e;\tRot Bias Prob = %.3e /site;\n", fCuTemp,
-//    // fRot_Bias);
-//    printf("MC Temp  = %.3e;\n", fCuTemp);
-//
-//    printf("Energies\n");
-//    printf("Tot: %.2e| ", faCurrEn[E_TOT]);
-//    printf("Ovlp: %.2e| ", faCurrEn[E_OVLP]);
-//    printf("Cont: %.2e| ", faCurrEn[E_CONT]);
-//    printf("Aniso: %.2e| ", faCurrEn[E_SC_SC]);
-//    printf("FSol: %.2e| ", faCurrEn[E_F_SOL]);
-//    printf("Stiff: %.2e| ", faCurrEn[E_STIFF]);
-//    printf("\n");
-//
-//    printf("Percolation Parameter Is: %.3f\n",
-//           ((float) nLargestClusterRightNow) / ((float) nTotClusCounter + 0.0001) / (float) tot_chains);
-//    int i, j;
-//    printf("Acceptance Ratios:\n");
-//    for (i = 1; i < MAX_MV; i++)
-//        {
-//            printf("%-5.2f ", 100. * (float) naMCAccepMat[1][i] /
-//                                  ((float) naMCAccepMat[0][i] + 0.00001 + (float) naMCAccepMat[1][i]));
-//        }
-//    printf("\n\n");
+    PrintToScreen_Log_FullRun(nGen, run_it);
 }
 
 /// FileIO_Write_EnergyHeader - write the header for the energy file.
@@ -458,12 +437,12 @@ void PrintToScreen_KeyFile(void)
     const char lBrace[] = "<======      ";
     const char rBrace[] = "      ======>";
     printf("%s System Settings %s\n", lBrace, rBrace);
-    printf("Number of Sticker Types = %d\n", nBeadTypes);
-    printf("Number of Beads         = %ld\n", tot_beads);
-    printf("Number of Chains        = %ld\n", tot_chains);
-    printf("Number of Components    = %ld\n", tot_chain_types);
-    printf("Box Sizes               = %3d %3d %3d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]);
-    printf("Monomer density         = %1.1e\n",
+    printf("Number of Bead Types = %d\n", nBeadTypes);
+    printf("Number of Beads      = %ld\n", tot_beads);
+    printf("Number of Chains     = %ld\n", tot_chains);
+    printf("Number of Components = %ld\n", tot_chain_types);
+    printf("Box Sizes            = %3d %3d %3d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]);
+    printf("Monomer density      = %1.1e\n",
            (float) tot_beads / (float) nBoxSize[0] / (float) nBoxSize[1] / (float) nBoxSize[2]);
     printf("\n");
 
@@ -480,31 +459,16 @@ void PrintToScreen_KeyFile(void)
     printf("%s MC Setup %s\n", lBrace, rBrace);
     printf("Temperature Inverted           = %d\n", nTemp_inv);
     printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", fKT, fKT + (float) (nTot_CycleNum - 1) * fdelta_temp);
-    printf("Temperature Mode               = %d\n", Temp_Mode);
-    printf("Indent Mode                    = %d\n", nThermalization_Mode);
+    printf("Temperature Mode               = %d\n", nAnnealing_Mode);
+    printf("Indent Mode                    = %d\n", nInitialPotential_Mode);
     printf("Rotational Bias Mode           = %d\n", RotBias_Mode);
     printf("Number of MC Cycles            = %d\n", nTot_CycleNum);
     printf("Number of MC Steps/Cycle       = %e\n", (float) nMCStepsPerCycle);
     printf("Thermalizing Temperature       = %.2f\n", fPreKT);
     printf("Number of Thermalizing Steps   = %e\n", (float) nMCPreSteps);
-    printf("RNG Seed                       = %d\n", RNG_Seed);
+    printf("RNG Seed                       = %d\n", nRNG_Seed);
     printf("Clustering Mode                = %d\n", nClusteringMode);
 
-    char* MoveName[MAX_MV];
-    MoveName[MV_PIVOT]      = "Pivot           ";
-    MoveName[MV_DBPVT]      = "Double Pivot    ";
-    MoveName[MV_CLSTR]      = "Larger Cluster  ";
-    MoveName[MV_SMCLSTR]    = "Smaller Cluster ";
-    MoveName[MV_STROT]      = "Face Change     ";
-    MoveName[MV_LOCAL]      = "Local           ";
-    MoveName[MV_COLOCAL]    = "Co-local        ";
-    MoveName[MV_MTLOCAL]    = "Shake           ";
-    MoveName[MV_BRROT]      = "Rotate Branched ";
-    MoveName[MV_SNAKE]      = "Slithering Snake";
-    MoveName[MV_TRANS]      = "Translation     ";
-    MoveName[MV_PR_SMCLSTR] = "Pr. Smal Cluster";
-
-    float freqMin = 1e10f;
     PrintToScreen_MCMoveFreqs();
     printf("\n");
 }
@@ -574,11 +538,29 @@ void PrintToScreen_AcceptanceRatios(void){
     printf("%s\n", sSectionHead);
 }
 
-/// PrintToScreen_Log - print the log to the screen.
-void PrintToScreen_Log(const long nGen) {
+/// PrintToScreen_Log_Thermalization - print the log to the screen.
+void PrintToScreen_Log_Thermalization(const long nGen) {
     printf("Run Cycle: Thermalization\n");
     printf("Step     : %8.3e\n", (float) nGen);
     printf("MC Temp  : %8.3e\n", fCuTemp);
+
+    if (nTotClusCounter > 0)
+    {
+        printf("Perc Phi : %8.3f\n",
+               ((float) nLargestClusterRightNow) / ((float) nTotClusCounter ) / (float) tot_chains);
+    }
+
+    PrintToScreen_SystemEnergy();
+    PrintToScreen_AcceptanceRatios();
+}
+
+
+/// PrintToScreen_Log_FullRun - print the log to the screen.
+void PrintToScreen_Log_FullRun(const long nGen, const int run_cycle) {
+    printf("Run Cycle: %ld\n", run_cycle);
+    printf("Step     : %8.3e\n", (float) nGen);
+    printf("MC Temp  : %8.3e\n", fCuTemp);
+
     if (nTotClusCounter > 0)
     {
         printf("Perc Phi : %8.3f\n",
@@ -984,7 +966,7 @@ void DataPrinting_Thermalization(const long nGen)
                     }
                     Energy_Total_System();
                     cFlagForEnCal = 1;
-                    PrintToScreen_Log(nGen);
+                    PrintToScreen_Log_Thermalization(nGen);
                 }
         }
 

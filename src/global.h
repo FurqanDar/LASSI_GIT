@@ -84,8 +84,8 @@ lInt** linker_len;
 size_t tot_beads;
 size_t tot_chains;
 size_t tot_chain_types;
-lInt Temp_Mode, nTemp_inv;
-lInt nThermalization_Mode, RotBias_Mode;
+lInt nAnnealing_Mode, nTemp_inv;
+lInt nInitialPotential_Mode, RotBias_Mode;
 
 // system setup
 lInt nBoxSize[POS_MAX];
@@ -130,8 +130,8 @@ lLong nMCStepsPerCycle, nMCPreSteps;
 float fMCFreq[MAX_MV];
 lInt  nTot_CycleNum;
 
-// random number generator RNG_Seed
-lInt RNG_Seed;
+// random number generator nRNG_Seed
+lInt nRNG_Seed;
 
 // report-related
 char strReportPrefix[512];
