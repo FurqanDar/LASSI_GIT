@@ -136,14 +136,16 @@ int main(int argc, char* argv[])
 
     tEnd         = clock();
     elapsed_time = (double) (tEnd - tStart) / (double) CLOCKS_PER_SEC;
+
     double elapsed_minutes = elapsed_time / 60.;
     double elapsed_hours   = elapsed_minutes / 60.;
     double elapsed_days    = elapsed_hours / 24.;
+
     printf("____________________________________\n");
     printf("Simulation finished! Timings:\n");
-    printf("%.1lf mins.\n", elapsed_minutes);
-    printf("%.1lf hours.\n", elapsed_hours);
-    printf("%.1lf days.\n", elapsed_days);
+    printf("%.2lf mins.\n", elapsed_minutes);
+    printf("%.2lf hours.\n", elapsed_hours);
+    printf("%.2lf days.\n", elapsed_days);
     printf("------------------------------------\n");
     printf("%s ENDING %s\n", lBrace, rBrace);
     printf("******************************************\n");
