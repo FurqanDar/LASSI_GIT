@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
         {
             printf("Key file %s was successfully parsed.\n\n", keyfile);
             srand(nRNG_Seed);
-            PrintToScreen_KeyFile();
+            ScreenIO_Print_KeyFile();
         }
     else
         {
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
              * Post run-cycle specific cleanup.
              */
             nAnnealing_Mode = -1;
-            Copy_Data(run_cycle);
+            CopyData_All(run_cycle);
             Reset_Global_Arrays();
         }
 
