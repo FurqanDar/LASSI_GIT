@@ -43,13 +43,19 @@ void FileIO_CreateRunningDataFiles(void);
 
 void FileIO_WriteTo_MCMoveFile(const char* filename, const long nGen, const float fMCTemp);
 
-void FileIO_WriteTo_EnergyFile(const char* filename, long nGen);
+void FileIO_PreCycle_Init(const int run_it);
+
+void FileIO_AppendEnergyTo_EnergyFile(const char* fileNameStr, const long nGen);
 
 void FileIO_WriteTo_TopFile(const char* filename);
 
-void FileIO_HandleTrajectory(const char* fileStruct, const int run_it, const long nGen);
+void FileIO_HandleTrajectory(const char* fileNameStr, const int run_it, const long nGen);
 
-void FileIO_WriteTo_TrajFile(const char* filename, const long nGen);
+void FileIO_AppendTrajFrame_ToFile(const char* filename, const long nGen);
+
+void FileIO_WriteRestart_ForThermalization(void);
+
+void FileIO_WriteRestart_ForRun(const int run_it);
 
 void FileIO_Write_TotalSysProp(const int run_it);
 

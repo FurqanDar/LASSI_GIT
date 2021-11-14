@@ -102,6 +102,11 @@ int main(int argc, char* argv[])
             //        printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
             DataPrinting_Thermalization(nGen);
         }
+    /*
+     * Post-thermalization
+     * */
+    FileIO_WriteRestart_ForThermalization();
+
 
     printf("____________________________\n");
     printf("System has been thermalized!\n");
@@ -118,7 +123,8 @@ int main(int argc, char* argv[])
              */
             fKT = fKT_Cycle[run_cycle];
             Calculate_Rot_Bias(fKT);
-            Print_Data(-1, run_cycle);
+            FileIO_PreCycle_Init(run_cycle);
+//            Print_Data(-1, run_cycle);
             //FileIO_GenerateFiles()
             for (nGen = 0; nGen <= nMCStepsPerCycle; nGen++)
                 {
@@ -134,6 +140,8 @@ int main(int argc, char* argv[])
              * Post run-cycle specific cleanup.
              */
             nAnnealing_Mode = -1;
+            FileIO_WriteRestart_ForRun(run_cycle);
+
             CopyData_All(run_cycle);
             Reset_Global_Arrays();
         }
