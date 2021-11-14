@@ -31,7 +31,7 @@ int Parse_Keyfile(char* filename)
 
     for (i = 0; i < MAX_MV; i++)
         {
-            fMCFreq[i] = 0.0; // initialization; to be normalized
+            fMCFreq[i] = 0.0f; // initialization; to be normalized
         }
     nInitialPotential_Mode = 0;
     nAnnealing_Mode      = -1;
