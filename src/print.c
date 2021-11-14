@@ -480,12 +480,12 @@ void ScreenIO_Print_SystemEnergy(void){
 
     printf("%s\n", sSectionHead);
     printf("Energies\n");
-    printf("Tot  : %8.2e |\n", faCurrEn[E_TOT]);
-    printf("Ovlp : %8.2e |\n", faCurrEn[E_OVLP]);
-    printf("Cont : %8.2e |\n", faCurrEn[E_CONT]);
-    printf("Aniso: %8.2e |\n", faCurrEn[E_SC_SC]);
-    printf("FSol : %8.2e |\n", faCurrEn[E_F_SOL]);
-    printf("Stiff: %8.2e |\n", faCurrEn[E_STIFF]);
+    printf("Tot  : %-10.2e |\n", faCurrEn[E_TOT]);
+    printf("Ovlp : %-10.2e |\n", faCurrEn[E_OVLP]);
+    printf("Cont : %-10.2e |\n", faCurrEn[E_CONT]);
+    printf("Aniso: %-10.2e |\n", faCurrEn[E_SC_SC]);
+    printf("FSol : %-10.2e |\n", faCurrEn[E_F_SOL]);
+    printf("Stiff: %-10.2e |\n", faCurrEn[E_STIFF]);
     printf("%s\n", sSectionHead);
 }
 
@@ -923,7 +923,7 @@ void FileIO_CreateRunningDataFiles(void)
 /// \param nGen
 /// \param thisReport
 /// \return
-inline char ForPrinting_GetReportState(const long nGen, const long thisReport)
+char ForPrinting_GetReportState(const long nGen, const long thisReport)
 {
     char dum_log = (char)((nGen % thisReport) == 0);
     dum_log = dum_log ? 1 : 0;
@@ -1007,57 +1007,6 @@ void Print_Data(const long nGen, const int run_it)
 {
     // This function handles all the data IO.
     int nFlagForEnCalc = 0; // Flag for total energy calculation
-
-    if (run_it == -1)
-        { // Thermalization cycle.
-            if (nReport[REPORT_LOG] != 0)
-                        {
-                            if (nGen % nReport[REPORT_LOG] == 0)
-                                {
-                                    if (Check_System_Structure() == 0)
-                                        {
-                                            printf("Structure is still a-okay!\n");
-                                        }
-                                    else
-                                        {
-                                            printf("Molecular structure is inconsistent with initial "
-                                                   "structure.\nCRASHING\n\n");
-                                            exit(1);
-                                        }
-                                    Energy_Total_System();
-                                    nFlagForEnCalc = 1;
-                                    Print_LogToScreen(nGen, run_it);
-                                }
-                        }
-
-            if (nReport[REPORT_CONFIG] != 0)
-                {
-                    if (nGen % nReport[REPORT_CONFIG] == 0)
-                        {
-                            FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                            // FileIO_WriteTo_TrajFile(fileTraj, nGen);
-                        }
-                }
-            if (nReport[REPORT_ENERGY] != 0)
-                {
-                    if (nGen % nReport[REPORT_ENERGY] == 0)
-                        {
-                            if (nFlagForEnCalc != 1)
-                                { // Calculate the energy
-                                    Energy_Total_System();
-                                    nFlagForEnCalc = 1;
-                                }
-                            FileIO_WriteTo_EnergyFile(fileEnergy, nGen);
-                        }
-                }
-            if (nReport[REPORT_MCMOVE] != 0)
-                        {
-                            if (nGen % nReport[REPORT_MCMOVE] == 0)
-                                {
-                                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
-                                }
-                        }
-                }
 
     if (run_it == 0 && nGen == -1)
         { // Write out equilibrium trajectory
