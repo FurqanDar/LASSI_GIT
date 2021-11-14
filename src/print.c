@@ -196,45 +196,30 @@ void FileIO_Write_EnergyHeader(const char* fileName)
     fclose(fp);
 }
 
-/// FileIO_WriteTo_EnergyFile - write the decomposed energy of the system to a file.
+/// FileIO_AppendEnergyTo_EnergyFile - write the decomposed energy of the system to a file.
 /// Just appends to the file for this run.
-/// \param filename
+/// \param fileNameStr
 /// \param nGen
-void FileIO_WriteTo_EnergyFile(const char* filename, long nGen)
+void FileIO_AppendEnergyTo_EnergyFile(const char* fileNameStr, const long nGen)
 {
-    FILE* fp;
-    if (nGen == -1)
-        {
-            fp = fopen(filename, "w"); // overwrite
-        }
-    else
-        {
-            fp = fopen(filename, "a");
-        }
+    FILE* fp = fopen(fileNameStr, "a");
 
     int i;
-    if (nGen == -1)
-        { // title
-            fprintf(fp, "#step\ttotal\toverlap\tcontact\tSC-SC\tstiff\n");
-        }
-    else
-        {
-            fprintf(fp, "%ld", nGen);
+            fprintf(fp, "%-10ld", nGen);
             for (i = 0; i < (MAX_E); i++)
                 {
-                    fprintf(fp, "\t%.1f", faCurrEn[i]);
+                    fprintf(fp, "  %-10.2f", faCurrEn[i]);
                 }
             fprintf(fp, "\n");
-        }
 
     fclose(fp);
 }
 
 /// FileIO_HandleTrajectory -
-/// \param fileStruct
+/// \param fileNameStr
 /// \param run_it
 /// \param nGen
-void FileIO_HandleTrajectory(const char* fileStruct, const int run_it, const long nGen)
+void FileIO_HandleTrajectory(const char* fileNameStr, const int run_it, const long nGen)
 {
     if (nTrajMode == 1)
         {
@@ -245,20 +230,20 @@ void FileIO_HandleTrajectory(const char* fileStruct, const int run_it, const lon
         {
             if (run_it >= 0)
                 {
-                    FileIO_WriteTo_TrajFile(fileStruct, nGen + nMCPreSteps + run_it * nMCStepsPerCycle);
+                    FileIO_AppendTrajFrame_ToFile(fileNameStr, nGen + nMCPreSteps + run_it * nMCStepsPerCycle);
                 }
             else
                 {
-                    FileIO_WriteTo_TrajFile(fileStruct, nGen);
+                    FileIO_AppendTrajFrame_ToFile(fileNameStr, nGen);
                 }
         }
 }
 
-/// FileIO_WriteTo_TrajFile -  write a LAMMPS style trajectory file for the system.
+/// FileIO_AppendTrajFrame_ToFile -  write a LAMMPS style trajectory file for the system.
 /// Appends to the file for this run.
 /// \param filename
 /// \param nGen
-void FileIO_WriteTo_TrajFile(const char* filename, const long nGen)
+void FileIO_AppendTrajFrame_ToFile(const char* filename, const long nGen)
 {
     // Writes the trajectory in LAMMPS format. To be viewed with VMD (hopefully). Read the LAMMPS dump documentation for
     // the actual format of the file
@@ -983,7 +968,7 @@ void DataPrinting_Thermalization(const long nGen)
                         Energy_Total_System();
                         cFlagForEnCal = 1;
                     }
-                FileIO_WriteTo_EnergyFile(fileEnergy, nGen);
+                FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
                 }
         }
 
@@ -1008,7 +993,7 @@ void Print_Data(const long nGen, const int run_it)
     // This function handles all the data IO.
     int nFlagForEnCalc = 0; // Flag for total energy calculation
 
-    if (run_it == 0 && nGen == -1)
+    /*if (run_it == 0 && nGen == -1)
         { // Write out equilibrium trajectory
             if (nReport[REPORT_CONFIG] != 0)
                 {
@@ -1016,8 +1001,7 @@ void Print_Data(const long nGen, const int run_it)
                         {
                             sprintf(fileTraj, "%s_EQ_trj.lammpstrj", strReportPrefix);
                             // Naming convention for trajectory files.
-                            FileIO_WriteTo_TrajFile(fileTraj,
-                                                    -1); // This opens a new trajectory file;
+                            FileIO_CreateFile(fileTraj); // This opens a new trajectory file;
                                                   // each run_it will have its own
                             Write_Saved_Trajectory(fileTraj, -1);
                             nTrajCurFrame = 0;
@@ -1030,20 +1014,16 @@ void Print_Data(const long nGen, const int run_it)
         {
             if (nReport[REPORT_CONFIG])
                 {
-                    sprintf(fileTraj, "%s_%d_restart.lammpstrj", strReportPrefix,
-                            run_it); // Naming convention for trajectory files.
-                    FileIO_WriteTo_TrajFile(fileTraj, -1);
-                    // This opens a new trajectory file; each run_it will have its own
-                    FileIO_WriteTo_TrajFile(fileTraj, 0); // End of previous run_it is initial conditions for this one.
+                    FileIO_WriteRestart_ForRun(run_it);
                     if (nTrajMode == 1)
                         {
                             sprintf(fileTraj, "%s_%d_trj.lammpstrj", strReportPrefix,
                                     run_it); // Naming convention for trajectory files.
-                            FileIO_WriteTo_TrajFile(fileTraj, -1);
+                            FileIO_CreateFile(fileTraj);
                             Write_Saved_Trajectory(fileTraj, run_it);
                         }
                 }
-        }
+        }*/
 
     if (run_it == 0 && nGen > 0)
         {
@@ -1073,7 +1053,7 @@ void Print_Data(const long nGen, const int run_it)
                             sprintf(fileTraj, "%s_trj.lammpstrj",
                                     strReportPrefix); // Naming convention for trajectory files.
                             FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                            // FileIO_WriteTo_TrajFile(fileTraj, nGen + MCPreSteps);
+                            // FileIO_AppendTrajFrame_ToFile(fileTraj, nGen + MCPreSteps);
                         }
                 }
             if (nReport[REPORT_ENERGY] != 0)
@@ -1085,7 +1065,7 @@ void Print_Data(const long nGen, const int run_it)
                                     Energy_Total_System();
                                     nFlagForEnCalc = 1;
                                 }
-                            FileIO_WriteTo_EnergyFile(fileEnergy, nGen + nMCPreSteps);
+                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen + nMCPreSteps);
                         }
                 }
             if (nReport[REPORT_MCMOVE] != 0)
@@ -1126,19 +1106,14 @@ void Print_Data(const long nGen, const int run_it)
                     if (nReport[REPORT_ENERGY] != 0)
                         {
                             sprintf(fileEnergy, "%s_%d_energy.dat", strReportPrefix, run_it);
-                            FileIO_WriteTo_EnergyFile(fileEnergy,
-                                                      -1); // Open a new energy file; each run_it will
-                                                           // have its own
-                            FileIO_WriteTo_EnergyFile(fileEnergy,
-                                                      0); // Last frame from previous run_it is first
+                            FileIO_CreateFile(fileEnergy);
+                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy,0); // Last frame from previous run_it is first
                                                           // frame of this one
                         }
                     if (nReport[REPORT_MCMOVE] != 0)
                         {
                             sprintf(fileMCMove, "%s_%d_mcmove.dat", strReportPrefix, run_it);
-                            FileIO_WriteTo_MCMoveFile(fileMCMove, -1,
-                                                      0.0); // Open a new MCInfo file; each run_it will
-                                               // have its own
+                            FileIO_CreateFile(fileMCMove);// Open a new MCInfo file; each run_it will have its own
                         }
                 }
             else
@@ -1168,7 +1143,7 @@ void Print_Data(const long nGen, const int run_it)
                                 {
                                     sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix);
                                     FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                                    // FileIO_WriteTo_TrajFile(fileTraj, nGen + (run_it *
+                                    // FileIO_AppendTrajFrame_ToFile(fileTraj, nGen + (run_it *
                                     // nMCStepsPerCycle));
                                 }
                         }
@@ -1181,7 +1156,7 @@ void Print_Data(const long nGen, const int run_it)
                                             Energy_Total_System();
                                             nFlagForEnCalc = 1;
                                         }
-                                    FileIO_WriteTo_EnergyFile(fileEnergy, nGen);
+                                    FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
                                 }
                         }
                     if (nReport[REPORT_MCMOVE] != 0)
@@ -1220,6 +1195,43 @@ void Print_Data(const long nGen, const int run_it)
         }
 }
 
+void FileIO_PreCycle_Init(const int run_it)
+{
+    if (nReport[REPORT_CONFIG])
+        {
+            if (nTrajMode != 1)
+                {
+                    sprintf(fileEnergy, "%s_trj.dat", strReportPrefix);
+                }
+        }
+
+    if (nReport[REPORT_ENERGY] != 0)
+        {
+            sprintf(fileEnergy, "%s_%d_energy.dat", strReportPrefix, run_it);
+            FileIO_CreateFile(fileEnergy); // Open a new Energy file; each run_it will have its own
+        }
+    if (nReport[REPORT_MCMOVE] != 0)
+        {
+            sprintf(fileMCMove, "%s_%d_mcmove.dat", strReportPrefix, run_it);
+            FileIO_CreateFile(fileMCMove); // Open a new MCInfo file; each run_it will have its own
+        }
+}
+
+void FileIO_WriteRestart_ForRun(const int run_it)
+{
+    sprintf(fileTraj, "%s_%d_restart.lammpstrj", strReportPrefix,
+            run_it); // Naming convention for trajectory files.
+    FileIO_CreateFile(fileTraj);
+    FileIO_AppendTrajFrame_ToFile(fileTraj, nMCPreSteps + (run_it + 1) * nMCStepsPerCycle);
+}
+
+void FileIO_WriteRestart_ForThermalization(void)
+{
+    sprintf(fileTraj, "%s_EQ_restart.lammpstrj", strReportPrefix); // Naming convention for trajectory files.
+    FileIO_CreateFile(fileTraj);
+    FileIO_AppendTrajFrame_ToFile(fileTraj, nMCPreSteps);
+}
+
 /// Print_Data - helper function that decides given nGen and run_it which things
 /// to print. Usually don't print much during the thermalization but could
 /// change that here
@@ -1244,8 +1256,8 @@ void Print_Data_New(const long nGen, const int run_it)
                                 {
                                     sprintf(fileTraj, "%s_trj.lammpstrj",
                                             strReportPrefix); // Naming convention for trajectory files.
-                                    FileIO_WriteTo_TrajFile(fileTraj,
-                                                            -1); // This opens a new trajectory file;
+                                    FileIO_AppendTrajFrame_ToFile(fileTraj,
+                                                                  -1); // This opens a new trajectory file;
                                     // each run_it will have its own
                                 }
                         }
@@ -1253,8 +1265,8 @@ void Print_Data_New(const long nGen, const int run_it)
                     if (nReport[REPORT_ENERGY] != 0)
                         {
                             sprintf(fileEnergy, "%s_energy.dat", strReportPrefix);
-                            FileIO_WriteTo_EnergyFile(fileEnergy,
-                                                      -1); // Open a new energy file; each run_it will
+                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy,
+                                                             -1); // Open a new energy file; each run_it will
                             // have its own
                         }
 
@@ -1292,7 +1304,7 @@ void Print_Data_New(const long nGen, const int run_it)
                             if (nGen % nReport[REPORT_CONFIG] == 0)
                                 {
                                     FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                                    // FileIO_WriteTo_TrajFile(fileTraj, nGen);
+                                    // FileIO_AppendTrajFrame_ToFile(fileTraj, nGen);
                                 }
                         }
                     if (nReport[REPORT_ENERGY] != 0)
@@ -1304,7 +1316,7 @@ void Print_Data_New(const long nGen, const int run_it)
                                             Energy_Total_System();
                                             nFlagForEnCalc = 1;
                                         }
-                                    FileIO_WriteTo_EnergyFile(fileEnergy, nGen);
+                                    FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
                                 }
                         }
                     if (nReport[REPORT_MCMOVE] != 0)
@@ -1325,7 +1337,7 @@ void Print_Data_New(const long nGen, const int run_it)
                         {
                             sprintf(fileTraj, "%s_EQ_trj.lammpstrj", strReportPrefix);
                             // Naming convention for trajectory files.
-                            FileIO_WriteTo_TrajFile(fileTraj, -1); // This opens a new trajectory file;
+                            FileIO_AppendTrajFrame_ToFile(fileTraj, -1); // This opens a new trajectory file;
                             // each run_it will have its own
                             Write_Saved_Trajectory(fileTraj, -1);
                             nTrajCurFrame = 0;
@@ -1340,14 +1352,15 @@ void Print_Data_New(const long nGen, const int run_it)
                 {
                     sprintf(fileTraj, "%s_%d_restart.lammpstrj", strReportPrefix,
                             run_it); // Naming convention for trajectory files.
-                    FileIO_WriteTo_TrajFile(fileTraj, -1);
+                    FileIO_AppendTrajFrame_ToFile(fileTraj, -1);
                     // This opens a new trajectory file; each run_it will have its own
-                    FileIO_WriteTo_TrajFile(fileTraj, 0); // End of previous run_it is initial conditions for this one.
+                    FileIO_AppendTrajFrame_ToFile(fileTraj,
+                                                  0); // End of previous run_it is initial conditions for this one.
                     if (nTrajMode == 1)
                         {
                             sprintf(fileTraj, "%s_%d_trj.lammpstrj", strReportPrefix,
                                     run_it); // Naming convention for trajectory files.
-                            FileIO_WriteTo_TrajFile(fileTraj, -1);
+                            FileIO_AppendTrajFrame_ToFile(fileTraj, -1);
                             Write_Saved_Trajectory(fileTraj, run_it);
                         }
                 }
@@ -1381,7 +1394,7 @@ void Print_Data_New(const long nGen, const int run_it)
                             sprintf(fileTraj, "%s_trj.lammpstrj",
                                     strReportPrefix); // Naming convention for trajectory files.
                             FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                            // FileIO_WriteTo_TrajFile(fileTraj, nGen + MCPreSteps);
+                            // FileIO_AppendTrajFrame_ToFile(fileTraj, nGen + MCPreSteps);
                         }
                 }
             if (nReport[REPORT_ENERGY] != 0)
@@ -1393,7 +1406,7 @@ void Print_Data_New(const long nGen, const int run_it)
                                     Energy_Total_System();
                                     nFlagForEnCalc = 1;
                                 }
-                            FileIO_WriteTo_EnergyFile(fileEnergy, nGen + nMCPreSteps);
+                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen + nMCPreSteps);
                         }
                 }
             if (nReport[REPORT_MCMOVE] != 0)
@@ -1434,11 +1447,11 @@ void Print_Data_New(const long nGen, const int run_it)
                     if (nReport[REPORT_ENERGY] != 0)
                         {
                             sprintf(fileEnergy, "%s_%d_energy.dat", strReportPrefix, run_it);
-                            FileIO_WriteTo_EnergyFile(fileEnergy,
-                                                      -1); // Open a new energy file; each run_it will
+                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy,
+                                                             -1); // Open a new energy file; each run_it will
                             // have its own
-                            FileIO_WriteTo_EnergyFile(fileEnergy,
-                                                      0); // Last frame from previous run_it is first
+                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy,
+                                                             0); // Last frame from previous run_it is first
                             // frame of this one
                         }
                     if (nReport[REPORT_MCMOVE] != 0)
@@ -1476,7 +1489,7 @@ void Print_Data_New(const long nGen, const int run_it)
                                 {
                                     sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix);
                                     FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                                    // FileIO_WriteTo_TrajFile(fileTraj, nGen + (run_it *
+                                    // FileIO_AppendTrajFrame_ToFile(fileTraj, nGen + (run_it *
                                     // nMCStepsPerCycle));
                                 }
                         }
@@ -1489,7 +1502,7 @@ void Print_Data_New(const long nGen, const int run_it)
                                             Energy_Total_System();
                                             nFlagForEnCalc = 1;
                                         }
-                                    FileIO_WriteTo_EnergyFile(fileEnergy, nGen);
+                                    FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
                                 }
                         }
                     if (nReport[REPORT_MCMOVE] != 0)
