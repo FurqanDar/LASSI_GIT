@@ -453,7 +453,7 @@ void Reset_Global_Arrays(void)
                 {
                     naCluster[i][j] = -1;
                 }
-            if (nReport[REPORT_NETWORK] != 0)
+            if (nReport[REPORT_NETWORK])
                 {
                     for (j = 0; j < tot_chain_types; j++)
                         {
@@ -462,7 +462,7 @@ void Reset_Global_Arrays(void)
                 }
         }
     // Initializing arrays for pair-distribution calculations
-    if (nReport[REPORT_RDFTOT] != 0)
+    if (nReport[REPORT_RDFTOT])
         {
             for (j = 0; j < nRDF_TotComps; j++)
                 {
@@ -472,7 +472,7 @@ void Reset_Global_Arrays(void)
                         }
                 }
         }
-    if (nReport[REPORT_COMDEN] != 0)
+    if (nReport[REPORT_COMDEN])
         {
             // Initalizing for density histograms wrt to the COM
             for (j = 0; j < nRadDen_TotComps; j++)
@@ -806,7 +806,7 @@ void Calculate_Rot_Bias(const float CurrentTemp)
 /// Temperature_Function - used to calculate what fCuTemp should (current
 /// temperature) based on how long the run has been going. \param mode - which
 /// of the four functions to use. Note that the various modes are described
-/// below where \f$F(t)\f$ is the returned value, and t == nGen. If mode = 0:
+/// below where $F(t)$ is the returned value, and t == nGen. If mode = 0:
 /// \f$F(t) = fKT + \tanh(1.+ (nGen-nPre)/1250fPreKT\f$. A hyperbolic tangent to
 /// smoothly reduce temperature, after nPreSteps If mode = 1: \f$F(t) = fKT +
 /// 5\exp(-(nGen-nPre)/4nPre)\abs(sin((nGen-nPre)/nPre))\f$. An exponentially
@@ -825,7 +825,7 @@ float Temperature_Function(int mode, long nGen)
     switch (mode)
         {
             case 0:
-                x_val   = (float) (nMCPreSteps - nGen);
+                x_val   = (float) (nMCStepsForTherm - nGen);
                 x_val   = x_val / 1250.f / fPreKT;
                 x_val   = fPreKT * (tanhf(x_val) + 1.f);
                 end_val = fKT + x_val;
@@ -833,7 +833,7 @@ float Temperature_Function(int mode, long nGen)
                 break;
 
             case 1:
-                x_val   = (float) (nGen - nMCPreSteps) / (float) nMCPreSteps;
+                x_val   = (float) (nGen - nMCStepsForTherm) / (float) nMCStepsForTherm;
                 y_val   = -x_val;
                 x_val   = fabsf(sinf(x_val));
                 y_val   = expf(y_val / 4.f);
@@ -842,9 +842,9 @@ float Temperature_Function(int mode, long nGen)
                 break;
 
             case 2:
-                x_val   = (float) (nGen - 10 * nMCPreSteps);
+                x_val   = (float) (nGen - 10 * nMCStepsForTherm);
                 x_val   = x_val * x_val;
-                y_val   = (float) (nMCPreSteps * nMCPreSteps) * 10.f;
+                y_val   = (float) (nMCStepsForTherm * nMCStepsForTherm) * 10.f;
                 end_val = fKT + expf(-x_val / y_val) / fKT / 10.f;
 
                 break;
@@ -852,7 +852,7 @@ float Temperature_Function(int mode, long nGen)
             case 3:
                 x_val   = -(float) (nGen);
                 x_val   = 4.f * x_val;
-                x_val   = x_val / (float) (nMCPreSteps);
+                x_val   = x_val / (float) (nMCStepsForTherm);
                 end_val = fKT + expf(x_val);
 
                 break;
@@ -860,7 +860,7 @@ float Temperature_Function(int mode, long nGen)
             case 4:
                 x_val   = -(float) (nGen);
                 x_val   = fMC_Temp_Rate * x_val;
-                x_val   = x_val / (float) (nMCPreSteps);
+                x_val   = x_val / (float) (nMCStepsForTherm);
                 end_val = fKT + expf(x_val);
 
                 break;
