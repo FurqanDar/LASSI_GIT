@@ -23,20 +23,20 @@ void PrintToScreen_EnergyMatrix(char* strTitle, int nSeqEn, float fArray[MAX_AA]
 
     printf("| %-5s ", strTitle);
     for (i = 0; i < nLen; i++)
-    {
-        printf("%4d  ", i);
-    }
+        {
+            printf("%4d  ", i);
+        }
     printf("%3s\n", "|");
 
     for (i = 0; i < nLen; i++)
-    {
-        printf("| %-5d ", i);
-        for (j = 0; j < nLen; j++)
         {
-            printf("%5.2f ", fArray[i][j][param]);
+            printf("| %-5d ", i);
+            for (j = 0; j < nLen; j++)
+                {
+                    printf("%5.2f ", fArray[i][j][param]);
+                }
+            printf("%3s\n", "|");
         }
-        printf("%3s\n", "|");
-    }
 
     printf("%s\n", sSectionHead);
 }
@@ -148,16 +148,15 @@ void FileIO_Write_MCMoveHeader(const char* fileName)
     fclose(fp);
 }
 
-/// FileIO_WriteTo_MCMoveFile - writes the acceptance and rejection ratios of the various moves. Just keeps appending to that file.
-/// Can be used to track the 'dynamics' during a simulation.
-/// ALSO: Zeros out all the acceptance arrays.
+/// FileIO_WriteTo_MCMoveFile - writes the acceptance and rejection ratios of the various moves. Just keeps appending to
+/// that file. Can be used to track the 'dynamics' during a simulation. ALSO: Zeros out all the acceptance arrays.
 /// \param filename
 /// \param nGen
 /// \param fMCTemp
 void FileIO_WriteTo_MCMoveFile(const char* filename, const long nGen, float const fMCTemp)
 {
     FILE* fp = fopen(filename, "a+");
-    int i; // Iterator
+    int i;                                           // Iterator
     fprintf(fp, "%-10ld  %-10.2f  ", nGen, fMCTemp); // Step and Temp
     for (i = 1; i < MAX_MV; i++)
         {
@@ -166,12 +165,12 @@ void FileIO_WriteTo_MCMoveFile(const char* filename, const long nGen, float cons
     fprintf(fp, "\n");
 
     for (i = 1; i < MAX_MV; i++)
-    {
-        naMCAccepMat[0][i] = 0;
-        naMCAccepMat[1][i] = 0;
-        // This way the print function will zero out the matrix every time
-        // we print to a file!
-    }
+        {
+            naMCAccepMat[0][i] = 0;
+            naMCAccepMat[1][i] = 0;
+            // This way the print function will zero out the matrix every time
+            // we print to a file!
+        }
 
     fclose(fp);
 }
@@ -210,12 +209,12 @@ void FileIO_AppendEnergyTo_EnergyFile(const char* fileNameStr, const long nGen)
     FILE* fp = fopen(fileNameStr, "a");
 
     int i;
-            fprintf(fp, "%-10ld", nGen);
-            for (i = 0; i < (MAX_E); i++)
-                {
-                    fprintf(fp, "  %-10.2e", faCurrEn[i]);
-                }
-            fprintf(fp, "\n");
+    fprintf(fp, "%-10ld", nGen);
+    for (i = 0; i < (MAX_E); i++)
+        {
+            fprintf(fp, "  %-10.2e", faCurrEn[i]);
+        }
+    fprintf(fp, "\n");
 
     fclose(fp);
 }
@@ -267,10 +266,10 @@ void FileIO_AppendTrajFrame_ToFile(const char* filename, const long nGen)
     fprintf(fp, "ITEM: ATOMS id type mol x y z bP\n"); // What we are printing
 
     for (i = 0; i < tot_beads; i++)
-                {
-                    fprintf(fp, "%d %d %d %d %d %d %d\n", i, bead_info[i][BEAD_TYPE], bead_info[i][BEAD_CHAINID],
-                            bead_info[i][POS_X], bead_info[i][POS_Y], bead_info[i][POS_Z], bead_info[i][BEAD_FACE]);
-                }
+        {
+            fprintf(fp, "%d %d %d %d %d %d %d\n", i, bead_info[i][BEAD_TYPE], bead_info[i][BEAD_CHAINID],
+                    bead_info[i][POS_X], bead_info[i][POS_Y], bead_info[i][POS_Z], bead_info[i][BEAD_FACE]);
+        }
 
     fclose(fp);
 }
@@ -459,14 +458,14 @@ void ScreenIO_Print_KeyFile(void)
 }
 
 /// ScreenIO_Print_SystemEnergy
-void ScreenIO_Print_SystemEnergy(void){
+void ScreenIO_Print_SystemEnergy(void)
+{
 
     int i;
 
     char sSectionHead[32];
     memset(sSectionHead, '-', 17);
     sSectionHead[17] = NULL;
-
 
     printf("%s\n", sSectionHead);
     printf("Energies\n");
@@ -480,7 +479,8 @@ void ScreenIO_Print_SystemEnergy(void){
 }
 
 /// void ScreenIO_Print_AcceptanceRatios
-void ScreenIO_Print_AcceptanceRatios(void){
+void ScreenIO_Print_AcceptanceRatios(void)
+{
 
     char* MoveName[MAX_MV];
     MoveName[MV_PIVOT]      = "Pivot       ";
@@ -497,60 +497,60 @@ void ScreenIO_Print_AcceptanceRatios(void){
     MoveName[MV_PR_SMCLSTR] = "Pr. Sm. Cls.";
 
     int i, j;
-    float fAccRatio   = 0.f;
-    lLong nMoveSum    = 0;
+    float fAccRatio = 0.f;
+    lLong nMoveSum  = 0;
 
     char sSectionHead[32];
     memset(sSectionHead, '-', 22);
     sSectionHead[22] = NULL;
 
-
     printf("%s\n", sSectionHead);
     printf("Acceptance Ratios:\n");
     for (i = 1; i < MAX_MV; i++)
-    {
-        nMoveSum = naMCAccepMat[0][i] + naMCAccepMat[1][i];
-        if (nMoveSum)
-            {
-                fAccRatio = 100.f * (float) naMCAccepMat[1][i] / (float) nMoveSum;
-                printf("%-12s: %-7.2f|\n", MoveName[i], fAccRatio);
-            }
-        else
-            {
-                printf("%-12s: %-7s|\n", MoveName[i], "NA");
-            }
-    }
+        {
+            nMoveSum = naMCAccepMat[0][i] + naMCAccepMat[1][i];
+            if (nMoveSum)
+                {
+                    fAccRatio = 100.f * (float) naMCAccepMat[1][i] / (float) nMoveSum;
+                    printf("%-12s: %-7.2f|\n", MoveName[i], fAccRatio);
+                }
+            else
+                {
+                    printf("%-12s: %-7s|\n", MoveName[i], "NA");
+                }
+        }
     printf("%s\n", sSectionHead);
 }
 
 /// ScreenIO_Print_Log_Thermalization - print the log to the screen.
-void ScreenIO_Print_Log_Thermalization(const long nGen) {
+void ScreenIO_Print_Log_Thermalization(const long nGen)
+{
     printf("Run Cycle: Thermalization\n");
     printf("Step     : %8.3e\n", (float) nGen);
     printf("MC Temp  : %8.3e\n", fCuTemp);
 
     if (nTotClusCounter > 0)
-    {
-        printf("Perc Phi : %8.3f\n",
-               ((float) nLargestClusterRightNow) / ((float) nTotClusCounter ) / (float) tot_chains);
-    }
+        {
+            printf("Perc Phi : %8.3f\n",
+                   ((float) nLargestClusterRightNow) / ((float) nTotClusCounter) / (float) tot_chains);
+        }
 
     ScreenIO_Print_SystemEnergy();
     ScreenIO_Print_AcceptanceRatios();
 }
 
-
 /// ScreenIO_Print_Log_FullRun - print the log to the screen.
-void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle) {
+void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle)
+{
     printf("Run Cycle: %ld\n", run_cycle);
     printf("Step     : %8.3e\n", (float) nGen);
     printf("MC Temp  : %8.3e\n", fCuTemp);
 
     if (nTotClusCounter > 0)
-    {
-        printf("Perc Phi : %8.3f\n",
-               ((float) nLargestClusterRightNow) / ((float) nTotClusCounter ) / (float) tot_chains);
-    }
+        {
+            printf("Perc Phi : %8.3f\n",
+                   ((float) nLargestClusterRightNow) / ((float) nTotClusCounter) / (float) tot_chains);
+        }
 
     ScreenIO_Print_SystemEnergy();
     ScreenIO_Print_AcceptanceRatios();
@@ -797,17 +797,17 @@ void FileIO_WriteTo_MolClusFile(const int run_it)
     fprintf(fp, "#Cluster Histograms: 1st column is largest cluster, and then clusters of size 1, 2, and so on. Each "
                 "row is a different moltype\n");
     for (i = 0; i < run_it; i++)
-    {
-        fprintf(fp, "#Run_Cycle = %d\n", i);
-        for (j = 0; j < tot_chain_types; j++)
         {
-            for (k = 0; k < tot_chains; k++)
-            {
-                fprintf(fp, "%LE\t", ld_TOTMOLCLUS_Arr[MolClusArr_Index(i, j, k)]);
-            }
-            fprintf(fp, "\n");
+            fprintf(fp, "#Run_Cycle = %d\n", i);
+            for (j = 0; j < tot_chain_types; j++)
+                {
+                    for (k = 0; k < tot_chains; k++)
+                        {
+                            fprintf(fp, "%LE\t", ld_TOTMOLCLUS_Arr[MolClusArr_Index(i, j, k)]);
+                        }
+                    fprintf(fp, "\n");
+                }
         }
-    }
     fprintf(fp, "#Done");
     fclose(fp);
 }
@@ -825,11 +825,11 @@ void FileIO_WriteTo_GyrRadFile(const int run_it)
     fprintf(fp, "#Cluster Histograms: 1st column is largest cluster, and then "
                 "clusters of size 1, 2, and so on\n");
     for (i = 0; i < run_it; i++)
-    {
-        fprintf(fp, "#Run_Cycle = %d\n", i);
-        fprintf(fp, "%LE\t", ld_TOTRg_Arr[i][0]);
-        fprintf(fp, "%LE\n", ld_TOTRg_Arr[i][1]);
-    }
+        {
+            fprintf(fp, "#Run_Cycle = %d\n", i);
+            fprintf(fp, "%LE\t", ld_TOTRg_Arr[i][0]);
+            fprintf(fp, "%LE\n", ld_TOTRg_Arr[i][1]);
+        }
     fprintf(fp, "#Done");
     fclose(fp);
 }
@@ -878,7 +878,7 @@ void FileIO_CreateFile(const char* fileName)
 /// of a simulation.
 void FileIO_CreateRunningDataFiles(void)
 {
-    //Trajectory
+    // Trajectory
     if (nReport[REPORT_CONFIG])
         {
             sprintf(fileTraj, "%s_topo.lammpstrj", strReportPrefix); // Name of the topology file
@@ -890,7 +890,7 @@ void FileIO_CreateRunningDataFiles(void)
                 }
         }
 
-    //Energy
+    // Energy
     if (nReport[REPORT_ENERGY])
         {
             sprintf(fileEnergy, "%s_energy.dat", strReportPrefix);
@@ -898,7 +898,7 @@ void FileIO_CreateRunningDataFiles(void)
             FileIO_Write_EnergyHeader(fileEnergy);
         }
 
-    //MC Move Acceptance
+    // MC Move Acceptance
     if (nReport[REPORT_MCMOVE])
         {
             sprintf(fileMCMove, "%s_mcmove.dat", strReportPrefix);
@@ -915,8 +915,8 @@ void FileIO_CreateRunningDataFiles(void)
 /// \return
 char ForPrinting_GetReportState(const long nGen, const long thisReport)
 {
-    char dum_log = (char)((nGen % thisReport) == 0);
-    dum_log = dum_log ? 1 : 0;
+    char dum_log = (char) ((nGen % thisReport) == 0);
+    dum_log      = dum_log ? 1 : 0;
     return dum_log;
 }
 
@@ -942,13 +942,13 @@ void DataPrinting_Thermalization(const long nGen)
             cLogFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_LOG]);
             if (cLogFlag)
                 {
-                    //TODO: I think this whole business can be abstracted away as well.
+                    // TODO: I think this whole business can be abstracted away as well.
                     if (Check_System_Structure())
-                    {
-                        fprintf(stderr  , "Molecular structure is inconsistent with initial "
-                               "structure.\nCRASHING\n\n");
-                        exit(1);
-                    }
+                        {
+                            fprintf(stderr, "Molecular structure is inconsistent with initial "
+                                            "structure.\nCRASHING\n\n");
+                            exit(1);
+                        }
                     Energy_Total_System();
                     cFlagForEnCal = 1;
                     ScreenIO_Print_Log_Thermalization(nGen);
@@ -968,12 +968,14 @@ void DataPrinting_Thermalization(const long nGen)
         {
             // DO ENERGY SHIT
             cEnergyFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_ENERGY]);
-            if (cEnergyFlag){
-                if (!cFlagForEnCal){
-                        Energy_Total_System();
-                        cFlagForEnCal = 1;
-                    }
-                FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
+            if (cEnergyFlag)
+                {
+                    if (! cFlagForEnCal)
+                        {
+                            Energy_Total_System();
+                            cFlagForEnCal = 1;
+                        }
+                    FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
                 }
         }
 
@@ -1000,55 +1002,57 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
     char cConfigFlag   = 0;
 
     if (nReport[REPORT_LOG])
-    {
-        cLogFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_LOG]);
-        if (cLogFlag)
         {
-            //TODO: I think this whole business can be abstracted away as well.
-            if (Check_System_Structure())
-            {
-                fprintf(stderr  , "Molecular structure is inconsistent with initial "
-                                  "structure.\nCRASHING\n\n");
-                exit(1);
-            }
-            Energy_Total_System();
-            cFlagForEnCal = 1;
-            ScreenIO_Print_Log_FullRun(nGen, run_it);
+            cLogFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_LOG]);
+            if (cLogFlag)
+                {
+                    // TODO: I think this whole business can be abstracted away as well.
+                    if (Check_System_Structure())
+                        {
+                            fprintf(stderr, "Molecular structure is inconsistent with initial "
+                                            "structure.\nCRASHING\n\n");
+                            exit(1);
+                        }
+                    Energy_Total_System();
+                    cFlagForEnCal = 1;
+                    ScreenIO_Print_Log_FullRun(nGen, run_it);
+                }
         }
-    }
 
     if (nReport[REPORT_CONFIG])
-    {
-        cConfigFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_CONFIG]);
-        if (cConfigFlag)
         {
-            sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix);
-            FileIO_HandleTrajectory(fileTraj, run_it, nGen);
+            cConfigFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_CONFIG]);
+            if (cConfigFlag)
+                {
+                    sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix);
+                    FileIO_HandleTrajectory(fileTraj, run_it, nGen);
+                }
         }
-    }
 
     if (nReport[REPORT_ENERGY])
-    {
-        // DO ENERGY SHIT
-        cEnergyFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_ENERGY]);
-        if (cEnergyFlag){
-            if (!cFlagForEnCal){
-                Energy_Total_System();
-                cFlagForEnCal = 1;
-            }
-            FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
+        {
+            // DO ENERGY SHIT
+            cEnergyFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_ENERGY]);
+            if (cEnergyFlag)
+                {
+                    if (! cFlagForEnCal)
+                        {
+                            Energy_Total_System();
+                            cFlagForEnCal = 1;
+                        }
+                    FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
+                }
         }
-    }
 
     if (nReport[REPORT_MCMOVE])
-    {
-        // DO MC_ACC SHIT
-        cAccFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_MCMOVE]);
-        if (cAccFlag)
         {
-            FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
+            // DO MC_ACC SHIT
+            cAccFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_MCMOVE]);
+            if (cAccFlag)
+                {
+                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
+                }
         }
-    }
 }
 
 /// DataAnalysis_DuringRunCycles
@@ -1057,32 +1061,32 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
 void DataAnalysis_DuringRunCycles(const long nGen, const int run_it)
 {
 
-//    char cRDF_flag  = 0;
-//    char cCOM_flag  = 0;
-//    char cCLUS_flag = 0;
+    //    char cRDF_flag  = 0;
+    //    char cCOM_flag  = 0;
+    //    char cCLUS_flag = 0;
 
     if (nReport[REPORT_RDFTOT])
-    { // SysProp is printed outside of this function in main.c, lol
-        if (nGen % nReport[REPORT_RDFTOT] == 0)
-        {
-            RDF_ComponentWise_Avg();
+        { // SysProp is printed outside of this function in main.c, lol
+            if (nGen % nReport[REPORT_RDFTOT] == 0)
+                {
+                    RDF_ComponentWise_Avg();
+                }
         }
-    }
     if (nReport[REPORT_COMDEN])
-    { // SysProp is printed outside of this function in main.c, lol
-        if (nGen % nReport[REPORT_COMDEN] == 0)
-        {
-            RadDen_Avg_MolTypeWise_FromMolTypeCen();
+        { // SysProp is printed outside of this function in main.c, lol
+            if (nGen % nReport[REPORT_COMDEN] == 0)
+                {
+                    RadDen_Avg_MolTypeWise_FromMolTypeCen();
+                }
         }
-    }
     if (nReport[REPORT_NETWORK])
-    { // SysProp is printed outside of this function in main.c, lol
-        if (nGen % nReport[REPORT_NETWORK] == 0)
-        {
-            Clus_Perform_Analysis();
-            GyrTensor_GyrRad_Avg();
+        { // SysProp is printed outside of this function in main.c, lol
+            if (nGen % nReport[REPORT_NETWORK] == 0)
+                {
+                    Clus_Perform_Analysis();
+                    GyrTensor_GyrRad_Avg();
+                }
         }
-    }
 }
 
 /// FileIO_PreCycle_Init
