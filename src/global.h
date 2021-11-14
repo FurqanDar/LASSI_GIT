@@ -126,7 +126,7 @@ float fLinkerEqLen;
 // MC setup
 float fKT, fPreKT, fCuTemp, fRot_Bias, f_globRotBias, fdelta_temp, fMC_Temp_Rate, fSquishRad;
 float* fKT_Cycle;
-lLong nMCStepsPerCycle, nMCPreSteps;
+lLong nMCStepsPerCycle, nMCStepsForTherm;
 float fMCFreq[MAX_MV];
 lInt  nTot_CycleNum;
 

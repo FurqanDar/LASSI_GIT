@@ -131,19 +131,19 @@ void FileIO_Write_MCMoveHeader(const char* fileName)
 {
     FILE* fp = fopen(fileName, "a");
     fprintf(fp, "#Steps, and Temp, are followed by (rej, acc) for each MC Move.\n");
-    fprintf(fp, "#(nStep, T) "
-                "STROT       "
-                "LOCAL       "
-                "COLOCAL     "
-                "MTLOCAL     "
-                "SNAKE       "
-                "TRANS       "
-                "SM_CLST     "
-                "CLST        "
-                "PIVOT       "
-                "BRROT       "
-                "DBPVT       "
-                "PR_CLST     "
+    fprintf(fp, "#(nStep, T)             "
+                "STROT                   "
+                "LOCAL                   "
+                "COLOCAL                 "
+                "MTLOCAL                 "
+                "SNAKE                   "
+                "TRANS                   "
+                "SM_CLST                 "
+                "CLST                    "
+                "PIVOT                   "
+                "BRROT                   "
+                "DBPVT                   "
+                "PR_CLST                 "
                 "\n");
     fclose(fp);
 }
@@ -156,18 +156,22 @@ void FileIO_Write_MCMoveHeader(const char* fileName)
 /// \param fMCTemp
 void FileIO_WriteTo_MCMoveFile(const char* filename, const long nGen, float const fMCTemp)
 {
-    FILE* fp = fopen(filename, "a");
+    FILE* fp = fopen(filename, "a+");
     int i; // Iterator
     fprintf(fp, "%-10ld  %-10.2f  ", nGen, fMCTemp); // Step and Temp
     for (i = 1; i < MAX_MV; i++)
         {
             fprintf(fp, "%-10ld  %-10ld  ", naMCAccepMat[0][i], naMCAccepMat[1][i]);
-            naMCAccepMat[0][i] = 0;
-            naMCAccepMat[1][i] = 0;
-            // This way the print function will zero out the matrix every time
-            // we print to a file!
         }
     fprintf(fp, "\n");
+
+    for (i = 1; i < MAX_MV; i++)
+    {
+        naMCAccepMat[0][i] = 0;
+        naMCAccepMat[1][i] = 0;
+        // This way the print function will zero out the matrix every time
+        // we print to a file!
+    }
 
     fclose(fp);
 }
@@ -183,16 +187,17 @@ void Print_LogToScreen(long nGen, const int run_it)
 /// \param fileName
 void FileIO_Write_EnergyHeader(const char* fileName)
 {
-    FILE* fp = fopen(fileName, "a");
-    fprintf(fp, "# "
-                "STEP  "
-                "TOT   "
-                "OVLP  "
-                "CONT  "
-                "SC-SC "
-                "FSOL  "
-                "T_IND "
-                "STIFF ");
+    FILE* fp = fopen(fileName, "a+");
+    fprintf(fp, "#           "
+                "STEP        "
+                "TOT         "
+                "OVLP        "
+                "CONT        "
+                "SC-SC       "
+                "FSOL        "
+                "T_IND       "
+                "STIFF       "
+                "\n");
     fclose(fp);
 }
 
@@ -208,7 +213,7 @@ void FileIO_AppendEnergyTo_EnergyFile(const char* fileNameStr, const long nGen)
             fprintf(fp, "%-10ld", nGen);
             for (i = 0; i < (MAX_E); i++)
                 {
-                    fprintf(fp, "  %-10.2f", faCurrEn[i]);
+                    fprintf(fp, "  %-10.2e", faCurrEn[i]);
                 }
             fprintf(fp, "\n");
 
@@ -230,7 +235,7 @@ void FileIO_HandleTrajectory(const char* fileNameStr, const int run_it, const lo
         {
             if (run_it >= 0)
                 {
-                    FileIO_AppendTrajFrame_ToFile(fileNameStr, nGen + nMCPreSteps + run_it * nMCStepsPerCycle);
+                    FileIO_AppendTrajFrame_ToFile(fileNameStr, nGen + nMCStepsForTherm + run_it * nMCStepsPerCycle);
                 }
             else
                 {
@@ -309,7 +314,7 @@ void Write_Saved_Trajectory(char* filename, const int run_it)
             if (run_it >= 0)
                 {
                     fprintf(fp, "%ld\n",
-                            nMCPreSteps + run_it * nMCStepsPerCycle + i * nReport[REPORT_CONFIG]); // Timestep
+                            nMCStepsForTherm + run_it * nMCStepsPerCycle + i * nReport[REPORT_CONFIG]); // Timestep
                 }
             else
                 {
@@ -445,7 +450,7 @@ void ScreenIO_Print_KeyFile(void)
     printf("Number of MC Cycles            = %d\n", nTot_CycleNum);
     printf("Number of MC Steps/Cycle       = %e\n", (float) nMCStepsPerCycle);
     printf("Thermalizing Temperature       = %.2f\n", fPreKT);
-    printf("Number of Thermalizing Steps   = %e\n", (float) nMCPreSteps);
+    printf("Number of Thermalizing Steps   = %e\n", (float) nMCStepsForTherm);
     printf("RNG Seed                       = %d\n", nRNG_Seed);
     printf("Clustering Mode                = %d\n", nClusteringMode);
 
@@ -983,218 +988,105 @@ void DataPrinting_Thermalization(const long nGen)
         }
 }
 
-/// Print_Data - helper function that decides given nGen and run_it which things
-/// to print. Usually don't print much during the thermalization but could
-/// change that here
+/// DataPrinting_DuringRunCycles
 /// \param nGen
 /// \param run_it
-void Print_Data(const long nGen, const int run_it)
+void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
 {
-    // This function handles all the data IO.
-    int nFlagForEnCalc = 0; // Flag for total energy calculation
+    char cFlagForEnCal = 0;
+    char cLogFlag      = 0;
+    char cEnergyFlag   = 0;
+    char cAccFlag      = 0;
+    char cConfigFlag   = 0;
 
-    /*if (run_it == 0 && nGen == -1)
-        { // Write out equilibrium trajectory
-            if (nReport[REPORT_CONFIG] != 0)
-                {
-                    if (nTrajMode == 1)
-                        {
-                            sprintf(fileTraj, "%s_EQ_trj.lammpstrj", strReportPrefix);
-                            // Naming convention for trajectory files.
-                            FileIO_CreateFile(fileTraj); // This opens a new trajectory file;
-                                                  // each run_it will have its own
-                            Write_Saved_Trajectory(fileTraj, -1);
-                            nTrajCurFrame = 0;
-                            FileIO_HandleTrajectory(fileTraj, run_it, 0);
-                        }
-                }
-        }
-
-    if (run_it >= 0 && nGen == nMCStepsPerCycle)
+    if (nReport[REPORT_LOG])
+    {
+        cLogFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_LOG]);
+        if (cLogFlag)
         {
-            if (nReport[REPORT_CONFIG])
-                {
-                    FileIO_WriteRestart_ForRun(run_it);
-                    if (nTrajMode == 1)
-                        {
-                            sprintf(fileTraj, "%s_%d_trj.lammpstrj", strReportPrefix,
-                                    run_it); // Naming convention for trajectory files.
-                            FileIO_CreateFile(fileTraj);
-                            Write_Saved_Trajectory(fileTraj, run_it);
-                        }
-                }
-        }*/
-
-    if (run_it == 0 && nGen > 0)
-        {
-            if (nReport[REPORT_LOG] != 0)
-                {
-                    if (nGen % nReport[REPORT_LOG] == 0)
-                        {
-                            if (Check_System_Structure() == 0)
-                                {
-                                    printf("Structure is still a-okay!\n");
-                                }
-                            else
-                                {
-                                    printf("Molecular structure is inconsistent with initial "
-                                           "structure.\nCRASHING\n\n");
-                                    exit(1);
-                                }
-                            Energy_Total_System();
-                            nFlagForEnCalc = 1;
-                            Print_LogToScreen(nGen, run_it);
-                        }
-                }
-            if (nReport[REPORT_CONFIG] != 0)
-                {
-                    if (nGen % nReport[REPORT_CONFIG] == 0)
-                        {
-                            sprintf(fileTraj, "%s_trj.lammpstrj",
-                                    strReportPrefix); // Naming convention for trajectory files.
-                            FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                            // FileIO_AppendTrajFrame_ToFile(fileTraj, nGen + MCPreSteps);
-                        }
-                }
-            if (nReport[REPORT_ENERGY] != 0)
-                {
-                    if (nGen % nReport[REPORT_ENERGY] == 0)
-                        {
-                            if (nFlagForEnCalc != 1)
-                                { // Calculate the energy
-                                    Energy_Total_System();
-                                    nFlagForEnCalc = 1;
-                                }
-                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen + nMCPreSteps);
-                        }
-                }
-            if (nReport[REPORT_MCMOVE] != 0)
-                {
-                    if (nGen % nReport[REPORT_MCMOVE] == 0)
-                        {
-                            FileIO_WriteTo_MCMoveFile(fileMCMove, nGen + nMCPreSteps, fCuTemp);
-                        }
-                }
-            if (nReport[REPORT_RDFTOT] != 0)
-                { // SysProp is printed outside of this function in main.c, lol
-                    if (nGen % nReport[REPORT_RDFTOT] == 0 && nGen > nMCStepsPerCycle / 2)
-                        {
-                            RDF_ComponentWise_Avg();
-                        }
-                }
-            if (nReport[REPORT_COMDEN] != 0)
-                { // SysProp is printed outside of this function in main.c, lol
-                    if (nGen % nReport[REPORT_COMDEN] == 0 && nGen > nMCStepsPerCycle / 2)
-                        {
-                            RadDen_Avg_MolTypeWise_FromMolTypeCen();
-                        }
-                }
-            if (nReport[REPORT_NETWORK] != 0)
-                { // SysProp is printed outside of this function in main.c, lol
-                    if (nGen % nReport[REPORT_NETWORK] == 0 && nGen > nMCStepsPerCycle / 2)
-                        {
-                            Clus_Perform_Analysis();
-                            GyrTensor_GyrRad_Avg();
-                        }
-                }
+            //TODO: I think this whole business can be abstracted away as well.
+            if (Check_System_Structure())
+            {
+                fprintf(stderr  , "Molecular structure is inconsistent with initial "
+                                  "structure.\nCRASHING\n\n");
+                exit(1);
+            }
+            Energy_Total_System();
+            cFlagForEnCal = 1;
+            ScreenIO_Print_Log_FullRun(nGen, run_it);
         }
+    }
 
-    if (run_it > 0)
+    if (nReport[REPORT_CONFIG])
+    {
+        cConfigFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_CONFIG]);
+        if (cConfigFlag)
         {
-            if (nGen == -1)
-                {
-                    if (nReport[REPORT_ENERGY] != 0)
-                        {
-                            sprintf(fileEnergy, "%s_%d_energy.dat", strReportPrefix, run_it);
-                            FileIO_CreateFile(fileEnergy);
-                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy,0); // Last frame from previous run_it is first
-                                                          // frame of this one
-                        }
-                    if (nReport[REPORT_MCMOVE] != 0)
-                        {
-                            sprintf(fileMCMove, "%s_%d_mcmove.dat", strReportPrefix, run_it);
-                            FileIO_CreateFile(fileMCMove);// Open a new MCInfo file; each run_it will have its own
-                        }
-                }
-            else
-                {
-                    if (nReport[REPORT_LOG] != 0)
-                        {
-                            if (nGen % nReport[REPORT_LOG] == 0)
-                                {
-                                    if (Check_System_Structure() == 0)
-                                        {
-                                            printf("Structure is still a-okay!\n");
-                                        }
-                                    else
-                                        {
-                                            printf("Molecular structure is inconsistent with initial "
-                                                   "structure.\nCRASHING\n\n");
-                                            exit(1);
-                                        }
-                                    Energy_Total_System();
-                                    nFlagForEnCalc = 1;
-                                    Print_LogToScreen(nGen, run_it);
-                                }
-                        }
-                    if (nReport[REPORT_CONFIG] != 0)
-                        {
-                            if (nGen % nReport[REPORT_CONFIG] == 0)
-                                {
-                                    sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix);
-                                    FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                                    // FileIO_AppendTrajFrame_ToFile(fileTraj, nGen + (run_it *
-                                    // nMCStepsPerCycle));
-                                }
-                        }
-                    if (nReport[REPORT_ENERGY] != 0)
-                        {
-                            if (nGen % nReport[REPORT_ENERGY] == 0)
-                                {
-                                    if (nFlagForEnCalc != 1)
-                                        { // Calculate the energy
-                                            Energy_Total_System();
-                                            nFlagForEnCalc = 1;
-                                        }
-                                    FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
-                                }
-                        }
-                    if (nReport[REPORT_MCMOVE] != 0)
-                        {
-                            if (nGen % nReport[REPORT_MCMOVE] == 0)
-                                {
-                                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
-                                }
-                        }
-                    if (nReport[REPORT_RDFTOT] != 0)
-                        { // SysProp is printed outside of this function in main.c,
-                          // lol
-                            if (nGen % nReport[REPORT_RDFTOT] == 0 && nGen > nMCStepsPerCycle / 2)
-                                {
-                                    RDF_ComponentWise_Avg();
-                                }
-                        }
-                    if (nReport[REPORT_COMDEN] != 0)
-                        { // SysProp is printed outside of this function in main.c,
-                          // lol
-                            if (nGen % nReport[REPORT_COMDEN] == 0 && nGen > nMCStepsPerCycle / 2)
-                                {
-                                    RadDen_Avg_MolTypeWise_FromMolTypeCen();
-                                }
-                        }
-                    if (nReport[REPORT_NETWORK] != 0)
-                        { // SysProp is printed outside of this function in main.c,
-                          // lol
-                            if (nGen % nReport[REPORT_NETWORK] == 0 && nGen > nMCStepsPerCycle / 2)
-                                {
-                                    Clus_Perform_Analysis();
-                                    GyrTensor_GyrRad_Avg();
-                                }
-                        }
-                }
+            sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix);
+            FileIO_HandleTrajectory(fileTraj, run_it, nGen);
         }
+    }
+
+    if (nReport[REPORT_ENERGY])
+    {
+        // DO ENERGY SHIT
+        cEnergyFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_ENERGY]);
+        if (cEnergyFlag){
+            if (!cFlagForEnCal){
+                Energy_Total_System();
+                cFlagForEnCal = 1;
+            }
+            FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
+        }
+    }
+
+    if (nReport[REPORT_MCMOVE])
+    {
+        // DO MC_ACC SHIT
+        cAccFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_MCMOVE]);
+        if (cAccFlag)
+        {
+            FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
+        }
+    }
 }
 
+/// DataAnalysis_DuringRunCycles
+/// \param nGen
+/// \param run_it
+void DataAnalysis_DuringRunCycles(const long nGen, const int run_it)
+{
+
+//    char cRDF_flag  = 0;
+//    char cCOM_flag  = 0;
+//    char cCLUS_flag = 0;
+
+    if (nReport[REPORT_RDFTOT])
+    { // SysProp is printed outside of this function in main.c, lol
+        if (nGen % nReport[REPORT_RDFTOT] == 0)
+        {
+            RDF_ComponentWise_Avg();
+        }
+    }
+    if (nReport[REPORT_COMDEN])
+    { // SysProp is printed outside of this function in main.c, lol
+        if (nGen % nReport[REPORT_COMDEN] == 0)
+        {
+            RadDen_Avg_MolTypeWise_FromMolTypeCen();
+        }
+    }
+    if (nReport[REPORT_NETWORK])
+    { // SysProp is printed outside of this function in main.c, lol
+        if (nGen % nReport[REPORT_NETWORK] == 0)
+        {
+            Clus_Perform_Analysis();
+            GyrTensor_GyrRad_Avg();
+        }
+    }
+}
+
+/// FileIO_PreCycle_Init
+/// \param run_it
 void FileIO_PreCycle_Init(const int run_it)
 {
     if (nReport[REPORT_CONFIG])
@@ -1216,329 +1108,22 @@ void FileIO_PreCycle_Init(const int run_it)
             FileIO_CreateFile(fileMCMove); // Open a new MCInfo file; each run_it will have its own
         }
 }
-
+/// FileIO_WriteRestart_ForRun
+/// \param run_it
 void FileIO_WriteRestart_ForRun(const int run_it)
 {
     sprintf(fileTraj, "%s_%d_restart.lammpstrj", strReportPrefix,
             run_it); // Naming convention for trajectory files.
     FileIO_CreateFile(fileTraj);
-    FileIO_AppendTrajFrame_ToFile(fileTraj, nMCPreSteps + (run_it + 1) * nMCStepsPerCycle);
+    FileIO_AppendTrajFrame_ToFile(fileTraj, nMCStepsForTherm + (run_it + 1) * nMCStepsPerCycle);
 }
 
+/// FileIO_WriteRestart_ForThermalization
 void FileIO_WriteRestart_ForThermalization(void)
 {
     sprintf(fileTraj, "%s_EQ_restart.lammpstrj", strReportPrefix); // Naming convention for trajectory files.
     FileIO_CreateFile(fileTraj);
-    FileIO_AppendTrajFrame_ToFile(fileTraj, nMCPreSteps);
-}
-
-/// Print_Data - helper function that decides given nGen and run_it which things
-/// to print. Usually don't print much during the thermalization but could
-/// change that here
-/// \param nGen
-/// \param run_it
-void Print_Data_New(const long nGen, const int run_it)
-{
-    // This function handles all the data IO.
-    int nFlagForEnCalc = 0; // Flag for total energy calculation
-
-    if (run_it == -1)
-        { // Thermalization cycle.
-            // Open the appropriate files before the thermalization sequence.
-            if (nGen == -1)
-                {
-                    //                    FileIO_CreateRunningDataFiles();
-                    if (nReport[REPORT_CONFIG] != 0)
-                        {
-                            sprintf(fileTraj, "%s_topo.lammpstrj", strReportPrefix); // Name of the topology file
-                            FileIO_WriteTo_TopFile(fileTraj); // Write the topology file. Only need to write once
-                            if (nTrajMode != 1)
-                                {
-                                    sprintf(fileTraj, "%s_trj.lammpstrj",
-                                            strReportPrefix); // Naming convention for trajectory files.
-                                    FileIO_AppendTrajFrame_ToFile(fileTraj,
-                                                                  -1); // This opens a new trajectory file;
-                                    // each run_it will have its own
-                                }
-                        }
-
-                    if (nReport[REPORT_ENERGY] != 0)
-                        {
-                            sprintf(fileEnergy, "%s_energy.dat", strReportPrefix);
-                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy,
-                                                             -1); // Open a new energy file; each run_it will
-                            // have its own
-                        }
-
-                    if (nReport[REPORT_MCMOVE] != 0)
-                        {
-                            sprintf(fileMCMove, "%s_mcmove.dat", strReportPrefix);
-                            FileIO_WriteTo_MCMoveFile(fileMCMove, -1,
-                                                      0.0); // Open a new MCInfo file; each run_it will
-                            // have its own
-                        }
-                }
-            else
-                {
-                    if (nReport[REPORT_LOG] != 0)
-                        {
-                            if (nGen % nReport[REPORT_LOG] == 0)
-                                {
-                                    if (Check_System_Structure() == 0)
-                                        {
-                                            printf("Structure is still a-okay!\n");
-                                        }
-                                    else
-                                        {
-                                            printf("Molecular structure is inconsistent with initial "
-                                                   "structure.\nCRASHING\n\n");
-                                            exit(1);
-                                        }
-                                    Energy_Total_System();
-                                    nFlagForEnCalc = 1;
-                                    Print_LogToScreen(nGen, run_it);
-                                }
-                        }
-                    if (nReport[REPORT_CONFIG] != 0)
-                        {
-                            if (nGen % nReport[REPORT_CONFIG] == 0)
-                                {
-                                    FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                                    // FileIO_AppendTrajFrame_ToFile(fileTraj, nGen);
-                                }
-                        }
-                    if (nReport[REPORT_ENERGY] != 0)
-                        {
-                            if (nGen % nReport[REPORT_ENERGY] == 0)
-                                {
-                                    if (nFlagForEnCalc != 1)
-                                        { // Calculate the energy
-                                            Energy_Total_System();
-                                            nFlagForEnCalc = 1;
-                                        }
-                                    FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
-                                }
-                        }
-                    if (nReport[REPORT_MCMOVE] != 0)
-                        {
-                            if (nGen % nReport[REPORT_MCMOVE] == 0)
-                                {
-                                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
-                                }
-                        }
-                }
-        }
-
-    if (run_it == 0 && nGen == -1)
-        { // Write out equilibrium trajectory
-            if (nReport[REPORT_CONFIG] != 0)
-                {
-                    if (nTrajMode == 1)
-                        {
-                            sprintf(fileTraj, "%s_EQ_trj.lammpstrj", strReportPrefix);
-                            // Naming convention for trajectory files.
-                            FileIO_AppendTrajFrame_ToFile(fileTraj, -1); // This opens a new trajectory file;
-                            // each run_it will have its own
-                            Write_Saved_Trajectory(fileTraj, -1);
-                            nTrajCurFrame = 0;
-                            FileIO_HandleTrajectory(fileTraj, run_it, 0);
-                        }
-                }
-        }
-
-    if (run_it >= 0 && nGen == nMCStepsPerCycle)
-        {
-            if (nReport[REPORT_CONFIG])
-                {
-                    sprintf(fileTraj, "%s_%d_restart.lammpstrj", strReportPrefix,
-                            run_it); // Naming convention for trajectory files.
-                    FileIO_AppendTrajFrame_ToFile(fileTraj, -1);
-                    // This opens a new trajectory file; each run_it will have its own
-                    FileIO_AppendTrajFrame_ToFile(fileTraj,
-                                                  0); // End of previous run_it is initial conditions for this one.
-                    if (nTrajMode == 1)
-                        {
-                            sprintf(fileTraj, "%s_%d_trj.lammpstrj", strReportPrefix,
-                                    run_it); // Naming convention for trajectory files.
-                            FileIO_AppendTrajFrame_ToFile(fileTraj, -1);
-                            Write_Saved_Trajectory(fileTraj, run_it);
-                        }
-                }
-        }
-
-    if (run_it == 0 && nGen > 0)
-        {
-            if (nReport[REPORT_LOG] != 0)
-                {
-                    if (nGen % nReport[REPORT_LOG] == 0)
-                        {
-                            if (Check_System_Structure() == 0)
-                                {
-                                    printf("Structure is still a-okay!\n");
-                                }
-                            else
-                                {
-                                    printf("Molecular structure is inconsistent with initial "
-                                           "structure.\nCRASHING\n\n");
-                                    exit(1);
-                                }
-                            Energy_Total_System();
-                            nFlagForEnCalc = 1;
-                            Print_LogToScreen(nGen, run_it);
-                        }
-                }
-            if (nReport[REPORT_CONFIG] != 0)
-                {
-                    if (nGen % nReport[REPORT_CONFIG] == 0)
-                        {
-                            sprintf(fileTraj, "%s_trj.lammpstrj",
-                                    strReportPrefix); // Naming convention for trajectory files.
-                            FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                            // FileIO_AppendTrajFrame_ToFile(fileTraj, nGen + MCPreSteps);
-                        }
-                }
-            if (nReport[REPORT_ENERGY] != 0)
-                {
-                    if (nGen % nReport[REPORT_ENERGY] == 0)
-                        {
-                            if (nFlagForEnCalc != 1)
-                                { // Calculate the energy
-                                    Energy_Total_System();
-                                    nFlagForEnCalc = 1;
-                                }
-                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen + nMCPreSteps);
-                        }
-                }
-            if (nReport[REPORT_MCMOVE] != 0)
-                {
-                    if (nGen % nReport[REPORT_MCMOVE] == 0)
-                        {
-                            FileIO_WriteTo_MCMoveFile(fileMCMove, nGen + nMCPreSteps, fCuTemp);
-                        }
-                }
-            if (nReport[REPORT_RDFTOT] != 0)
-                { // SysProp is printed outside of this function in main.c, lol
-                    if (nGen % nReport[REPORT_RDFTOT] == 0 && nGen > nMCStepsPerCycle / 2)
-                        {
-                            RDF_ComponentWise_Avg();
-                        }
-                }
-            if (nReport[REPORT_COMDEN] != 0)
-                { // SysProp is printed outside of this function in main.c, lol
-                    if (nGen % nReport[REPORT_COMDEN] == 0 && nGen > nMCStepsPerCycle / 2)
-                        {
-                            RadDen_Avg_MolTypeWise_FromMolTypeCen();
-                        }
-                }
-            if (nReport[REPORT_NETWORK] != 0)
-                { // SysProp is printed outside of this function in main.c, lol
-                    if (nGen % nReport[REPORT_NETWORK] == 0 && nGen > nMCStepsPerCycle / 2)
-                        {
-                            Clus_Perform_Analysis();
-                            GyrTensor_GyrRad_Avg();
-                        }
-                }
-        }
-
-    if (run_it > 0)
-        {
-            if (nGen == -1)
-                {
-                    if (nReport[REPORT_ENERGY] != 0)
-                        {
-                            sprintf(fileEnergy, "%s_%d_energy.dat", strReportPrefix, run_it);
-                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy,
-                                                             -1); // Open a new energy file; each run_it will
-                            // have its own
-                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy,
-                                                             0); // Last frame from previous run_it is first
-                            // frame of this one
-                        }
-                    if (nReport[REPORT_MCMOVE] != 0)
-                        {
-                            sprintf(fileMCMove, "%s_%d_mcmove.dat", strReportPrefix, run_it);
-                            FileIO_WriteTo_MCMoveFile(fileMCMove, -1,
-                                                      0.0); // Open a new MCInfo file; each run_it will
-                            // have its own
-                        }
-                }
-            else
-                {
-                    if (nReport[REPORT_LOG] != 0)
-                        {
-                            if (nGen % nReport[REPORT_LOG] == 0)
-                                {
-                                    if (Check_System_Structure() == 0)
-                                        {
-                                            printf("Structure is still a-okay!\n");
-                                        }
-                                    else
-                                        {
-                                            printf("Molecular structure is inconsistent with initial "
-                                                   "structure.\nCRASHING\n\n");
-                                            exit(1);
-                                        }
-                                    Energy_Total_System();
-                                    nFlagForEnCalc = 1;
-                                    Print_LogToScreen(nGen, run_it);
-                                }
-                        }
-                    if (nReport[REPORT_CONFIG] != 0)
-                        {
-                            if (nGen % nReport[REPORT_CONFIG] == 0)
-                                {
-                                    sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix);
-                                    FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                                    // FileIO_AppendTrajFrame_ToFile(fileTraj, nGen + (run_it *
-                                    // nMCStepsPerCycle));
-                                }
-                        }
-                    if (nReport[REPORT_ENERGY] != 0)
-                        {
-                            if (nGen % nReport[REPORT_ENERGY] == 0)
-                                {
-                                    if (nFlagForEnCalc != 1)
-                                        { // Calculate the energy
-                                            Energy_Total_System();
-                                            nFlagForEnCalc = 1;
-                                        }
-                                    FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
-                                }
-                        }
-                    if (nReport[REPORT_MCMOVE] != 0)
-                        {
-                            if (nGen % nReport[REPORT_MCMOVE] == 0)
-                                {
-                                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
-                                }
-                        }
-                    if (nReport[REPORT_RDFTOT] != 0)
-                        { // SysProp is printed outside of this function in main.c,
-                            // lol
-                            if (nGen % nReport[REPORT_RDFTOT] == 0 && nGen > nMCStepsPerCycle / 2)
-                                {
-                                    RDF_ComponentWise_Avg();
-                                }
-                        }
-                    if (nReport[REPORT_COMDEN] != 0)
-                        { // SysProp is printed outside of this function in main.c,
-                            // lol
-                            if (nGen % nReport[REPORT_COMDEN] == 0 && nGen > nMCStepsPerCycle / 2)
-                                {
-                                    RadDen_Avg_MolTypeWise_FromMolTypeCen();
-                                }
-                        }
-                    if (nReport[REPORT_NETWORK] != 0)
-                        { // SysProp is printed outside of this function in main.c,
-                            // lol
-                            if (nGen % nReport[REPORT_NETWORK] == 0 && nGen > nMCStepsPerCycle / 2)
-                                {
-                                    Clus_Perform_Analysis();
-                                    GyrTensor_GyrRad_Avg();
-                                }
-                        }
-                }
-        }
+    FileIO_AppendTrajFrame_ToFile(fileTraj, nMCStepsForTherm);
 }
 
 /// CopyData_All - copies data from run_it specific data arrays to the overall

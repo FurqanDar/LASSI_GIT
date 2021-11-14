@@ -21,6 +21,10 @@ char ForPrinting_GetReportState(const long nGen, const long thisReport);
 
 void DataPrinting_Thermalization(const long nGen);
 
+void DataPrinting_DuringRunCycles(const long nGen, const int run_it);
+
+void DataAnalysis_DuringRunCycles(const long nGen, const int run_it);
+
 void Save_Trajectory(const long nGen, const long curFrame);
 
 void Write_Saved_Trajectory(char* filename, const int run_it);

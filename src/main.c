@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
     else if (bReadConf == 1)
         {
             Initial_Conditions_FromFile();
-            if (nMCPreSteps > 0)
+            if (nMCStepsForTherm > 0)
                 { // Remember that all thermalizing variants of
                   // MC moves cannot handle bonds.
                     Initial_Conditions_BreakBonds();
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
     //FILE Initialization
     FileIO_CreateRunningDataFiles();
 
-    for (nGen = 0; nGen < nMCPreSteps; nGen++)
+    for (nGen = 0; nGen < nMCStepsForTherm; nGen++)
         { // Intentionally not performing any data acquisition in the thermalization phase.
             nMCInfo = MC_Step_Equil(fCuTemp);
             //        printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
@@ -124,24 +124,27 @@ int main(int argc, char* argv[])
             fKT = fKT_Cycle[run_cycle];
             Calculate_Rot_Bias(fKT);
             FileIO_PreCycle_Init(run_cycle);
-//            Print_Data(-1, run_cycle);
-            //FileIO_GenerateFiles()
-            for (nGen = 0; nGen <= nMCStepsPerCycle; nGen++)
+            for (nGen = 0; nGen < nMCStepsPerCycle / 2; nGen++)
                 {
                     fCuTemp = Temperature_Function(nAnnealing_Mode, nGen);
                     nMCInfo = MC_Step(fCuTemp);
                     //            printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
-                    //FileIO_WriteData(nGen, run_cycle)
-                    Print_Data(nGen, run_cycle);
-//                    DataAnalysis_DuringRun(nGen);
-//                    DataPrinting_DuringRun(nGen);
+                    DataPrinting_DuringRunCycles(nGen, run_cycle);
+                }
+
+            for (nGen = nMCStepsPerCycle / 2; nGen < nMCStepsPerCycle; nGen++)
+                {
+                    fCuTemp = Temperature_Function(nAnnealing_Mode, nGen);
+                    nMCInfo = MC_Step(fCuTemp);
+                    //            printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
+                    DataPrinting_DuringRunCycles(nGen, run_cycle);
+                    DataAnalysis_DuringRunCycles(nGen, run_cycle);
                 }
             /*
              * Post run-cycle specific cleanup.
              */
             nAnnealing_Mode = -1;
             FileIO_WriteRestart_ForRun(run_cycle);
-
             CopyData_All(run_cycle);
             Reset_Global_Arrays();
         }

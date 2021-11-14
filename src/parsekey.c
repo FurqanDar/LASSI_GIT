@@ -94,7 +94,7 @@ int Parse_Keyfile(char* filename)
                         }
                     else if (strcmp(strKeyword, "PREEQ_STEPS") == 0)
                         {
-                            sscanf(strLine, "%*s %ld", &nMCPreSteps);
+                            sscanf(strLine, "%*s %ld", &nMCStepsForTherm);
                         }
                     else if (strcmp(strKeyword, "PREEQ_TEMP") == 0)
                         {
