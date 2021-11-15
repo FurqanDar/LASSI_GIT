@@ -416,13 +416,13 @@ void Global_Array_Initialization_AtStart(void)
         }
 
     const float VolumeConst = 4.f / 3.f * (float) M_PI;
-    const float IntendedVol = 0.75f;
+    const float IntendedVol = 0.5f;
     // fSquishRad =  (float) nBoxSize[0]/2.;
-    fSquishRad = cbrtf((float) (tot_beads-5000*4) / VolumeConst / IntendedVol);
+    fSquishRad = cbrtf((float) (tot_beads) / VolumeConst / IntendedVol);
     // fSquishRad =  fSquishRad*fSquishRad/4.;
     ld_LogOfSmallestPossibleProb = logl((lLDub) 1. / (lLDub) RAND_MAX);
 
-    nLimitedClusterSize = 15;
+    nLimitedClusterSize = 250;
     nLimitedClusterSize = tot_chains > nLimitedClusterSize ? nLimitedClusterSize : tot_chains / 2;
 
     printf("All setup has been completed!\n");

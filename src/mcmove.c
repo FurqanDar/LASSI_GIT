@@ -1718,7 +1718,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
     // No new 'bonds' are made so the move is reversible....
 
     int bAccept        = 0; // Used in MC steps, assume that move fails initially.
-    int naClusList[15] = {0};
+    int naClusList[250] = {0};
     const int ClusSize =
         Clus_Proximity_LimitedCluster_All(chainID); // Looking at everything that is connected to chainID
     // Remember that naList[] contains the chainID's of the network chainID is
@@ -1733,7 +1733,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
     int r_Disp[POS_MAX];
     int yTemp;
     int i, j;
-    LatPos_gen_rand_wRad(r_Disp, nBoxSize[0] / 4);
+    LatPos_gen_rand_wRad(r_Disp, nBoxSize[0] / 2);
 
     for (i = 0; i < ClusSize; i++)
         {
