@@ -955,37 +955,40 @@ void DataPrinting_Thermalization(const long nGen)
                 }
         }
 
-    if (nReport[REPORT_CONFIG])
+    if (nGen)
         {
-            cConfigFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_CONFIG]);
-            if (cConfigFlag)
+            if (nReport[REPORT_CONFIG])
                 {
-                    FileIO_HandleTrajectory(fileTraj, -1, nGen);
-                }
-        }
-
-    if (nReport[REPORT_ENERGY])
-        {
-            // DO ENERGY SHIT
-            cEnergyFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_ENERGY]);
-            if (cEnergyFlag)
-                {
-                    if (! cFlagForEnCal)
+                    cConfigFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_CONFIG]);
+                    if (cConfigFlag)
                         {
-                            Energy_Total_System();
-                            cFlagForEnCal = 1;
+                            FileIO_HandleTrajectory(fileTraj, -1, nGen);
                         }
-                    FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
                 }
-        }
 
-    if (nReport[REPORT_MCMOVE])
-        {
-            // DO MC_ACC SHIT
-            cAccFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_MCMOVE]);
-            if (cAccFlag)
+            if (nReport[REPORT_ENERGY])
                 {
-                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
+                    // DO ENERGY SHIT
+                    cEnergyFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_ENERGY]);
+                    if (cEnergyFlag)
+                        {
+                            if (! cFlagForEnCal)
+                                {
+                                    Energy_Total_System();
+                                    cFlagForEnCal = 1;
+                                }
+                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
+                        }
+                }
+
+            if (nReport[REPORT_MCMOVE])
+                {
+                    // DO MC_ACC SHIT
+                    cAccFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_MCMOVE]);
+                    if (cAccFlag)
+                        {
+                            FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
+                        }
                 }
         }
 }
@@ -1019,38 +1022,41 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
                 }
         }
 
-    if (nReport[REPORT_CONFIG])
+    if (nGen)
         {
-            cConfigFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_CONFIG]);
-            if (cConfigFlag)
+            if (nReport[REPORT_CONFIG])
                 {
-                    sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix);
-                    FileIO_HandleTrajectory(fileTraj, run_it, nGen);
-                }
-        }
-
-    if (nReport[REPORT_ENERGY])
-        {
-            // DO ENERGY SHIT
-            cEnergyFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_ENERGY]);
-            if (cEnergyFlag)
-                {
-                    if (! cFlagForEnCal)
+                    cConfigFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_CONFIG]);
+                    if (cConfigFlag)
                         {
-                            Energy_Total_System();
-                            cFlagForEnCal = 1;
+                            sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix);
+                            FileIO_HandleTrajectory(fileTraj, run_it, nGen);
                         }
-                    FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
                 }
-        }
 
-    if (nReport[REPORT_MCMOVE])
-        {
-            // DO MC_ACC SHIT
-            cAccFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_MCMOVE]);
-            if (cAccFlag)
+            if (nReport[REPORT_ENERGY])
                 {
-                    FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
+                    // DO ENERGY SHIT
+                    cEnergyFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_ENERGY]);
+                    if (cEnergyFlag)
+                        {
+                            if (! cFlagForEnCal)
+                                {
+                                    Energy_Total_System();
+                                    cFlagForEnCal = 1;
+                                }
+                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
+                        }
+                }
+
+            if (nReport[REPORT_MCMOVE])
+                {
+                    // DO MC_ACC SHIT
+                    cAccFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_MCMOVE]);
+                    if (cAccFlag)
+                        {
+                            FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
+                        }
                 }
         }
 }
