@@ -134,14 +134,22 @@ float Energy_InitPotential(const int beadID)
                             tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
                             totEn += (float) (tmpR[j] * tmpR[j]);
                         }
+                        totEn = sqrtf(totEn);
                         j = bead_info[beadID][BEAD_TYPE];
                         if (j > 6)
                             {
-                                totEn = -(fCuTemp - fKT) * sqrtf(totEn) * ((float) j + 1.f);
+                                totEn = -(fCuTemp - fKT) * (totEn);
                             }
                         else
                             {
-                                totEn = (fCuTemp - fKT) * sqrtf(totEn) * ((float) j + 1.f);
+                                if (j == 4)
+                                {
+                                    totEn = (fCuTemp - fKT) * (totEn)*(totEn);
+                                }
+                                else
+                                {
+                                    totEn = (fCuTemp - fKT) * (totEn);
+                                }
                             }
                         break;
 
@@ -153,22 +161,22 @@ float Energy_InitPotential(const int beadID)
                             tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
                             totEn += (float) (tmpR[j] * tmpR[j]);
                         }
-
+                        totEn = sqrtf(totEn);
                         j = bead_info[beadID][BEAD_TYPE];
-                        if (j < 7)
+                        if (j == 4)
                             {
-                                if (totEn > fSquishRad * fSquishRad)
-                                    {
-                                        totEn = (fCuTemp - fKT) * totEn / ((float) j + 1.f);
-                                    }
-                                else
-                                    {
-                                        totEn = 0.f;
-                                    }
+                                totEn = (fCuTemp - fKT) * totEn * totEn;
                             }
                         else
                         {
-                            totEn = -(fCuTemp - fKT) * sqrtf(totEn);
+                            if (totEn > 20.)
+                            {
+                                totEn = (fCuTemp - fKT) * totEn;
+                            }
+                            else
+                            {
+                                totEn = 0.f;
+                            }
                         }
                         break;
 
