@@ -421,6 +421,10 @@ void Global_Array_Initialization_AtStart(void)
         {
             fSquishRad = cbrtf((float) (tot_beads - 5000 * 4) / VolumeConst / IntendedVol);
         }
+    else if (nInitialPotential_Mode == 8)
+        {
+            fSquishRad = cbrtf((float) (5000 * (4 + 4 + 3)) / VolumeConst / IntendedVol);
+        }
     else
         {
             fSquishRad = cbrtf((float) (tot_beads) / VolumeConst / IntendedVol);

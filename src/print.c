@@ -1131,9 +1131,12 @@ void FileIO_WriteRestart_ForRun(const int run_it)
 /// FileIO_WriteRestart_ForThermalization
 void FileIO_WriteRestart_ForThermalization(void)
 {
-    sprintf(fileTraj, "%s_EQ_restart.lammpstrj", strReportPrefix); // Naming convention for trajectory files.
-    FileIO_CreateFile(fileTraj);
-    FileIO_AppendTrajFrame_ToFile(fileTraj, nMCStepsForTherm);
+    if (nMCStepsForTherm)
+        {
+            sprintf(fileTraj, "%s_EQ_restart.lammpstrj", strReportPrefix); // Naming convention for trajectory files.
+            FileIO_CreateFile(fileTraj);
+            FileIO_AppendTrajFrame_ToFile(fileTraj, nMCStepsForTherm);
+        }
 }
 
 /// CopyData_All - copies data from run_it specific data arrays to the overall

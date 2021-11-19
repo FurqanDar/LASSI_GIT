@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
                     DataPrinting_DuringRunCycles(nGen, run_cycle);
                 }
 
-            for (nGen = nMCStepsPerCycle / 2; nGen < nMCStepsPerCycle; nGen++)
+            for (nGen = nMCStepsPerCycle / 2; nGen <= nMCStepsPerCycle; nGen++)
                 {
                     fCuTemp = nAnnealing_Mode == -1 ? fKT : Temperature_Function(nAnnealing_Mode, nGen);
                     nMCInfo = MC_Step(fCuTemp);

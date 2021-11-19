@@ -108,6 +108,32 @@ float Energy_InitPotential(const int beadID)
                             }
                         break;
 
+                    case 8:
+                        totEn = (float) Dist_VecMagSq(posDiff);
+                        if (bead_info[beadID][BEAD_TYPE] >= 5) // DNA & RNA & Crowder
+                        {
+                            if (totEn < fSquishRad_Sq)
+                            {
+                                totEn =  fCuTemp * sqrtf(totEn);
+                            }
+                            else
+                            {
+                                totEn = 0.f;
+                            }
+                        }
+                        else // Non-crowder
+                        {
+                            if (totEn > fSquishRad_Sq)
+                            {
+                                totEn = fCuTemp * sqrtf(totEn);
+                            }
+                            else
+                            {
+                                totEn = 0.f;
+                            }
+                        }
+                        break;
+
                     default:
                         totEn = 0.f;
                         break;
