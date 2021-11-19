@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
             FileIO_PreCycle_Init(run_cycle);
             for (nGen = 0; nGen < nMCStepsPerCycle / 2; nGen++)
                 {
-                    fCuTemp = Temperature_Function(nAnnealing_Mode, nGen);
+                    fCuTemp = nAnnealing_Mode == -1 ? fKT : Temperature_Function(nAnnealing_Mode, nGen);
                     nMCInfo = MC_Step(fCuTemp);
                     //            printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
                     DataPrinting_DuringRunCycles(nGen, run_cycle);
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 
             for (nGen = nMCStepsPerCycle / 2; nGen < nMCStepsPerCycle; nGen++)
                 {
-                    fCuTemp = Temperature_Function(nAnnealing_Mode, nGen);
+                    fCuTemp = nAnnealing_Mode == -1 ? fKT : Temperature_Function(nAnnealing_Mode, nGen);
                     nMCInfo = MC_Step(fCuTemp);
                     //            printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
                     DataPrinting_DuringRunCycles(nGen, run_cycle);

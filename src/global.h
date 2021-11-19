@@ -9,9 +9,9 @@
 
 #define MAX_AA         10
 #define MAX_CHAINTYPES 10
-#define MAX_CHAINLEN   1000
+#define MAX_CHAINLEN   100
 #define MAX_BONDS      4
-#define MAX_VALENCY    1000
+#define MAX_VALENCY    100
 
 // energy parameters
 #define E_TOT   0 // index zero must be assigned for total energy
@@ -124,7 +124,7 @@ float fLinkerSprCon;
 float fLinkerEqLen;
 
 // MC setup
-float fKT, fPreKT, fCuTemp, fRot_Bias, f_globRotBias, fdelta_temp, fMC_Temp_Rate, fSquishRad;
+float fKT, fPreKT, fCuTemp, fRot_Bias, f_globRotBias, fdelta_temp, fMC_Temp_Rate, fSquishRad, fSquishRad_Sq;
 float* fKT_Cycle;
 lLong nMCStepsPerCycle, nMCStepsForTherm;
 float fMCFreq[MAX_MV];

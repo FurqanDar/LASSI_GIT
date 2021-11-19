@@ -92,7 +92,6 @@ int MC_Step(float fMCTemp)
                 break;
             case MV_PR_SMCLSTR:
                 i = rand() % tot_chains;
-                // printf("%d\n",i);
                 nAccept = Move_SmallClus_Proximity(i, fMCTemp);
                 break;
             default:

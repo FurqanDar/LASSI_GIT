@@ -542,7 +542,7 @@ void ScreenIO_Print_Log_Thermalization(const long nGen)
 /// ScreenIO_Print_Log_FullRun - print the log to the screen.
 void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle)
 {
-    printf("Run Cycle: %ld\n", run_cycle);
+    printf("Run Cycle: %d\n", run_cycle);
     printf("Step     : %8.3e\n", (float) nGen);
     printf("MC Temp  : %8.3e\n", fCuTemp);
 

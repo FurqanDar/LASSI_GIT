@@ -7,100 +7,74 @@
 /// energy, given the nInitialPotential_Mode
 float Energy_InitPotential(const int beadID)
 {
-    int j;
-    float totEn = 0.;
-    int tmpR[POS_MAX];
-    if (fCuTemp - fKT > 0.005)
+    float totEn = 0.f;
+    const int centPos[POS_MAX] = {nBoxSize[0]/2, nBoxSize[1]/2, nBoxSize[2]/2};
+    const int tmpPos[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
+    const int posDiff[POS_MAX] = {tmpPos[0]-centPos[0], tmpPos[1]-centPos[1], tmpPos[2]-centPos[2]};
+
+    const float fDeltaTemp = fCuTemp - fKT;
+    const char cFlagCompute = fDeltaTemp > 0.005 ? 1 : 0;
+
+
+    if (cFlagCompute)
         {
             switch (nInitialPotential_Mode)
                 {
                     case 1:
-                        for (j = 0; j < POS_MAX; j++)
-                            {
-                                tmpR[j] = bead_info[beadID][j];
-                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                                totEn += (float) (tmpR[j] * tmpR[j]);
-                            }
-                        totEn = (fCuTemp - fKT) * totEn;
+                        totEn = (float) Dist_VecMagSq(posDiff);
+                        totEn = fCuTemp * totEn;
                         break;
 
                     case 2:
-                        for (j = 0; j < POS_MAX; j++)
-                            {
-                                tmpR[j] = bead_info[beadID][j];
-                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                                totEn += (float) (tmpR[j] * tmpR[j]);
-                            }
-                        if (totEn >= 250.)
+                        totEn = (float) Dist_VecMagSq(posDiff);
+                        if (totEn >= 250.f)
                             {
                                 totEn = (fCuTemp - fKT) * (totEn);
                             }
-                        else if (totEn <= 600.)
+                        else if (totEn <= 600.f)
                             {
-                                totEn = (fCuTemp - fKT) * ((float) tot_beads + 1. / (totEn + 0.02));
+                                totEn = fCuTemp * ((float) tot_beads + 1.f / (totEn + 0.02f));
                             }
                         else
                             {
-                                totEn = 0.;
+                                totEn = 0.f;
                             }
                         break;
 
                     case 3:
-                        for (j = 0; j < POS_MAX; j++)
-                            {
-                                tmpR[j] = bead_info[beadID][j];
-                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                                totEn += (float) (tmpR[j] * tmpR[j]);
-                            }
+                        totEn = (float) Dist_VecMagSq(posDiff);
                         if (totEn >= 35 * 35)
                             {
                                 totEn = (fCuTemp) *totEn;
                             }
                         else
                             {
-                                totEn = 0.;
+                                totEn = 0.f;
                             }
                         break;
+
                     case 4:
-                        for (j = 0; j < POS_MAX; j++)
-                            {
-                                tmpR[j] = bead_info[beadID][j];
-                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                                totEn += (float) (tmpR[j] * tmpR[j]);
-                            }
+                        totEn = (float) Dist_VecMagSq(posDiff);
                         if (totEn <= 100.)
                             {
-                                totEn = (fCuTemp - fKT) * (totEn + 0.2);
-                            } /*else if (totEn <= 2000.) {
-                                totEn = ;(fCuTemp - fKT*0.) * ((float) tot_beads + 1. /
-                            (totEn + 0.02));
-                            }*/
+                                totEn = fCuTemp * (totEn + 0.2f);
+                            }
                         else
                             {
-                                totEn = 0.;
+                                totEn = 0.f;
                             }
                         break;
+
                     case 5:
-                        for (j = 0; j < 1; j++)
-                            {
-                                tmpR[j] = bead_info[beadID][j];
-                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                                totEn += (float) (tmpR[j] * tmpR[j]);
-                            }
-                        totEn = (fCuTemp - fKT) * totEn;
+                        totEn = (float) (posDiff[0] * posDiff[0]);
+                        totEn = fCuTemp * totEn;
                         break;
 
                     case 6:
-
-                        for (j = 0; j < POS_MAX; j++)
+                        totEn = (float) Dist_VecMagSq(posDiff);
+                        if (totEn > fSquishRad_Sq)
                             {
-                                tmpR[j] = bead_info[beadID][j];
-                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                                totEn += (float) (tmpR[j] * tmpR[j]);
-                            }
-                        if (totEn > fSquishRad * fSquishRad)
-                            {
-                                totEn = (fCuTemp - fKT) * totEn;
+                                totEn = fCuTemp * totEn;
                             }
                         else
                             {
@@ -109,75 +83,29 @@ float Energy_InitPotential(const int beadID)
                         break;
 
                     case 7:
-
-                        for (j = 0; j < 1; j++)
+                        totEn = (float) Dist_VecMagSq(posDiff);
+                        if (bead_info[beadID][BEAD_TYPE] == 7) // Crowder
                             {
-                                tmpR[j] = bead_info[beadID][j];
-                                tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                                totEn += (float) (tmpR[j] * tmpR[j]);
-                            }
-                        if (totEn > 100)
-                            {
-                                totEn = (fCuTemp - fKT) * totEn;
-                            }
-                        else
-                            {
-                                totEn = 0.;
-                            }
-                        break;
-
-                    case 8:
-
-                        for (j = 0; j < POS_MAX; j++)
-                        {
-                            tmpR[j] = bead_info[beadID][j];
-                            tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                            totEn += (float) (tmpR[j] * tmpR[j]);
-                        }
-                        totEn = sqrtf(totEn);
-                        j = bead_info[beadID][BEAD_TYPE];
-                        if (j > 6)
-                            {
-                                totEn = -(fCuTemp - fKT) * (totEn);
-                            }
-                        else
-                            {
-                                if (j == 4)
-                                {
-                                    totEn = (fCuTemp - fKT) * (totEn)*(totEn);
-                                }
+                                if (totEn < fSquishRad_Sq)
+                                    {
+                                        totEn =  fCuTemp * sqrtf(totEn);
+                                    }
                                 else
-                                {
-                                    totEn = (fCuTemp - fKT) * (totEn);
-                                }
+                                    {
+                                        totEn = 0.f;
+                                    }
                             }
-                        break;
-
-                    case 9:
-
-                        for (j = 0; j < POS_MAX; j++)
-                        {
-                            tmpR[j] = bead_info[beadID][j];
-                            tmpR[j] = tmpR[j] - nBoxSize[j] / 2;
-                            totEn += (float) (tmpR[j] * tmpR[j]);
-                        }
-                        totEn = sqrtf(totEn);
-                        j = bead_info[beadID][BEAD_TYPE];
-                        if (j == 4)
+                        else // Non-crowder
                             {
-                                totEn = (fCuTemp - fKT) * totEn * totEn;
+                                if (totEn > fSquishRad_Sq)
+                                    {
+                                        totEn = fCuTemp * sqrtf(totEn);
+                                    }
+                                else
+                                    {
+                                        totEn = 0.f;
+                                    }
                             }
-                        else
-                        {
-                            if (totEn > 20.)
-                            {
-                                totEn = (fCuTemp - fKT) * totEn;
-                            }
-                            else
-                            {
-                                totEn = 0.f;
-                            }
-                        }
                         break;
 
                     default:
@@ -187,7 +115,7 @@ float Energy_InitPotential(const int beadID)
         }
     else
         {
-            nInitialPotential_Mode = -1;
+            totEn = 0.f;
         }
 
     return totEn;

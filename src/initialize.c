@@ -416,10 +416,18 @@ void Global_Array_Initialization_AtStart(void)
         }
 
     const float VolumeConst = 4.f / 3.f * (float) M_PI;
-    const float IntendedVol = 0.5f;
-    // fSquishRad =  (float) nBoxSize[0]/2.;
-    fSquishRad = cbrtf((float) (tot_beads) / VolumeConst / IntendedVol);
-    // fSquishRad =  fSquishRad*fSquishRad/4.;
+    const float IntendedVol = 0.75f;
+    if (nInitialPotential_Mode == 7)
+        {
+            fSquishRad = cbrtf((float) (tot_beads - 5000 * 4) / VolumeConst / IntendedVol);
+        }
+    else
+        {
+            fSquishRad = cbrtf((float) (tot_beads) / VolumeConst / IntendedVol);
+        }
+
+    fSquishRad_Sq = fSquishRad * fSquishRad;
+
     ld_LogOfSmallestPossibleProb = logl((lLDub) 1. / (lLDub) RAND_MAX);
 
     nLimitedClusterSize = 250;
@@ -815,7 +823,7 @@ void Calculate_Rot_Bias(const float CurrentTemp)
 /// nPreSteps. If mode = 3: \f$F(t) = fKT + \exp(-4nGen/nPre)/fKT\f$.
 /// Exponential decay from the beginning. \param nGen - basically 'time' or how
 /// many MC Steps have been done. \return end_val - the current temperature.
-float Temperature_Function(int mode, long nGen)
+float Temperature_Function(const int mode, const long nGen)
 {
 
     float x_val;
@@ -853,7 +861,7 @@ float Temperature_Function(int mode, long nGen)
                 x_val   = -(float) (nGen);
                 x_val   = 4.f * x_val;
                 x_val   = x_val / (float) (nMCStepsForTherm);
-                end_val = fKT + expf(x_val);
+                end_val = fKT + fPreKT * expf(x_val);
 
                 break;
 
@@ -865,12 +873,38 @@ float Temperature_Function(int mode, long nGen)
 
                 break;
 
+            case 5:
+                x_val = -(float) powf((float) nGen, 0.25f);
+                x_val *= 0.075f;
+                end_val = fKT + fPreKT * expf(x_val);
+
+                break;
+
+            case 6:
+                x_val   = powf((float) nGen, 0.5f);
+                end_val = fKT + fPreKT / (1.0f + x_val);
+
+                break;
+
+            case 7:
+                x_val   = (float) nGen * (0.00000002f);
+                end_val = fKT + 2.f - x_val;
+
+                break;
+
             default:
 
                 end_val = fKT;
                 break;
         }
-
+    if (end_val - fKT < 0.005)
+        {
+            puts("\n\n******************************\n");
+            puts("Annealing Is Being Turned Off");
+            puts("\n******************************\n\n");
+            nAnnealing_Mode        = -1;
+            nInitialPotential_Mode = -1;
+        }
     return end_val;
 }
 
