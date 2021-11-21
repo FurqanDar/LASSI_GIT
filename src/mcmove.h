@@ -159,26 +159,4 @@ void OP_Beads_RestoreBondsInList(const int listSize, const int* beadList);
 
 void OP_Beads_RestoreBond(const int beadID);
 
-void BeadListOP_GetChainIDs(const int beadNum, const int* beadList, int* chainList);
-
-void BeadListOP_GetChainTypes(const int beadNum, const int* beadList, int* chainList);
-
-int BeadListOP_Filter_wrt_SecondList(const int beadNum, int* beadList, const int* propList, const int prop_val);
-
-int BeadListOP_InvFilter_wrt_SecondList(const int beadNum, int* beadList, const int* propList, const int prop_val);
-
-void BeadListOP_GetIntraChainID(const int beadNum, const int* beadList, int* chainList);
-
-int BeadListOP_Filter_DbPvtLinkerConFwd(const int beadNum, int* beadList, const int thisBead);
-
-int BeadListOP_Filter_DbPvtLinkerConBck(const int beadNum, int* beadList, const int thisBead);
-
-int BeadList_AppendBeads(const int old_size, int* old_list, const int* app_list, const int app_size);
-
-int BeadList_UniqueElements(const int size, int* sorted_list);
-
-int BeadList_CanTopoAngle(const int size, int* beadList);
-
-int compare_int(const void* a, const void* b);
-
 #endif // _MCMOVE_H_

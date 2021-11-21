@@ -92,4 +92,26 @@ float Vec3n_AngleBetweenVecs(const int* vec_1, const int* vec_2);
 
 float BeadPos_CosThetaOfBeads(const int bead1, const int bead2);
 
+void BeadListOP_GetChainIDs(const int beadNum, const int* beadList, int* chainList);
+
+void BeadListOP_GetChainTypes(const int beadNum, const int* beadList, int* chainList);
+
+int BeadListOP_Filter_wrt_SecondList(const int beadNum, int* beadList, const int* propList, const int prop_val);
+
+int BeadListOP_InvFilter_wrt_SecondList(const int beadNum, int* beadList, const int* propList, const int prop_val);
+
+void BeadListOP_GetIntraChainID(const int beadNum, const int* beadList, int* chainList);
+
+int BeadListOP_Filter_DbPvtLinkerConFwd(const int beadNum, int* beadList, const int thisBead);
+
+int BeadListOP_Filter_DbPvtLinkerConBck(const int beadNum, int* beadList, const int thisBead);
+
+int BeadList_UniqueElements(const int size, int* sorted_list);
+
+int BeadList_AppendBeads(const int old_size, int* old_list, const int* app_list, const int app_size);
+
+int compare_int(const void* a, const void* b);
+
+int BeadList_CanTopoAngle(const int size, int* beadList);
+
 #endif // _STRUCTURE_H_

@@ -1018,7 +1018,7 @@ int Clus_Proximity_LimitedCluster_All(int const chainID)
     // chain, and to add it to naList If Cluster becomes larger than 15, exit
     // and return -1 If the number of chains is lower than 15, we use
     // tot_chains/2.
-    const size_t ClusterLimit = nLimitedClusterSize;
+    const int ClusterLimit = nLimitedClusterSize;
     int i, j, k; // Loop iterators
     for (i = 0; i < ClusterLimit; i++)
         {
@@ -1052,6 +1052,7 @@ int Clus_Proximity_LimitedCluster_All(int const chainID)
                         { // This is where I am right now
                             tmpR[j] = bead_info[i][j];
                         }
+                    LatPos_copy(tmpR, bead_info[i]);
                     for (k = 0; k < MAX_ROTSTATES - 1; k++)
                         {
                             tmpBead = Rot_IndArr[k];
@@ -1059,6 +1060,7 @@ int Clus_Proximity_LimitedCluster_All(int const chainID)
                                 {
                                     tmpR2[j] = (tmpR[j] + LocalArr[tmpBead][j] + nBoxSize[j]) % nBoxSize[j];
                                 }
+                            LatPos_add_wPBC(tmpR2, tmpR, LocalArr[k]);
                             tmpBead = Lat_Ind_FromVec(tmpR2);
                             tmpBead = naTotLattice[tmpBead];
                             if (tmpBead != -1)

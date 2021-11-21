@@ -144,6 +144,7 @@ int main(int argc, char* argv[])
              * Post run-cycle specific cleanup.
              */
             nAnnealing_Mode = -1;
+            nInitialPotential_Mode = -1;
             FileIO_WriteRestart_ForRun(run_cycle);
             CopyData_All(run_cycle);
             Reset_Global_Arrays();
