@@ -31,9 +31,9 @@ int Clus_Proximity_LimitedCluster_IntOnly(int const chainID);
 
 int Clus_Proximity_LimitedCluster_IntOnly_Check(int const chainID, int const* OldList);
 
-int Clus_Proximity_LimitedCluster_All(int const chainID);
+int Clus_Proximity_LimitedCluster_All(int const chainID, int* clusList);
 
-int Clus_Proximity_LimitedCluster_All_Check(int const chainID, int const* OldList);
+int Clus_Proximity_LimitedCluster_All_Check(int const chainID, int const* OldList, int* NewList);
 
 void Clus_Proximity_Distribution_Avg(void);
 

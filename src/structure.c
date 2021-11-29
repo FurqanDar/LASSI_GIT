@@ -235,14 +235,14 @@ int Dist_VecMagSq(const int* f1)
 
 /// GyrTensor_ClusterSpecific - calculates the total Gyration Tensor for a given cluster
 /// \param ClusSize - the total size of the cluster.
-/// \param ClusIndex - the index on naCluster where the cluster is stored.
+/// \param ClusIndex - the index on naClusterMatrix_g where the cluster is stored.
 /// THIS IS VERY OLD AND HASN'T BEEN LOOKED AT IN A WHILE
 /// TODO: Update this for the new version
 void GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex)
 {
     // Calculate the components of the gyration tensor for a given cluster.
     // ClusSize is the size of the cluster -- obviously -- whereas ClusIndex tell us
-    // where in naCluster the chain indecies are located. naCluster[ClusIndex][0-ClusSize] is all the chainID's I need
+    // where in naClusterMatrix_g the chain indecies are located. naClusterMatrix_g[ClusIndex][0-ClusSize] is all the chainID's I need
     // for the calculation
     // Remember that the Gyration Tensor is a 3x3 symmetric object so we only need 6 numbers.
     int i, k, j, j2; // Basic indecies for loops
@@ -264,8 +264,8 @@ void GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex)
     // Calculating the COM
     for (i = 0; i < ClusSize; i++)
         {
-            firstB = chain_info[naCluster[ClusIndex][i]][CHAIN_START];
-            lastB  = firstB + chain_info[naCluster[ClusIndex][i]][CHAIN_LENGTH];
+            firstB = chain_info[naClusterMatrix_g[ClusIndex][i]][CHAIN_START];
+            lastB  = firstB + chain_info[naClusterMatrix_g[ClusIndex][i]][CHAIN_LENGTH];
             // printf("%d %d\n", firstB, lastB);
             // Just easier to track each chain like this
             for (k = firstB; k < lastB; k++)
@@ -294,8 +294,8 @@ void GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex)
     //  GyrTen_{ij} = 1/N sum_1^N (r_i-com_i)(r_j-com_j) so just take the sums and divide at the end
     for (i = 0; i < ClusSize; i++)
         {
-            firstB = chain_info[naCluster[ClusIndex][i]][CHAIN_START];
-            lastB  = firstB + chain_info[naCluster[ClusIndex][i]][CHAIN_LENGTH];
+            firstB = chain_info[naClusterMatrix_g[ClusIndex][i]][CHAIN_START];
+            lastB  = firstB + chain_info[naClusterMatrix_g[ClusIndex][i]][CHAIN_LENGTH];
             // Just easier to track each chain like this
             for (k = firstB; k < lastB; k++)
                 {
@@ -697,7 +697,7 @@ void Calc_SystemCenterOfMass(lDub* tmpR)
 void Calc_CenterOfMass_OfCluster(lDub* tmpR, const int cluster_size, const int* ClusList)
 {
     // This version measures the COM of a cluster of size c
-    //  cluster size, given the molecule ID's in naList.
+    //  cluster size, given the molecule ID's in naList_gl.
     // The COM from this is not necessarily the COM of the system as a whole.
     int thisMol, i, j, k;         // Iterators
     int fB, lB;                   // Keep track of first and last beads of a given molecule
@@ -1029,20 +1029,20 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void)
     // Remember the cluster ID's
     for (i = 0; i <= tot_chain_types; i++)
         {
-            clus_id_list[i] = naList[i];
+            clus_id_list[i] = naList_gl[i];
         }
 
     for (cur_type = 0; cur_type <= tot_chain_types; cur_type++)
         {
             clus_id   = clus_id_list[cur_type];
-            clus_size = naCluster[clus_id][0];
+            clus_size = naClusterMatrix_g[clus_id][0];
             // printf("(%d %d) ", clus_id, clus_size);
             for (i = 0; i < clus_size; i++)
                 {
-                    naList[i] = naCluster[clus_id][i + 1];
+                    naList_gl[i] = naClusterMatrix_g[clus_id][i + 1];
                 }
 
-            Calc_CenterOfMass_OfCluster(typeCOM, clus_size, naList);
+            Calc_CenterOfMass_OfCluster(typeCOM, clus_size, naList_gl);
             for (j = 0; j < POS_MAX; j++)
                 {
                     COM_int[j] = (int) typeCOM[j];
@@ -1050,8 +1050,8 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void)
 
             for (k = 0; k < clus_size; k++)
                 {
-                    fB = chain_info[naList[k]][CHAIN_START];
-                    lB = fB + chain_info[naList[k]][CHAIN_LENGTH];
+                    fB = chain_info[naList_gl[k]][CHAIN_START];
+                    lB = fB + chain_info[naList_gl[k]][CHAIN_LENGTH];
                     for (i = fB; i < lB; i++)
                         {
                             thisType = bead_info[i][BEAD_CHAINID];
@@ -1312,6 +1312,44 @@ int NeighborSearch_AroundPoint_wRad_wDists(const int beadID, const int* startVec
                         }
                 }
         }
+    return neigh_num;
+}
+
+
+/// NeighborSearch_ForOvlp: Given the beadID, which should be at startVec, we calculate all the neighbors
+/// within the +-1 cube. We return the number of neighbors.
+/// \param beadID
+/// \param startVec
+/// \param neighList
+/// \return Number of neighbors.
+int NeighborSearch_ForCluster_Ovlp(int const beadID, const int* startVec, int* neighList)
+{
+    int neigh_num = 0;
+
+    int tmpBead;
+    int r_disp[POS_MAX] = {0};
+    int r_chck[POS_MAX] = {0};
+    const int nRad      = 1;
+
+    for (r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++)
+    {
+        LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_X);
+        for (r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++)
+        {
+            LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_Y);
+            for (r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++)
+            {
+                LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_Z);
+                tmpBead = naTotLattice[Lat_Ind_FromVec(r_chck)];
+                if (tmpBead != -1)
+                {
+                    neighList[neigh_num] = tmpBead;
+                    neigh_num++;
+                }
+            }
+        }
+    }
+    neighList[neigh_num] = -1;
     return neigh_num;
 }
 
@@ -1711,4 +1749,116 @@ int BeadList_CanTopoAngle(const int size, int* beadList)
         }
 
     return newSize;
+}
+
+/// ChainListOP_AddUniqueChains_wSize: Add any chains that are not in clusList from chainList. This function assumes that
+/// chainList contains only unique elements, and that clusList has the smallest chainID as the first element, and the
+/// largest chainID the last element (at clusList[clusSize-1]).
+/// \param clusSize
+/// \param clusList
+/// \param newChainNums
+/// \param chainList
+int ChainListOP_AddUniqueChains_wSize(const int clusSize, int* clusList, const int newChainNums, const int* chainList,
+                                      const int maxClus)
+{
+    int i;
+    int curChain;
+    int newClusSize = clusSize;
+
+    for (i=0; i < newChainNums; i++)
+    {
+        curChain = chainList[i];
+        newClusSize = ClusListOP_AddChainID(newClusSize, clusList, curChain);
+        if (newClusSize >= maxClus)
+        {
+            return newClusSize;
+        }
+    }
+
+    return newClusSize;
+
+}
+
+
+/// ChainListOP_AddUniqueChains_wSize: Add any chains that are not in clusList from chainList. This function assumes that
+/// chainList contains only unique elements, and that clusList has the smallest chainID as the first element, and the
+/// largest chainID the last element (at clusList[clusSize-1]).
+/// \param clusSize
+/// \param clusList
+/// \param newChainNums
+/// \param chainList
+int ChainListOP_AddUniqueChains_wSize_Check(const int clusSize, int* clusList, const int newChainNums, const int* chainList,
+                                      const int maxClus, const int* oldList)
+{
+    int i;
+    int curChain;
+    int newClusSize = clusSize;
+
+    for (i=0; i < newChainNums; i++)
+    {
+        curChain = chainList[i];
+        newClusSize = ClusListOP_AddChainID(newClusSize, clusList, curChain);
+        if (newClusSize >= maxClus)
+        {
+            return newClusSize;
+        }
+        if (clusList[newClusSize-1] != oldList[newClusSize-1])
+        {
+            return maxClus;
+        }
+    }
+
+    return newClusSize;
+
+}
+
+/// ClusListOP_AddChainID - Given a cluster-chainIDs list containing clusSize chains, we try to add the proposed
+/// chainID. Assumes that clusList[0] is the smallest, and clusList[clusSize-1] is the largest.
+/// - If the chain is smaller than the smallest, we add it to become the first element of the chain, because it is now
+/// the smallest chainID. The largest chainID moves up one, and the old smallest is placed behind the largest.
+/// - Else, if the chain is larger than the largest, we add it infront of the old largest.
+/// - Else, we loop over the clusList to see if the proposed chainID is unique.
+/// \param clusSize
+/// \param clusList
+/// \param chainID
+/// \return
+int ClusListOP_AddChainID(const int clusSize, int* clusList, const int chainID)
+{
+
+    int i;
+    for (i=0; i<clusSize; i++)
+    {
+        if (clusList[i] == chainID)
+        {
+            return clusSize;
+        }
+    }
+
+    clusList[clusSize] = chainID;
+
+
+    return clusSize+1;
+
+}
+
+/// ClusListOP_AddIfUniqueChainID - Loop over the clusList. If none of the chains match, we insert the chainID behind
+/// last chain in clusList. So we move the last chain up by one.
+/// \param clusSize
+/// \param clusList
+/// \param chainID
+/// \return clusSize+1 if the chain was added, clusSize if not.
+int ClusListOP_AddIfUniqueChainID(const int clusSize, int* clusList, const int chainID)
+{
+    int i;
+    for (i=0; i<clusSize; i++)
+    {
+        if (clusList[i] == chainID)
+        {
+            return clusSize;
+        }
+    }
+    clusList[clusSize]=clusList[clusSize-1];
+    clusList[clusSize-1]=chainID;
+    return clusSize+1;
+
 }

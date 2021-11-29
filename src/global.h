@@ -149,8 +149,8 @@ lLong naMCAccepMat[2][MAX_MV];
 
 // Cluster analysis
 lInt nClusteringMode;
-lInt** naCluster;
-lInt* naList;
+lInt** naClusterMatrix_g;
+lInt* naList_gl;
 lLong* naClusHistList;
 lInt* naChainCheckList;
 lInt nTotClusCounter;

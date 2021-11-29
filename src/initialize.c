@@ -22,11 +22,11 @@ void Memory_Initialization_AtStart(void)
     strcpy(arr_name, "fKTCycle");
     fKT_Cycle = Create1DFloat(1 + nTot_CycleNum, arr_name);
 
-    strcpy(arr_name, "naList");
-    naList = Create1DInt(2 + tot_chains, arr_name);
+    strcpy(arr_name, "naList_gl");
+    naList_gl = Create1DInt(2 + tot_chains, arr_name);
 
-    strcpy(arr_name, "naCluster");
-    naCluster = Create2DInt(tot_chains + 2, tot_chains + 2, arr_name);
+    strcpy(arr_name, "naClusterMatrix_g");
+    naClusterMatrix_g = Create2DInt(tot_chains + 2, tot_chains + 2, arr_name);
 
     if (nReport[REPORT_NETWORK] != 0)
         {
@@ -319,7 +319,7 @@ void Global_Array_Initialization_AtStart(void)
             naClusHistList[i]   = 0;
             for (j = 0; j <= tot_chains; j++)
                 {
-                    naCluster[i][j] = -1;
+                    naClusterMatrix_g[i][j] = -1;
                 }
         }
 
@@ -435,7 +435,7 @@ void Global_Array_Initialization_AtStart(void)
     ld_LogOfSmallestPossibleProb = logl((lLDub) 1. / (lLDub) RAND_MAX);
 
     nLimitedClusterSize = MAX_SMCLSTR_SIZE;
-    nLimitedClusterSize = tot_chains > nLimitedClusterSize ? nLimitedClusterSize : tot_chains / 2;
+    nLimitedClusterSize = tot_chains > nLimitedClusterSize ? nLimitedClusterSize : tot_chains - 2;
 
     printf("All setup has been completed!\n");
 }
@@ -463,7 +463,7 @@ void Reset_Global_Arrays(void)
             naClusHistList[i]   = 0;
             for (j = 0; j <= tot_chains; j++)
                 {
-                    naCluster[i][j] = -1;
+                    naClusterMatrix_g[i][j] = -1;
                 }
             if (nReport[REPORT_NETWORK])
                 {
