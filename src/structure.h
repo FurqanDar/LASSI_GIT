@@ -82,7 +82,7 @@ void LatPos_add_wPBC_ofComp(int* outVec, const int* firVec, const int* secVec, c
 
 void LatPos_add_noPBC(int* outVec, const int* firVec, const int* secVec);
 
-void LatPos_gen_rand_wRad(int* outVec, const int nRadius);
+void LatPos_gen_rand_wRad(int outVec[POS_MAX], const int nRadius);
 
 int OP_GetTopoBonds(const int beadID, int* dum_list);
 

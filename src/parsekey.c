@@ -82,7 +82,6 @@ int Parse_Keyfile(char* filename)
                                         }
                                 }
                             nRDF_TotBins = nBoxSize[0] * 4;
-                            // nRDF_TotBins   = (lInt)sqrtf((float))
                         }
                     else if (strcmp(strKeyword, "MC_TEMP") == 0)
                         {

@@ -67,7 +67,7 @@
 #define CHAININFO_MAX 3
 
 #define MAX_ROTSTATES 27
-#define MAX_SMCLSTR_SIZE 256
+#define MAX_SMCLSTR_SIZE 32
 
 typedef int lInt;
 typedef long lLong;

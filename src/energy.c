@@ -134,6 +134,30 @@ float Energy_InitPotential(const int beadID)
                         }
                         break;
 
+                    case 9:
+                        totEn = (float) (posDiff[2] * posDiff[2]);
+                        if (totEn > fSquishRad_Sq / 2.f)
+                            {
+                                totEn = fCuTemp * totEn;
+                            }
+                        else
+                            {
+                                totEn = 0.f;
+                            }
+                        break;
+
+                    case 10:
+                        totEn = (float) (posDiff[2] * posDiff[2]);
+                        if (totEn > fSquishRad_Sq / 2.f)
+                        {
+                            totEn = fCuTemp * totEn;
+                        }
+                        else
+                        {
+                            totEn = fCuTemp * powf(totEn, 0.25f);
+                        }
+                        break;
+
                     default:
                         totEn = 0.f;
                         break;

@@ -296,8 +296,8 @@ int Move_Local(int beadID, float MyTemp)
 
     // Attempt to find an empty lattice point.
     LatPos_copy(r_pos0, bead_info[beadID]);
-    //    LatPos_gen_rand_wRad (r_disp, 2);
-    LatPos_gen_rand_wRad(r_disp, linker_len[beadID][0]);
+        LatPos_gen_rand_wRad (r_disp, 2);
+//    LatPos_gen_rand_wRad(r_disp, linker_len[beadID][0]);
     LatPos_add_wPBC(r_posNew, r_pos0, r_disp);
 
     // Checking to see validity of new point.
@@ -1719,8 +1719,9 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
 
     int bAccept        = 0; // Used in MC steps, assume that move fails initially.
 
-    int newClusList[MAX_SMCLSTR_SIZE] = {0};
-    int oldClusList[MAX_SMCLSTR_SIZE] = {0};
+    int* oldClusList = calloc(nLimitedClusterSize, sizeof(int));
+//    int newClusList[MAX_SMCLSTR_SIZE] = {0};
+//    int oldClusList[MAX_SMCLSTR_SIZE] = {0};
 
     const int ClusSize =
         Clus_Proximity_LimitedCluster_All(chainID, oldClusList); // Looking at everything that is connected to chainID
@@ -1729,8 +1730,11 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
     if (ClusSize < 2)
         {
             bAccept = 0;
+            free(oldClusList);
             return bAccept;
         }
+//    printf("\n%d\n", ClusSize);
+    int* newClusList = calloc(nLimitedClusterSize, sizeof(int));
 
     // Radii for translation moves. All moves are L/2 radius
     int r_Disp[POS_MAX];
@@ -1744,12 +1748,13 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
             if (yTemp == 0)
                 {
                     bAccept = 0;
+                    free(oldClusList);
+                    free(newClusList);
                     return bAccept;
                 }
         }
     // No  clash
 
-//    qsort(oldClusList, ClusSize, sizeof(int), compare_int);
 
     int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
     int thisChain, firstB, lastB;
@@ -1804,6 +1809,8 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
                     OP_System_RestoreChain(oldClusList[i]); // Placing  the cluster back properly
                 }
             bAccept = 0;
+            free(oldClusList);
+            free(newClusList);
             return bAccept;
         }
 
@@ -1841,6 +1848,8 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
     if (MCProb < MHAcc)
         {                // Accept this state
             bAccept = 1; // Accept the move
+            free(oldClusList);
+            free(newClusList);
             return bAccept;
             // printf("End CLUS - Yes\n");
         }
@@ -1851,6 +1860,8 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
                     OP_System_RestoreChain(newClusList[i]); // Placing  the cluster back properly
                 }
             bAccept = 0;
+            free(oldClusList);
+            free(newClusList);
             return bAccept;
             // printf("End CLUS - Failed.\n");
         }
@@ -1869,8 +1880,8 @@ int Move_Local_Equil(int beadID, float MyTemp)
         r_disp[POS_MAX]; // Vectors to stores coordinates.
     // printf("Beginning LOCAL\n");
     LatPos_copy(r_pos0, bead_info[beadID]);
-    LatPos_gen_rand_wRad(r_disp, linker_len[beadID][0]);
-    //    LatPos_gen_rand_wRad (r_disp, 2);
+//    LatPos_gen_rand_wRad(r_disp, linker_len[beadID][0]);
+        LatPos_gen_rand_wRad (r_disp, 2);
     LatPos_add_wPBC(r_posNew, r_pos0, r_disp);
 
     yTemp = Check_MoveBeadTo(r_posNew);
@@ -2077,7 +2088,7 @@ int Move_Trans_Equil(int chainID, float MyTemp)
     lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
     // Radii for translation moves. All moves are L/4 radius
 
-    LatPos_gen_rand_wRad(r_disp, nBoxSize[2] / 2);
+    LatPos_gen_rand_wRad(r_disp, nBoxSize[0] / 2);
 
     yTemp = Check_ChainDisp(chainID, r_disp); // yTemp=0 means clash
     if (yTemp == 0)

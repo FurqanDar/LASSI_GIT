@@ -17,7 +17,7 @@ void PrintToScreen_EnergyMatrix(char* strTitle, int nSeqEn, float fArray[MAX_AA]
 
     char sSectionHead[512];
     memset(sSectionHead, '-', outLen);
-    sSectionHead[outLen] = NULL;
+    sSectionHead[outLen] = '\0';
 
     printf("%s\n", sSectionHead);
 
@@ -465,7 +465,7 @@ void ScreenIO_Print_SystemEnergy(void)
 
     char sSectionHead[32];
     memset(sSectionHead, '-', 17);
-    sSectionHead[17] = NULL;
+    sSectionHead[17] = '\0';
 
     printf("%s\n", sSectionHead);
     printf("Energies\n");
@@ -502,7 +502,7 @@ void ScreenIO_Print_AcceptanceRatios(void)
 
     char sSectionHead[32];
     memset(sSectionHead, '-', 22);
-    sSectionHead[22] = NULL;
+    sSectionHead[22] = '\0';
 
     printf("%s\n", sSectionHead);
     printf("Acceptance Ratios:\n");

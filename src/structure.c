@@ -1367,7 +1367,7 @@ void LatPos_copy(int* copy_vec, const int* in_vec)
 /// for each dimension. The result is stored in outVec
 /// \param outVec
 /// \param nRadius
-void LatPos_gen_rand_wRad(int* outVec, const int nRadius)
+void LatPos_gen_rand_wRad(int outVec[POS_MAX], const int nRadius)
 {
     int j;
     int radUp = 2 * nRadius + 1;
@@ -1379,6 +1379,7 @@ void LatPos_gen_rand_wRad(int* outVec, const int nRadius)
         {
             outVec[j] -= nRadius;
         }
+
 }
 
 /// LatPos_add_wPBC: Given firVec and secVec, we add the two vectors, and take care of PBCs, storing in outVec.
