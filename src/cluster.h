@@ -51,4 +51,16 @@ void Clus_Perform_MolWise_LargestClusters(void);
 
 void Clus_Find_LargestClusters(void);
 
+int ClusUtil_GetOvlpNeighborBeads_ForBead(const int beadID, int* restrict neighList);
+
+int ClusUtil_GetOvlpNeighborChains_ForBead(const int beadID, int* restrict neighList);
+
+int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict nTotClusTable, int* restrict clusList,
+                                   int* restrict clusSize);
+
+int ClusUtil_AddOvlpCluster_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+                                    int* restrict clusSize);
+
+int Clus_Ovlp_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList);
+
 #endif // _CLUSTER_H_

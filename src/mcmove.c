@@ -1720,6 +1720,14 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
     int bAccept        = 0; // Used in MC steps, assume that move fails initially.
 
     int* oldClusList = calloc(nLimitedClusterSize, sizeof(int));
+
+
+    int* oldClusListN = calloc(tot_chains, sizeof(int));
+    char* oldHashTab   = calloc(tot_chains, sizeof(char));
+    const int woClusSize = Clus_Ovlp_OfChain(chainID, oldHashTab, oldClusListN);
+
+
+
 //    int newClusList[MAX_SMCLSTR_SIZE] = {0};
 //    int oldClusList[MAX_SMCLSTR_SIZE] = {0};
 
@@ -1727,6 +1735,9 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         Clus_Proximity_LimitedCluster_All(chainID, oldClusList); // Looking at everything that is connected to chainID
     // Remember that naList_gl[] contains the chainID's of the network chainID is
     // part of from 0 - ClusSize-1.
+
+    free(oldClusListN);
+    free(oldHashTab);
     if (ClusSize < 2)
         {
             bAccept = 0;
@@ -1741,6 +1752,12 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
     int yTemp;
     int i, j;
     LatPos_gen_rand_wRad(r_Disp, nBoxSize[0] / 2);
+
+    /*
+     *
+     * SHOULD BE A FUNCTION THAT CHECKS FOR CLUSTER DISP!
+     *
+     */
 
     for (i = 0; i < ClusSize; i++)
         {

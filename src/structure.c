@@ -1518,7 +1518,7 @@ float BeadPos_CosThetaOfBeads(const int bead1, const int bead2)
 /// \param beadNum
 /// \param beadList
 /// \param chainList
-void BeadListOP_GetChainIDs(const int beadNum, const int* beadList, int* chainList)
+void BeadListOP_GetChainIDs(const int beadNum, const int* restrict beadList, int* restrict chainList)
 {
     int i, tmp_bead, dum_chain;
 
@@ -1863,3 +1863,88 @@ int ClusListOP_AddIfUniqueChainID(const int clusSize, int* clusList, const int c
     return clusSize+1;
 
 }
+
+/// LatticeUtil_GetOvlpLattIndecies: Given the starting location r_pos0, we store all of the naTotLattice indecies
+/// corresponding to the +-1 neighbors. We store all the indecies in numList. NOTE: This list _will_ include the
+/// point at r_pos0 as well.
+/// \param r_pos0
+/// \param numList - MUST be at least 27 = 3^3 elements long. Undefined behavior if not that long.
+void LatticeUtil_GetOvlpLattIndecies(const int* restrict r_pos0, int* restrict numList)
+{
+    int i = 0;
+    int r_disp[POS_MAX] = {0};
+    int r_chck[POS_MAX] = {0};
+    const int nRad      = 1;
+    int tmpBead;
+
+    for (r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++)
+    {
+        LatPos_add_wPBC_ofComp(r_chck, r_pos0, r_disp, POS_X);
+        for (r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++)
+        {
+            LatPos_add_wPBC_ofComp(r_chck, r_pos0, r_disp, POS_Y);
+            for (r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++)
+            {
+                LatPos_add_wPBC_ofComp(r_chck, r_pos0, r_disp, POS_Z);
+                tmpBead = Lat_Ind_FromVec(r_chck);
+                numList[i++] = tmpBead;
+//                *(numList++) = tmpBead;
+            }
+        }
+    }
+
+}
+
+/// LatticeUtil_GetLattVals_FromList - loop over nIndexList and store the naTotLattice values in nLatValsList.
+/// Note that this will include -1 values as well, or empty sites.
+/// \param nIndexList
+/// \param nLatValsList - Must be at least 27 elements long.
+void LatticeUtil_GetLattVals_FromList(const int* restrict nIndexList, int* restrict nLatValsList, const int listSize)
+{
+    int i;
+    for (i=0; i<listSize; ++i)
+    {
+        nLatValsList[i] = naTotLattice[nIndexList[i]];
+    }
+}
+
+/// LatticeUtil_GetBeadIDs_FromList - Given the list of Lattice values, we get all the values that are not -1.
+/// Or, the we get the values that correspond to non-empty lattice sites.
+/// \param nLatValsList
+/// \param nBeadsList
+/// \return
+int LatticeUtil_GetBeadIDs_FromList(const int* restrict nLatValsList, int* restrict nBeadsList, const int listSize)
+{
+    int nBeadsNum = 0;
+    int tmpBead;
+    int i;
+
+    for (i=0; i<CLUS_CONTACT_NEIGHS; ++i)
+    {
+        tmpBead = nLatValsList[i];
+        if (tmpBead != -1)
+        {
+            nBeadsList[nBeadsNum++] = tmpBead;
+        }
+    }
+    return nBeadsNum;
+}
+
+/// LatticeUtil_GetNeighBeads_AtPos - given the starting position
+/// \param r_pos0
+/// \param nBeadsList
+/// \return
+int LatticeUtil_GetNeighBeads_AtPos(const int* restrict r_pos0, int* restrict nBeadsList)
+{
+
+    int nLatInd[CLUS_CONTACT_NEIGHS];
+    LatticeUtil_GetOvlpLattIndecies(r_pos0, nLatInd);
+
+    int nLatVals[CLUS_CONTACT_NEIGHS];
+    LatticeUtil_GetLattVals_FromList(nLatInd, nLatVals, CLUS_CONTACT_NEIGHS);
+
+    return LatticeUtil_GetBeadIDs_FromList(nLatVals, nBeadsList, CLUS_CONTACT_NEIGHS);
+}
+
+
+

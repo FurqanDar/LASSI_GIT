@@ -1564,3 +1564,122 @@ void Clus_Find_LargestClusters(void)
                 break;
         }
 }
+
+
+/// ClusUtil_GetOvlpNeighborBeads_ForBead: Given the beadID, we get the chainIDs of the neighboring beads and store
+/// the values in neighList. Note that the list have beadID in it as well.
+/// \param beadID
+/// \param neighList
+/// \return The number of neighbors for this bead + 1 since we always have beadID.
+int ClusUtil_GetOvlpNeighborBeads_ForBead(const int beadID, int* restrict neighList)
+{
+    const int r_pos0[POS_MAX] = {bead_info[beadID][POS_X],
+                                 bead_info[beadID][POS_Y],
+                                 bead_info[beadID][POS_Z]};
+
+
+    return LatticeUtil_GetNeighBeads_AtPos(r_pos0, neighList);
+}
+
+/// ClusUtil_GetOvlpNeighborChains_ForBead - Given this beadID, we get all the chainIDs of it's neighbors,
+/// including it's own chain. We return the number of chains.
+/// \param beadID
+/// \param neighList
+/// \return Number of ChainIDs. This should always be >= 1.
+int ClusUtil_GetOvlpNeighborChains_ForBead(const int beadID, int* restrict neighList)
+{
+
+    int tmpBeadList[CLUS_CONTACT_NEIGHS + 1];
+
+    const int tmpNum = ClusUtil_GetOvlpNeighborBeads_ForBead(beadID, tmpBeadList);
+
+    BeadListOP_GetChainIDs(tmpNum, tmpBeadList, neighList);
+
+    return tmpNum;
+}
+
+/// ClusUtil_AddOvlpCluster_OfBead - Given this beadID, and a hash-table like structure nTotClusTable we add the new
+/// and unique chains that are part of the cluster. nTotClusTable should be an array that is 'tot_chains' long
+/// where nTotClusTable[chainID] 0 means a unique chain, and 1 means that the chain has already been added.
+/// Furthermore, also adds the chains into clusList, while increasing the total clusSize.
+/// Lastly, the function returns the number of unique chains found.
+/// \param beadID
+/// \param nTotClusTable
+/// \param clusList
+/// \param clusSize
+/// \return
+int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict nTotClusTable, int* restrict clusList,
+                               int* restrict clusSize)
+{
+    int tmpChainList[CLUS_CONTACT_NEIGHS];
+    const int dumChainNum = ClusUtil_GetOvlpNeighborChains_ForBead(beadID, tmpChainList);
+
+    int i;
+    const int startSize = *clusSize;
+    int tmpChain;
+    for (i = 0; i < dumChainNum; ++i)
+        {
+            tmpChain = tmpChainList[i];
+            if (! nTotClusTable[tmpChain])
+                {
+                    nTotClusTable[tmpChain] = 1;
+                    clusList[*clusSize]     = tmpChain;
+                    (*clusSize)++;
+                }
+        }
+
+    const int endSize = *clusSize - startSize;
+
+    return endSize;
+}
+
+/// ClusUtil_AddOvlpCluster_OfChain - Adds all the unique chains within +-1 of each bead of this chain.
+/// nTotClusTable is a sort of hash-table used to track if a chainID has been added or not.
+/// Returns the number of chains that are _unique_ given nTotClusTable.
+/// \param chainID
+/// \param nTotClusTable
+/// \param clusList
+/// \param clusSize
+/// \return
+int ClusUtil_AddOvlpCluster_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+                                int* restrict clusSize)
+{
+    const int startSize = *clusSize;
+
+    const int firstB = chain_info[chainID][CHAIN_START];
+    const int lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
+
+    int i;
+    for (i=firstB; i<lastB; ++i)
+    {
+        ClusUtil_AddOvlpCluster_OfBead(i, nTotClusTable, clusList, clusSize);
+    }
+
+    const int endSize = *clusSize - startSize;
+
+    return endSize;
+}
+
+///
+/// \param chainID
+/// \param nTotClusTable
+/// \param clusList
+/// \return
+int Clus_Ovlp_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList)
+{
+    clusList[0]            = chainID;
+    nTotClusTable[chainID] = 1;
+
+    int clusSize = 1;
+
+    int tmpChain;
+    int i;
+    for (i = 0; i < clusSize; ++i)
+        {
+            tmpChain = clusList[i];
+            ClusUtil_AddOvlpCluster_OfChain(tmpChain, nTotClusTable, clusList, &clusSize);
+        }
+
+    return clusSize;
+}
+
