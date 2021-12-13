@@ -234,7 +234,8 @@ void FileIO_HandleTrajectory(const char* fileNameStr, const int run_it, const lo
         {
             if (run_it >= 0)
                 {
-                    FileIO_AppendTrajFrame_ToFile(fileNameStr, nGen + nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb);
+                    FileIO_AppendTrajFrame_ToFile(fileNameStr,
+                                                  nGen + nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb);
                 }
             else
                 {
@@ -260,7 +261,7 @@ void FileIO_AppendTrajFrame_ToFile(const char* filename, const long nGen)
     fprintf(fp, "ITEM: NUMBER OF ATOMS\n");
     fprintf(fp, "%ld\n", tot_beads_glb); // Total atom number
 
-    fprintf(fp, "ITEM: BOX BOUNDS pp pp pp\n");                               // BCs are always periodic for now
+    fprintf(fp, "ITEM: BOX BOUNDS pp pp pp\n"); // BCs are always periodic for now
     fprintf(fp, "0 %d\n0 %d\n0 %d\n", naBoxSize_glb[0], naBoxSize_glb[1], naBoxSize_glb[2]); // Box dimensions
 
     fprintf(fp, "ITEM: ATOMS id type mol x y z bP\n"); // What we are printing
@@ -287,7 +288,7 @@ void Save_Trajectory(const long nGen, const long curFrame)
         {
             for (j = 0; j < BEADINFO_MAX; j++)
                 {
-                    ar_idx                = TrajArr_Index(i, curFrame, j);
+                    ar_idx                    = TrajArr_Index(i, curFrame, j);
                     naTOTTRAJ_Arr_glb[ar_idx] = bead_info_glb[i][j];
                 }
         }
@@ -314,7 +315,8 @@ void Write_Saved_Trajectory(char* filename, const int run_it)
             if (run_it >= 0)
                 {
                     fprintf(fp, "%ld\n",
-                            nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb + i * naReportFreqs_glb[REPORT_CONFIG]); // Timestep
+                            nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb +
+                                i * naReportFreqs_glb[REPORT_CONFIG]); // Timestep
                 }
             else
                 {
@@ -324,7 +326,7 @@ void Write_Saved_Trajectory(char* filename, const int run_it)
             fprintf(fp, "ITEM: NUMBER OF ATOMS\n");
             fprintf(fp, "%ld\n", tot_beads_glb); // Total atom number
 
-            fprintf(fp, "ITEM: BOX BOUNDS pp pp pp\n");                               // BCs are always periodic for now
+            fprintf(fp, "ITEM: BOX BOUNDS pp pp pp\n"); // BCs are always periodic for now
             fprintf(fp, "0 %d\n0 %d\n0 %d\n", naBoxSize_glb[0], naBoxSize_glb[1], naBoxSize_glb[2]); // Box dimensions
 
             fprintf(fp, "ITEM: ATOMS id type mol x y z bP\n"); // What we are printing
@@ -613,8 +615,8 @@ void FileIO_WriteTo_TopFile(const char* filename)
     int i, j, k;               // Loop iterators.
     int numBonds;              // Used to count total number of bonds!
     printf("Writing the topology file!\n");
-    fprintf(fp, "LAMMPS Description\n");      // The file must start with this.
-    fprintf(fp, "\n");                        // Empty line.
+    fprintf(fp, "LAMMPS Description\n");          // The file must start with this.
+    fprintf(fp, "\n");                            // Empty line.
     fprintf(fp, "\t%ld\tatoms\n", tot_beads_glb); // Listing total number of atoms
     numBonds = 0;
     for (i = 0; i < tot_beads_glb; i++)
@@ -628,15 +630,15 @@ void FileIO_WriteTo_TopFile(const char* filename)
                 }
         }
 
-    fprintf(fp, "\t%d\tbonds\n", numBonds);      // Listing number of bonds
-    fprintf(fp, "\t0\tangles\n");                // Systems don't have angle depenece yet
-    fprintf(fp, "\t0\tdihedrals\n");             // Systems don't have dihedrals  yet
-    fprintf(fp, "\t0\timpropers\n");             // Systems don't have imporopers yet
-    fprintf(fp, "\n");                           // Empty line.
+    fprintf(fp, "\t%d\tbonds\n", numBonds);          // Listing number of bonds
+    fprintf(fp, "\t0\tangles\n");                    // Systems don't have angle depenece yet
+    fprintf(fp, "\t0\tdihedrals\n");                 // Systems don't have dihedrals  yet
+    fprintf(fp, "\t0\timpropers\n");                 // Systems don't have imporopers yet
+    fprintf(fp, "\n");                               // Empty line.
     fprintf(fp, "%d\tatom types\n", nBeadTypes_glb); // This many bead-types
-    fprintf(fp, "1\tbond types\n");              // System can have multiple bond-lengths
-    fprintf(fp, "0\tangle types\n");             // Systems don't have any angular forces yet
-    fprintf(fp, "\n");                           // Empty line.
+    fprintf(fp, "1\tbond types\n");                  // System can have multiple bond-lengths
+    fprintf(fp, "0\tangle types\n");                 // Systems don't have any angular forces yet
+    fprintf(fp, "\n");                               // Empty line.
     fprintf(fp, " 0 %d xlo xhi\n", naBoxSize_glb[0]);
     fprintf(fp, " 0 %d ylo yhi\n", naBoxSize_glb[1]);
     fprintf(fp, " 0 %d zlo zhi\n", naBoxSize_glb[2]);
@@ -687,7 +689,8 @@ void Write_SysProp(char* filename)
     fp = fopen(filename, "w");
     fprintf(fp, "#Contains various averaged quatities.\n");
     // Gyration Radius
-    fprintf(fp, "#Total Rg\n%f\t%f\n#Cluster Hist\n", faSysGyrRad_glb / (float) nTotGyrRadCounter_glb, (float) naBoxSize_glb[0] / 2.);
+    fprintf(fp, "#Total Rg\n%f\t%f\n#Cluster Hist\n", faSysGyrRad_glb / (float) nTotGyrRadCounter_glb,
+            (float) naBoxSize_glb[0] / 2.);
     // Cluster Histogram
     fprintf(fp, "%f\t", (float) nLargestClusterRightNow_glb / (float) nTotClusCounter_glb);
     for (i = 1; i <= tot_chains_glb; i++)
@@ -885,7 +888,7 @@ void FileIO_CreateRunningDataFiles(void)
     if (naReportFreqs_glb[REPORT_CONFIG])
         {
             sprintf(strFileTraj_glb, "%s_topo.lammpstrj", strReportPrefix_glb); // Name of the topology file
-            FileIO_WriteTo_TopFile(strFileTraj_glb);                        // Write the topology file. Only need to write once
+            FileIO_WriteTo_TopFile(strFileTraj_glb); // Write the topology file. Only need to write once
             if (nTrajMode_glb != 1)
                 {
                     sprintf(strFileTraj_glb, "%s_trj.lammpstrj",
@@ -1195,9 +1198,8 @@ void CopyData_COMDen(const int run_it)
         }
 }
 
-/// CopyData_Clus - Copies ldMOLClUS_Arr into ldaTOTMOLCLUS_Arr_glb. Also copies naClusHistList_glb into ldaTOTCLUS_Arr_glb.
-/// And stores the Gyration radius.
-/// \param run_it: which run cycle we are on. Should be >= 0.
+/// CopyData_Clus - Copies ldMOLClUS_Arr into ldaTOTMOLCLUS_Arr_glb. Also copies naClusHistList_glb into
+/// ldaTOTCLUS_Arr_glb. And stores the Gyration radius. \param run_it: which run cycle we are on. Should be >= 0.
 void CopyData_Clus(const int run_it)
 {
     int i, j;

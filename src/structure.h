@@ -126,7 +126,6 @@ int ClusListOP_AddIfUniqueChainID(const int clusSize, int* clusList, const int c
 int ChainListOP_AddUniqueChains_wSize_Check(const int clusSize, int* clusList, const int newChainNums,
                                             const int* chainList, const int maxClus, const int* oldList);
 
-
 void LatticeUtil_GetOvlpLattIndecies(const int* r_pos0, int* numList);
 
 void LatticeUtil_GetLattVals_FromList(const int* nIndexList, int* nLatValsList, const int listSize);

@@ -34,7 +34,7 @@ int Parse_Keyfile(char* filename)
             faMCFreq_glb[i] = 0.0f; // initialization; to be normalized
         }
     nInitialPotential_Mode_glb = 0;
-    nAnnealing_Mode_glb    = -1;
+    nAnnealing_Mode_glb        = -1;
     while (fgets(strLine, sizeof(strLine), infile) != NULL)
         {
             nLine++;
@@ -275,7 +275,8 @@ int Parse_Keyfile(char* filename)
     if (strStructFile[0] != '\0')
         {
 
-            Parse_StructureFile_CalcBeadsAndChains(strStructFile, &tot_beads_glb, &tot_chains_glb, &tot_chain_types_glb);
+            Parse_StructureFile_CalcBeadsAndChains(strStructFile, &tot_beads_glb, &tot_chains_glb,
+                                                   &tot_chain_types_glb);
 
             CreateBeadsAndChains(tot_beads_glb, tot_chains_glb);
 
@@ -316,7 +317,6 @@ int Parse_Keyfile(char* filename)
 
     return nErr;
 }
-
 
 void ForEnergyMatrix_FillWithZeros()
 {
@@ -699,8 +699,8 @@ void Parse_StructureFile(char* filename)
                                     nBEADS++;
                                     bead_info_glb[curID][BEAD_TYPE]    = curType;
                                     bead_info_glb[curID][BEAD_CHAINID] = nChainID;
-                                    nCursor                        = 0; // This is a counter for number of bonds, which
-                                                                        // should reset when you have a 'new' bead.
+                                    nCursor = 0; // This is a counter for number of bonds, which
+                                                 // should reset when you have a 'new' bead.
                                 }
 
                             if (curPartner != -1)
@@ -711,8 +711,8 @@ void Parse_StructureFile(char* filename)
                                           // because indicies start at 0.
                                             nChainTypeIsLinear_glb[nChainType] = 0;
                                         }
-                                    curPartner += nChainStart;              // Accounts for all beads before,
-                                                                            // like above.
+                                    curPartner += nChainStart;                  // Accounts for all beads before,
+                                                                                // like above.
                                     topo_info_glb[curID][nCursor] = curPartner; // Adding the ID of the partner
                                     linker_len_glb[curID][nCursor] =
                                         curLinker * (int) fLinkerLength_glb; // Adding the linker constraint.
@@ -734,8 +734,8 @@ void Parse_StructureFile(char* filename)
 
                             for (i = 0; i < nBEADS; i++)
                                 {
-                                    curID                          = i + nChainStart;
-                                    nTemp                          = curID - nBEADS;
+                                    curID                              = i + nChainStart;
+                                    nTemp                              = curID - nBEADS;
                                     bead_info_glb[curID][BEAD_TYPE]    = bead_info_glb[nTemp][BEAD_TYPE];
                                     bead_info_glb[curID][BEAD_CHAINID] = nChainID;
                                     for (j = 0; j < MAX_BONDS; j++)
@@ -745,7 +745,7 @@ void Parse_StructureFile(char* filename)
                                                 {
                                                     topo_info_glb[curID][j] =
                                                         topo_info_glb[nTemp][j] + nBEADS; // Because we must account for
-                                                                                      // chain lengths
+                                                                                          // chain lengths
                                                 }
                                         }
                                 }

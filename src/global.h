@@ -66,7 +66,7 @@
 #define CHAIN_START   2
 #define CHAININFO_MAX 3
 
-#define MAX_ROTSTATES 27
+#define MAX_ROTSTATES       27
 #define CLUS_CONTACT_NEIGHS 27
 
 typedef int lInt;
@@ -105,12 +105,12 @@ float faEnergy_glb[MAX_AA][MAX_AA][MAX_E];
 float faEnRad_glb[MAX_AA][MAX_AA][MAX_E];
 #define LARGEST_RADIUS 3
 lInt naRotTrial_glb[MAX_VALENCY][MAX_ROTSTATES]; // Used in orientational-bias MC moves
-lLDub ldaBoltzFac_glb[MAX_ROTSTATES - 1];          // Used in orientational-bias
+lLDub ldaBoltzFac_glb[MAX_ROTSTATES - 1];        // Used in orientational-bias
 lLDub ldaBoltzNorm_glb[MAX_VALENCY];
 lLDub ldaBoltzFacNorm_glb[MAX_AA][MAX_AA]; // For pre-calculating the factors.
-lLDub ldLogOfSmallestPossibleProb_glb;   // Smallest probability possible logl(1/RAND_MAX)
+lLDub ldLogOfSmallestPossibleProb_glb;     // Smallest probability possible logl(1/RAND_MAX)
 
-float faCurrEn_glb[MAX_E];                // Vector for current energy
+float faCurrEn_glb[MAX_E]; // Vector for current energy
 
 // Arrays to track certain topology and interaction information
 lInt nBeadTypeIsSticker_glb[MAX_AA];         // Used to track if that beadType interacts via rotations.
@@ -118,7 +118,7 @@ lInt nChainTypeIsLinear_glb[MAX_CHAINTYPES]; // Used to track if this chainType 
 lInt nBeadTypeCanOvlp_glb[MAX_AA];           // Used to track if a certain beadType has an overlap cost.
 lInt nBeadTypeCanCont_glb[MAX_AA];           // Used to track if a certain beadType has contact interactions
 lInt nBeadTypeCanFSol_glb[MAX_AA];           // Used to track if a certain beadType has solvation energies
-lInt nBeadTypeCanTInd_glb[MAX_AA];           // Used to track if a certain beadType has temperature independent solvation
+lInt nBeadTypeCanTInd_glb[MAX_AA]; // Used to track if a certain beadType has temperature independent solvation
 
 float fLinkerLength_glb;
 float fLinkerSprCon_glb;

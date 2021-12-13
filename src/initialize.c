@@ -37,7 +37,8 @@ void Memory_Initialization_AtStart(void)
             ldaMOLCLUS_Arr_glb = Create1DLongdouble(((tot_chains_glb + 1) * tot_chain_types_glb), arr_name);
 
             strcpy(arr_name, "ldTotMolClusArr");
-            ldaTOTMOLCLUS_Arr_glb = Create1DLongdouble((tot_chains_glb * tot_chain_types_glb * nTotCycleNum_glb), arr_name);
+            ldaTOTMOLCLUS_Arr_glb =
+                Create1DLongdouble((tot_chains_glb * tot_chain_types_glb * nTotCycleNum_glb), arr_name);
 
             strcpy(arr_name, "ldTotGyrRad");
             ldaTOTRg_Arr_glb = Create2DLongdouble(2, nTotCycleNum_glb, arr_name);
@@ -56,14 +57,15 @@ void Memory_Initialization_AtStart(void)
 
     if (naReportFreqs_glb[REPORT_COMDEN] != 0)
         {
-            nRadDen_TotComps_glb = 2 * tot_chain_types_glb * (tot_chain_types_glb + 1);
+            nRadDen_TotComps_glb  = 2 * tot_chain_types_glb * (tot_chain_types_glb + 1);
             nRadDen_CompShift_glb = tot_chain_types_glb * (tot_chain_types_glb + 1);
 
             strcpy(arr_name, "ldRadDenArr");
             ldaRadDen_Arr_glb = Create1DLongdouble(nRadDen_TotComps_glb * nRDF_TotBins_glb, arr_name);
 
             strcpy(arr_name, "ldTotRadDenArr");
-            ldaTOTRadDen_Arr_glb = Create1DLongdouble(nRadDen_TotComps_glb * nTotCycleNum_glb * nRDF_TotBins_glb, arr_name);
+            ldaTOTRadDen_Arr_glb =
+                Create1DLongdouble(nRadDen_TotComps_glb * nTotCycleNum_glb * nRDF_TotBins_glb, arr_name);
         }
     if (nTrajMode_glb != 0)
         {
@@ -153,14 +155,14 @@ void Check_BeadTypewiseInteractions(void)
 {
     int i, j;
     for (i = 0; i < MAX_AA; i++)
-    {
-        nBeadTypeIsSticker_glb[i] = 0; // Assume beads don't rotationally interact.
-        nBeadTypeCanOvlp_glb[i]   = 0; // Assume beads don't have an overlap cost
-        nBeadTypeCanCont_glb[i]   = 0; // Assume beads don't have contact costs.
-        nBeadTypeCanFSol_glb[i]   = 0; // Assume beads have no stiffness
-        nBeadTypeCanTInd_glb[i]   = 0; // Assume beads have no Temperature independent interactions
-    }
-    //Assume system has no interactions
+        {
+            nBeadTypeIsSticker_glb[i] = 0; // Assume beads don't rotationally interact.
+            nBeadTypeCanOvlp_glb[i]   = 0; // Assume beads don't have an overlap cost
+            nBeadTypeCanCont_glb[i]   = 0; // Assume beads don't have contact costs.
+            nBeadTypeCanFSol_glb[i]   = 0; // Assume beads have no stiffness
+            nBeadTypeCanTInd_glb[i]   = 0; // Assume beads have no Temperature independent interactions
+        }
+    // Assume system has no interactions
     bSystemHasSCSC_glb = 0;
     bSystemHasOvlp_glb = 0;
     bSystemHasCont_glb = 0;
@@ -208,66 +210,65 @@ void Check_BeadTypewiseInteractions(void)
 
     // CONT Check
     for (i = 0; i < nBeadTypes_glb; i++)
-    {
-        for (j = 0; j < nBeadTypes_glb; j++)
         {
-            if (faEnergy_glb[i][j][E_CONT])
-            {
-                nBeadTypeCanCont_glb[i] = 1;
-            }
+            for (j = 0; j < nBeadTypes_glb; j++)
+                {
+                    if (faEnergy_glb[i][j][E_CONT])
+                        {
+                            nBeadTypeCanCont_glb[i] = 1;
+                        }
+                }
         }
-    }
     for (i = 0; i < nBeadTypes_glb; i++)
-    {
-        if (nBeadTypeCanCont_glb[i])
         {
-            bSystemHasCont_glb = 1;
+            if (nBeadTypeCanCont_glb[i])
+                {
+                    bSystemHasCont_glb = 1;
+                }
         }
-    }
 
     // FSOL Check
     for (i = 0; i < nBeadTypes_glb; i++)
-    {
-        for (j = 0; j < nBeadTypes_glb; j++)
         {
-            if (faEnergy_glb[i][j][E_F_SOL])
-            {
-                nBeadTypeCanFSol_glb[i] = 1;
-            }
+            for (j = 0; j < nBeadTypes_glb; j++)
+                {
+                    if (faEnergy_glb[i][j][E_F_SOL])
+                        {
+                            nBeadTypeCanFSol_glb[i] = 1;
+                        }
+                }
         }
-    }
     for (i = 0; i < nBeadTypes_glb; i++)
-    {
-        if (nBeadTypeCanFSol_glb[i])
         {
-            bSystemHasFSol_glb = 1;
+            if (nBeadTypeCanFSol_glb[i])
+                {
+                    bSystemHasFSol_glb = 1;
+                }
         }
-    }
 
     // T_IND Check
     for (i = 0; i < nBeadTypes_glb; i++)
-    {
-        for (j = 0; j < nBeadTypes_glb; j++)
         {
-            if (faEnergy_glb[i][j][E_T_IND])
-            {
-                nBeadTypeCanTInd_glb[i] = 1;
-            }
+            for (j = 0; j < nBeadTypes_glb; j++)
+                {
+                    if (faEnergy_glb[i][j][E_T_IND])
+                        {
+                            nBeadTypeCanTInd_glb[i] = 1;
+                        }
+                }
         }
-    }
 
     // STIFF Check
     for (i = 0; i < nBeadTypes_glb; i++)
-    {
-        for (j = 0; j < nBeadTypes_glb; j++)
         {
-            if (faEnergy_glb[i][j][E_STIFF])
-            {
-                bSystemHasTopo_glb = 1;
-            }
+            for (j = 0; j < nBeadTypes_glb; j++)
+                {
+                    if (faEnergy_glb[i][j][E_STIFF])
+                        {
+                            bSystemHasTopo_glb = 1;
+                        }
+                }
         }
-    }
-
 }
 
 void Global_Array_Initialization_AtStart(void)
@@ -276,7 +277,7 @@ void Global_Array_Initialization_AtStart(void)
     int myCubeLen = 3;
 
     for (i = 0; i < naBoxSize_glb[0] * naBoxSize_glb[1] * naBoxSize_glb[2]; i++)
-        {                         // Initializing the lattice
+        {                             // Initializing the lattice
             naTotLattice_glb[i] = -1; // If -1, then there is no bead there.
         }
     i = 0;
@@ -392,10 +393,10 @@ void Global_Array_Initialization_AtStart(void)
             faMCFreq_glb[i] += faMCFreq_glb[i - 1]; // Cumulative Frequencies
         }
     for (i = 0; i < MAX_MV; i++)
-    { // Zero out all the MCAccepts
-        naMCAccepMat_glb[0][i] = 0;
-        naMCAccepMat_glb[1][i] = 0;
-    }
+        { // Zero out all the MCAccepts
+            naMCAccepMat_glb[0][i] = 0;
+            naMCAccepMat_glb[1][i] = 0;
+        }
 
     for (i = 0; i < nTotCycleNum_glb; i++)
         {
@@ -443,7 +444,7 @@ void Reset_Counters(void)
     nTotGyrRadCounter_glb       = 0;
     nRDFCounter_glb             = 0;
     nRadDenCounter_glb          = 0;
-    nTotClusCounter_glb     = 0;
+    nTotClusCounter_glb         = 0;
     nLargestClusterRightNow_glb = 0;
     nTrajCurFrame_glb           = 0;
 }
@@ -496,10 +497,10 @@ void Reset_Global_Arrays(void)
     Reset_Counters();
     // MCAccept arrays.
     for (i = 0; i < MAX_MV; i++)
-    {
-        naMCAccepMat_glb[0][i] = 0;
-        naMCAccepMat_glb[1][i] = 0;
-    }
+        {
+            naMCAccepMat_glb[0][i] = 0;
+            naMCAccepMat_glb[1][i] = 0;
+        }
 }
 
 /// Initial_Conditions_Simple - randomly place all the molecules.
@@ -621,9 +622,9 @@ void Initial_Conditions_Simple(void)
                             for (j = 0; j < POS_MAX; j++)
                                 {
                                     bead_info_glb[i][j] = tmpR2[j];
-                                }                                     // Placing bead
+                                }                                         // Placing bead
                             naTotLattice_glb[Lat_Ind_FromVec(tmpR2)] = i; // Putting on lattice
-                            temp_list[list_it]                   = i;
+                            temp_list[list_it]                       = i;
                             list_it++; // Remembering in hash list.
                             // The bead has been placed around an appropriate anchor.
                         }
@@ -659,7 +660,7 @@ void Initial_Conditions_Simple(void)
                                     bead_info_glb[i][j] = tmpR[j];
                                 }
                             naTotLattice_glb[Lat_Ind_FromVec(tmpR)] = i; // Placing on lattice!
-                            temp_list[list_it]                  = i;
+                            temp_list[list_it]                      = i;
                             list_it++; // Remembering that this bead has been placed.
                         }
                 SproutForth:
@@ -668,7 +669,7 @@ void Initial_Conditions_Simple(void)
                         { // Making the current bead an anchor.
                             tmpR[j] = bead_info_glb[i][j];
                         }
-                    idx      = 0;                 // Resets things!
+                    idx      = 0;                     // Resets things!
                     bondPart = topo_info_glb[i][idx]; // Resets things!
                     while (topo_info_glb[i][idx] != -1 && idx < MAX_BONDS)
                         { // Again, -1 signifies that no bonded
@@ -717,7 +718,7 @@ void Initial_Conditions_Simple(void)
                                 }
 
                             naTotLattice_glb[Lat_Ind_FromVec(tmpR2)] = bondPart; // Putting on lattice
-                            temp_list[list_it]                   = bondPart;
+                            temp_list[list_it]                       = bondPart;
                             list_it++; // Remembering in hash list.
                         SkipThisPartner:
                             idx++;
@@ -802,7 +803,8 @@ void Calculate_Rot_Bias(const float CurrentTemp)
         {
             for (j = 0; j < MAX_AA; j++)
                 {
-                    ldaBoltzFacNorm_glb[i][j] = (lLDub) expl(-(lLDub) faEnergy_glb[i][j][E_SC_SC] / (lLDub) CurrentTemp);
+                    ldaBoltzFacNorm_glb[i][j] =
+                        (lLDub) expl(-(lLDub) faEnergy_glb[i][j][E_SC_SC] / (lLDub) CurrentTemp);
                     // printf("%LE; ", ldaBoltzFacNorm_glb[i][j]);
                 }
             // printf("\n");
@@ -903,7 +905,7 @@ float Temperature_Function(const int mode, const long nGen)
             puts("\n\n******************************\n");
             puts("Annealing Is Being Turned Off");
             puts("\n******************************\n\n");
-            nAnnealing_Mode_glb    = -1;
+            nAnnealing_Mode_glb        = -1;
             nInitialPotential_Mode_glb = -1;
         }
     return end_val;

@@ -173,16 +173,15 @@ int Check_System_Structure(void)
                         {
                             printf("Bad beads! %d\t(%d %d %d)\t\tTopo:(%d %d %d)\t\tLinkers:(%.5f\t%.5f\t%.5f)\n", i,
                                    bead_info_glb[i][0], bead_info_glb[i][1], bead_info_glb[i][2], topo_info_glb[i][0],
-                                   topo_info_glb[i][1], topo_info_glb[i][2], (float) linker_len_glb[i][0], (float) linker_len_glb[i][1],
-                                   (float) linker_len_glb[i][2]);
+                                   topo_info_glb[i][1], topo_info_glb[i][2], (float) linker_len_glb[i][0],
+                                   (float) linker_len_glb[i][1], (float) linker_len_glb[i][2]);
                             printf("\t\t\t\t\t-------------------->\t\t%f\tSHOULD BE\t%f\n",
                                    Dist_BeadToBead(i, bondPart), LINKER_RSCALE * (float) linker_len_glb[i][idx]);
                             printf("Bad beads! %d\t(%d %d %d)\t\tTopo:(%d %d %d)\t\tLinkers:(%.5f\t%.5f\t%.5f)\n\n",
                                    bondPart, bead_info_glb[bondPart][0], bead_info_glb[bondPart][1],
                                    bead_info_glb[bondPart][2], topo_info_glb[bondPart][0], topo_info_glb[bondPart][1],
-                                   topo_info_glb[bondPart][2],
-                                   (float) linker_len_glb[bondPart][0], (float) linker_len_glb[bondPart][1],
-                                   (float) linker_len_glb[bondPart][2]);
+                                   topo_info_glb[bondPart][2], (float) linker_len_glb[bondPart][0],
+                                   (float) linker_len_glb[bondPart][1], (float) linker_len_glb[bondPart][2]);
                             return i + 1;
                         }
                     idx++;
@@ -203,8 +202,8 @@ int Check_System_Structure(void)
                         {
                             printf("Bad bond!\n\t%d %d %d %f\nCrashing.\n", i, bead_info_glb[i][BEAD_FACE],
                                    bead_info_glb[bead_info_glb[i][BEAD_FACE]][BEAD_FACE],
-                                   faEnergy_glb[bead_info_glb[i][BEAD_TYPE]][bead_info_glb[bead_info_glb[i][BEAD_FACE]][BEAD_TYPE]]
-                                          [E_SC_SC]);
+                                   faEnergy_glb[bead_info_glb[i][BEAD_TYPE]]
+                                               [bead_info_glb[bead_info_glb[i][BEAD_FACE]][BEAD_TYPE]][E_SC_SC]);
                             return i + 1;
                         }
                     if (Dist_BeadToBead(i, bead_info_glb[i][BEAD_FACE]) > LINKER_RSCALE)
@@ -244,9 +243,9 @@ void GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex)
 {
     // Calculate the components of the gyration tensor for a given cluster.
     // ClusSize is the size of the cluster -- obviously -- whereas ClusIndex tell us
-    // where in naClusterMatrix_glb the chain indecies are located. naClusterMatrix_glb[ClusIndex][0-ClusSize] is all the chainID's I need
-    // for the calculation
-    // Remember that the Gyration Tensor is a 3x3 symmetric object so we only need 6 numbers.
+    // where in naClusterMatrix_glb the chain indecies are located. naClusterMatrix_glb[ClusIndex][0-ClusSize] is all
+    // the chainID's I need for the calculation Remember that the Gyration Tensor is a 3x3 symmetric object so we only
+    // need 6 numbers.
     int i, k, j, j2; // Basic indecies for loops
     for (i = 0; i < 7; i++)
         {
@@ -305,15 +304,18 @@ void GyrTensor_ClusterSpecific(int ClusSize, int ClusIndex)
                         {
                             for (j2 = j; j2 < POS_MAX; j2++)
                                 {
-                                    dumArg = fabsf((float) bead_info_glb[k][j] - tot_COM[j]) <
-                                                     (float) naBoxSize_glb[j] - fabsf((float) bead_info_glb[k][j] - tot_COM[j]) ?
-                                                 fabsf((float) bead_info_glb[k][j] - tot_COM[j]) :
-                                                 (float) naBoxSize_glb[j] - fabsf((float) bead_info_glb[k][j] - tot_COM[j]);
-                                    dumArg2 =
-                                        fabsf((float) bead_info_glb[k][j2] - tot_COM[j2]) <
-                                                (float) naBoxSize_glb[j2] - fabsf((float) bead_info_glb[k][j2] - tot_COM[j2]) ?
-                                            fabsf((float) bead_info_glb[k][j2] - tot_COM[j2]) :
-                                            (float) naBoxSize_glb[j2] - fabsf((float) bead_info_glb[k][j2] - tot_COM[j2]);
+                                    dumArg =
+                                        fabsf((float) bead_info_glb[k][j] - tot_COM[j]) <
+                                                (float) naBoxSize_glb[j] -
+                                                    fabsf((float) bead_info_glb[k][j] - tot_COM[j]) ?
+                                            fabsf((float) bead_info_glb[k][j] - tot_COM[j]) :
+                                            (float) naBoxSize_glb[j] - fabsf((float) bead_info_glb[k][j] - tot_COM[j]);
+                                    dumArg2 = fabsf((float) bead_info_glb[k][j2] - tot_COM[j2]) <
+                                                      (float) naBoxSize_glb[j2] -
+                                                          fabsf((float) bead_info_glb[k][j2] - tot_COM[j2]) ?
+                                                  fabsf((float) bead_info_glb[k][j2] - tot_COM[j2]) :
+                                                  (float) naBoxSize_glb[j2] -
+                                                      fabsf((float) bead_info_glb[k][j2] - tot_COM[j2]);
                                     faGyrTensor_glb[j + 3 * (j2 - j)] += dumArg * dumArg2;
                                     // 0 = xx; 1 = yy; 2 = zz; 3 = xy; 6 = xz; 4 = yz; Need smarter indexing
                                 }
@@ -339,7 +341,7 @@ void GyrTensor_GyrRad(void)
     for (i = 0; i < 7; i++)
         {
             faGyrTensor_glb[i] = 0.f;
-        }                          // Initializing
+        }                           // Initializing
     float tot_COM[POS_MAX] = {0.f}; // This is where we shall store the COM of the cluster.
 
     // The only thing one needs to be careful about is to take PBC into account; the rest is tedium.
@@ -497,7 +499,7 @@ void RDF_ComponentWise_Avg(void)
                     resj = bead_info_glb[j][BEAD_TYPE];
                     x    = Dist_BeadToBead(i, j);
                     // Note that Dist_BeadToBead(i,j) automatically ensures no distance is greater than (L/2)*sqrt(3)
-                    myBin = (int) floor(4. * x);                 // I am assuming for now that dr=1/4
+                    myBin = (int) floor(4. * x);                      // I am assuming for now that dr=1/4
                     ldaRDF_Arr_glb[RDFArr_Index(0, 0, myBin)] += 2.0; // Adding a pair to that bin
                     array_pos = RDF_ComponentIndex(resi, resj);
                     ldaRDF_Arr_glb[RDFArr_Index(0, array_pos, myBin)] += 2.0;
@@ -522,7 +524,8 @@ int Check_LinkerConstraint(const int beadID, const int* tmpR)
     while (idx < MAX_BONDS && topo_info_glb[beadID][idx] != -1)
         { // Keep going till we run out of partners
             bondPartner = topo_info_glb[beadID][idx];
-            if (Dist_PointToPoint(bead_info_glb[bondPartner], tmpR) > LINKER_RSCALE * (float) linker_len_glb[beadID][idx])
+            if (Dist_PointToPoint(bead_info_glb[bondPartner], tmpR) >
+                LINKER_RSCALE * (float) linker_len_glb[beadID][idx])
                 {
                     return 0; // This means that we have broken one of the linkers.
                 }
@@ -1317,7 +1320,6 @@ int NeighborSearch_AroundPoint_wRad_wDists(const int beadID, const int* startVec
     return neigh_num;
 }
 
-
 /// NeighborSearch_ForOvlp: Given the beadID, which should be at startVec, we calculate all the neighbors
 /// within the +-1 cube. We return the number of neighbors.
 /// \param beadID
@@ -1334,23 +1336,23 @@ int NeighborSearch_ForCluster_Ovlp(int const beadID, const int* startVec, int* n
     const int nRad      = 1;
 
     for (r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++)
-    {
-        LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_X);
-        for (r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++)
         {
-            LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_Y);
-            for (r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++)
-            {
-                LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_Z);
-                tmpBead = naTotLattice_glb[Lat_Ind_FromVec(r_chck)];
-                if (tmpBead != -1)
+            LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_X);
+            for (r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++)
                 {
-                    neighList[neigh_num] = tmpBead;
-                    neigh_num++;
+                    LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_Y);
+                    for (r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++)
+                        {
+                            LatPos_add_wPBC_ofComp(r_chck, startVec, r_disp, POS_Z);
+                            tmpBead = naTotLattice_glb[Lat_Ind_FromVec(r_chck)];
+                            if (tmpBead != -1)
+                                {
+                                    neighList[neigh_num] = tmpBead;
+                                    neigh_num++;
+                                }
+                        }
                 }
-            }
         }
-    }
     neighList[neigh_num] = -1;
     return neigh_num;
 }
@@ -1381,7 +1383,6 @@ void LatPos_gen_rand_wRad(int outVec[POS_MAX], const int nRadius)
         {
             outVec[j] -= nRadius;
         }
-
 }
 
 /// LatPos_add_wPBC: Given firVec and secVec, we add the two vectors, and take care of PBCs, storing in outVec.
@@ -1418,7 +1419,8 @@ inline void LatPos_add_wPBC_ofComp(int* outVec, const int* firVec, const int* se
 {
     outVec[compNum] = firVec[compNum] + secVec[compNum];
     outVec[compNum] = outVec[compNum] < 0 ? outVec[compNum] + naBoxSize_glb[compNum] : outVec[compNum];
-    outVec[compNum] = outVec[compNum] >= naBoxSize_glb[compNum] ? outVec[compNum] - naBoxSize_glb[compNum] : outVec[compNum];
+    outVec[compNum] =
+        outVec[compNum] >= naBoxSize_glb[compNum] ? outVec[compNum] - naBoxSize_glb[compNum] : outVec[compNum];
 }
 
 /// LatPos_add_noPBC: Given the two arrays firVec and secVec, we store the sum of the two arrays in outVec.
@@ -1513,7 +1515,6 @@ float BeadPos_CosThetaOfBeads(const int bead1, const int bead2)
 
     return Vec3n_CosTheta(r_pos1, r_pos2);
 }
-
 
 /// BeadIDListOP_GetChainIDs: Given beadList of size beadNum, we record the chainIDs of every bead into chainList.
 /// Make sure chainList is as big as beadList.
@@ -1754,12 +1755,9 @@ int BeadList_CanTopoAngle(const int size, int* beadList)
     return newSize;
 }
 
-/// ChainListOP_AddUniqueChains_wSize: Add any chains that are not in clusList from chainList. This function assumes that
-/// chainList contains only unique elements, and that clusList has the smallest chainID as the first element, and the
-/// largest chainID the last element (at clusList[clusSize-1]).
-/// \param clusSize
-/// \param clusList
-/// \param newChainNums
+/// ChainListOP_AddUniqueChains_wSize: Add any chains that are not in clusList from chainList. This function assumes
+/// that chainList contains only unique elements, and that clusList has the smallest chainID as the first element, and
+/// the largest chainID the last element (at clusList[clusSize-1]). \param clusSize \param clusList \param newChainNums
 /// \param chainList
 int ChainListOP_AddUniqueChains_wSize(const int clusSize, int* clusList, const int newChainNums, const int* chainList,
                                       const int maxClus)
@@ -1768,51 +1766,45 @@ int ChainListOP_AddUniqueChains_wSize(const int clusSize, int* clusList, const i
     int curChain;
     int newClusSize = clusSize;
 
-    for (i=0; i < newChainNums; i++)
-    {
-        curChain = chainList[i];
-        newClusSize = ClusListOP_AddChainID(newClusSize, clusList, curChain);
-        if (newClusSize >= maxClus)
+    for (i = 0; i < newChainNums; i++)
         {
-            return newClusSize;
+            curChain    = chainList[i];
+            newClusSize = ClusListOP_AddChainID(newClusSize, clusList, curChain);
+            if (newClusSize >= maxClus)
+                {
+                    return newClusSize;
+                }
         }
-    }
 
     return newClusSize;
-
 }
 
-
-/// ChainListOP_AddUniqueChains_wSize: Add any chains that are not in clusList from chainList. This function assumes that
-/// chainList contains only unique elements, and that clusList has the smallest chainID as the first element, and the
-/// largest chainID the last element (at clusList[clusSize-1]).
-/// \param clusSize
-/// \param clusList
-/// \param newChainNums
+/// ChainListOP_AddUniqueChains_wSize: Add any chains that are not in clusList from chainList. This function assumes
+/// that chainList contains only unique elements, and that clusList has the smallest chainID as the first element, and
+/// the largest chainID the last element (at clusList[clusSize-1]). \param clusSize \param clusList \param newChainNums
 /// \param chainList
-int ChainListOP_AddUniqueChains_wSize_Check(const int clusSize, int* clusList, const int newChainNums, const int* chainList,
-                                      const int maxClus, const int* oldList)
+int ChainListOP_AddUniqueChains_wSize_Check(const int clusSize, int* clusList, const int newChainNums,
+                                            const int* chainList, const int maxClus, const int* oldList)
 {
     int i;
     int curChain;
     int newClusSize = clusSize;
 
-    for (i=0; i < newChainNums; i++)
-    {
-        curChain = chainList[i];
-        newClusSize = ClusListOP_AddChainID(newClusSize, clusList, curChain);
-        if (newClusSize >= maxClus)
+    for (i = 0; i < newChainNums; i++)
         {
-            return newClusSize;
+            curChain    = chainList[i];
+            newClusSize = ClusListOP_AddChainID(newClusSize, clusList, curChain);
+            if (newClusSize >= maxClus)
+                {
+                    return newClusSize;
+                }
+            if (clusList[newClusSize - 1] != oldList[newClusSize - 1])
+                {
+                    return maxClus;
+                }
         }
-        if (clusList[newClusSize-1] != oldList[newClusSize-1])
-        {
-            return maxClus;
-        }
-    }
 
     return newClusSize;
-
 }
 
 /// ClusListOP_AddChainID - Given a cluster-chainIDs list containing clusSize chains, we try to add the proposed
@@ -1829,19 +1821,17 @@ int ClusListOP_AddChainID(const int clusSize, int* clusList, const int chainID)
 {
 
     int i;
-    for (i=0; i<clusSize; i++)
-    {
-        if (clusList[i] == chainID)
+    for (i = 0; i < clusSize; i++)
         {
-            return clusSize;
+            if (clusList[i] == chainID)
+                {
+                    return clusSize;
+                }
         }
-    }
 
     clusList[clusSize] = chainID;
 
-
-    return clusSize+1;
-
+    return clusSize + 1;
 }
 
 /// ClusListOP_AddIfUniqueChainID - Loop over the clusList. If none of the chains match, we insert the chainID behind
@@ -1853,17 +1843,16 @@ int ClusListOP_AddChainID(const int clusSize, int* clusList, const int chainID)
 int ClusListOP_AddIfUniqueChainID(const int clusSize, int* clusList, const int chainID)
 {
     int i;
-    for (i=0; i<clusSize; i++)
-    {
-        if (clusList[i] == chainID)
+    for (i = 0; i < clusSize; i++)
         {
-            return clusSize;
+            if (clusList[i] == chainID)
+                {
+                    return clusSize;
+                }
         }
-    }
-    clusList[clusSize]=clusList[clusSize-1];
-    clusList[clusSize-1]=chainID;
-    return clusSize+1;
-
+    clusList[clusSize]     = clusList[clusSize - 1];
+    clusList[clusSize - 1] = chainID;
+    return clusSize + 1;
 }
 
 /// LatticeUtil_GetOvlpLattIndecies: Given the starting location r_pos0, we store all of the naTotLattice_glb indecies
@@ -1873,28 +1862,27 @@ int ClusListOP_AddIfUniqueChainID(const int clusSize, int* clusList, const int c
 /// \param numList - MUST be at least 27 = 3^3 elements long. Undefined behavior if not that long.
 void LatticeUtil_GetOvlpLattIndecies(const int* restrict r_pos0, int* restrict numList)
 {
-    int i = 0;
+    int i               = 0;
     int r_disp[POS_MAX] = {0};
     int r_chck[POS_MAX] = {0};
     const int nRad      = 1;
     int tmpBead;
 
     for (r_disp[0] = -nRad; r_disp[0] <= nRad; r_disp[0]++)
-    {
-        LatPos_add_wPBC_ofComp(r_chck, r_pos0, r_disp, POS_X);
-        for (r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++)
         {
-            LatPos_add_wPBC_ofComp(r_chck, r_pos0, r_disp, POS_Y);
-            for (r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++)
-            {
-                LatPos_add_wPBC_ofComp(r_chck, r_pos0, r_disp, POS_Z);
-                tmpBead = Lat_Ind_FromVec(r_chck);
-                numList[i++] = tmpBead;
-//                *(numList++) = tmpBead;
-            }
+            LatPos_add_wPBC_ofComp(r_chck, r_pos0, r_disp, POS_X);
+            for (r_disp[1] = -nRad; r_disp[1] <= nRad; r_disp[1]++)
+                {
+                    LatPos_add_wPBC_ofComp(r_chck, r_pos0, r_disp, POS_Y);
+                    for (r_disp[2] = -nRad; r_disp[2] <= nRad; r_disp[2]++)
+                        {
+                            LatPos_add_wPBC_ofComp(r_chck, r_pos0, r_disp, POS_Z);
+                            tmpBead      = Lat_Ind_FromVec(r_chck);
+                            numList[i++] = tmpBead;
+                            //                *(numList++) = tmpBead;
+                        }
+                }
         }
-    }
-
 }
 
 /// LatticeUtil_GetLattVals_FromList - loop over nIndexList and store the naTotLattice_glb values in nLatValsList.
@@ -1904,10 +1892,10 @@ void LatticeUtil_GetOvlpLattIndecies(const int* restrict r_pos0, int* restrict n
 void LatticeUtil_GetLattVals_FromList(const int* restrict nIndexList, int* restrict nLatValsList, const int listSize)
 {
     int i;
-    for (i=0; i<listSize; ++i)
-    {
-        nLatValsList[i] = naTotLattice_glb[nIndexList[i]];
-    }
+    for (i = 0; i < listSize; ++i)
+        {
+            nLatValsList[i] = naTotLattice_glb[nIndexList[i]];
+        }
 }
 
 /// LatticeUtil_GetBeadIDs_FromList - Given the list of Lattice values, we get all the values that are not -1.
@@ -1921,14 +1909,14 @@ int LatticeUtil_GetBeadIDs_FromList(const int* restrict nLatValsList, int* restr
     int tmpBead;
     int i;
 
-    for (i=0; i<CLUS_CONTACT_NEIGHS; ++i)
-    {
-        tmpBead = nLatValsList[i];
-        if (tmpBead != -1)
+    for (i = 0; i < CLUS_CONTACT_NEIGHS; ++i)
         {
-            nBeadsList[nBeadsNum++] = tmpBead;
+            tmpBead = nLatValsList[i];
+            if (tmpBead != -1)
+                {
+                    nBeadsList[nBeadsNum++] = tmpBead;
+                }
         }
-    }
     return nBeadsNum;
 }
 
@@ -1947,6 +1935,3 @@ int LatticeUtil_GetNeighBeads_AtPos(const int* restrict r_pos0, int* restrict nB
 
     return LatticeUtil_GetBeadIDs_FromList(nLatVals, nBeadsList, CLUS_CONTACT_NEIGHS);
 }
-
-
-

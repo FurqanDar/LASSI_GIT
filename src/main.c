@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
     printf("---------------------\n\n");
     // Thermalizing the system.
     fCuTemp_glb = fPreKT_glb;
-    //FILE Initialization
+    // FILE Initialization
     FileIO_CreateRunningDataFiles();
 
     for (nGen = 0; nGen < nMCStepsForTherm_glb; nGen++)
@@ -106,7 +106,6 @@ int main(int argc, char* argv[])
      * Post-thermalization
      * */
     FileIO_WriteRestart_ForThermalization();
-
 
     printf("____________________________\n");
     printf("System has been thermalized!\n");
@@ -127,7 +126,7 @@ int main(int argc, char* argv[])
             for (nGen = 0; nGen < nMCStepsPerCycle_glb / 2; nGen++)
                 {
                     fCuTemp_glb = nAnnealing_Mode_glb == -1 ? fKT_glb : Temperature_Function(nAnnealing_Mode_glb, nGen);
-                    nMCInfo = MC_Step(fCuTemp_glb);
+                    nMCInfo     = MC_Step(fCuTemp_glb);
                     //            printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
                     DataPrinting_DuringRunCycles(nGen, run_cycle);
                 }
@@ -135,7 +134,7 @@ int main(int argc, char* argv[])
             for (nGen = nMCStepsPerCycle_glb / 2; nGen <= nMCStepsPerCycle_glb; nGen++)
                 {
                     fCuTemp_glb = nAnnealing_Mode_glb == -1 ? fKT_glb : Temperature_Function(nAnnealing_Mode_glb, nGen);
-                    nMCInfo = MC_Step(fCuTemp_glb);
+                    nMCInfo     = MC_Step(fCuTemp_glb);
                     //            printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
                     DataPrinting_DuringRunCycles(nGen, run_cycle);
                     DataAnalysis_DuringRunCycles(nGen, run_cycle);
@@ -143,7 +142,7 @@ int main(int argc, char* argv[])
             /*
              * Post run-cycle specific cleanup.
              */
-            nAnnealing_Mode_glb    = -1;
+            nAnnealing_Mode_glb        = -1;
             nInitialPotential_Mode_glb = -1;
             FileIO_WriteRestart_ForRun(run_cycle);
             CopyData_All(run_cycle);
