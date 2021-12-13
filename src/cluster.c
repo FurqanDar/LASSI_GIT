@@ -1609,7 +1609,7 @@ int ClusUtil_GetOvlpNeighborChains_ForBead(const int beadID, int* restrict neigh
 /// \param clusSize
 /// \return
 int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict nTotClusTable, int* restrict clusList,
-                               int* restrict clusSize)
+                                   int* restrict clusSize)
 {
     int tmpChainList[CLUS_CONTACT_NEIGHS];
     const int dumChainNum = ClusUtil_GetOvlpNeighborChains_ForBead(beadID, tmpChainList);
@@ -1631,6 +1631,25 @@ int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict nTotClusTabl
     const int endSize = *clusSize - startSize;
 
     return endSize;
+}
+
+int ClusUtil_AddOvlpCluster_OfBead_CheckForSame(const int beadID, const char* const nTotClusTable)
+{
+    int tmpChainList[CLUS_CONTACT_NEIGHS];
+    const int dumChainNum = ClusUtil_GetOvlpNeighborChains_ForBead(beadID, tmpChainList);
+
+    int i;
+    int tmpChain;
+    for (i = 0; i < dumChainNum; ++i)
+        {
+            tmpChain = tmpChainList[i];
+            if (! nTotClusTable[tmpChain])
+                {
+                    return -1;
+                }
+        }
+
+    return 1;
 }
 
 /// ClusUtil_AddOvlpCluster_OfChain - Adds all the unique chains within +-1 of each bead of this chain.
@@ -1663,6 +1682,29 @@ int ClusUtil_AddOvlpCluster_OfChain(const int chainID, char* restrict nTotClusTa
 ///
 /// \param chainID
 /// \param nTotClusTable
+/// \return
+int ClusUtil_AddOvlpCluster_OfChain_CheckForSame(const int chainID, const char* restrict const nTotClusTable)
+{
+    const int firstB = chain_info[chainID][CHAIN_START];
+    const int lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
+
+    int i;
+    int tmpVal;
+    for (i=firstB; i<lastB; ++i)
+    {
+        tmpVal = ClusUtil_AddOvlpCluster_OfBead_CheckForSame(i, nTotClusTable);
+        if (tmpVal == -1)
+        {
+            return -1;
+        }
+    }
+
+    return 1;
+}
+
+///
+/// \param chainID
+/// \param nTotClusTable
 /// \param clusList
 /// \return
 int Clus_Ovlp_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList)
@@ -1683,3 +1725,157 @@ int Clus_Ovlp_OfChain(const int chainID, char* restrict nTotClusTable, int* rest
     return clusSize;
 }
 
+///
+/// \param chainID
+/// \param nTotClusTable
+/// \param clusList
+/// \param maxSize
+/// \return
+int Clus_Ovlp_OfChain_wMaxSize(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+                               int const maxSize)
+{
+    clusList[0]            = chainID;
+    nTotClusTable[chainID] = 1;
+
+    int clusSize = 1;
+
+    int tmpChain;
+    int i;
+    for (i = 0; i < clusSize; ++i)
+    {
+        tmpChain = clusList[i];
+        ClusUtil_AddOvlpCluster_OfChain(tmpChain, nTotClusTable, clusList, &clusSize);
+        if (clusSize >= maxSize)
+        {
+            return 0;
+        }
+    }
+
+    return clusSize;
+}
+
+///
+/// \param nTotClusTable
+/// \param clusList
+/// \param clusSize
+/// \return
+int Clus_Ovlp_OfChain_CheckForSame(const char* const nTotClusTable, const int* const clusList, int const clusSize)
+{
+
+    int tmpChain;
+    int tmpVal;
+    int i;
+    for (i = 0; i < clusSize; ++i)
+        {
+            tmpChain = clusList[i];
+            tmpVal   = ClusUtil_AddOvlpCluster_OfChain_CheckForSame(tmpChain, nTotClusTable);
+            if (tmpVal == -1)
+                {
+                    return -1;
+                }
+        }
+
+    return 1;
+}
+
+///
+/// \param beadID
+/// \param nTotClusTable
+/// \param clusList
+/// \param clusSize
+/// \return
+int ClusUtil_AddAnisoCluster_OfBead(const int beadID, char* restrict nTotClusTable, int* restrict clusList,
+                                    int* restrict clusSize)
+{
+    int const beadPartner = bead_info[beadID][BEAD_FACE];
+
+    if (beadPartner != -1)
+        {
+            int const tmpChain = bead_info[beadPartner][BEAD_CHAINID];
+            if (! nTotClusTable[tmpChain])
+                {
+                    nTotClusTable[tmpChain] = 1;
+                    clusList[*clusSize]     = tmpChain;
+                    (*clusSize)++;
+                    return 1;
+                }
+        }
+    return 0;
+}
+
+///
+/// \param chainID
+/// \param nTotClusTable
+/// \param clusList
+/// \param clusSize
+/// \return
+int ClusUtil_AddAnisoCluster_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+                                     int* restrict clusSize)
+{
+    const int startSize = *clusSize;
+
+    const int firstB = chain_info[chainID][CHAIN_START];
+    const int lastB  = firstB + chain_info[chainID][CHAIN_LENGTH];
+
+    int i;
+    for (i = firstB; i < lastB; ++i)
+        {
+            ClusUtil_AddAnisoCluster_OfBead(i, nTotClusTable, clusList, clusSize);
+        }
+
+    const int endSize = *clusSize - startSize;
+
+    return endSize;
+}
+
+///
+/// \param chainID
+/// \param nTotClusTable
+/// \param clusList
+/// \return
+int Clus_Aniso_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList)
+{
+    clusList[0]            = chainID;
+    nTotClusTable[chainID] = 1;
+
+    int clusSize = 1;
+
+    int tmpChain;
+    int i;
+    for (i = 0; i < clusSize; ++i)
+        {
+            tmpChain = clusList[i];
+            ClusUtil_AddAnisoCluster_OfChain(tmpChain, nTotClusTable, clusList, &clusSize);
+        }
+
+    return clusSize;
+}
+
+///
+/// \param chainID
+/// \param nTotClusTable
+/// \param clusList
+/// \param maxSize
+/// \return
+int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+                                int const maxSize)
+{
+    clusList[0]            = chainID;
+    nTotClusTable[chainID] = 1;
+
+    int clusSize = 1;
+
+    int tmpChain;
+    int i;
+    for (i = 0; i < clusSize; ++i)
+        {
+            tmpChain = clusList[i];
+            ClusUtil_AddAnisoCluster_OfChain(tmpChain, nTotClusTable, clusList, &clusSize);
+            if (clusSize >= maxSize)
+            {
+                return 0;
+            }
+        }
+
+    return clusSize;
+}

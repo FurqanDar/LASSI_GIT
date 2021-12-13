@@ -63,4 +63,27 @@ int ClusUtil_AddOvlpCluster_OfChain(const int chainID, char* restrict nTotClusTa
 
 int Clus_Ovlp_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList);
 
+int Clus_Ovlp_OfChain_wMaxSize(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+                               int const maxSize);
+
+int ClusUtil_AddOvlpCluster_OfBead_CheckForSame(const int beadID, const char* restrict const nTotClusTable);
+
+int ClusUtil_AddOvlpCluster_OfChain_CheckForSame(const int chainID, const char* restrict const nTotClusTable);
+
+int Clus_Ovlp_OfChain_CheckForSame(const char* const nTotClusTable, const int* const clusList, int const clusSize);
+
+
+int ClusUtil_AddAnisoCluster_OfBead(const int beadID, char* restrict nTotClusTable, int* restrict clusList,
+                                    int* restrict clusSize);
+
+int ClusUtil_AddAnisoCluster_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+                                     int* restrict clusSize);
+
+int Clus_Aniso_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList);
+
+int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+                                int const maxSize);
+
+
+
 #endif // _CLUSTER_H_

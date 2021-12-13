@@ -678,7 +678,7 @@ int Move_Clus_Network(float MyTemp)
     // Radii for translation moves. All moves are L/4 radius
     // I guess moving single chains around as well is not a bad idea
 
-    LatPos_gen_rand_wRad(r_Disp, nBoxSize[0] / 4);
+    LatPos_gen_rand_wRad(r_Disp, nBoxSize[0] / 2);
     for (i = 0; i < ClusSize; i++)
         {
             // printf("%d\n", naList_gl[i]);
@@ -800,12 +800,17 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
 
     int bAccept = 0; // Used in MC steps, assume that move fails initially.
 
-    const int ClusSize = Clus_Network_LimitedCluster(chainID); // Looking at everything that is connected to chainID
+//    const int ClusSize = Clus_Network_LimitedCluster(chainID); // Looking at everything that is connected to chainID
 
-    // Remember that naList_gl[] contains the chainID's of the network chainID is part of from 0 to ClusSize-1.
-    if (ClusSize < 1)
+    char* oldHashTab = calloc(tot_chains, sizeof (char));
+    int*  clusList   = calloc(tot_chains, sizeof (int));
+
+    const int ClusSize = Clus_Aniso_OfChain_wMaxSize(chainID, oldHashTab, clusList, nLimitedClusterSize);
+    if ((ClusSize < 2))
         {
             bAccept = 0;
+            free(oldHashTab);
+            free(clusList);
             return bAccept;
         }
 
@@ -815,15 +820,17 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
     // Radii for translation moves. All moves are L/4 radius
     // I guess moving single chains around as well is not a bad idea
 
-    LatPos_gen_rand_wRad(r_Disp, nBoxSize[0] / 4);
+    LatPos_gen_rand_wRad(r_Disp, nBoxSize[0] / 2);
     for (i = 0; i < ClusSize; i++)
         {
             // printf("%d\n", naList_gl[i]);
-            yTemp = Check_ChainDisp(naList_gl[i], r_Disp); // Checking for steric clash
+            yTemp = Check_ChainDisp(clusList[i], r_Disp); // Checking for steric clash
             if (yTemp == 0)
                 {
                     bAccept = 0;
                     // printf("End CLUS - No space\n");
+                    free(oldHashTab);
+                    free(clusList);
                     return bAccept;
                 }
         }
@@ -838,7 +845,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = naList_gl[j];
+                    thisChain = clusList[j];
                     firstB    = chain_info[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -852,7 +859,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = naList_gl[j];
+                    thisChain = clusList[j];
                     firstB    = chain_info[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -865,14 +872,14 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
 
     for (j = 0; j < ClusSize; j++)
         {
-            OP_System_DispChain(naList_gl[j], r_Disp); // Moving the cluster properly
+            OP_System_DispChain(clusList[j], r_Disp); // Moving the cluster properly
         }
 
     if (nInitialPotential_Mode != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = naList_gl[j];
+                    thisChain = clusList[j];
                     firstB    = chain_info[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -886,7 +893,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = naList_gl[j];
+                    thisChain = clusList[j];
                     firstB    = chain_info[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -901,6 +908,8 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
     if (MCProb < MHAcc)
         {                // Accept this state
             bAccept = 1; // Accept the move
+            free(oldHashTab);
+            free(clusList);
             return bAccept;
             // printf("End CLUS - Yes\n");
         }
@@ -908,9 +917,11 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
         {
             for (i = 0; i < ClusSize; i++)
                 {
-                    OP_System_RestoreChain(naList_gl[i]); // Placing  the cluster back properly
+                    OP_System_RestoreChain(clusList[i]); // Placing  the cluster back properly
                 }
             bAccept = 0;
+            free(oldHashTab);
+            free(clusList);
             return bAccept;
             // printf("End CLUS - Failed.\n");
         }
@@ -1719,45 +1730,24 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
 
     int bAccept        = 0; // Used in MC steps, assume that move fails initially.
 
-    int* oldClusList = calloc(nLimitedClusterSize, sizeof(int));
-
-
-    int* oldClusListN = calloc(tot_chains, sizeof(int));
+    int* oldClusList = calloc(tot_chains, sizeof(int));
     char* oldHashTab   = calloc(tot_chains, sizeof(char));
-    const int woClusSize = Clus_Ovlp_OfChain(chainID, oldHashTab, oldClusListN);
+    const int ClusSize = Clus_Ovlp_OfChain_wMaxSize(chainID, oldHashTab, oldClusList, nLimitedClusterSize);
 
-
-
-//    int newClusList[MAX_SMCLSTR_SIZE] = {0};
-//    int oldClusList[MAX_SMCLSTR_SIZE] = {0};
-
-    const int ClusSize =
-        Clus_Proximity_LimitedCluster_All(chainID, oldClusList); // Looking at everything that is connected to chainID
-    // Remember that naList_gl[] contains the chainID's of the network chainID is
-    // part of from 0 - ClusSize-1.
-
-    free(oldClusListN);
-    free(oldHashTab);
-    if (ClusSize < 2)
+    if ((ClusSize < 2))
         {
             bAccept = 0;
             free(oldClusList);
+            free(oldHashTab);
             return bAccept;
         }
 //    printf("\n%d\n", ClusSize);
-    int* newClusList = calloc(nLimitedClusterSize, sizeof(int));
 
     // Radii for translation moves. All moves are L/2 radius
     int r_Disp[POS_MAX];
     int yTemp;
     int i, j;
     LatPos_gen_rand_wRad(r_Disp, nBoxSize[0] / 2);
-
-    /*
-     *
-     * SHOULD BE A FUNCTION THAT CHECKS FOR CLUSTER DISP!
-     *
-     */
 
     for (i = 0; i < ClusSize; i++)
         {
@@ -1766,12 +1756,11 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
                 {
                     bAccept = 0;
                     free(oldClusList);
-                    free(newClusList);
+                    free(oldHashTab);
                     return bAccept;
                 }
         }
     // No  clash
-
 
     int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
     int thisChain, firstB, lastB;
@@ -1810,16 +1799,17 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
                 }
         }
 
+
     for (i = 0; i < ClusSize; i++)
         {
             OP_System_DispChain(oldClusList[i], r_Disp); // Moving the cluster properly
-            newClusList[i] = oldClusList[i];
         }
     // Recalculating cluster to see if we have the same cluster or not. If not, we reject.
 
-    const int ClusCheck = Clus_Proximity_LimitedCluster_All_Check(chainID, oldClusList, newClusList);
+    const int ClusCheckN = Clus_Ovlp_OfChain_CheckForSame(oldHashTab, oldClusList, ClusSize);
+    free(oldHashTab);
 
-    if (ClusCheck == -1)
+    if (ClusCheckN == -1)
         {
             for (i = 0; i < ClusSize; i++)
                 {
@@ -1827,7 +1817,6 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
                 }
             bAccept = 0;
             free(oldClusList);
-            free(newClusList);
             return bAccept;
         }
 
@@ -1835,7 +1824,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = newClusList[j];
+                    thisChain = oldClusList[j];
                     firstB    = chain_info[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -1849,7 +1838,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = newClusList[j];
+                    thisChain = oldClusList[j];
                     firstB    = chain_info[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -1866,7 +1855,6 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         {                // Accept this state
             bAccept = 1; // Accept the move
             free(oldClusList);
-            free(newClusList);
             return bAccept;
             // printf("End CLUS - Yes\n");
         }
@@ -1874,11 +1862,10 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         {
             for (i = 0; i < ClusSize; i++)
                 {
-                    OP_System_RestoreChain(newClusList[i]); // Placing  the cluster back properly
+                    OP_System_RestoreChain(oldClusList[i]); // Placing  the cluster back properly
                 }
             bAccept = 0;
             free(oldClusList);
-            free(newClusList);
             return bAccept;
             // printf("End CLUS - Failed.\n");
         }
@@ -2705,7 +2692,7 @@ void OP_System_RestoreChain(int chainID)
 /// OP_CopyBead: Copies BEADINFO_MAX elements of orig_arr into copy_arr
 /// \param copy_arr
 /// \param orig_arr
-inline void OP_CopyBead(int* copy_arr, const int* orig_arr)
+inline void OP_CopyBead(int* restrict copy_arr, const int* restrict orig_arr)
 {
     int j;
     for (j = 0; j < BEADINFO_MAX; j++)
@@ -2720,7 +2707,7 @@ inline void OP_CopyBead(int* copy_arr, const int* orig_arr)
 /// \param lastB
 inline void OP_CopyBeadsToOld(const int firstB, const int lastB)
 {
-    int i, j;
+    int i;
     for (i = firstB; i < lastB; i++)
         {
             OP_CopyBead(old_bead[i], bead_info[i]);

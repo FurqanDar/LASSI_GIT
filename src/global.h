@@ -68,7 +68,6 @@
 
 #define MAX_ROTSTATES 27
 #define CLUS_CONTACT_NEIGHS 27
-#define MAX_SMCLSTR_SIZE 128
 
 typedef int lInt;
 typedef long lLong;
@@ -160,9 +159,9 @@ lLDub* ldMOLCLUS_Arr;
 lLDub* ld_TOTMOLCLUS_Arr;
 lInt naTempR[POS_MAX];
 lInt nLargestClusterRightNow;
-size_t nLimitedClusterSize;
+lInt nLimitedClusterSize;
 
-// Neighor search
+// Neighbor search
 lInt* oldOvlpNeighs;
 lInt* newOvlpNeighs;
 lInt* oldContNeighs;
