@@ -154,11 +154,11 @@ void Check_BeadTypewiseInteractions(void)
     int i, j;
     for (i = 0; i < MAX_AA; i++)
     {
-        nBeadTypeIsSticker[i] = 0; // Assume beads don't rotationally interact.
-        nBeadTypeCanOvlp[i]   = 0; // Assume beads don't have an overlap cost
-        nBeadTypeCanCont[i]   = 0; // Assume beads don't have contact costs.
-        nBeadTypeCanFSol[i]   = 0; // Assume beads have no stiffness
-        nBeadTypeCanTInd[i]   = 0; // Assume beads have no Temperature independent interactions
+        nBeadTypeIsSticker_glb[i] = 0; // Assume beads don't rotationally interact.
+        nBeadTypeCanOvlp_glb[i]   = 0; // Assume beads don't have an overlap cost
+        nBeadTypeCanCont_glb[i]   = 0; // Assume beads don't have contact costs.
+        nBeadTypeCanFSol_glb[i]   = 0; // Assume beads have no stiffness
+        nBeadTypeCanTInd_glb[i]   = 0; // Assume beads have no Temperature independent interactions
     }
     //Assume system has no interactions
     bSystemHasSCSC = 0;
@@ -174,14 +174,14 @@ void Check_BeadTypewiseInteractions(void)
                 {
                     if (fEnergy[i][j][E_SC_SC])
                         {
-                            nBeadTypeIsSticker[i] = 1;
+                            nBeadTypeIsSticker_glb[i] = 1;
                         }
                 }
         }
 
     for (i = 0; i < nBeadTypes; i++)
         {
-            if (nBeadTypeIsSticker[i])
+            if (nBeadTypeIsSticker_glb[i])
                 {
                     bSystemHasSCSC = 1;
                 }
@@ -194,13 +194,13 @@ void Check_BeadTypewiseInteractions(void)
                 {
                     if (fEnergy[i][j][E_OVLP])
                         {
-                            nBeadTypeCanOvlp[i] = 1;
+                            nBeadTypeCanOvlp_glb[i] = 1;
                         }
                 }
         }
     for (i = 0; i < nBeadTypes; i++)
         {
-            if (nBeadTypeCanOvlp[i])
+            if (nBeadTypeCanOvlp_glb[i])
                 {
                     bSystemHasOvlp = 1;
                 }
@@ -213,13 +213,13 @@ void Check_BeadTypewiseInteractions(void)
         {
             if (fEnergy[i][j][E_CONT])
             {
-                nBeadTypeCanCont[i] = 1;
+                nBeadTypeCanCont_glb[i] = 1;
             }
         }
     }
     for (i = 0; i < nBeadTypes; i++)
     {
-        if (nBeadTypeCanCont[i])
+        if (nBeadTypeCanCont_glb[i])
         {
             bSystemHasCont = 1;
         }
@@ -232,13 +232,13 @@ void Check_BeadTypewiseInteractions(void)
         {
             if (fEnergy[i][j][E_F_SOL])
             {
-                nBeadTypeCanFSol[i] = 1;
+                nBeadTypeCanFSol_glb[i] = 1;
             }
         }
     }
     for (i = 0; i < nBeadTypes; i++)
     {
-        if (nBeadTypeCanFSol[i])
+        if (nBeadTypeCanFSol_glb[i])
         {
             bSystemHasFSol = 1;
         }
@@ -251,7 +251,7 @@ void Check_BeadTypewiseInteractions(void)
         {
             if (fEnergy[i][j][E_T_IND])
             {
-                nBeadTypeCanTInd[i] = 1;
+                nBeadTypeCanTInd_glb[i] = 1;
             }
         }
     }

@@ -224,7 +224,7 @@ int Move_Rot(int beadID, float MyTemp)
     // Firstly -- make sure that bead i can even have rotational states.
     resi = bead_info[beadID][BEAD_TYPE];
     // printf("Beginning ROT\n");
-    if (nBeadTypeIsSticker[resi] == 0)
+    if (nBeadTypeIsSticker_glb[resi] == 0)
         { // Skip beads that cannot rotate!
             bAccept = 0;
             return bAccept;
@@ -412,7 +412,7 @@ int Move_Snake(int chainID, float MyTemp)
         }
     else
         {
-            if (nChainTypeIsLinear[chain_info[chainID][CHAIN_TYPE]] != 1)
+            if (nChainTypeIsLinear_glb[chain_info[chainID][CHAIN_TYPE]] != 1)
                 {
                     // If chain is not linear. Reject move because slithering will not
                     // work!
@@ -954,7 +954,7 @@ int Move_DbPvt(const int beadID, const float myTemp)
     const int PChainID = bead_info[beadID][BEAD_CHAINID];  // The proposed chainID
     const int PType    = chain_info[PChainID][CHAIN_TYPE]; // Type of chain.
 
-    if (nChainTypeIsLinear[PType] == 0)
+    if (nChainTypeIsLinear_glb[PType] == 0)
         {
             // Reject the move because the chain is not linear.
             return bAccept;
@@ -1392,7 +1392,7 @@ int Move_Pivot(int chainID, float MyTemp)
      * linear chain has been passed!
      */
     int bAccept = 0;
-    if (! nChainTypeIsLinear[chain_info[chainID][CHAIN_TYPE]])
+    if (! nChainTypeIsLinear_glb[chain_info[chainID][CHAIN_TYPE]])
         {
             return bAccept;
         }
@@ -1579,7 +1579,7 @@ int Move_BranchedRot(int chainID, float MyTemp)
       */
     int bAccept = 0;
     // Reject if the molecule is linear
-    if (nChainTypeIsLinear[chain_info[chainID][CHAIN_TYPE]])
+    if (nChainTypeIsLinear_glb[chain_info[chainID][CHAIN_TYPE]])
         {
             return bAccept;
         }
@@ -1968,7 +1968,7 @@ int Move_Snake_Equil(int chainID, float MyTemp)
         }
     else
         {
-            if (nChainTypeIsLinear[chain_info[chainID][CHAIN_TYPE]] != 1)
+            if (nChainTypeIsLinear_glb[chain_info[chainID][CHAIN_TYPE]] != 1)
                 { // If chain is not linear. Reject move because
                   // slithering will not werk!
                     bAccept = 0;
@@ -2297,7 +2297,7 @@ int Move_Pivot_Equil(int chainID, float MyTemp)
     been passed!
     */
     int bAccept = 0;
-    if (! nChainTypeIsLinear[chain_info[chainID][CHAIN_TYPE]])
+    if (! nChainTypeIsLinear_glb[chain_info[chainID][CHAIN_TYPE]])
         {
             return bAccept;
         }
@@ -2460,7 +2460,7 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp)
       */
     int bAccept = 0;
     // Reject if the molecule is linear
-    if (nChainTypeIsLinear[chain_info[chainID][CHAIN_TYPE]])
+    if (nChainTypeIsLinear_glb[chain_info[chainID][CHAIN_TYPE]])
         {
             return bAccept;
         }
@@ -3552,7 +3552,7 @@ void OP_Inv_MoveBeads_InList_ToPos(const int listSize, const int* beadList)
 lLDub MC_RosenbluthSampling_ForLocal_AtOld(const int beadID, const int resi, long double* oldEn, const int neigh_num)
 {
     int ros_num;
-    if (nBeadTypeIsSticker[resi])
+    if (nBeadTypeIsSticker_glb[resi])
         {
             *oldEn  = *oldEn + Energy_Anisotropic(beadID);
             ros_num = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, neigh_num);
@@ -3571,7 +3571,7 @@ lLDub MC_RosenbluthSampling_ForLocal_AtNew(const int beadID, const int resi, int
     int ros_num;
 
     *bead_part = -1;
-    if (nBeadTypeIsSticker[resi])
+    if (nBeadTypeIsSticker_glb[resi])
         {
             OP_ShuffleArray(neigh_num, newOvlpNeighs);
             ros_num = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, neigh_num);
@@ -3590,7 +3590,7 @@ lLDub MC_RosenbluthSampling_ForLocal_AtNew(const int beadID, const int resi, int
 lLDub MC_RosenbluthSampling_ForChains_AtOld(const int beadID, const int resi, long double* oldEn, const int neigh_num)
 {
     int ros_num;
-    if (nBeadTypeIsSticker[resi])
+    if (nBeadTypeIsSticker_glb[resi])
         {
             *oldEn  = *oldEn + Energy_Anisotropic_For_Chain(beadID);
             ros_num = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, neigh_num);
@@ -3609,7 +3609,7 @@ lLDub MC_RosenbluthSampling_ForChains_AtNew(const int beadID, const int resi, in
     int ros_num;
     const int cur_part = bead_info[beadID][BEAD_FACE];
     *bead_part         = -1;
-    if (nBeadTypeIsSticker[resi])
+    if (nBeadTypeIsSticker_glb[resi])
         {
             OP_ShuffleArray(neigh_num, newOvlpNeighs);
             ros_num = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, neigh_num);
@@ -3632,7 +3632,7 @@ lLDub MC_RosenbluthSampling_ForLists_AtOld(const int beadIdx, const int listSize
     const int beadID = beadList[beadIdx];
     const int resi   = bead_info[beadID][BEAD_TYPE];
     int ros_num;
-    if (nBeadTypeIsSticker[resi])
+    if (nBeadTypeIsSticker_glb[resi])
         {
             *oldEn  = *oldEn + Energy_Anisotropic_For_List(beadID, listSize, beadList);
             ros_num = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, neigh_num);
@@ -3653,7 +3653,7 @@ lLDub MC_RosenbluthSampling_ForLists_AtNew(const int beadIdx, const int listSize
     const int resi     = bead_info[beadID][BEAD_TYPE];
     const int cur_part = bead_info[beadID][BEAD_FACE];
     int ros_num;
-    if (nBeadTypeIsSticker[resi])
+    if (nBeadTypeIsSticker_glb[resi])
         {
             *oldEn  = *oldEn + Energy_Anisotropic_For_List(beadID, listSize, beadList);
             ros_num = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, neigh_num);
@@ -3674,7 +3674,7 @@ lLDub MC_RosenbluthSampling_ForRange_AtOld(const int beadID, const int resi, con
                                            const int largestBead, lLDub* oldEn, const int neigh_num)
 {
     int ros_num;
-    if (nBeadTypeIsSticker[resi])
+    if (nBeadTypeIsSticker_glb[resi])
         {
             *oldEn  = *oldEn + Energy_Anisotropic_For_Range(beadID, smallestBead, largestBead);
             ros_num = Check_RotStates_wNeighList(beadID, resi, oldOvlpNeighs, neigh_num);
@@ -3693,7 +3693,7 @@ lLDub MC_RosenbluthSampling_ForRange_AtNew(const int beadID, const int resi, int
     int ros_num;
     const int cur_part = bead_info[beadID][BEAD_FACE];
     *bead_part         = -1;
-    if (nBeadTypeIsSticker[resi])
+    if (nBeadTypeIsSticker_glb[resi])
         {
             OP_ShuffleArray(neigh_num, newOvlpNeighs);
             ros_num = Check_RotStates_wNeighList(beadID, resi, newOvlpNeighs, neigh_num);

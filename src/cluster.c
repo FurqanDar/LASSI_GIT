@@ -543,7 +543,7 @@ int Clus_Proximity_ChainCluster_ForTotal_IntOnly(int const chainID)
                                     naChainCheckList[chainPart] = 1; // Recording that this chain has been looked at
                                 }
                         }
-                    if (nBeadTypeCanOvlp[resi] == 0)
+                    if (nBeadTypeCanOvlp_glb[resi] == 0)
                         {
                             continue;
                         }
@@ -830,7 +830,7 @@ int Clus_Proximity_LimitedCluster_IntOnly(int const chainID)
                                 }
                         }
                     resi = bead_info[i][BEAD_TYPE];
-                    if (nBeadTypeCanOvlp[resi] == 0)
+                    if (nBeadTypeCanOvlp_glb[resi] == 0)
                         {
                             continue;
                         }
@@ -952,7 +952,7 @@ int Clus_Proximity_LimitedCluster_IntOnly_Check(int const chainID, int const* Ol
                                 }
                         }
                     resi = bead_info[i][BEAD_TYPE];
-                    if (nBeadTypeCanOvlp[resi] == 0)
+                    if (nBeadTypeCanOvlp_glb[resi] == 0)
                         {
                             continue;
                         }

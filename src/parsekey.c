@@ -675,7 +675,7 @@ void Parse_StructureFile(char* filename)
                     // It's assumed that the next line contains the number of copies for
                     // this molecule.
                     nChainType++;
-                    nChainTypeIsLinear[nChainType] = 1; // Assume all chains are linear to begin with.
+                    nChainTypeIsLinear_glb[nChainType] = 1; // Assume all chains are linear to begin with.
                     nChainStart += nBEADS;
                     nChainID++;
                     nBEADS = 0;
@@ -709,7 +709,7 @@ void Parse_StructureFile(char* filename)
                                         { // This signifies that the chain is not
                                           // linear because a bead has more than two bonds
                                           // because indicies start at 0.
-                                            nChainTypeIsLinear[nChainType] = 0;
+                                            nChainTypeIsLinear_glb[nChainType] = 0;
                                         }
                                     curPartner += nChainStart;              // Accounts for all beads before,
                                                                             // like above.

@@ -113,12 +113,12 @@ lLDub ld_LogOfSmallestPossibleProb;   // Smallest probability possible logl(1/RA
 float faCurrEn[MAX_E];                // Vector for current energy
 
 // Arrays to track certain topology and interaction information
-lInt nBeadTypeIsSticker[MAX_AA];         // Used to track if that beadType interacts via rotations.
-lInt nChainTypeIsLinear[MAX_CHAINTYPES]; // Used to track if this chainType is linear.
-lInt nBeadTypeCanOvlp[MAX_AA];           // Used to track if a certain beadType has an overlap cost.
-lInt nBeadTypeCanCont[MAX_AA];           // Used to track if a certain beadType has contact interactions
-lInt nBeadTypeCanFSol[MAX_AA];           // Used to track if a certain beadType has solvation energies
-lInt nBeadTypeCanTInd[MAX_AA];           // Used to track if a certain beadType has temperature independent solvation
+lInt nBeadTypeIsSticker_glb[MAX_AA];         // Used to track if that beadType interacts via rotations.
+lInt nChainTypeIsLinear_glb[MAX_CHAINTYPES]; // Used to track if this chainType is linear.
+lInt nBeadTypeCanOvlp_glb[MAX_AA];           // Used to track if a certain beadType has an overlap cost.
+lInt nBeadTypeCanCont_glb[MAX_AA];           // Used to track if a certain beadType has contact interactions
+lInt nBeadTypeCanFSol_glb[MAX_AA];           // Used to track if a certain beadType has solvation energies
+lInt nBeadTypeCanTInd_glb[MAX_AA];           // Used to track if a certain beadType has temperature independent solvation
 
 float fLinkerLength;
 float fLinkerSprCon;

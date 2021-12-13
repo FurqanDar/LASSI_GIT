@@ -187,7 +187,7 @@ int Check_System_Structure(void)
                 }
             if (bead_info[i][BEAD_FACE] != -1)
                 {
-                    if (nBeadTypeIsSticker[bead_info[i][BEAD_TYPE]] == 0)
+                    if (nBeadTypeIsSticker_glb[bead_info[i][BEAD_TYPE]] == 0)
                         {
                             printf("This bead -- %d -- should not have a bond. Crashing.\n", i);
                             return i + 1;

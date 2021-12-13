@@ -703,13 +703,13 @@ float Energy_Isotropic_Old(const int beadID)
     int resi   = bead_info[beadID][BEAD_TYPE];
     totEn += nInitialPotential_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-        nBeadTypeCanTInd[resi] == 0)
+    if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
+        nBeadTypeCanTInd_glb[resi] == 0)
         {
             return totEn;
         } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont_glb[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++)
         {
@@ -787,13 +787,13 @@ float Energy_Isotropic(const int beadID)
     int resi   = bead_info[beadID][BEAD_TYPE];
     totEn += nInitialPotential_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-        nBeadTypeCanTInd[resi] == 0)
+    if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
+        nBeadTypeCanTInd_glb[resi] == 0)
         {
             return totEn;
         } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont_glb[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++)
         {
@@ -856,13 +856,13 @@ float Energy_Isotropic_Self(const int beadID)
     int resi   = bead_info[beadID][BEAD_TYPE];
     // totEn += nInitialPotential_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-        nBeadTypeCanTInd[resi] == 0)
+    if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
+        nBeadTypeCanTInd_glb[resi] == 0)
         {
             return totEn;
         } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont_glb[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++)
         {
@@ -927,13 +927,13 @@ float Energy_Isotropic_For_Chain(const int beadID)
     int resi   = bead_info[beadID][BEAD_TYPE];
     totEn += nInitialPotential_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-        nBeadTypeCanTInd[resi] == 0)
+    if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
+        nBeadTypeCanTInd_glb[resi] == 0)
         {
             return totEn;
         } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont_glb[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++)
         {
@@ -1008,13 +1008,13 @@ float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bea
     int resi   = bead_info[beadID][BEAD_TYPE];
     totEn += nInitialPotential_Mode == -1 ? 0. : Energy_InitPotential(beadID);
 
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-        nBeadTypeCanTInd[resi] == 0)
+    if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
+        nBeadTypeCanTInd_glb[resi] == 0)
         {
             return totEn;
         } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont_glb[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++)
         {
@@ -1095,13 +1095,13 @@ float Energy_Isotropic_With_List(const int beadID, const int* bead_list, const i
     int resi   = bead_info[beadID][BEAD_TYPE];
     totEn += nInitialPotential_Mode == -1 ? 0.f : Energy_InitPotential(beadID);
 
-    if (nBeadTypeCanOvlp[resi] == 0 && nBeadTypeCanCont[resi] == 0 && nBeadTypeCanFSol[resi] == 0 &&
-        nBeadTypeCanTInd[resi] == 0)
+    if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
+        nBeadTypeCanTInd_glb[resi] == 0)
         {
             return totEn;
         } // No need to do anything if there's no isotropic interactions.
 
-    int BoxRad = nBeadTypeCanCont[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
+    int BoxRad = nBeadTypeCanCont_glb[resi] == 0 ? 1 : LARGEST_RADIUS; // No need to search if no cont interactions
 
     for (j = 0; j < POS_MAX; j++)
         {
@@ -1188,7 +1188,7 @@ void Energy_Total_System(void)
     for (i = 0; i < tot_beads; i++)
         {
             resi = bead_info[i][BEAD_TYPE];
-            if (nBeadTypeCanCont[resi])
+            if (nBeadTypeCanCont_glb[resi])
                 {
                     cont_num = NeighborSearch_ForCont(i, bead_info[i], oldContNeighs, oldOvlpNeighs, &ovlp_num);
                     faCurrEn[E_CONT] += Energy_OfCont_wNeighList(i, oldContNeighs, cont_num);
@@ -1281,27 +1281,27 @@ void Energy_Iso_ForLocal(const int beadID, const int resi, const int* r_pos0, lo
 
     *ovlp_num = 0;
     *cont_num = 0;
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT neighbors.
             *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
         }
-    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+    else if (nBeadTypeIsSticker_glb[resi] || nBeadTypeCanOvlp_glb[resi] || nBeadTypeCanFSol_glb[resi])
         {
             // OVLP neighbors.
             *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
         }
 
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT energy.
             *oldEn = *oldEn + Energy_OfCont_wNeighList(beadID, cont_neighs, *cont_num);
         }
 
-    if (nBeadTypeCanOvlp[resi])
+    if (nBeadTypeCanOvlp_glb[resi])
         { // OVLP energy.
             *oldEn = *oldEn + Energy_OfOvlp_wNeighList(beadID, ovlp_neighs, *ovlp_num);
         }
 
-    if (nBeadTypeCanFSol[resi])
+    if (nBeadTypeCanFSol_glb[resi])
         { // Solvation energy.
             *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
             *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
@@ -1314,27 +1314,27 @@ void Energy_Iso_ForLocalEquil(const int beadID, const int resi, const int* r_pos
 
     *ovlp_num = 0;
     *cont_num = 0;
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT neighbors.
             *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
         }
-    else if (nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+    else if (nBeadTypeCanOvlp_glb[resi] || nBeadTypeCanFSol_glb[resi])
         {
             // OVLP neighbors.
             *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
         }
 
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT energy.
             *oldEn = *oldEn + Energy_OfCont_wNeighList(beadID, cont_neighs, *cont_num);
         }
 
-    if (nBeadTypeCanOvlp[resi])
+    if (nBeadTypeCanOvlp_glb[resi])
         { // OVLP energy.
             *oldEn = *oldEn + Energy_OfOvlp_wNeighList(beadID, ovlp_neighs, *ovlp_num);
         }
 
-    if (nBeadTypeCanFSol[resi])
+    if (nBeadTypeCanFSol_glb[resi])
         { // Solvation energy.
             *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
             *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
@@ -1348,27 +1348,27 @@ void Energy_Iso_ForChains(const int beadID, long double* oldEn, long double* new
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
     *ovlp_num                 = 0;
     *cont_num                 = 0;
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT neighbors.
             *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
         }
-    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+    else if (nBeadTypeIsSticker_glb[resi] || nBeadTypeCanOvlp_glb[resi] || nBeadTypeCanFSol_glb[resi])
         {
             // OVLP neighbors.
             *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
         }
 
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT energy.
             *oldEn = *oldEn + Energy_OfCont_wNeighList_ForChains(beadID, cont_neighs, *cont_num);
         }
 
-    if (nBeadTypeCanOvlp[resi])
+    if (nBeadTypeCanOvlp_glb[resi])
         { // OVLP energy.
             *oldEn = *oldEn + Energy_OfOvlp_wNeighList_ForChains(beadID, ovlp_neighs, *ovlp_num);
         }
 
-    if (nBeadTypeCanFSol[resi])
+    if (nBeadTypeCanFSol_glb[resi])
         { // Solvation energy.
             *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
             *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
@@ -1382,27 +1382,27 @@ void Energy_Iso_ForChainsEquil(const int beadID, long double* oldEn, long double
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
     *ovlp_num                 = 0;
     *cont_num                 = 0;
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT neighbors.
             *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
         }
-    else if (nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+    else if (nBeadTypeCanOvlp_glb[resi] || nBeadTypeCanFSol_glb[resi])
         {
             // OVLP neighbors.
             *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
         }
 
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT energy.
             *oldEn = *oldEn + Energy_OfCont_wNeighList_ForChains(beadID, cont_neighs, *cont_num);
         }
 
-    if (nBeadTypeCanOvlp[resi])
+    if (nBeadTypeCanOvlp_glb[resi])
         { // OVLP energy.
             *oldEn = *oldEn + Energy_OfOvlp_wNeighList_ForChains(beadID, ovlp_neighs, *ovlp_num);
         }
 
-    if (nBeadTypeCanFSol[resi])
+    if (nBeadTypeCanFSol_glb[resi])
         { // Solvation energy.
             *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
             *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
@@ -1415,7 +1415,7 @@ void Energy_Iso_ForCoLocal(const int thisBeadID, const int otherBeadID, const in
     *ovlp_num      = 0;
     *cont_num      = 0;
     const int resi = bead_info[thisBeadID][BEAD_TYPE];
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT neighbors.
             *cont_num = NeighborSearch_ForCont(thisBeadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
         }
@@ -1425,19 +1425,19 @@ void Energy_Iso_ForCoLocal(const int thisBeadID, const int otherBeadID, const in
             *ovlp_num = NeighborSearch_ForOvlp(thisBeadID, r_pos0, ovlp_neighs);
         }
 
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT energy.
             *oldEn = *oldEn +
                      Energy_OfCont_wNeighList_ForRange(thisBeadID, otherBeadID, otherBeadID, cont_neighs, *cont_num);
         }
 
-    if (nBeadTypeCanOvlp[resi])
+    if (nBeadTypeCanOvlp_glb[resi])
         { // OVLP energy.
             *oldEn = *oldEn +
                      Energy_OfOvlp_wNeighList_ForRange(thisBeadID, otherBeadID, otherBeadID, ovlp_neighs, *ovlp_num);
         }
 
-    if (nBeadTypeCanFSol[resi])
+    if (nBeadTypeCanFSol_glb[resi])
         { // Solvation energy.
             *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
             *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
@@ -1455,28 +1455,28 @@ void Energy_Iso_ForLists(const int beadIdx, int const listSize, const int beadLi
     const int resi            = bead_info[beadID][BEAD_TYPE];
     const int r_pos0[POS_MAX] = {beadPos[beadIdx][0], beadPos[beadIdx][1], beadPos[beadIdx][2]};
 
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT neighbors.
             *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
         }
-    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+    else if (nBeadTypeIsSticker_glb[resi] || nBeadTypeCanOvlp_glb[resi] || nBeadTypeCanFSol_glb[resi])
         {
             // OVLP neighbors.
             *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
         }
 
-    if (nBeadTypeCanFSol[resi])
+    if (nBeadTypeCanFSol_glb[resi])
         { // Solvation energy.
             *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
             *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
         }
 
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT energy.
             *oldEn = *oldEn + Energy_OfCont_wNeighList_ForLists(beadID, listSize, beadList, cont_neighs, *cont_num);
         }
 
-    if (nBeadTypeCanOvlp[resi])
+    if (nBeadTypeCanOvlp_glb[resi])
         { // OVLP energy.
             *oldEn = *oldEn + Energy_OfOvlp_wNeighList_ForLists(beadID, listSize, beadList, ovlp_neighs, *ovlp_num);
         }
@@ -1490,30 +1490,30 @@ void Energy_Iso_ForRange(const int beadID, const int smallestBead, const int lar
     const int resi            = bead_info[beadID][BEAD_TYPE];
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
 
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT neighbors.
             *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
         }
-    else if (nBeadTypeIsSticker[resi] || nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+    else if (nBeadTypeIsSticker_glb[resi] || nBeadTypeCanOvlp_glb[resi] || nBeadTypeCanFSol_glb[resi])
         { // Since CoLocal assumes bonded
           // beads, it is a sticker.
             // OVLP neighbors.
             *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
         }
 
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT energy.
             *oldEn =
                 *oldEn + Energy_OfCont_wNeighList_ForRange(beadID, smallestBead, largestBead, cont_neighs, *cont_num);
         }
 
-    if (nBeadTypeCanOvlp[resi])
+    if (nBeadTypeCanOvlp_glb[resi])
         { // OVLP energy.
             *oldEn =
                 *oldEn + Energy_OfOvlp_wNeighList_ForRange(beadID, smallestBead, largestBead, ovlp_neighs, *ovlp_num);
         }
 
-    if (nBeadTypeCanFSol[resi])
+    if (nBeadTypeCanFSol_glb[resi])
         { // Solvation energy.
             *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
             *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
@@ -1528,30 +1528,30 @@ void Energy_Iso_ForRangeEquil(const int beadID, const int smallestBead, const in
     const int resi            = bead_info[beadID][BEAD_TYPE];
     const int r_pos0[POS_MAX] = {bead_info[beadID][0], bead_info[beadID][1], bead_info[beadID][2]};
 
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT neighbors.
             *cont_num = NeighborSearch_ForCont(beadID, r_pos0, cont_neighs, ovlp_neighs, ovlp_num);
         }
-    else if (nBeadTypeCanOvlp[resi] || nBeadTypeCanFSol[resi])
+    else if (nBeadTypeCanOvlp_glb[resi] || nBeadTypeCanFSol_glb[resi])
         { // Since CoLocal assumes bonded
           // beads, it is a sticker.
             // OVLP neighbors.
             *ovlp_num = NeighborSearch_ForOvlp(beadID, r_pos0, ovlp_neighs);
         }
 
-    if (nBeadTypeCanCont[resi])
+    if (nBeadTypeCanCont_glb[resi])
         { // CONT energy.
             *oldEn =
                 *oldEn + Energy_OfCont_wNeighList_ForRange(beadID, smallestBead, largestBead, cont_neighs, *cont_num);
         }
 
-    if (nBeadTypeCanOvlp[resi])
+    if (nBeadTypeCanOvlp_glb[resi])
         { // OVLP energy.
             *oldEn =
                 *oldEn + Energy_OfOvlp_wNeighList_ForRange(beadID, smallestBead, largestBead, ovlp_neighs, *ovlp_num);
         }
 
-    if (nBeadTypeCanFSol[resi])
+    if (nBeadTypeCanFSol_glb[resi])
         { // Solvation energy.
             *oldEn = *oldEn + (float) (26 - *ovlp_num) * fEnergy[resi][resi][E_F_SOL];
             *newEn = *newEn + Energy_ofSol_wNeighList(ovlp_neighs, *ovlp_num);
