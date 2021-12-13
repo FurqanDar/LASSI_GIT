@@ -1595,17 +1595,17 @@ int ClusUtil_GetOvlpNeighborChains_ForBead(const int beadID, int* restrict neigh
     return tmpNum;
 }
 
-/// ClusUtil_AddOvlpCluster_OfBead - Given this beadID, and a hash-table like structure nTotClusTable we add the new
-/// and unique chains that are part of the cluster. nTotClusTable should be an array that is 'tot_chains_glb' long
-/// where nTotClusTable[chainID] 0 means a unique chain, and 1 means that the chain has already been added.
+/// ClusUtil_AddOvlpCluster_OfBead - Given this beadID, and a hash-table like structure caTotClusTable we add the new
+/// and unique chains that are part of the cluster. caTotClusTable should be an array that is 'tot_chains_glb' long
+/// where caTotClusTable[chainID] 0 means a unique chain, and 1 means that the chain has already been added.
 /// Furthermore, also adds the chains into clusList, while increasing the total clusSize.
 /// Lastly, the function returns the number of unique chains found.
 /// \param beadID
-/// \param nTotClusTable
+/// \param caTotClusTable
 /// \param clusList
 /// \param clusSize
 /// \return
-int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict nTotClusTable, int* restrict clusList,
+int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict caTotClusTable, int* restrict clusList,
                                    int* restrict clusSize)
 {
     int tmpChainList[CLUS_CONTACT_NEIGHS];
@@ -1617,9 +1617,9 @@ int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict nTotClusTabl
     for (i = 0; i < dumChainNum; ++i)
         {
             tmpChain = tmpChainList[i];
-            if (! nTotClusTable[tmpChain])
+            if (! caTotClusTable[tmpChain])
                 {
-                    nTotClusTable[tmpChain] = 1;
+                    caTotClusTable[tmpChain] = 1;
                     clusList[*clusSize]     = tmpChain;
                     (*clusSize)++;
                 }
@@ -1630,7 +1630,11 @@ int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict nTotClusTabl
     return endSize;
 }
 
-int ClusUtil_AddOvlpCluster_OfBead_CheckForSame(const int beadID, const char* const nTotClusTable)
+///
+/// \param beadID
+/// \param caTotClusTable
+/// \return
+int ClusUtil_AddOvlpCluster_OfBead_CheckForSame(const int beadID, const char* const caTotClusTable)
 {
     int tmpChainList[CLUS_CONTACT_NEIGHS];
     const int dumChainNum = ClusUtil_GetOvlpNeighborChains_ForBead(beadID, tmpChainList);
@@ -1640,7 +1644,7 @@ int ClusUtil_AddOvlpCluster_OfBead_CheckForSame(const int beadID, const char* co
     for (i = 0; i < dumChainNum; ++i)
         {
             tmpChain = tmpChainList[i];
-            if (! nTotClusTable[tmpChain])
+            if (! caTotClusTable[tmpChain])
                 {
                     return -1;
                 }
@@ -1650,14 +1654,14 @@ int ClusUtil_AddOvlpCluster_OfBead_CheckForSame(const int beadID, const char* co
 }
 
 /// ClusUtil_AddOvlpCluster_OfChain - Adds all the unique chains within +-1 of each bead of this chain.
-/// nTotClusTable is a sort of hash-table used to track if a chainID has been added or not.
-/// Returns the number of chains that are _unique_ given nTotClusTable.
+/// caTotClusTable is a sort of hash-table used to track if a chainID has been added or not.
+/// Returns the number of chains that are _unique_ given caTotClusTable.
 /// \param chainID
-/// \param nTotClusTable
+/// \param caTotClusTable
 /// \param clusList
 /// \param clusSize
 /// \return
-int ClusUtil_AddOvlpCluster_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+int ClusUtil_AddOvlpCluster_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                     int* restrict clusSize)
 {
     const int startSize = *clusSize;
@@ -1668,7 +1672,7 @@ int ClusUtil_AddOvlpCluster_OfChain(const int chainID, char* restrict nTotClusTa
     int i;
     for (i = firstB; i < lastB; ++i)
         {
-            ClusUtil_AddOvlpCluster_OfBead(i, nTotClusTable, clusList, clusSize);
+            ClusUtil_AddOvlpCluster_OfBead(i, caTotClusTable, clusList, clusSize);
         }
 
     const int endSize = *clusSize - startSize;
@@ -1678,9 +1682,9 @@ int ClusUtil_AddOvlpCluster_OfChain(const int chainID, char* restrict nTotClusTa
 
 ///
 /// \param chainID
-/// \param nTotClusTable
+/// \param caTotClusTable
 /// \return
-int ClusUtil_AddOvlpCluster_OfChain_CheckForSame(const int chainID, const char* restrict const nTotClusTable)
+int ClusUtil_AddOvlpCluster_OfChain_CheckForSame(const int chainID, const char* restrict const caTotClusTable)
 {
     const int firstB = chain_info_glb[chainID][CHAIN_START];
     const int lastB  = firstB + chain_info_glb[chainID][CHAIN_LENGTH];
@@ -1689,7 +1693,7 @@ int ClusUtil_AddOvlpCluster_OfChain_CheckForSame(const int chainID, const char* 
     int tmpVal;
     for (i = firstB; i < lastB; ++i)
         {
-            tmpVal = ClusUtil_AddOvlpCluster_OfBead_CheckForSame(i, nTotClusTable);
+            tmpVal = ClusUtil_AddOvlpCluster_OfBead_CheckForSame(i, caTotClusTable);
             if (tmpVal == -1)
                 {
                     return -1;
@@ -1701,13 +1705,13 @@ int ClusUtil_AddOvlpCluster_OfChain_CheckForSame(const int chainID, const char* 
 
 ///
 /// \param chainID
-/// \param nTotClusTable
+/// \param caTotClusTable
 /// \param clusList
 /// \return
-int Clus_Ovlp_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList)
+int Clus_Ovlp_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList)
 {
     clusList[0]            = chainID;
-    nTotClusTable[chainID] = 1;
+    caTotClusTable[chainID] = 1;
 
     int clusSize = 1;
 
@@ -1716,7 +1720,7 @@ int Clus_Ovlp_OfChain(const int chainID, char* restrict nTotClusTable, int* rest
     for (i = 0; i < clusSize; ++i)
         {
             tmpChain = clusList[i];
-            ClusUtil_AddOvlpCluster_OfChain(tmpChain, nTotClusTable, clusList, &clusSize);
+            ClusUtil_AddOvlpCluster_OfChain(tmpChain, caTotClusTable, clusList, &clusSize);
         }
 
     return clusSize;
@@ -1724,15 +1728,15 @@ int Clus_Ovlp_OfChain(const int chainID, char* restrict nTotClusTable, int* rest
 
 ///
 /// \param chainID
-/// \param nTotClusTable
+/// \param caTotClusTable
 /// \param clusList
 /// \param maxSize
 /// \return
-int Clus_Ovlp_OfChain_wMaxSize(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+int Clus_Ovlp_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                int const maxSize)
 {
     clusList[0]            = chainID;
-    nTotClusTable[chainID] = 1;
+    caTotClusTable[chainID] = 1;
 
     int clusSize = 1;
 
@@ -1741,7 +1745,7 @@ int Clus_Ovlp_OfChain_wMaxSize(const int chainID, char* restrict nTotClusTable, 
     for (i = 0; i < clusSize; ++i)
         {
             tmpChain = clusList[i];
-            ClusUtil_AddOvlpCluster_OfChain(tmpChain, nTotClusTable, clusList, &clusSize);
+            ClusUtil_AddOvlpCluster_OfChain(tmpChain, caTotClusTable, clusList, &clusSize);
             if (clusSize >= maxSize)
                 {
                     return 0;
@@ -1752,11 +1756,11 @@ int Clus_Ovlp_OfChain_wMaxSize(const int chainID, char* restrict nTotClusTable, 
 }
 
 ///
-/// \param nTotClusTable
+/// \param caTotClusTable
 /// \param clusList
 /// \param clusSize
 /// \return
-int Clus_Ovlp_OfChain_CheckForSame(const char* const nTotClusTable, const int* const clusList, int const clusSize)
+int Clus_Ovlp_OfChain_CheckForSame(const char* const caTotClusTable, const int* const clusList, int const clusSize)
 {
 
     int tmpChain;
@@ -1765,7 +1769,7 @@ int Clus_Ovlp_OfChain_CheckForSame(const char* const nTotClusTable, const int* c
     for (i = 0; i < clusSize; ++i)
         {
             tmpChain = clusList[i];
-            tmpVal   = ClusUtil_AddOvlpCluster_OfChain_CheckForSame(tmpChain, nTotClusTable);
+            tmpVal   = ClusUtil_AddOvlpCluster_OfChain_CheckForSame(tmpChain, caTotClusTable);
             if (tmpVal == -1)
                 {
                     return -1;
@@ -1777,11 +1781,11 @@ int Clus_Ovlp_OfChain_CheckForSame(const char* const nTotClusTable, const int* c
 
 ///
 /// \param beadID
-/// \param nTotClusTable
+/// \param caTotClusTable
 /// \param clusList
 /// \param clusSize
 /// \return
-int ClusUtil_AddAnisoCluster_OfBead(const int beadID, char* restrict nTotClusTable, int* restrict clusList,
+int ClusUtil_AddAnisoCluster_OfBead(const int beadID, char* restrict caTotClusTable, int* restrict clusList,
                                     int* restrict clusSize)
 {
     int const beadPartner = bead_info_glb[beadID][BEAD_FACE];
@@ -1789,9 +1793,9 @@ int ClusUtil_AddAnisoCluster_OfBead(const int beadID, char* restrict nTotClusTab
     if (beadPartner != -1)
         {
             int const tmpChain = bead_info_glb[beadPartner][BEAD_CHAINID];
-            if (! nTotClusTable[tmpChain])
+            if (! caTotClusTable[tmpChain])
                 {
-                    nTotClusTable[tmpChain] = 1;
+                    caTotClusTable[tmpChain] = 1;
                     clusList[*clusSize]     = tmpChain;
                     (*clusSize)++;
                     return 1;
@@ -1802,11 +1806,11 @@ int ClusUtil_AddAnisoCluster_OfBead(const int beadID, char* restrict nTotClusTab
 
 ///
 /// \param chainID
-/// \param nTotClusTable
+/// \param caTotClusTable
 /// \param clusList
 /// \param clusSize
 /// \return
-int ClusUtil_AddAnisoCluster_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+int ClusUtil_AddAnisoCluster_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                      int* restrict clusSize)
 {
     const int startSize = *clusSize;
@@ -1817,7 +1821,7 @@ int ClusUtil_AddAnisoCluster_OfChain(const int chainID, char* restrict nTotClusT
     int i;
     for (i = firstB; i < lastB; ++i)
         {
-            ClusUtil_AddAnisoCluster_OfBead(i, nTotClusTable, clusList, clusSize);
+            ClusUtil_AddAnisoCluster_OfBead(i, caTotClusTable, clusList, clusSize);
         }
 
     const int endSize = *clusSize - startSize;
@@ -1827,13 +1831,13 @@ int ClusUtil_AddAnisoCluster_OfChain(const int chainID, char* restrict nTotClusT
 
 ///
 /// \param chainID
-/// \param nTotClusTable
+/// \param caTotClusTable
 /// \param clusList
 /// \return
-int Clus_Aniso_OfChain(const int chainID, char* restrict nTotClusTable, int* restrict clusList)
+int Clus_Aniso_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList)
 {
     clusList[0]            = chainID;
-    nTotClusTable[chainID] = 1;
+    caTotClusTable[chainID] = 1;
 
     int clusSize = 1;
 
@@ -1842,7 +1846,7 @@ int Clus_Aniso_OfChain(const int chainID, char* restrict nTotClusTable, int* res
     for (i = 0; i < clusSize; ++i)
         {
             tmpChain = clusList[i];
-            ClusUtil_AddAnisoCluster_OfChain(tmpChain, nTotClusTable, clusList, &clusSize);
+            ClusUtil_AddAnisoCluster_OfChain(tmpChain, caTotClusTable, clusList, &clusSize);
         }
 
     return clusSize;
@@ -1850,15 +1854,15 @@ int Clus_Aniso_OfChain(const int chainID, char* restrict nTotClusTable, int* res
 
 ///
 /// \param chainID
-/// \param nTotClusTable
+/// \param caTotClusTable
 /// \param clusList
 /// \param maxSize
 /// \return
-int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict nTotClusTable, int* restrict clusList,
+int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                 int const maxSize)
 {
     clusList[0]            = chainID;
-    nTotClusTable[chainID] = 1;
+    caTotClusTable[chainID] = 1;
 
     int clusSize = 1;
 
@@ -1867,7 +1871,7 @@ int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict nTotClusTable,
     for (i = 0; i < clusSize; ++i)
         {
             tmpChain = clusList[i];
-            ClusUtil_AddAnisoCluster_OfChain(tmpChain, nTotClusTable, clusList, &clusSize);
+            ClusUtil_AddAnisoCluster_OfChain(tmpChain, caTotClusTable, clusList, &clusSize);
             if (clusSize >= maxSize)
                 {
                     return 0;
