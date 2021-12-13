@@ -9,7 +9,9 @@ int str2farr(char* strRaw, float fArray[MAX_AA]);
 /// scripts to generate key files that are used in actual runs. Have to
 /// painstakingly go through every different keyword that exists in the keyfile.
 /// Everytime you want to add something to the keyfile, do it here and also the
-/// python scripts so that everything is consistent. \param filename \return
+/// python scripts so that everything is consistent.
+/// \param filename
+/// \return
 int Parse_Keyfile(char* filename)
 {
     FILE* infile;
@@ -348,10 +350,10 @@ int Parse_EnergyFile(char* strEnFile)
     FILE* infile;
     infile = fopen(strEnFile, "r");
 
-    char strLine[250];
+    char strLine[256];
     int nFlag   = 0;
     char bOrder = 0;
-    char strKey[250];
+    char strKey[256];
     int nRow;
     float fTemp[MAX_AA] = {0.f};
     int i, j;
@@ -521,8 +523,10 @@ int Parse_EnergyFile(char* strEnFile)
 
 /// str2farr - converts the string array to an array of floats. The nice thing
 /// about C is the ease of string manipulation. used to generate matrices from
-/// the energy file. \param strRaw \param fArray \return Changes fArray to
-/// include be the array in
+/// the energy file.
+/// \param strRaw
+/// \param fArray
+/// \return Changes fArray to include be the array in
 int str2farr(char strRaw[], float fArray[MAX_AA])
 {
     int i         = 0;
@@ -547,7 +551,8 @@ int str2farr(char strRaw[], float fArray[MAX_AA])
 
 /// Parse_StructureFile - reads the structure file filename.
 /// The format of the structure file is in the function below. Should be easier
-/// to use Python to generate the files, usually. \param filename
+/// to use Python to generate the files, usually.
+/// \param filename
 void Parse_StructureFile(char* filename)
 {
     /*
@@ -642,7 +647,7 @@ void Parse_StructureFile(char* filename)
     nBEADS      = 0;
     nChainStart = 0;
     nCopies     = 0;
-    while (fgets(strLine, sizeof(strLine), inFile) != NULL && nFlag == -1)
+    while ((fgets(strLine, sizeof(strLine), inFile) != NULL) && (nFlag == -1))
         {
             // Keep reading the file until it ends or it's incorrectly formatted.
 
@@ -863,7 +868,10 @@ void Parse_StructureFile_CalcBeadsAndChains(char* filename, size_t* n_bead_num, 
 }
 
 /// CreateBeadsAndChains. Allocate memory for the given number of beads, chains,
-/// and chain-types. \param n_bead_num \param n_chain_types \param n_chain_num
+/// and chain-types.
+/// \param n_bead_num
+/// \param n_chain_types
+/// \param n_chain_num
 void CreateBeadsAndChains(size_t n_bead_num, size_t n_chain_num)
 {
     char strTemp[100];
