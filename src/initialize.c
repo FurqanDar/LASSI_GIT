@@ -8,72 +8,72 @@ void Memory_Initialization_AtStart(void)
 {
     char arr_name[100];
 
-    strcpy(arr_name, "naTotLattice");
-    naTotLattice = Create1DInt(nBoxSize[0] * nBoxSize[1] * nBoxSize[2], arr_name);
+    strcpy(arr_name, "naTotLattice_glb");
+    naTotLattice_glb = Create1DInt(naBoxSize_glb[0] * naBoxSize_glb[1] * naBoxSize_glb[2], arr_name);
 
     Memory_Allocate_NeighborLists();
 
-    strcpy(arr_name, "naClusHistList");
-    naClusHistList = Create1DLong((2 + tot_chains), arr_name);
+    strcpy(arr_name, "naClusHistList_glb");
+    naClusHistList_glb = Create1DLong((2 + tot_chains_glb), arr_name);
 
-    strcpy(arr_name, "naChainCheckList");
-    naChainCheckList = Create1DInt(2 + tot_chains, arr_name);
+    strcpy(arr_name, "naChainCheckList_glb");
+    naChainCheckList_glb = Create1DInt(2 + tot_chains_glb, arr_name);
 
     strcpy(arr_name, "fKTCycle");
-    fKT_Cycle = Create1DFloat(1 + nTot_CycleNum, arr_name);
+    faKT_Cycle_glb = Create1DFloat(1 + nTotCycleNum_glb, arr_name);
 
-    strcpy(arr_name, "naList_gl");
-    naList_gl = Create1DInt(2 + tot_chains, arr_name);
+    strcpy(arr_name, "naList_glb");
+    naList_glb = Create1DInt(2 + tot_chains_glb, arr_name);
 
-    strcpy(arr_name, "naClusterMatrix_g");
-    naClusterMatrix_g = Create2DInt(tot_chains + 2, tot_chains + 2, arr_name);
+    strcpy(arr_name, "naClusterMatrix_glb");
+    naClusterMatrix_glb = Create2DInt(tot_chains_glb + 2, tot_chains_glb + 2, arr_name);
 
-    if (nReport[REPORT_NETWORK] != 0)
+    if (naReportFreqs_glb[REPORT_NETWORK] != 0)
         {
             strcpy(arr_name, "ldTotClusArr");
-            ld_TOTCLUS_Arr = Create2DLongdouble(2 + tot_chains, nTot_CycleNum, arr_name);
+            ldaTOTCLUS_Arr_glb = Create2DLongdouble(2 + tot_chains_glb, nTotCycleNum_glb, arr_name);
 
             strcpy(arr_name, "ldMolClusArr");
-            ldMOLCLUS_Arr = Create1DLongdouble(((tot_chains + 1) * tot_chain_types), arr_name);
+            ldaMOLCLUS_Arr_glb = Create1DLongdouble(((tot_chains_glb + 1) * tot_chain_types_glb), arr_name);
 
             strcpy(arr_name, "ldTotMolClusArr");
-            ld_TOTMOLCLUS_Arr = Create1DLongdouble((tot_chains * tot_chain_types * nTot_CycleNum), arr_name);
+            ldaTOTMOLCLUS_Arr_glb = Create1DLongdouble((tot_chains_glb * tot_chain_types_glb * nTotCycleNum_glb), arr_name);
 
             strcpy(arr_name, "ldTotGyrRad");
-            ld_TOTRg_Arr = Create2DLongdouble(2, nTot_CycleNum, arr_name);
+            ldaTOTRg_Arr_glb = Create2DLongdouble(2, nTotCycleNum_glb, arr_name);
         }
-    nRDF_TotComps = 2 + nBeadTypes + nBeadTypes * nBeadTypes;
-    nRDF_TotComps /= 2;
-    if (nReport[REPORT_RDFTOT] != 0)
+    nRDF_TotComps_glb = 2 + nBeadTypes_glb + nBeadTypes_glb * nBeadTypes_glb;
+    nRDF_TotComps_glb /= 2;
+    if (naReportFreqs_glb[REPORT_RDFTOT] != 0)
         {
 
             strcpy(arr_name, "ldTotRDFArr");
-            ld_TOTRDF_Arr = Create1DLongdouble((nTot_CycleNum * nRDF_TotComps * nRDF_TotBins), arr_name);
+            ldaTOTRDF_Arr_glb = Create1DLongdouble((nTotCycleNum_glb * nRDF_TotComps_glb * nRDF_TotBins_glb), arr_name);
 
             strcpy(arr_name, "ldRDFArr");
-            ldRDF_Arr = Create1DLongdouble((nRDF_TotComps * nRDF_TotBins), arr_name);
+            ldaRDF_Arr_glb = Create1DLongdouble((nRDF_TotComps_glb * nRDF_TotBins_glb), arr_name);
         }
 
-    if (nReport[REPORT_COMDEN] != 0)
+    if (naReportFreqs_glb[REPORT_COMDEN] != 0)
         {
-            nRadDen_TotComps  = 2 * tot_chain_types * (tot_chain_types + 1);
-            nRadDen_CompShift = tot_chain_types * (tot_chain_types + 1);
+            nRadDen_TotComps_glb = 2 * tot_chain_types_glb * (tot_chain_types_glb + 1);
+            nRadDen_CompShift_glb = tot_chain_types_glb * (tot_chain_types_glb + 1);
 
             strcpy(arr_name, "ldRadDenArr");
-            ldRadDen_Arr = Create1DLongdouble(nRadDen_TotComps * nRDF_TotBins, arr_name);
+            ldaRadDen_Arr_glb = Create1DLongdouble(nRadDen_TotComps_glb * nRDF_TotBins_glb, arr_name);
 
             strcpy(arr_name, "ldTotRadDenArr");
-            ld_TOTRadDen_Arr = Create1DLongdouble(nRadDen_TotComps * nTot_CycleNum * nRDF_TotBins, arr_name);
+            ldaTOTRadDen_Arr_glb = Create1DLongdouble(nRadDen_TotComps_glb * nTotCycleNum_glb * nRDF_TotBins_glb, arr_name);
         }
-    if (nTrajMode != 0)
+    if (nTrajMode_glb != 0)
         {
-            nTraj_FramesPerCycle = nMCStepsPerCycle / nReport[REPORT_CONFIG];
+            nTraj_FramesPerCycle_glb = nMCStepsPerCycle_glb / naReportFreqs_glb[REPORT_CONFIG];
             printf("\n***********************************************\n");
             printf("This feature is still experimental!\n");
             printf("\n***********************************************\n");
 
             strcpy(arr_name, "nTotTrajArr");
-            n_TOTTRAJ_Arr = Create1DInt(nTraj_FramesPerCycle * tot_beads * BEADINFO_MAX, arr_name);
+            naTOTTRAJ_Arr_glb = Create1DInt(nTraj_FramesPerCycle_glb * tot_beads_glb * BEADINFO_MAX, arr_name);
         }
 
     printf("Successfully allocated memory! Arrays initialized.\n");
@@ -87,64 +87,64 @@ void Memory_Allocate_NeighborLists(void)
 
     num_of_points = 1 * 2 + 1;
     num_of_points = num_of_points * num_of_points * num_of_points;
-    strcpy(arr_name, "oldOvlpNeighs");
-    oldOvlpNeighs = Create1DInt(num_of_points, arr_name);
-    strcpy(arr_name, "newOvlpNeighs");
-    newOvlpNeighs = Create1DInt(num_of_points, arr_name);
+    strcpy(arr_name, "naOldOvlpNeighs_glb");
+    naOldOvlpNeighs_glb = Create1DInt(num_of_points, arr_name);
+    strcpy(arr_name, "naNewOvlpNeighs_glb");
+    naNewOvlpNeighs_glb = Create1DInt(num_of_points, arr_name);
 
     num_of_points = LARGEST_RADIUS * 2 + 1;
     num_of_points = num_of_points * num_of_points * num_of_points;
-    strcpy(arr_name, "oldContNeighs");
-    oldContNeighs = Create1DInt(num_of_points, arr_name);
-    strcpy(arr_name, "newContNeighs");
-    newContNeighs = Create1DInt(num_of_points, arr_name);
+    strcpy(arr_name, "naOldContNeighs_glb");
+    naOldContNeighs_glb = Create1DInt(num_of_points, arr_name);
+    strcpy(arr_name, "naNewContNeighs_glb");
+    naNewContNeighs_glb = Create1DInt(num_of_points, arr_name);
 }
 
 void Memory_VerifyMalloc(void)
 {
-    if (naClusHistList == NULL)
+    if (naClusHistList_glb == NULL)
         {
-            printf("naClusHistList malloc failed\n");
+            printf("naClusHistList_glb malloc failed\n");
             exit(1);
         }
-    if (naChainCheckList == NULL)
+    if (naChainCheckList_glb == NULL)
         {
-            printf("naChainCheckList malloc failed\n");
+            printf("naChainCheckList_glb malloc failed\n");
             exit(1);
         }
-    if (ldRDF_Arr == NULL && nReport[REPORT_RDFTOT] != 0)
+    if (ldaRDF_Arr_glb == NULL && naReportFreqs_glb[REPORT_RDFTOT] != 0)
         {
-            printf("ldRDF_Arr malloc failed\n");
+            printf("ldaRDF_Arr_glb malloc failed\n");
             exit(1);
         }
-    if (ld_TOTRDF_Arr == NULL && nReport[REPORT_RDFTOT] != 0)
+    if (ldaTOTRDF_Arr_glb == NULL && naReportFreqs_glb[REPORT_RDFTOT] != 0)
         {
-            printf("ld_TOTRDF_Arr malloc failed\n");
+            printf("ldaTOTRDF_Arr_glb malloc failed\n");
             exit(1);
         }
-    if (ldRadDen_Arr == NULL && nReport[REPORT_COMDEN] != 0)
+    if (ldaRadDen_Arr_glb == NULL && naReportFreqs_glb[REPORT_COMDEN] != 0)
         {
-            printf("ldRadDen_Arr malloc failed\n");
+            printf("ldaRadDen_Arr_glb malloc failed\n");
             exit(1);
         }
-    if (ld_TOTRadDen_Arr == NULL && nReport[REPORT_COMDEN] != 0)
+    if (ldaTOTRadDen_Arr_glb == NULL && naReportFreqs_glb[REPORT_COMDEN] != 0)
         {
-            printf("ld_TOTRadDen_Arr malloc failed\n");
+            printf("ldaTOTRadDen_Arr_glb malloc failed\n");
             exit(1);
         }
-    if (ldMOLCLUS_Arr == NULL && nReport[REPORT_NETWORK] != 0)
+    if (ldaMOLCLUS_Arr_glb == NULL && naReportFreqs_glb[REPORT_NETWORK] != 0)
         {
-            printf("ldMOLCLUS_Arr malloc failed\n");
+            printf("ldaMOLCLUS_Arr_glb malloc failed\n");
             exit(1);
         }
-    if (ld_TOTMOLCLUS_Arr == NULL && nReport[REPORT_NETWORK] != 0)
+    if (ldaTOTMOLCLUS_Arr_glb == NULL && naReportFreqs_glb[REPORT_NETWORK] != 0)
         {
-            printf("ld_TOTMOLCLUS_Arr malloc failed\n");
+            printf("ldaTOTMOLCLUS_Arr_glb malloc failed\n");
             exit(1);
         }
-    if (n_TOTTRAJ_Arr == NULL && nTrajMode != 0)
+    if (naTOTTRAJ_Arr_glb == NULL && nTrajMode_glb != 0)
         {
-            printf("n_TOTTRAJ_Arr malloc failed\n");
+            printf("naTOTTRAJ_Arr_glb malloc failed\n");
             exit(1);
         }
 }
@@ -161,95 +161,95 @@ void Check_BeadTypewiseInteractions(void)
         nBeadTypeCanTInd_glb[i]   = 0; // Assume beads have no Temperature independent interactions
     }
     //Assume system has no interactions
-    bSystemHasSCSC = 0;
-    bSystemHasOvlp = 0;
-    bSystemHasCont = 0;
-    bSystemHasFSol = 0;
-    bSystemHasTopo = 0;
+    bSystemHasSCSC_glb = 0;
+    bSystemHasOvlp_glb = 0;
+    bSystemHasCont_glb = 0;
+    bSystemHasFSol_glb = 0;
+    bSystemHasTopo_glb = 0;
 
     // SC-SC Check
-    for (i = 0; i < nBeadTypes; i++)
+    for (i = 0; i < nBeadTypes_glb; i++)
         {
-            for (j = 0; j < nBeadTypes; j++)
+            for (j = 0; j < nBeadTypes_glb; j++)
                 {
-                    if (fEnergy[i][j][E_SC_SC])
+                    if (faEnergy_glb[i][j][E_SC_SC])
                         {
                             nBeadTypeIsSticker_glb[i] = 1;
                         }
                 }
         }
 
-    for (i = 0; i < nBeadTypes; i++)
+    for (i = 0; i < nBeadTypes_glb; i++)
         {
             if (nBeadTypeIsSticker_glb[i])
                 {
-                    bSystemHasSCSC = 1;
+                    bSystemHasSCSC_glb = 1;
                 }
         }
 
     // OVLP Check
-    for (i = 0; i < nBeadTypes; i++)
+    for (i = 0; i < nBeadTypes_glb; i++)
         {
-            for (j = 0; j < nBeadTypes; j++)
+            for (j = 0; j < nBeadTypes_glb; j++)
                 {
-                    if (fEnergy[i][j][E_OVLP])
+                    if (faEnergy_glb[i][j][E_OVLP])
                         {
                             nBeadTypeCanOvlp_glb[i] = 1;
                         }
                 }
         }
-    for (i = 0; i < nBeadTypes; i++)
+    for (i = 0; i < nBeadTypes_glb; i++)
         {
             if (nBeadTypeCanOvlp_glb[i])
                 {
-                    bSystemHasOvlp = 1;
+                    bSystemHasOvlp_glb = 1;
                 }
         }
 
     // CONT Check
-    for (i = 0; i < nBeadTypes; i++)
+    for (i = 0; i < nBeadTypes_glb; i++)
     {
-        for (j = 0; j < nBeadTypes; j++)
+        for (j = 0; j < nBeadTypes_glb; j++)
         {
-            if (fEnergy[i][j][E_CONT])
+            if (faEnergy_glb[i][j][E_CONT])
             {
                 nBeadTypeCanCont_glb[i] = 1;
             }
         }
     }
-    for (i = 0; i < nBeadTypes; i++)
+    for (i = 0; i < nBeadTypes_glb; i++)
     {
         if (nBeadTypeCanCont_glb[i])
         {
-            bSystemHasCont = 1;
+            bSystemHasCont_glb = 1;
         }
     }
 
     // FSOL Check
-    for (i = 0; i < nBeadTypes; i++)
+    for (i = 0; i < nBeadTypes_glb; i++)
     {
-        for (j = 0; j < nBeadTypes; j++)
+        for (j = 0; j < nBeadTypes_glb; j++)
         {
-            if (fEnergy[i][j][E_F_SOL])
+            if (faEnergy_glb[i][j][E_F_SOL])
             {
                 nBeadTypeCanFSol_glb[i] = 1;
             }
         }
     }
-    for (i = 0; i < nBeadTypes; i++)
+    for (i = 0; i < nBeadTypes_glb; i++)
     {
         if (nBeadTypeCanFSol_glb[i])
         {
-            bSystemHasFSol = 1;
+            bSystemHasFSol_glb = 1;
         }
     }
 
     // T_IND Check
-    for (i = 0; i < nBeadTypes; i++)
+    for (i = 0; i < nBeadTypes_glb; i++)
     {
-        for (j = 0; j < nBeadTypes; j++)
+        for (j = 0; j < nBeadTypes_glb; j++)
         {
-            if (fEnergy[i][j][E_T_IND])
+            if (faEnergy_glb[i][j][E_T_IND])
             {
                 nBeadTypeCanTInd_glb[i] = 1;
             }
@@ -257,13 +257,13 @@ void Check_BeadTypewiseInteractions(void)
     }
 
     // STIFF Check
-    for (i = 0; i < nBeadTypes; i++)
+    for (i = 0; i < nBeadTypes_glb; i++)
     {
-        for (j = 0; j < nBeadTypes; j++)
+        for (j = 0; j < nBeadTypes_glb; j++)
         {
-            if (fEnergy[i][j][E_STIFF])
+            if (faEnergy_glb[i][j][E_STIFF])
             {
-                bSystemHasTopo = 1;
+                bSystemHasTopo_glb = 1;
             }
         }
     }
@@ -275,9 +275,9 @@ void Global_Array_Initialization_AtStart(void)
     int i, j, k, xTemp, yTemp, zTemp; // Indecies
     int myCubeLen = 3;
 
-    for (i = 0; i < nBoxSize[0] * nBoxSize[1] * nBoxSize[2]; i++)
+    for (i = 0; i < naBoxSize_glb[0] * naBoxSize_glb[1] * naBoxSize_glb[2]; i++)
         {                         // Initializing the lattice
-            naTotLattice[i] = -1; // If -1, then there is no bead there.
+            naTotLattice_glb[i] = -1; // If -1, then there is no bead there.
         }
     i = 0;
     // Constructing the local array to search for bonding partners.
@@ -291,9 +291,9 @@ void Global_Array_Initialization_AtStart(void)
                                 //&& (xTemp*xTemp + yTemp*yTemp + zTemp*zTemp > 3)
                                 && (xTemp * xTemp + yTemp * yTemp + zTemp * zTemp <= 3))
                                 {
-                                    LocalArr[i][0] = xTemp;
-                                    LocalArr[i][1] = yTemp;
-                                    LocalArr[i][2] = zTemp;
+                                    naLocalArr_glb[i][0] = xTemp;
+                                    naLocalArr_glb[i][1] = yTemp;
+                                    naLocalArr_glb[i][2] = zTemp;
                                     i++;
                                 }
                         }
@@ -305,76 +305,76 @@ void Global_Array_Initialization_AtStart(void)
         {
             for (j = 0; j < MAX_ROTSTATES; j++)
                 {
-                    rot_trial[i][j] = -1;
+                    naRotTrial_glb[i][j] = -1;
                 }
         }
     for (i = 0; i < MAX_ROTSTATES - 1; i++)
         {
-            Rot_IndArr[i] = i;
+            naRot_IndArr_glb[i] = i;
         }
     // Initializing arrays required for cluster analyses.
-    for (i = 0; i <= tot_chains; i++)
+    for (i = 0; i <= tot_chains_glb; i++)
         {
-            naChainCheckList[i] = 0;
-            naClusHistList[i]   = 0;
-            for (j = 0; j <= tot_chains; j++)
+            naChainCheckList_glb[i] = 0;
+            naClusHistList_glb[i]   = 0;
+            for (j = 0; j <= tot_chains_glb; j++)
                 {
-                    naClusterMatrix_g[i][j] = -1;
+                    naClusterMatrix_glb[i][j] = -1;
                 }
         }
 
-    if (nReport[REPORT_NETWORK] != 0)
+    if (naReportFreqs_glb[REPORT_NETWORK] != 0)
         {
-            for (i = 0; i < tot_chains; i++)
+            for (i = 0; i < tot_chains_glb; i++)
                 { // For MolWise Clus arrays
-                    for (j = 0; j < tot_chain_types; j++)
+                    for (j = 0; j < tot_chain_types_glb; j++)
                         {
-                            ldMOLCLUS_Arr[MolClusArr_Index(0, j, i)] = 0.;
-                            for (k = 0; k < nTot_CycleNum; k++)
+                            ldaMOLCLUS_Arr_glb[MolClusArr_Index(0, j, i)] = 0.;
+                            for (k = 0; k < nTotCycleNum_glb; k++)
                                 {
-                                    ld_TOTMOLCLUS_Arr[MolClusArr_Index(k, j, i)] = 0.;
+                                    ldaTOTMOLCLUS_Arr_glb[MolClusArr_Index(k, j, i)] = 0.;
                                 }
                         }
                 }
-            for (k = 0; k < nTot_CycleNum; k++)
+            for (k = 0; k < nTotCycleNum_glb; k++)
                 { // For GyrRad
-                    ld_TOTRg_Arr[k][0] = 0.;
-                    ld_TOTRg_Arr[k][1] = 0.;
+                    ldaTOTRg_Arr_glb[k][0] = 0.;
+                    ldaTOTRg_Arr_glb[k][1] = 0.;
                 }
-            for (k = 0; k < nTot_CycleNum; k++)
+            for (k = 0; k < nTotCycleNum_glb; k++)
                 { // For ClusterDists
-                    for (i = 0; i <= tot_chains; i++)
+                    for (i = 0; i <= tot_chains_glb; i++)
                         {
-                            ld_TOTCLUS_Arr[k][i] = 0.;
+                            ldaTOTCLUS_Arr_glb[k][i] = 0.;
                         }
                 }
         }
 
-    if (nReport[REPORT_RDFTOT] != 0)
+    if (naReportFreqs_glb[REPORT_RDFTOT] != 0)
         {
-            for (i = 0; i < nRDF_TotBins; i++)
+            for (i = 0; i < nRDF_TotBins_glb; i++)
                 { // For Radial distributions
-                    for (j = 0; j < nRDF_TotComps; j++)
+                    for (j = 0; j < nRDF_TotComps_glb; j++)
                         { // For RDFs
-                            ld_TOTRDF_Arr[RDFArr_Index(0, j, i)] = 0.;
-                            for (k = 0; k < nTot_CycleNum; k++)
+                            ldaTOTRDF_Arr_glb[RDFArr_Index(0, j, i)] = 0.;
+                            for (k = 0; k < nTotCycleNum_glb; k++)
                                 {
-                                    ld_TOTRDF_Arr[RDFArr_Index(k, j, i)] = 0.;
+                                    ldaTOTRDF_Arr_glb[RDFArr_Index(k, j, i)] = 0.;
                                 }
                         }
                 }
         }
 
-    if (nReport[REPORT_COMDEN] != 0)
+    if (naReportFreqs_glb[REPORT_COMDEN] != 0)
         {
-            for (j = 0; j < nRadDen_TotComps; j++)
+            for (j = 0; j < nRadDen_TotComps_glb; j++)
                 { // For Density Dists wrt COM
-                    for (i = 0; i < nRDF_TotBins; i++)
+                    for (i = 0; i < nRDF_TotBins_glb; i++)
                         { // For Radial distributions
-                            ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
-                            for (k = 0; k < nTot_CycleNum; k++)
+                            ldaRadDen_Arr_glb[RadDenArr_Index(0, j, i)] = 0.;
+                            for (k = 0; k < nTotCycleNum_glb; k++)
                                 {
-                                    ld_TOTRadDen_Arr[RadDenArr_Index(k, j, i)] = 0.;
+                                    ldaTOTRadDen_Arr_glb[RadDenArr_Index(k, j, i)] = 0.;
                                 }
                         }
                 }
@@ -389,63 +389,63 @@ void Global_Array_Initialization_AtStart(void)
 
     for (i = MV_NULL + 2; i < MAX_MV; i++)
         {
-            fMCFreq[i] += fMCFreq[i - 1]; // Cumulative Frequencies
+            faMCFreq_glb[i] += faMCFreq_glb[i - 1]; // Cumulative Frequencies
         }
     for (i = 0; i < MAX_MV; i++)
     { // Zero out all the MCAccepts
-        naMCAccepMat[0][i] = 0;
-        naMCAccepMat[1][i] = 0;
+        naMCAccepMat_glb[0][i] = 0;
+        naMCAccepMat_glb[1][i] = 0;
     }
 
-    for (i = 0; i < nTot_CycleNum; i++)
+    for (i = 0; i < nTotCycleNum_glb; i++)
         {
-            fKT_Cycle[i] = fKT + (float) i * fdelta_temp;
+            faKT_Cycle_glb[i] = fKT_glb + (float) i * fDeltaTemp_glb;
         }
 
-    if (RotBias_Mode == 1)
+    if (RotBias_Mode_glb == 1)
         {
-            fRot_Bias = expf(-fRot_Bias / fKT_Cycle[0]);
+            fRot_Bias_glb = expf(-fRot_Bias_glb / faKT_Cycle_glb[0]);
         }
 
-    if (nTemp_inv == 1)
+    if (nTemp_inv_glb == 1)
         {
-            for (i = 0; i < nTot_CycleNum; i++)
+            for (i = 0; i < nTotCycleNum_glb; i++)
                 {
-                    fKT_Cycle[i] = 1.f / fKT_Cycle[i];
+                    faKT_Cycle_glb[i] = 1.f / faKT_Cycle_glb[i];
                 }
         }
 
     const float VolumeConst = 4.f / 3.f * (float) M_PI;
     const float IntendedVol = 0.75f;
-    if (nInitialPotential_Mode == 7)
+    if (nInitialPotential_Mode_glb == 7)
         {
-            fSquishRad = cbrtf((float) (tot_beads - 5000 * 4) / VolumeConst / IntendedVol);
+            fSquishRad_glb = cbrtf((float) (tot_beads_glb - 5000 * 4) / VolumeConst / IntendedVol);
         }
-    else if (nInitialPotential_Mode == 8)
+    else if (nInitialPotential_Mode_glb == 8)
         {
-            fSquishRad = cbrtf((float) (5000 * (4 + 4 + 3)) / VolumeConst / IntendedVol);
+            fSquishRad_glb = cbrtf((float) (5000 * (4 + 4 + 3)) / VolumeConst / IntendedVol);
         }
     else
         {
-            fSquishRad = cbrtf((float) (tot_beads) / VolumeConst / IntendedVol);
+            fSquishRad_glb = cbrtf((float) (tot_beads_glb) / VolumeConst / IntendedVol);
         }
 
-    fSquishRad_Sq = fSquishRad * fSquishRad;
-    ld_LogOfSmallestPossibleProb = logl((lLDub) 1. / (lLDub) RAND_MAX);
-    nLimitedClusterSize = tot_chains / 2;
+    fSquishRad_Sq_glb               = fSquishRad_glb * fSquishRad_glb;
+    ldLogOfSmallestPossibleProb_glb = logl((lLDub) 1. / (lLDub) RAND_MAX);
+    nLimitedClusterSize_glb         = tot_chains_glb / 2;
 
     printf("All setup has been completed!\n");
 }
 
 void Reset_Counters(void)
 {
-    fSysGyrRad              = 0.f;
-    nTotGyrRadCounter       = 0;
-    nRDFCounter             = 0;
-    nRadDenCounter          = 0;
-    nTotClusCounter         = 0;
-    nLargestClusterRightNow = 0;
-    nTrajCurFrame           = 0;
+    faSysGyrRad_glb             = 0.f;
+    nTotGyrRadCounter_glb       = 0;
+    nRDFCounter_glb             = 0;
+    nRadDenCounter_glb          = 0;
+    nTotClusCounter_glb     = 0;
+    nLargestClusterRightNow_glb = 0;
+    nTrajCurFrame_glb           = 0;
 }
 
 /// Reset_Global_Arrays - resets the various global counters and arrays for
@@ -454,41 +454,41 @@ void Reset_Global_Arrays(void)
 {
     // Zero-ing out all the arrays used for data tracking!
     int i, j;
-    for (i = 0; i <= tot_chains; i++)
+    for (i = 0; i <= tot_chains_glb; i++)
         {
-            naChainCheckList[i] = -1;
-            naClusHistList[i]   = 0;
-            for (j = 0; j <= tot_chains; j++)
+            naChainCheckList_glb[i] = -1;
+            naClusHistList_glb[i]   = 0;
+            for (j = 0; j <= tot_chains_glb; j++)
                 {
-                    naClusterMatrix_g[i][j] = -1;
+                    naClusterMatrix_glb[i][j] = -1;
                 }
-            if (nReport[REPORT_NETWORK])
+            if (naReportFreqs_glb[REPORT_NETWORK])
                 {
-                    for (j = 0; j < tot_chain_types; j++)
+                    for (j = 0; j < tot_chain_types_glb; j++)
                         {
-                            ldMOLCLUS_Arr[MolClusArr_Index(0, j, i)] = 0.;
+                            ldaMOLCLUS_Arr_glb[MolClusArr_Index(0, j, i)] = 0.;
                         }
                 }
         }
     // Initializing arrays for pair-distribution calculations
-    if (nReport[REPORT_RDFTOT])
+    if (naReportFreqs_glb[REPORT_RDFTOT])
         {
-            for (j = 0; j < nRDF_TotComps; j++)
+            for (j = 0; j < nRDF_TotComps_glb; j++)
                 {
-                    for (i = 0; i < nRDF_TotBins; i++)
+                    for (i = 0; i < nRDF_TotBins_glb; i++)
                         {
-                            ldRDF_Arr[RDFArr_Index(0, j, i)] = 0.;
+                            ldaRDF_Arr_glb[RDFArr_Index(0, j, i)] = 0.;
                         }
                 }
         }
-    if (nReport[REPORT_COMDEN])
+    if (naReportFreqs_glb[REPORT_COMDEN])
         {
             // Initalizing for density histograms wrt to the COM
-            for (j = 0; j < nRadDen_TotComps; j++)
+            for (j = 0; j < nRadDen_TotComps_glb; j++)
                 {
-                    for (i = 0; i < nRDF_TotBins; i++)
+                    for (i = 0; i < nRDF_TotBins_glb; i++)
                         {
-                            ldRadDen_Arr[RadDenArr_Index(0, j, i)] = 0.;
+                            ldaRadDen_Arr_glb[RadDenArr_Index(0, j, i)] = 0.;
                         }
                 }
         }
@@ -497,8 +497,8 @@ void Reset_Global_Arrays(void)
     // MCAccept arrays.
     for (i = 0; i < MAX_MV; i++)
     {
-        naMCAccepMat[0][i] = 0;
-        naMCAccepMat[1][i] = 0;
+        naMCAccepMat_glb[0][i] = 0;
+        naMCAccepMat_glb[1][i] = 0;
     }
 }
 
@@ -537,15 +537,15 @@ void Initial_Conditions_Simple(void)
         }
     for (j = 0; j < POS_MAX; j++)
         { // Initialize the coordinate arrays to some numbers.
-            tmpR[j]  = rand() % nBoxSize[j];
+            tmpR[j]  = rand() % naBoxSize_glb[j];
             tmpR2[j] = tmpR[j];
         }
 
-    for (k = 0; k < tot_chains; k++)
+    for (k = 0; k < tot_chains_glb; k++)
         {
             // This makes reading easier, honestly
-            fB = chain_info[k][CHAIN_START];
-            lB = fB + chain_info[k][CHAIN_LENGTH];
+            fB = chain_info_glb[k][CHAIN_START];
+            lB = fB + chain_info_glb[k][CHAIN_LENGTH];
 
             // Reset the temp_list for each chain, and the iterator!
             for (i = 0; i < list_it; i++)
@@ -567,13 +567,13 @@ void Initial_Conditions_Simple(void)
                         }
                     // If we have reached here, this bead has not been placed before.
                     idx      = 0;
-                    bondPart = topo_info[i][idx]; // Re-initialize these two.
+                    bondPart = topo_info_glb[i][idx]; // Re-initialize these two.
                     // Let's go through the bonded partners for this bead and see if one
                     // can be used as an anchor.
-                    while (topo_info[i][idx] != -1 && idx < MAX_BONDS)
+                    while (topo_info_glb[i][idx] != -1 && idx < MAX_BONDS)
                         { // Again, -1 signifies that no bonded
                           // bead exists.
-                            bondPart = topo_info[i][idx];
+                            bondPart = topo_info_glb[i][idx];
                             // Checking if thisBead has been placed already, and can be used
                             // as anchor.
                             for (idy = 0; idy < list_it; idy++)
@@ -594,20 +594,20 @@ void Initial_Conditions_Simple(void)
                 FoundAnchor:
                     if (bondPart != -1)
                         { // We found an anchor.
-                            radUp  = 2 * linker_len[i][idx] + 1;
-                            radLow = linker_len[i][idx];
+                            radUp  = 2 * linker_len_glb[i][idx] + 1;
+                            radLow = linker_len_glb[i][idx];
                             for (j = 0; j < POS_MAX; j++)
                                 { // Using thisBead as anchor
-                                    tmpR[j]  = bead_info[bondPart][j];
+                                    tmpR[j]  = bead_info_glb[bondPart][j];
                                     tmpR2[j] = tmpR[j];
                                 }
                             TlCnt = 0; // Reset this counter.
-                            while (naTotLattice[Lat_Ind_FromVec(tmpR2)] != -1 && TlCnt < 5000000)
+                            while (naTotLattice_glb[Lat_Ind_FromVec(tmpR2)] != -1 && TlCnt < 5000000)
                                 {
                                     for (j = 0; j < POS_MAX; j++)
                                         {
                                             tmpR2[j] = (rand() % radUp) - radLow;
-                                            tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
+                                            tmpR2[j] = (tmpR[j] + tmpR2[j] + naBoxSize_glb[j]) % naBoxSize_glb[j];
                                         }
                                     TlCnt++;
                                 }
@@ -620,9 +620,9 @@ void Initial_Conditions_Simple(void)
                                 }
                             for (j = 0; j < POS_MAX; j++)
                                 {
-                                    bead_info[i][j] = tmpR2[j];
+                                    bead_info_glb[i][j] = tmpR2[j];
                                 }                                     // Placing bead
-                            naTotLattice[Lat_Ind_FromVec(tmpR2)] = i; // Putting on lattice
+                            naTotLattice_glb[Lat_Ind_FromVec(tmpR2)] = i; // Putting on lattice
                             temp_list[list_it]                   = i;
                             list_it++; // Remembering in hash list.
                             // The bead has been placed around an appropriate anchor.
@@ -632,17 +632,17 @@ void Initial_Conditions_Simple(void)
                           // wherever.
                             for (j = 0; j < POS_MAX; j++)
                                 {
-                                    tmpR[j] = rand() % nBoxSize[j];
+                                    tmpR[j] = rand() % naBoxSize_glb[j];
                                 }
                             // This usually means this is the first bead in the chain.
                             TlCnt = 0;
-                            while (naTotLattice[Lat_Ind_FromVec(tmpR)] != -1 && TlCnt < 5000000)
+                            while (naTotLattice_glb[Lat_Ind_FromVec(tmpR)] != -1 && TlCnt < 5000000)
                                 { // Keep looping till we find
                                   // an empty lattice site.
                                     TlCnt++;
                                     for (j = 0; j < POS_MAX; j++)
                                         { // Generate a random point in the lattice.
-                                            tmpR[j] = rand() % nBoxSize[j];
+                                            tmpR[j] = rand() % naBoxSize_glb[j];
                                         }
                                 }
                             if (TlCnt == 5000000)
@@ -656,9 +656,9 @@ void Initial_Conditions_Simple(void)
                             // anchor. Also updating the lattice, and temp_list
                             for (j = 0; j < POS_MAX; j++)
                                 {
-                                    bead_info[i][j] = tmpR[j];
+                                    bead_info_glb[i][j] = tmpR[j];
                                 }
-                            naTotLattice[Lat_Ind_FromVec(tmpR)] = i; // Placing on lattice!
+                            naTotLattice_glb[Lat_Ind_FromVec(tmpR)] = i; // Placing on lattice!
                             temp_list[list_it]                  = i;
                             list_it++; // Remembering that this bead has been placed.
                         }
@@ -666,14 +666,14 @@ void Initial_Conditions_Simple(void)
                     // Now going over the list of bondParts for i and sprouting them
                     for (j = 0; j < POS_MAX; j++)
                         { // Making the current bead an anchor.
-                            tmpR[j] = bead_info[i][j];
+                            tmpR[j] = bead_info_glb[i][j];
                         }
                     idx      = 0;                 // Resets things!
-                    bondPart = topo_info[i][idx]; // Resets things!
-                    while (topo_info[i][idx] != -1 && idx < MAX_BONDS)
+                    bondPart = topo_info_glb[i][idx]; // Resets things!
+                    while (topo_info_glb[i][idx] != -1 && idx < MAX_BONDS)
                         { // Again, -1 signifies that no bonded
                           // bead exists.
-                            bondPart = topo_info[i][idx];
+                            bondPart = topo_info_glb[i][idx];
                             // If the bead has already been dealt with, move on to next
                             // potential bondPartner
                             for (idy = 0; idy < list_it; idy++)
@@ -685,20 +685,20 @@ void Initial_Conditions_Simple(void)
                                         }
                                 }
                             // Get the radii for placing this bead around bead i
-                            radUp  = 2 * linker_len[i][idx] + 1;
-                            radLow = linker_len[i][idx];
+                            radUp  = 2 * linker_len_glb[i][idx] + 1;
+                            radLow = linker_len_glb[i][idx];
                             // Initializing new vector to be where bead i is.
                             for (j = 0; j < POS_MAX; j++)
                                 {
                                     tmpR2[j] = tmpR[j];
                                 }
                             TlCnt = 0; // Reset this counter.
-                            while (naTotLattice[Lat_Ind_FromVec(tmpR2)] != -1 && TlCnt < 5000000)
+                            while (naTotLattice_glb[Lat_Ind_FromVec(tmpR2)] != -1 && TlCnt < 5000000)
                                 {
                                     for (j = 0; j < POS_MAX; j++)
                                         {
                                             tmpR2[j] = (rand() % radUp) - radLow;
-                                            tmpR2[j] = (tmpR[j] + tmpR2[j] + nBoxSize[j]) % nBoxSize[j];
+                                            tmpR2[j] = (tmpR[j] + tmpR2[j] + naBoxSize_glb[j]) % naBoxSize_glb[j];
                                         }
                                     // printf("%d %d %d\n", tmpR2[0], tmpR2[1], tmpR2[2]);
                                     TlCnt++;
@@ -708,15 +708,15 @@ void Initial_Conditions_Simple(void)
                                     printf("\n\nNot enough space in the lattice. Crashing. "
                                            "Maybe try increasing max trials, "
                                            "or make the box bigger!\t %d\t%d %d\n\n",
-                                           TlCnt, i, naTotLattice[Lat_Ind_FromVec(tmpR2)]);
+                                           TlCnt, i, naTotLattice_glb[Lat_Ind_FromVec(tmpR2)]);
                                     exit(1);
                                 }
                             for (j = 0; j < POS_MAX; j++)
                                 { // Placing bead
-                                    bead_info[bondPart][j] = tmpR2[j];
+                                    bead_info_glb[bondPart][j] = tmpR2[j];
                                 }
 
-                            naTotLattice[Lat_Ind_FromVec(tmpR2)] = bondPart; // Putting on lattice
+                            naTotLattice_glb[Lat_Ind_FromVec(tmpR2)] = bondPart; // Putting on lattice
                             temp_list[list_it]                   = bondPart;
                             list_it++; // Remembering in hash list.
                         SkipThisPartner:
@@ -728,9 +728,9 @@ void Initial_Conditions_Simple(void)
             // Moving on to the next molecule!
         }
     // Initializing all beads with no physical bonds.
-    for (i = 0; i < tot_beads; i++)
+    for (i = 0; i < tot_beads_glb; i++)
         {
-            bead_info[i][BEAD_FACE] = -1;
+            bead_info_glb[i][BEAD_FACE] = -1;
         }
 }
 
@@ -743,7 +743,7 @@ void Initial_Conditions_FromFile(void)
     int i, j;
     int tmp_beadinfo[BEADINFO_MAX];
     FILE* infile;
-    infile       = fopen(strRestartFile, "r");
+    infile       = fopen(strRestartFile_glb, "r");
     int tmpBeads = 0;
     while (fgets(strLine, sizeof(strLine), infile) != NULL)
         {
@@ -761,20 +761,20 @@ void Initial_Conditions_FromFile(void)
             tmpBeads++;
             for (j = 0; j < BEADINFO_MAX; j++)
                 {
-                    bead_info[i][j] = tmp_beadinfo[j];
+                    bead_info_glb[i][j] = tmp_beadinfo[j];
                 }
         }
     fclose(infile);
-    if (tmpBeads != tot_beads)
+    if (tmpBeads != tot_beads_glb)
         {
             printf("Given restart file does not have the same number of beads as "
                    "the provided structure.");
             printf("Crashing!\n");
             exit(1);
         }
-    for (i = 0; i < tot_beads; i++)
+    for (i = 0; i < tot_beads_glb; i++)
         {
-            naTotLattice[Lat_Ind_OfBead(i)] = i;
+            naTotLattice_glb[Lat_Ind_OfBead(i)] = i;
         }
     printf("File read successfully and initial configuration set.\n");
 }
@@ -784,9 +784,9 @@ void Initial_Conditions_FromFile(void)
 void Initial_Conditions_BreakBonds(void)
 {
     int i;
-    for (i = 0; i < tot_beads; i++)
+    for (i = 0; i < tot_beads_glb; i++)
         {
-            bead_info[i][BEAD_FACE] = -1;
+            bead_info_glb[i][BEAD_FACE] = -1;
         }
     printf("Since system has thermalization cycle, deleting all physical "
            "bonds!\n");
@@ -802,26 +802,26 @@ void Calculate_Rot_Bias(const float CurrentTemp)
         {
             for (j = 0; j < MAX_AA; j++)
                 {
-                    dbias_bolt_fac[i][j] = (lLDub) expl(-(lLDub) fEnergy[i][j][E_SC_SC] / (lLDub) CurrentTemp);
-                    // printf("%LE; ", dbias_bolt_fac[i][j]);
+                    ldaBoltzFacNorm_glb[i][j] = (lLDub) expl(-(lLDub) faEnergy_glb[i][j][E_SC_SC] / (lLDub) CurrentTemp);
+                    // printf("%LE; ", ldaBoltzFacNorm_glb[i][j]);
                 }
             // printf("\n");
         }
-    // TODO: Make sure that fRot_Bias can be used in the future to set a solvent
+    // TODO: Make sure that fRot_Bias_glb can be used in the future to set a solvent
     // 'anisotropy'
-    fRot_Bias = expf(-f_globRotBias / CurrentTemp);
+    fRot_Bias_glb = expf(-fRotBias_glb / CurrentTemp);
 }
 
-/// Temperature_Function - used to calculate what fCuTemp should (current
+/// Temperature_Function - used to calculate what fCuTemp_glb should (current
 /// temperature) based on how long the run has been going. \param mode - which
 /// of the four functions to use. Note that the various modes are described
 /// below where $F(t)$ is the returned value, and t == nGen. If mode = 0:
-/// \f$F(t) = fKT + \tanh(1.+ (nGen-nPre)/1250fPreKT\f$. A hyperbolic tangent to
-/// smoothly reduce temperature, after nPreSteps If mode = 1: \f$F(t) = fKT +
+/// \f$F(t) = fKT_glb + \tanh(1.+ (nGen-nPre)/1250fPreKT\f$. A hyperbolic tangent to
+/// smoothly reduce temperature, after nPreSteps If mode = 1: \f$F(t) = fKT_glb +
 /// 5\exp(-(nGen-nPre)/4nPre)\abs(sin((nGen-nPre)/nPre))\f$. An exponentially
-/// decaying sinusoidal bouncing after nPreSteps If mode = 2: \f$F(t) = fKT +
-/// 5\exp(-(nGen-10nPre)^2/10nPre^2)/fKT\f$. Gaussian like decay after
-/// nPreSteps. If mode = 3: \f$F(t) = fKT + \exp(-4nGen/nPre)/fKT\f$.
+/// decaying sinusoidal bouncing after nPreSteps If mode = 2: \f$F(t) = fKT_glb +
+/// 5\exp(-(nGen-10nPre)^2/10nPre^2)/fKT_glb\f$. Gaussian like decay after
+/// nPreSteps. If mode = 3: \f$F(t) = fKT_glb + \exp(-4nGen/nPre)/fKT_glb\f$.
 /// Exponential decay from the beginning. \param nGen - basically 'time' or how
 /// many MC Steps have been done. \return end_val - the current temperature.
 float Temperature_Function(const int mode, const long nGen)
@@ -834,77 +834,77 @@ float Temperature_Function(const int mode, const long nGen)
     switch (mode)
         {
             case 0:
-                x_val   = (float) (nMCStepsForTherm - nGen);
-                x_val   = x_val / 1250.f / fPreKT;
-                x_val   = fPreKT * (tanhf(x_val) + 1.f);
-                end_val = fKT + x_val;
+                x_val   = (float) (nMCStepsForTherm_glb - nGen);
+                x_val   = x_val / 1250.f / fPreKT_glb;
+                x_val   = fPreKT_glb * (tanhf(x_val) + 1.f);
+                end_val = fKT_glb + x_val;
 
                 break;
 
             case 1:
-                x_val   = (float) (nGen - nMCStepsForTherm) / (float) nMCStepsForTherm;
+                x_val   = (float) (nGen - nMCStepsForTherm_glb) / (float) nMCStepsForTherm_glb;
                 y_val   = -x_val;
                 x_val   = fabsf(sinf(x_val));
                 y_val   = expf(y_val / 4.f);
-                end_val = fKT + 5.f * fKT * x_val * y_val;
+                end_val = fKT_glb + 5.f * fKT_glb * x_val * y_val;
 
                 break;
 
             case 2:
-                x_val   = (float) (nGen - 10 * nMCStepsForTherm);
+                x_val   = (float) (nGen - 10 * nMCStepsForTherm_glb);
                 x_val   = x_val * x_val;
-                y_val   = (float) (nMCStepsForTherm * nMCStepsForTherm) * 10.f;
-                end_val = fKT + expf(-x_val / y_val) / fKT / 10.f;
+                y_val   = (float) (nMCStepsForTherm_glb * nMCStepsForTherm_glb) * 10.f;
+                end_val = fKT_glb + expf(-x_val / y_val) / fKT_glb / 10.f;
 
                 break;
 
             case 3:
                 x_val   = -(float) (nGen);
                 x_val   = 4.f * x_val;
-                x_val   = x_val / (float) (nMCStepsForTherm);
-                end_val = fKT + fPreKT * expf(x_val);
+                x_val   = x_val / (float) (nMCStepsForTherm_glb);
+                end_val = fKT_glb + fPreKT_glb * expf(x_val);
 
                 break;
 
             case 4:
                 x_val   = -(float) (nGen);
-                x_val   = fMC_Temp_Rate * x_val;
-                x_val   = x_val / (float) (nMCStepsForTherm);
-                end_val = fKT + expf(x_val);
+                x_val   = fMC_TempRate_glb * x_val;
+                x_val   = x_val / (float) (nMCStepsForTherm_glb);
+                end_val = fKT_glb + expf(x_val);
 
                 break;
 
             case 5:
                 x_val = -(float) powf((float) nGen, 0.25f);
                 x_val *= 0.075f;
-                end_val = fKT + fPreKT * expf(x_val);
+                end_val = fKT_glb + fPreKT_glb * expf(x_val);
 
                 break;
 
             case 6:
                 x_val   = powf((float) nGen, 0.5f);
-                end_val = fKT + fPreKT / (1.0f + x_val);
+                end_val = fKT_glb + fPreKT_glb / (1.0f + x_val);
 
                 break;
 
             case 7:
                 x_val   = (float) nGen * (0.00000002f);
-                end_val = fKT + 2.f - x_val;
+                end_val = fKT_glb + 2.f - x_val;
 
                 break;
 
             default:
 
-                end_val = fKT;
+                end_val = fKT_glb;
                 break;
         }
-    if (end_val - fKT < 0.005)
+    if (end_val - fKT_glb < 0.005)
         {
             puts("\n\n******************************\n");
             puts("Annealing Is Being Turned Off");
             puts("\n******************************\n\n");
-            nAnnealing_Mode        = -1;
-            nInitialPotential_Mode = -1;
+            nAnnealing_Mode_glb    = -1;
+            nInitialPotential_Mode_glb = -1;
         }
     return end_val;
 }

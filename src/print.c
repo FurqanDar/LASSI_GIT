@@ -48,7 +48,7 @@ void PrintToScreen_EnergyMatrix(char* strTitle, int nSeqEn, float fArray[MAX_AA]
 /// \return
 long TrajArr_Index(const int beadID, const int nFrameNumber, const int beadProp)
 {
-    return beadProp + BEADINFO_MAX * (beadID + tot_beads * nFrameNumber);
+    return beadProp + BEADINFO_MAX * (beadID + tot_beads_glb * nFrameNumber);
 }
 
 /// Write_ClusterDist - write the cluster histogram to a separate file. NOT USED
@@ -76,9 +76,9 @@ void Write_ClusterDist(char* filename, long nGen)
     else
         {
             fprintf(fp, "#%ld\n", nGen);
-            for (i = 0; i <= tot_chains; i++)
+            for (i = 0; i <= tot_chains_glb; i++)
                 {
-                    fprintf(fp, "%ld\t", naClusHistList[i]);
+                    fprintf(fp, "%ld\t", naClusHistList_glb[i]);
                 }
             fprintf(fp, "\n");
         }
@@ -117,7 +117,7 @@ void Write_GyrTen(char* filename, long nGen)
                         {
                             continue;
                         } // Not smart enough to make a better indexing function
-                    fprintf(fp, "%f\t", fGyrTensor[i]);
+                    fprintf(fp, "%f\t", faGyrTensor_glb[i]);
                 }
             fprintf(fp, "\n");
         }
@@ -160,14 +160,14 @@ void FileIO_WriteTo_MCMoveFile(const char* filename, const long nGen, float cons
     fprintf(fp, "%-10ld  %-10.2f  ", nGen, fMCTemp); // Step and Temp
     for (i = 1; i < MAX_MV; i++)
         {
-            fprintf(fp, "%-10ld  %-10ld  ", naMCAccepMat[0][i], naMCAccepMat[1][i]);
+            fprintf(fp, "%-10ld  %-10ld  ", naMCAccepMat_glb[0][i], naMCAccepMat_glb[1][i]);
         }
     fprintf(fp, "\n");
 
     for (i = 1; i < MAX_MV; i++)
         {
-            naMCAccepMat[0][i] = 0;
-            naMCAccepMat[1][i] = 0;
+            naMCAccepMat_glb[0][i] = 0;
+            naMCAccepMat_glb[1][i] = 0;
             // This way the print function will zero out the matrix every time
             // we print to a file!
         }
@@ -212,7 +212,7 @@ void FileIO_AppendEnergyTo_EnergyFile(const char* fileNameStr, const long nGen)
     fprintf(fp, "%-10ld", nGen);
     for (i = 0; i < (MAX_E); i++)
         {
-            fprintf(fp, "  %-10.2e", faCurrEn[i]);
+            fprintf(fp, "  %-10.2e", faCurrEn_glb[i]);
         }
     fprintf(fp, "\n");
 
@@ -225,16 +225,16 @@ void FileIO_AppendEnergyTo_EnergyFile(const char* fileNameStr, const long nGen)
 /// \param nGen
 void FileIO_HandleTrajectory(const char* fileNameStr, const int run_it, const long nGen)
 {
-    if (nTrajMode == 1)
+    if (nTrajMode_glb == 1)
         {
-            Save_Trajectory(nGen, nTrajCurFrame);
-            nTrajCurFrame++;
+            Save_Trajectory(nGen, nTrajCurFrame_glb);
+            nTrajCurFrame_glb++;
         }
     else
         {
             if (run_it >= 0)
                 {
-                    FileIO_AppendTrajFrame_ToFile(fileNameStr, nGen + nMCStepsForTherm + run_it * nMCStepsPerCycle);
+                    FileIO_AppendTrajFrame_ToFile(fileNameStr, nGen + nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb);
                 }
             else
                 {
@@ -258,17 +258,18 @@ void FileIO_AppendTrajFrame_ToFile(const char* filename, const long nGen)
     fprintf(fp, "%ld\n", nGen); // Timestep
 
     fprintf(fp, "ITEM: NUMBER OF ATOMS\n");
-    fprintf(fp, "%ld\n", tot_beads); // Total atom number
+    fprintf(fp, "%ld\n", tot_beads_glb); // Total atom number
 
     fprintf(fp, "ITEM: BOX BOUNDS pp pp pp\n");                               // BCs are always periodic for now
-    fprintf(fp, "0 %d\n0 %d\n0 %d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]); // Box dimensions
+    fprintf(fp, "0 %d\n0 %d\n0 %d\n", naBoxSize_glb[0], naBoxSize_glb[1], naBoxSize_glb[2]); // Box dimensions
 
     fprintf(fp, "ITEM: ATOMS id type mol x y z bP\n"); // What we are printing
 
-    for (i = 0; i < tot_beads; i++)
+    for (i = 0; i < tot_beads_glb; i++)
         {
-            fprintf(fp, "%d %d %d %d %d %d %d\n", i, bead_info[i][BEAD_TYPE], bead_info[i][BEAD_CHAINID],
-                    bead_info[i][POS_X], bead_info[i][POS_Y], bead_info[i][POS_Z], bead_info[i][BEAD_FACE]);
+            fprintf(fp, "%d %d %d %d %d %d %d\n", i, bead_info_glb[i][BEAD_TYPE], bead_info_glb[i][BEAD_CHAINID],
+                    bead_info_glb[i][POS_X], bead_info_glb[i][POS_Y], bead_info_glb[i][POS_Z],
+                    bead_info_glb[i][BEAD_FACE]);
         }
 
     fclose(fp);
@@ -282,12 +283,12 @@ void Save_Trajectory(const long nGen, const long curFrame)
 
     int i, j;
     long ar_idx;
-    for (i = 0; i < tot_beads; i++)
+    for (i = 0; i < tot_beads_glb; i++)
         {
             for (j = 0; j < BEADINFO_MAX; j++)
                 {
                     ar_idx                = TrajArr_Index(i, curFrame, j);
-                    n_TOTTRAJ_Arr[ar_idx] = bead_info[i][j];
+                    naTOTTRAJ_Arr_glb[ar_idx] = bead_info_glb[i][j];
                 }
         }
 }
@@ -307,42 +308,42 @@ void Write_Saved_Trajectory(char* filename, const int run_it)
     int i, j, k; // Looping index
     int ar_idx;
 
-    for (i = 0; i < nTrajCurFrame; i++)
+    for (i = 0; i < nTrajCurFrame_glb; i++)
         {
             fprintf(fp, "ITEM: TIMESTEP\n");
             if (run_it >= 0)
                 {
                     fprintf(fp, "%ld\n",
-                            nMCStepsForTherm + run_it * nMCStepsPerCycle + i * nReport[REPORT_CONFIG]); // Timestep
+                            nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb + i * naReportFreqs_glb[REPORT_CONFIG]); // Timestep
                 }
             else
                 {
-                    fprintf(fp, "%ld\n", i * nReport[REPORT_CONFIG]); // Timestep
+                    fprintf(fp, "%ld\n", i * naReportFreqs_glb[REPORT_CONFIG]); // Timestep
                 }
 
             fprintf(fp, "ITEM: NUMBER OF ATOMS\n");
-            fprintf(fp, "%ld\n", tot_beads); // Total atom number
+            fprintf(fp, "%ld\n", tot_beads_glb); // Total atom number
 
             fprintf(fp, "ITEM: BOX BOUNDS pp pp pp\n");                               // BCs are always periodic for now
-            fprintf(fp, "0 %d\n0 %d\n0 %d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]); // Box dimensions
+            fprintf(fp, "0 %d\n0 %d\n0 %d\n", naBoxSize_glb[0], naBoxSize_glb[1], naBoxSize_glb[2]); // Box dimensions
 
             fprintf(fp, "ITEM: ATOMS id type mol x y z bP\n"); // What we are printing
 
-            for (j = 0; j < tot_beads; j++)
+            for (j = 0; j < tot_beads_glb; j++)
                 {
                     fprintf(fp, "%d", j);
                     ar_idx = TrajArr_Index(j, i, BEAD_TYPE);
-                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
+                    fprintf(fp, " %d", naTOTTRAJ_Arr_glb[ar_idx]);
                     ar_idx = TrajArr_Index(j, i, BEAD_CHAINID);
-                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
+                    fprintf(fp, " %d", naTOTTRAJ_Arr_glb[ar_idx]);
                     ar_idx = TrajArr_Index(j, i, POS_X);
-                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
+                    fprintf(fp, " %d", naTOTTRAJ_Arr_glb[ar_idx]);
                     ar_idx = TrajArr_Index(j, i, POS_Y);
-                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
+                    fprintf(fp, " %d", naTOTTRAJ_Arr_glb[ar_idx]);
                     ar_idx = TrajArr_Index(j, i, POS_Z);
-                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
+                    fprintf(fp, " %d", naTOTTRAJ_Arr_glb[ar_idx]);
                     ar_idx = TrajArr_Index(j, i, BEAD_FACE);
-                    fprintf(fp, " %d", n_TOTTRAJ_Arr[ar_idx]);
+                    fprintf(fp, " %d", naTOTTRAJ_Arr_glb[ar_idx]);
                     fprintf(fp, "\n");
                 }
         }
@@ -359,15 +360,15 @@ void PrintToScreen_AllEnergyMatrices(void)
 
     printf("%s Energy Matrices %s\n", lBrace, rBrace);
 
-    PrintToScreen_EnergyMatrix("OVLP ", nBeadTypes, fEnergy, E_OVLP);
+    PrintToScreen_EnergyMatrix("OVLP ", nBeadTypes_glb, faEnergy_glb, E_OVLP);
 
-    PrintToScreen_EnergyMatrix("CONT ", nBeadTypes, fEnergy, E_CONT);
+    PrintToScreen_EnergyMatrix("CONT ", nBeadTypes_glb, faEnergy_glb, E_CONT);
 
-    PrintToScreen_EnergyMatrix("SC_SC", nBeadTypes, fEnergy, E_SC_SC);
+    PrintToScreen_EnergyMatrix("SC_SC", nBeadTypes_glb, faEnergy_glb, E_SC_SC);
 
-    PrintToScreen_EnergyMatrix("FSOL ", nBeadTypes, fEnergy, E_F_SOL);
+    PrintToScreen_EnergyMatrix("FSOL ", nBeadTypes_glb, faEnergy_glb, E_F_SOL);
 
-    PrintToScreen_EnergyMatrix("STIFF", nBeadTypes, fEnergy, E_STIFF);
+    PrintToScreen_EnergyMatrix("STIFF", nBeadTypes_glb, faEnergy_glb, E_STIFF);
 }
 
 /// PrintToScreen_MCMoveFreqs
@@ -391,9 +392,9 @@ void PrintToScreen_MCMoveFreqs(void)
     int i;
     for (i = MV_NULL + 1; i < MAX_MV; i++)
         {
-            if (freqMin >= fMCFreq[i] && fMCFreq[i] != 0.)
+            if (freqMin >= faMCFreq_glb[i] && faMCFreq_glb[i] != 0.)
                 {
-                    freqMin = fMCFreq[i];
+                    freqMin = faMCFreq_glb[i];
                 }
         }
 
@@ -405,7 +406,7 @@ void PrintToScreen_MCMoveFreqs(void)
     printf("| MC Move Frequencies%9s\n", "|");
     for (i = MV_NULL + 1; i < MAX_MV; i++)
         {
-            printf("| %-16s %5d %5s\n", MoveName[i], (int) ceilf(fMCFreq[i] / freqMin), "|");
+            printf("| %-16s %5d %5s\n", MoveName[i], (int) ceilf(faMCFreq_glb[i] / freqMin), "|");
         }
     for (i = 0; i < 30; i++)
         {
@@ -421,13 +422,13 @@ void ScreenIO_Print_KeyFile(void)
     const char lBrace[] = "<======      ";
     const char rBrace[] = "      ======>";
     printf("%s System Settings %s\n", lBrace, rBrace);
-    printf("Number of Bead Types = %d\n", nBeadTypes);
-    printf("Number of Beads      = %ld\n", tot_beads);
-    printf("Number of Chains     = %ld\n", tot_chains);
-    printf("Number of Components = %ld\n", tot_chain_types);
-    printf("Box Sizes            = %3d %3d %3d\n", nBoxSize[0], nBoxSize[1], nBoxSize[2]);
+    printf("Number of Bead Types = %d\n", nBeadTypes_glb);
+    printf("Number of Beads      = %ld\n", tot_beads_glb);
+    printf("Number of Chains     = %ld\n", tot_chains_glb);
+    printf("Number of Components = %ld\n", tot_chain_types_glb);
+    printf("Box Sizes            = %3d %3d %3d\n", naBoxSize_glb[0], naBoxSize_glb[1], naBoxSize_glb[2]);
     printf("Monomer density      = %1.1e\n",
-           (float) tot_beads / (float) nBoxSize[0] / (float) nBoxSize[1] / (float) nBoxSize[2]);
+           (float) tot_beads_glb / (float) naBoxSize_glb[0] / (float) naBoxSize_glb[1] / (float) naBoxSize_glb[2]);
     printf("\n");
 
     PrintToScreen_AllEnergyMatrices();
@@ -435,23 +436,24 @@ void ScreenIO_Print_KeyFile(void)
     printf("\n");
 
     printf("%s Linker Info %s\n", lBrace, rBrace);
-    printf("Linker length             = %.2f\n", fLinkerLength);
-    printf("Linker spring constant    = %.2f\n", fLinkerSprCon);
-    printf("Linker equilibrium length = %.2f\n", fLinkerEqLen);
+    printf("Linker length             = %.2f\n", fLinkerLength_glb);
+    printf("Linker spring constant    = %.2f\n", fLinkerSprCon_glb);
+    printf("Linker equilibrium length = %.2f\n", fLinkerEqLen_glb);
     printf("\n");
 
     printf("%s MC Setup %s\n", lBrace, rBrace);
-    printf("Temperature Inverted           = %d\n", nTemp_inv);
-    printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", fKT, fKT + (float) (nTot_CycleNum - 1) * fdelta_temp);
-    printf("Temperature Mode               = %d\n", nAnnealing_Mode);
-    printf("Indent Mode                    = %d\n", nInitialPotential_Mode);
-    printf("Rotational Bias Mode           = %d\n", RotBias_Mode);
-    printf("Number of MC Cycles            = %d\n", nTot_CycleNum);
-    printf("Number of MC Steps/Cycle       = %e\n", (float) nMCStepsPerCycle);
-    printf("Thermalizing Temperature       = %.2f\n", fPreKT);
-    printf("Number of Thermalizing Steps   = %e\n", (float) nMCStepsForTherm);
-    printf("RNG Seed                       = %d\n", nRNG_Seed);
-    printf("Clustering Mode                = %d\n", nClusteringMode);
+    printf("Temperature Inverted           = %d\n", nTemp_inv_glb);
+    printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", fKT_glb,
+           fKT_glb + (float) (nTotCycleNum_glb - 1) * fDeltaTemp_glb);
+    printf("Temperature Mode               = %d\n", nAnnealing_Mode_glb);
+    printf("Indent Mode                    = %d\n", nInitialPotential_Mode_glb);
+    printf("Rotational Bias Mode           = %d\n", RotBias_Mode_glb);
+    printf("Number of MC Cycles            = %d\n", nTotCycleNum_glb);
+    printf("Number of MC Steps/Cycle       = %e\n", (float) nMCStepsPerCycle_glb);
+    printf("Thermalizing Temperature       = %.2f\n", fPreKT_glb);
+    printf("Number of Thermalizing Steps   = %e\n", (float) nMCStepsForTherm_glb);
+    printf("RNG Seed                       = %d\n", nRNG_Seed_glb);
+    printf("Clustering Mode                = %d\n", nClusteringMode_glb);
 
     PrintToScreen_MCMoveFreqs();
     printf("\n");
@@ -469,12 +471,12 @@ void ScreenIO_Print_SystemEnergy(void)
 
     printf("%s\n", sSectionHead);
     printf("Energies\n");
-    printf("Tot  : %-10.2e |\n", faCurrEn[E_TOT]);
-    printf("Ovlp : %-10.2e |\n", faCurrEn[E_OVLP]);
-    printf("Cont : %-10.2e |\n", faCurrEn[E_CONT]);
-    printf("Aniso: %-10.2e |\n", faCurrEn[E_SC_SC]);
-    printf("FSol : %-10.2e |\n", faCurrEn[E_F_SOL]);
-    printf("Stiff: %-10.2e |\n", faCurrEn[E_STIFF]);
+    printf("Tot  : %-10.2e |\n", faCurrEn_glb[E_TOT]);
+    printf("Ovlp : %-10.2e |\n", faCurrEn_glb[E_OVLP]);
+    printf("Cont : %-10.2e |\n", faCurrEn_glb[E_CONT]);
+    printf("Aniso: %-10.2e |\n", faCurrEn_glb[E_SC_SC]);
+    printf("FSol : %-10.2e |\n", faCurrEn_glb[E_F_SOL]);
+    printf("Stiff: %-10.2e |\n", faCurrEn_glb[E_STIFF]);
     printf("%s\n", sSectionHead);
 }
 
@@ -508,10 +510,10 @@ void ScreenIO_Print_AcceptanceRatios(void)
     printf("Acceptance Ratios:\n");
     for (i = 1; i < MAX_MV; i++)
         {
-            nMoveSum = naMCAccepMat[0][i] + naMCAccepMat[1][i];
+            nMoveSum = naMCAccepMat_glb[0][i] + naMCAccepMat_glb[1][i];
             if (nMoveSum)
                 {
-                    fAccRatio = 100.f * (float) naMCAccepMat[1][i] / (float) nMoveSum;
+                    fAccRatio = 100.f * (float) naMCAccepMat_glb[1][i] / (float) nMoveSum;
                     printf("%-12s: %-7.2f|\n", MoveName[i], fAccRatio);
                 }
             else
@@ -527,12 +529,12 @@ void ScreenIO_Print_Log_Thermalization(const long nGen)
 {
     printf("Run Cycle: Thermalization\n");
     printf("Step     : %8.3e\n", (float) nGen);
-    printf("MC Temp  : %8.3e\n", fCuTemp);
+    printf("MC Temp  : %8.3e\n", fCuTemp_glb);
 
-    if (nTotClusCounter > 0)
+    if (nTotClusCounter_glb > 0)
         {
             printf("Perc Phi : %8.3f\n",
-                   ((float) nLargestClusterRightNow) / ((float) nTotClusCounter) / (float) tot_chains);
+                   ((float) nLargestClusterRightNow_glb) / ((float) nTotClusCounter_glb) / (float) tot_chains_glb);
         }
 
     ScreenIO_Print_SystemEnergy();
@@ -544,12 +546,12 @@ void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle)
 {
     printf("Run Cycle: %d\n", run_cycle);
     printf("Step     : %8.3e\n", (float) nGen);
-    printf("MC Temp  : %8.3e\n", fCuTemp);
+    printf("MC Temp  : %8.3e\n", fCuTemp_glb);
 
-    if (nTotClusCounter > 0)
+    if (nTotClusCounter_glb > 0)
         {
             printf("Perc Phi : %8.3f\n",
-                   ((float) nLargestClusterRightNow) / ((float) nTotClusCounter) / (float) tot_chains);
+                   ((float) nLargestClusterRightNow_glb) / ((float) nTotClusCounter_glb) / (float) tot_chains_glb);
         }
 
     ScreenIO_Print_SystemEnergy();
@@ -581,11 +583,11 @@ void Write_RDF_ComponentWise(char* filename, long nGen)
         }
     else
         {
-            for (k = 0; k < nRDF_TotComps; k++)
+            for (k = 0; k < nRDF_TotComps_glb; k++)
                 {
-                    for (i = 0; i < nRDF_TotBins; i++)
+                    for (i = 0; i < nRDF_TotBins_glb; i++)
                         {
-                            fprintf(fp, "%.5Lf\t", ldRDF_Arr[RDFArr_Index(0, k, i)]);
+                            fprintf(fp, "%.5Lf\t", ldaRDF_Arr_glb[RDFArr_Index(0, k, i)]);
                         }
                     fprintf(fp, "\n");
                 }
@@ -613,14 +615,14 @@ void FileIO_WriteTo_TopFile(const char* filename)
     printf("Writing the topology file!\n");
     fprintf(fp, "LAMMPS Description\n");      // The file must start with this.
     fprintf(fp, "\n");                        // Empty line.
-    fprintf(fp, "\t%ld\tatoms\n", tot_beads); // Listing total number of atoms
+    fprintf(fp, "\t%ld\tatoms\n", tot_beads_glb); // Listing total number of atoms
     numBonds = 0;
-    for (i = 0; i < tot_beads; i++)
+    for (i = 0; i < tot_beads_glb; i++)
         {
             for (j = 0; j < MAX_BONDS; j++)
                 {
-                    if (topo_info[i][j] != -1)
-                        { // There is a bond between i and topo_info[i][j]
+                    if (topo_info_glb[i][j] != -1)
+                        { // There is a bond between i and topo_info_glb[i][j]
                             numBonds++;
                         }
                 }
@@ -631,17 +633,17 @@ void FileIO_WriteTo_TopFile(const char* filename)
     fprintf(fp, "\t0\tdihedrals\n");             // Systems don't have dihedrals  yet
     fprintf(fp, "\t0\timpropers\n");             // Systems don't have imporopers yet
     fprintf(fp, "\n");                           // Empty line.
-    fprintf(fp, "%d\tatom types\n", nBeadTypes); // This many bead-types
+    fprintf(fp, "%d\tatom types\n", nBeadTypes_glb); // This many bead-types
     fprintf(fp, "1\tbond types\n");              // System can have multiple bond-lengths
     fprintf(fp, "0\tangle types\n");             // Systems don't have any angular forces yet
     fprintf(fp, "\n");                           // Empty line.
-    fprintf(fp, " 0 %d xlo xhi\n", nBoxSize[0]);
-    fprintf(fp, " 0 %d ylo yhi\n", nBoxSize[1]);
-    fprintf(fp, " 0 %d zlo zhi\n", nBoxSize[2]);
+    fprintf(fp, " 0 %d xlo xhi\n", naBoxSize_glb[0]);
+    fprintf(fp, " 0 %d ylo yhi\n", naBoxSize_glb[1]);
+    fprintf(fp, " 0 %d zlo zhi\n", naBoxSize_glb[2]);
     fprintf(fp, "\n");       // Empty line.
     fprintf(fp, "Masses\n"); // These don't really mean anything
     fprintf(fp, "\n");       // Empty line.
-    for (i = 0; i < nBeadTypes; i++)
+    for (i = 0; i < nBeadTypes_glb; i++)
         {
             fprintf(fp, "%d\t1.0\n", i);
         }
@@ -649,22 +651,23 @@ void FileIO_WriteTo_TopFile(const char* filename)
     fprintf(fp, "\n");             // Empty line.
     fprintf(fp, "Atoms # bond\n"); // Signifying the beginning of atom coordinates.
     fprintf(fp, "\n");             // Empty line.
-    for (i = 0; i < tot_beads; i++)
+    for (i = 0; i < tot_beads_glb; i++)
         {
-            fprintf(fp, "%d %d %d %d %d %d\n", i, bead_info[i][BEAD_CHAINID], bead_info[i][BEAD_TYPE],
-                    bead_info[i][POS_X], bead_info[i][POS_Y], bead_info[i][POS_Z]);
+            fprintf(fp, "%d %d %d %d %d %d\n", i, bead_info_glb[i][BEAD_CHAINID], bead_info_glb[i][BEAD_TYPE],
+                    bead_info_glb[i][POS_X], bead_info_glb[i][POS_Y], bead_info_glb[i][POS_Z]);
         }                   // Done with the coordinates
     fprintf(fp, "\n");      // Empty line.
     fprintf(fp, "Bonds\n"); // Signifying the beginning of atom coordinates.
     fprintf(fp, "\n");      // Empty line.
     k = 0;                  // This guy counts bondIDs
-    for (i = 0; i < tot_beads; i++)
+    for (i = 0; i < tot_beads_glb; i++)
         {
             for (j = 0; j < MAX_BONDS; j++)
                 {
-                    if (topo_info[i][j] != -1)
-                        { // There is a bond between i and topo_info[i][j]
-                            fprintf(fp, "%d %d %d %d\n", k, linker_len[i][j] / (int) fLinkerLength, i, topo_info[i][j]);
+                    if (topo_info_glb[i][j] != -1)
+                        { // There is a bond between i and topo_info_glb[i][j]
+                            fprintf(fp, "%d %d %d %d\n", k, linker_len_glb[i][j] / (int) fLinkerLength_glb, i,
+                                    topo_info_glb[i][j]);
                             k++;
                         }
                 }
@@ -684,21 +687,21 @@ void Write_SysProp(char* filename)
     fp = fopen(filename, "w");
     fprintf(fp, "#Contains various averaged quatities.\n");
     // Gyration Radius
-    fprintf(fp, "#Total Rg\n%f\t%f\n#Cluster Hist\n", fSysGyrRad / (float) nTotGyrRadCounter, (float) nBoxSize[0] / 2.);
+    fprintf(fp, "#Total Rg\n%f\t%f\n#Cluster Hist\n", faSysGyrRad_glb / (float) nTotGyrRadCounter_glb, (float) naBoxSize_glb[0] / 2.);
     // Cluster Histogram
-    fprintf(fp, "%f\t", (float) nLargestClusterRightNow / (float) nTotClusCounter);
-    for (i = 1; i <= tot_chains; i++)
+    fprintf(fp, "%f\t", (float) nLargestClusterRightNow_glb / (float) nTotClusCounter_glb);
+    for (i = 1; i <= tot_chains_glb; i++)
         {
-            fprintf(fp, "%f\t", (float) naClusHistList[i] / (float) nTotClusCounter);
+            fprintf(fp, "%f\t", (float) naClusHistList_glb[i] / (float) nTotClusCounter_glb);
         }
     // Split RDFs
     fprintf(fp, "\n#Split RDFs. ALL-ALL; DIAGONALS and then from 0 onwards \n");
-    for (j = 0; j < nRDF_TotComps; j++)
+    for (j = 0; j < nRDF_TotComps_glb; j++)
         {
-            for (i = 0; i < nRDF_TotBins; i++)
+            for (i = 0; i < nRDF_TotBins_glb; i++)
                 {
-                    // fprintf(fp, "%LE\t", ldRDF_ARR[j][i] / (float)nRDFCounter);
-                    fprintf(fp, "%LE\t", ldRDF_Arr[RDFArr_Index(0, j, i)] / (float) nRDFCounter);
+                    // fprintf(fp, "%LE\t", ldRDF_ARR[j][i] / (float)nRDFCounter_glb);
+                    fprintf(fp, "%LE\t", ldaRDF_Arr_glb[RDFArr_Index(0, j, i)] / (float) nRDFCounter_glb);
                 }
             fprintf(fp, "\n");
         }
@@ -713,17 +716,17 @@ void FileIO_WriteTo_RDFTotFile(const int run_it)
     int i, j, k;
     char dumFile[512];
     sprintf(dumFile, "%s_RDF.dat",
-            strReportPrefix); // Name Of the RDF Files
+            strReportPrefix_glb); // Name Of the RDF Files
     fp = fopen(dumFile, "w");
     fprintf(fp, "#Split RDFs. ALL-ALL; DIAGONALS and then from 0-0, 0-1, and onwards \n");
     for (i = 0; i < run_it; i++)
         {
             fprintf(fp, "#Run_Cycle = %d\n", i);
-            for (j = 0; j < nRDF_TotComps; j++)
+            for (j = 0; j < nRDF_TotComps_glb; j++)
                 {
-                    for (k = 0; k < nRDF_TotBins; k++)
+                    for (k = 0; k < nRDF_TotBins_glb; k++)
                         {
-                            fprintf(fp, "%LE\t", ld_TOTRDF_Arr[RDFArr_Index(i, j, k)]);
+                            fprintf(fp, "%LE\t", ldaTOTRDF_Arr_glb[RDFArr_Index(i, j, k)]);
                         }
                     fprintf(fp, "\n");
                 }
@@ -740,18 +743,18 @@ void FileIO_WriteTo_COMDenFile(const int run_it)
     int i, j, k;
     char dumFile[512];
     sprintf(dumFile, "%s_COMDen.dat",
-            strReportPrefix); // Name Of the COM Density Distribution
+            strReportPrefix_glb); // Name Of the COM Density Distribution
     fp = fopen(dumFile, "w");
     fprintf(fp, "#Density distribution from the COM outwards. Order is "
                 "ChainType.\n");
     for (i = 0; i < run_it; i++)
         {
             fprintf(fp, "#Run_Cycle = %d\n", i);
-            for (j = 0; j < nRadDen_TotComps; j++)
+            for (j = 0; j < nRadDen_TotComps_glb; j++)
                 {
-                    for (k = 0; k < nRDF_TotBins; k++)
+                    for (k = 0; k < nRDF_TotBins_glb; k++)
                         {
-                            fprintf(fp, "%LE\t", ld_TOTRadDen_Arr[RadDenArr_Index(i, j, k)]);
+                            fprintf(fp, "%LE\t", ldaTOTRadDen_Arr_glb[RadDenArr_Index(i, j, k)]);
                         }
                     fprintf(fp, "\n");
                 }
@@ -768,15 +771,15 @@ void FileIO_WriteTo_ClusFile(const int run_it)
     int i, j, k;
     char dumFile[512];
     sprintf(dumFile, "%s_CLUS.dat",
-            strReportPrefix); // Name Of the ClusterHistogram Files
+            strReportPrefix_glb); // Name Of the ClusterHistogram Files
     fp = fopen(dumFile, "w");
     fprintf(fp, "#Cluster Histograms: 1st column is largest cluster, and then clusters of size 1, 2, and so on\n");
     for (i = 0; i < run_it; i++)
         {
             fprintf(fp, "#Run_Cycle = %d\n", i);
-            for (k = 0; k <= tot_chains; k++)
+            for (k = 0; k <= tot_chains_glb; k++)
                 {
-                    fprintf(fp, "%LE\t", ld_TOTCLUS_Arr[i][k]);
+                    fprintf(fp, "%LE\t", ldaTOTCLUS_Arr_glb[i][k]);
                 }
             fprintf(fp, "\n");
         }
@@ -792,18 +795,18 @@ void FileIO_WriteTo_MolClusFile(const int run_it)
     int i, j, k;
     char dumFile[512];
     sprintf(dumFile, "%s_MolClus.dat",
-            strReportPrefix); // Name Of the COM Density Distribution
+            strReportPrefix_glb); // Name Of the COM Density Distribution
     fp = fopen(dumFile, "w");
     fprintf(fp, "#Cluster Histograms: 1st column is largest cluster, and then clusters of size 1, 2, and so on. Each "
                 "row is a different moltype\n");
     for (i = 0; i < run_it; i++)
         {
             fprintf(fp, "#Run_Cycle = %d\n", i);
-            for (j = 0; j < tot_chain_types; j++)
+            for (j = 0; j < tot_chain_types_glb; j++)
                 {
-                    for (k = 0; k < tot_chains; k++)
+                    for (k = 0; k < tot_chains_glb; k++)
                         {
-                            fprintf(fp, "%LE\t", ld_TOTMOLCLUS_Arr[MolClusArr_Index(i, j, k)]);
+                            fprintf(fp, "%LE\t", ldaTOTMOLCLUS_Arr_glb[MolClusArr_Index(i, j, k)]);
                         }
                     fprintf(fp, "\n");
                 }
@@ -820,15 +823,15 @@ void FileIO_WriteTo_GyrRadFile(const int run_it)
     int i, j, k;
     char dumFile[512];
     sprintf(dumFile, "%s_GR.dat",
-            strReportPrefix); // Name Of the ClusterHistogram Files
+            strReportPrefix_glb); // Name Of the ClusterHistogram Files
     fp = fopen(dumFile, "w");
     fprintf(fp, "#Cluster Histograms: 1st column is largest cluster, and then "
                 "clusters of size 1, 2, and so on\n");
     for (i = 0; i < run_it; i++)
         {
             fprintf(fp, "#Run_Cycle = %d\n", i);
-            fprintf(fp, "%LE\t", ld_TOTRg_Arr[i][0]);
-            fprintf(fp, "%LE\n", ld_TOTRg_Arr[i][1]);
+            fprintf(fp, "%LE\t", ldaTOTRg_Arr_glb[i][0]);
+            fprintf(fp, "%LE\n", ldaTOTRg_Arr_glb[i][1]);
         }
     fprintf(fp, "#Done");
     fclose(fp);
@@ -848,17 +851,17 @@ void FileIO_Write_TotalSysProp(const int run_it)
      * measured quantities. Within each file, each run_cycle shall be written
      * one-by-one in the style of Write_SysProp
      */
-    if (nReport[REPORT_RDFTOT] != 0)
+    if (naReportFreqs_glb[REPORT_RDFTOT] != 0)
         {
             FileIO_WriteTo_RDFTotFile(run_it);
         }
 
-    if (nReport[REPORT_COMDEN] != 0)
+    if (naReportFreqs_glb[REPORT_COMDEN] != 0)
         {
             FileIO_WriteTo_COMDenFile(run_it);
         }
 
-    if (nReport[REPORT_NETWORK] != 0)
+    if (naReportFreqs_glb[REPORT_NETWORK] != 0)
         {
             FileIO_WriteTo_ClusFile(run_it);
             FileIO_WriteTo_MolClusFile(run_it);
@@ -879,31 +882,33 @@ void FileIO_CreateFile(const char* fileName)
 void FileIO_CreateRunningDataFiles(void)
 {
     // Trajectory
-    if (nReport[REPORT_CONFIG])
+    if (naReportFreqs_glb[REPORT_CONFIG])
         {
-            sprintf(fileTraj, "%s_topo.lammpstrj", strReportPrefix); // Name of the topology file
-            FileIO_WriteTo_TopFile(fileTraj);                        // Write the topology file. Only need to write once
-            if (nTrajMode != 1)
+            sprintf(strFileTraj_glb, "%s_topo.lammpstrj", strReportPrefix_glb); // Name of the topology file
+            FileIO_WriteTo_TopFile(strFileTraj_glb);                        // Write the topology file. Only need to write once
+            if (nTrajMode_glb != 1)
                 {
-                    sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix); // Naming convention for trajectory files.
-                    FileIO_CreateFile(fileTraj); // This opens a new trajectory file; each run_it will have its own
+                    sprintf(strFileTraj_glb, "%s_trj.lammpstrj",
+                            strReportPrefix_glb); // Naming convention for trajectory files.
+                    FileIO_CreateFile(
+                        strFileTraj_glb); // This opens a new trajectory file; each run_it will have its own
                 }
         }
 
     // Energy
-    if (nReport[REPORT_ENERGY])
+    if (naReportFreqs_glb[REPORT_ENERGY])
         {
-            sprintf(fileEnergy, "%s_energy.dat", strReportPrefix);
-            FileIO_CreateFile(fileEnergy); // Open a new energy file; each run_it will have its own
-            FileIO_Write_EnergyHeader(fileEnergy);
+            sprintf(strFileEnergy_glb, "%s_energy.dat", strReportPrefix_glb);
+            FileIO_CreateFile(strFileEnergy_glb); // Open a new energy file; each run_it will have its own
+            FileIO_Write_EnergyHeader(strFileEnergy_glb);
         }
 
     // MC Move Acceptance
-    if (nReport[REPORT_MCMOVE])
+    if (naReportFreqs_glb[REPORT_MCMOVE])
         {
-            sprintf(fileMCMove, "%s_mcmove.dat", strReportPrefix);
-            FileIO_CreateFile(fileMCMove); // Open a new MCInfo file; each run_it will have its own
-            FileIO_Write_MCMoveHeader(fileMCMove);
+            sprintf(strFileMCMove_glb, "%s_mcmove.dat", strReportPrefix_glb);
+            FileIO_CreateFile(strFileMCMove_glb); // Open a new MCInfo file; each run_it will have its own
+            FileIO_Write_MCMoveHeader(strFileMCMove_glb);
         }
 }
 
@@ -937,9 +942,9 @@ void DataPrinting_Thermalization(const long nGen)
     char cAccFlag      = 0;
     char cConfigFlag   = 0;
 
-    if (nReport[REPORT_LOG])
+    if (naReportFreqs_glb[REPORT_LOG])
         {
-            cLogFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_LOG]);
+            cLogFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_LOG]);
             if (cLogFlag)
                 {
                     // TODO: I think this whole business can be abstracted away as well.
@@ -957,19 +962,19 @@ void DataPrinting_Thermalization(const long nGen)
 
     if (nGen)
         {
-            if (nReport[REPORT_CONFIG])
+            if (naReportFreqs_glb[REPORT_CONFIG])
                 {
-                    cConfigFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_CONFIG]);
+                    cConfigFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_CONFIG]);
                     if (cConfigFlag)
                         {
-                            FileIO_HandleTrajectory(fileTraj, -1, nGen);
+                            FileIO_HandleTrajectory(strFileTraj_glb, -1, nGen);
                         }
                 }
 
-            if (nReport[REPORT_ENERGY])
+            if (naReportFreqs_glb[REPORT_ENERGY])
                 {
                     // DO ENERGY SHIT
-                    cEnergyFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_ENERGY]);
+                    cEnergyFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_ENERGY]);
                     if (cEnergyFlag)
                         {
                             if (! cFlagForEnCal)
@@ -977,17 +982,17 @@ void DataPrinting_Thermalization(const long nGen)
                                     Energy_Total_System();
                                     cFlagForEnCal = 1;
                                 }
-                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
+                            FileIO_AppendEnergyTo_EnergyFile(strFileEnergy_glb, nGen);
                         }
                 }
 
-            if (nReport[REPORT_MCMOVE])
+            if (naReportFreqs_glb[REPORT_MCMOVE])
                 {
                     // DO MC_ACC SHIT
-                    cAccFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_MCMOVE]);
+                    cAccFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_MCMOVE]);
                     if (cAccFlag)
                         {
-                            FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
+                            FileIO_WriteTo_MCMoveFile(strFileMCMove_glb, nGen, fCuTemp_glb);
                         }
                 }
         }
@@ -1004,9 +1009,9 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
     char cAccFlag      = 0;
     char cConfigFlag   = 0;
 
-    if (nReport[REPORT_LOG])
+    if (naReportFreqs_glb[REPORT_LOG])
         {
-            cLogFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_LOG]);
+            cLogFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_LOG]);
             if (cLogFlag)
                 {
                     // TODO: I think this whole business can be abstracted away as well.
@@ -1024,20 +1029,20 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
 
     if (nGen)
         {
-            if (nReport[REPORT_CONFIG])
+            if (naReportFreqs_glb[REPORT_CONFIG])
                 {
-                    cConfigFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_CONFIG]);
+                    cConfigFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_CONFIG]);
                     if (cConfigFlag)
                         {
-                            sprintf(fileTraj, "%s_trj.lammpstrj", strReportPrefix);
-                            FileIO_HandleTrajectory(fileTraj, run_it, nGen);
+                            sprintf(strFileTraj_glb, "%s_trj.lammpstrj", strReportPrefix_glb);
+                            FileIO_HandleTrajectory(strFileTraj_glb, run_it, nGen);
                         }
                 }
 
-            if (nReport[REPORT_ENERGY])
+            if (naReportFreqs_glb[REPORT_ENERGY])
                 {
                     // DO ENERGY SHIT
-                    cEnergyFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_ENERGY]);
+                    cEnergyFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_ENERGY]);
                     if (cEnergyFlag)
                         {
                             if (! cFlagForEnCal)
@@ -1045,17 +1050,17 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
                                     Energy_Total_System();
                                     cFlagForEnCal = 1;
                                 }
-                            FileIO_AppendEnergyTo_EnergyFile(fileEnergy, nGen);
+                            FileIO_AppendEnergyTo_EnergyFile(strFileEnergy_glb, nGen);
                         }
                 }
 
-            if (nReport[REPORT_MCMOVE])
+            if (naReportFreqs_glb[REPORT_MCMOVE])
                 {
                     // DO MC_ACC SHIT
-                    cAccFlag = ForPrinting_GetReportState(nGen, nReport[REPORT_MCMOVE]);
+                    cAccFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_MCMOVE]);
                     if (cAccFlag)
                         {
-                            FileIO_WriteTo_MCMoveFile(fileMCMove, nGen, fCuTemp);
+                            FileIO_WriteTo_MCMoveFile(strFileMCMove_glb, nGen, fCuTemp_glb);
                         }
                 }
         }
@@ -1071,23 +1076,23 @@ void DataAnalysis_DuringRunCycles(const long nGen, const int run_it)
     //    char cCOM_flag  = 0;
     //    char cCLUS_flag = 0;
 
-    if (nReport[REPORT_RDFTOT])
+    if (naReportFreqs_glb[REPORT_RDFTOT])
         { // SysProp is printed outside of this function in main.c, lol
-            if (nGen % nReport[REPORT_RDFTOT] == 0)
+            if (nGen % naReportFreqs_glb[REPORT_RDFTOT] == 0)
                 {
                     RDF_ComponentWise_Avg();
                 }
         }
-    if (nReport[REPORT_COMDEN])
+    if (naReportFreqs_glb[REPORT_COMDEN])
         { // SysProp is printed outside of this function in main.c, lol
-            if (nGen % nReport[REPORT_COMDEN] == 0)
+            if (nGen % naReportFreqs_glb[REPORT_COMDEN] == 0)
                 {
                     RadDen_Avg_MolTypeWise_FromMolTypeCen();
                 }
         }
-    if (nReport[REPORT_NETWORK])
+    if (naReportFreqs_glb[REPORT_NETWORK])
         { // SysProp is printed outside of this function in main.c, lol
-            if (nGen % nReport[REPORT_NETWORK] == 0)
+            if (nGen % naReportFreqs_glb[REPORT_NETWORK] == 0)
                 {
                     Clus_Perform_Analysis();
                     GyrTensor_GyrRad_Avg();
@@ -1099,43 +1104,44 @@ void DataAnalysis_DuringRunCycles(const long nGen, const int run_it)
 /// \param run_it
 void FileIO_PreCycle_Init(const int run_it)
 {
-    if (nReport[REPORT_CONFIG])
+    if (naReportFreqs_glb[REPORT_CONFIG])
         {
-            if (nTrajMode != 1)
+            if (nTrajMode_glb != 1)
                 {
-                    sprintf(fileEnergy, "%s_trj.dat", strReportPrefix);
+                    sprintf(strFileEnergy_glb, "%s_trj.dat", strReportPrefix_glb);
                 }
         }
 
-    if (nReport[REPORT_ENERGY] != 0)
+    if (naReportFreqs_glb[REPORT_ENERGY] != 0)
         {
-            sprintf(fileEnergy, "%s_%d_energy.dat", strReportPrefix, run_it);
-            FileIO_CreateFile(fileEnergy); // Open a new Energy file; each run_it will have its own
+            sprintf(strFileEnergy_glb, "%s_%d_energy.dat", strReportPrefix_glb, run_it);
+            FileIO_CreateFile(strFileEnergy_glb); // Open a new Energy file; each run_it will have its own
         }
-    if (nReport[REPORT_MCMOVE] != 0)
+    if (naReportFreqs_glb[REPORT_MCMOVE] != 0)
         {
-            sprintf(fileMCMove, "%s_%d_mcmove.dat", strReportPrefix, run_it);
-            FileIO_CreateFile(fileMCMove); // Open a new MCInfo file; each run_it will have its own
+            sprintf(strFileMCMove_glb, "%s_%d_mcmove.dat", strReportPrefix_glb, run_it);
+            FileIO_CreateFile(strFileMCMove_glb); // Open a new MCInfo file; each run_it will have its own
         }
 }
 /// FileIO_WriteRestart_ForRun
 /// \param run_it
 void FileIO_WriteRestart_ForRun(const int run_it)
 {
-    sprintf(fileTraj, "%s_%d_restart.lammpstrj", strReportPrefix,
+    sprintf(strFileTraj_glb, "%s_%d_restart.lammpstrj", strReportPrefix_glb,
             run_it); // Naming convention for trajectory files.
-    FileIO_CreateFile(fileTraj);
-    FileIO_AppendTrajFrame_ToFile(fileTraj, nMCStepsForTherm + (run_it + 1) * nMCStepsPerCycle);
+    FileIO_CreateFile(strFileTraj_glb);
+    FileIO_AppendTrajFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb + (run_it + 1) * nMCStepsPerCycle_glb);
 }
 
 /// FileIO_WriteRestart_ForThermalization
 void FileIO_WriteRestart_ForThermalization(void)
 {
-    if (nMCStepsForTherm)
+    if (nMCStepsForTherm_glb)
         {
-            sprintf(fileTraj, "%s_EQ_restart.lammpstrj", strReportPrefix); // Naming convention for trajectory files.
-            FileIO_CreateFile(fileTraj);
-            FileIO_AppendTrajFrame_ToFile(fileTraj, nMCStepsForTherm);
+            sprintf(strFileTraj_glb, "%s_EQ_restart.lammpstrj",
+                    strReportPrefix_glb); // Naming convention for trajectory files.
+            FileIO_CreateFile(strFileTraj_glb);
+            FileIO_AppendTrajFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb);
         }
 }
 
@@ -1145,69 +1151,69 @@ void FileIO_WriteRestart_ForThermalization(void)
 /// \param run_it
 void CopyData_All(const int run_it)
 {
-    if (nReport[REPORT_RDFTOT])
+    if (naReportFreqs_glb[REPORT_RDFTOT])
         {
             CopyData_RDF(run_it);
         }
-    if (nReport[REPORT_COMDEN])
+    if (naReportFreqs_glb[REPORT_COMDEN])
         {
             CopyData_COMDen(run_it);
         }
-    if (nReport[REPORT_NETWORK])
+    if (naReportFreqs_glb[REPORT_NETWORK])
         {
             CopyData_Clus(run_it);
         }
 }
 
-/// CopyData_RDF: Copies ldRDF_Arr into ld_TOTRDF_Arr
+/// CopyData_RDF: Copies ldaRDF_Arr_glb into ldaTOTRDF_Arr_glb
 /// \param run_it: which run cycle we are on. Should be >= 0.
 void CopyData_RDF(const int run_it)
 {
     int i, j;
-    for (i = 0; i < nRDF_TotComps; i++)
+    for (i = 0; i < nRDF_TotComps_glb; i++)
         {
-            for (j = 0; j < nRDF_TotBins; j++)
+            for (j = 0; j < nRDF_TotBins_glb; j++)
                 {
-                    ld_TOTRDF_Arr[RDFArr_Index(run_it, i, j)] =
-                        ldRDF_Arr[RDFArr_Index(0, i, j)] / (long double) nRDFCounter;
+                    ldaTOTRDF_Arr_glb[RDFArr_Index(run_it, i, j)] =
+                        ldaRDF_Arr_glb[RDFArr_Index(0, i, j)] / (long double) nRDFCounter_glb;
                 }
         }
 }
 
-/// CopyData_RDF: Copies ldRadDen_Arr into ld_TOTRadDen_Arr
+/// CopyData_RDF: Copies ldaRadDen_Arr_glb into ldaTOTRadDen_Arr_glb
 /// \param run_it: which run cycle we are on. Should be >= 0.
 void CopyData_COMDen(const int run_it)
 {
     int i, j;
-    for (i = 0; i < nRadDen_TotComps; i++)
+    for (i = 0; i < nRadDen_TotComps_glb; i++)
         {
-            for (j = 0; j < nRDF_TotBins; j++)
+            for (j = 0; j < nRDF_TotBins_glb; j++)
                 {
-                    ld_TOTRadDen_Arr[RadDenArr_Index(run_it, i, j)] =
-                        ldRadDen_Arr[RadDenArr_Index(0, i, j)] / (long double) nRadDenCounter;
+                    ldaTOTRadDen_Arr_glb[RadDenArr_Index(run_it, i, j)] =
+                        ldaRadDen_Arr_glb[RadDenArr_Index(0, i, j)] / (long double) nRadDenCounter_glb;
                 }
         }
 }
 
-/// CopyData_Clus - Copies ldMOLClUS_Arr into ld_TOTMOLCLUS_Arr. Also copies naClusHistList into ld_TOTCLUS_Arr.
+/// CopyData_Clus - Copies ldMOLClUS_Arr into ldaTOTMOLCLUS_Arr_glb. Also copies naClusHistList_glb into ldaTOTCLUS_Arr_glb.
 /// And stores the Gyration radius.
 /// \param run_it: which run cycle we are on. Should be >= 0.
 void CopyData_Clus(const int run_it)
 {
     int i, j;
-    ld_TOTCLUS_Arr[run_it][0] = (long double) nLargestClusterRightNow / (long double) nTotClusCounter;
-    for (i = 1; i <= tot_chains; i++)
+    ldaTOTCLUS_Arr_glb[run_it][0] = (long double) nLargestClusterRightNow_glb / (long double) nTotClusCounter_glb;
+    for (i = 1; i <= tot_chains_glb; i++)
         {
-            ld_TOTCLUS_Arr[run_it][i] = (long double) naClusHistList[i] / (long double) nTotClusCounter;
+            ldaTOTCLUS_Arr_glb[run_it][i] = (long double) naClusHistList_glb[i] / (long double) nTotClusCounter_glb;
         }
-    for (i = 0; i < tot_chains; i++)
+    for (i = 0; i < tot_chains_glb; i++)
         {
-            for (j = 0; j < tot_chain_types; j++)
+            for (j = 0; j < tot_chain_types_glb; j++)
                 {
-                    ld_TOTMOLCLUS_Arr[MolClusArr_Index(run_it, j, i)] =
-                        ldMOLCLUS_Arr[MolClusArr_Index(0, j, i)] / (long double) nTotClusCounter;
+                    ldaTOTMOLCLUS_Arr_glb[MolClusArr_Index(run_it, j, i)] =
+                        ldaMOLCLUS_Arr_glb[MolClusArr_Index(0, j, i)] / (long double) nTotClusCounter_glb;
                 }
         }
-    ld_TOTRg_Arr[run_it][0] = (long double) fSysGyrRad / (long double) nTotGyrRadCounter;
-    ld_TOTRg_Arr[run_it][1] = (long double) nBoxSize[0] / 2.;
+    ldaTOTRg_Arr_glb[run_it][0] = (long double) faSysGyrRad_glb / (long double) nTotGyrRadCounter_glb;
+    ldaTOTRg_Arr_glb[run_it][1] = (long double) naBoxSize_glb[0] / 2.;
 }

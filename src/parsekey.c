@@ -31,10 +31,10 @@ int Parse_Keyfile(char* filename)
 
     for (i = 0; i < MAX_MV; i++)
         {
-            fMCFreq[i] = 0.0f; // initialization; to be normalized
+            faMCFreq_glb[i] = 0.0f; // initialization; to be normalized
         }
-    nInitialPotential_Mode = 0;
-    nAnnealing_Mode      = -1;
+    nInitialPotential_Mode_glb = 0;
+    nAnnealing_Mode_glb    = -1;
     while (fgets(strLine, sizeof(strLine), infile) != NULL)
         {
             nLine++;
@@ -62,122 +62,122 @@ int Parse_Keyfile(char* filename)
                             sscanf(strLine, "%*s %s %s %s", strTempArr[0], strTempArr[1], strTempArr[2]);
                             if (strTempArr[1][0] < '0' || strTempArr[1][0] > '9')
                                 {
-                                    nBoxSize[0] = atoi(strTempArr[0]);
-                                    nBoxSize[1] = nBoxSize[0];
-                                    nBoxSize[2] = nBoxSize[0];
+                                    naBoxSize_glb[0] = atoi(strTempArr[0]);
+                                    naBoxSize_glb[1] = naBoxSize_glb[0];
+                                    naBoxSize_glb[2] = naBoxSize_glb[0];
                                 }
                             else
                                 {
                                     if (strTempArr[2][0] < '0' || strTempArr[2][0] > '9')
                                         {
-                                            nBoxSize[0] = atoi(strTempArr[0]);
-                                            nBoxSize[1] = atoi(strTempArr[1]);
-                                            nBoxSize[2] = 0; // error handling required
+                                            naBoxSize_glb[0] = atoi(strTempArr[0]);
+                                            naBoxSize_glb[1] = atoi(strTempArr[1]);
+                                            naBoxSize_glb[2] = 0; // error handling required
                                         }
                                     else
                                         {
-                                            nBoxSize[0] = atoi(strTempArr[0]);
-                                            nBoxSize[1] = atoi(strTempArr[1]);
-                                            nBoxSize[2] = atoi(strTempArr[2]);
+                                            naBoxSize_glb[0] = atoi(strTempArr[0]);
+                                            naBoxSize_glb[1] = atoi(strTempArr[1]);
+                                            naBoxSize_glb[2] = atoi(strTempArr[2]);
                                         }
                                 }
-                            nRDF_TotBins = nBoxSize[0] * 4;
+                            nRDF_TotBins_glb = naBoxSize_glb[0] * 4;
                         }
                     else if (strcmp(strKeyword, "MC_TEMP") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fKT);
+                            sscanf(strLine, "%*s %f", &fKT_glb);
                         }
                     else if (strcmp(strKeyword, "N_STEPS") == 0)
                         {
-                            sscanf(strLine, "%*s %ld", &nMCStepsPerCycle);
+                            sscanf(strLine, "%*s %ld", &nMCStepsPerCycle_glb);
                         }
                     else if (strcmp(strKeyword, "PREEQ_STEPS") == 0)
                         {
-                            sscanf(strLine, "%*s %ld", &nMCStepsForTherm);
+                            sscanf(strLine, "%*s %ld", &nMCStepsForTherm_glb);
                         }
                     else if (strcmp(strKeyword, "PREEQ_TEMP") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fPreKT);
+                            sscanf(strLine, "%*s %f", &fPreKT_glb);
                         }
                     else if (strcmp(strKeyword, "MC_TEMP_RATE") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMC_Temp_Rate);
+                            sscanf(strLine, "%*s %f", &fMC_TempRate_glb);
                         }
                     else if (strcmp(strKeyword, "MC_TEMP_MODE") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &nAnnealing_Mode);
+                            sscanf(strLine, "%*s %d", &nAnnealing_Mode_glb);
                         }
                     else if (strcmp(strKeyword, "MC_DELTA_TEMP") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fdelta_temp);
+                            sscanf(strLine, "%*s %f", &fDeltaTemp_glb);
                         }
                     else if (strcmp(strKeyword, "MC_INVERT_TEMP") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &nTemp_inv);
+                            sscanf(strLine, "%*s %d", &nTemp_inv_glb);
                         }
                     else if (strcmp(strKeyword, "MC_CYCLE_NUM") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &nTot_CycleNum);
+                            sscanf(strLine, "%*s %d", &nTotCycleNum_glb);
                         }
                     else if (strcmp(strKeyword, "MC_INDENT_MODE") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &nInitialPotential_Mode);
+                            sscanf(strLine, "%*s %d", &nInitialPotential_Mode_glb);
                         }
                     else if (strcmp(strKeyword, "ROT_ENERGY_BIAS") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &f_globRotBias);
+                            sscanf(strLine, "%*s %f", &fRotBias_glb);
                         }
                     else if (strcmp(strKeyword, "MV_TRANS_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_TRANS]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_TRANS]);
                         }
                     else if (strcmp(strKeyword, "MV_CLSTR_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_CLSTR]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_CLSTR]);
                         }
                     else if (strcmp(strKeyword, "MV_SMCLSTR_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_SMCLSTR]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_SMCLSTR]);
                         }
                     else if (strcmp(strKeyword, "MV_STROT_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_STROT]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_STROT]);
                         }
                     else if (strcmp(strKeyword, "MV_LOCAL_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_LOCAL]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_LOCAL]);
                         }
                     else if (strcmp(strKeyword, "MV_SNAKE_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_SNAKE]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_SNAKE]);
                         }
                     else if (strcmp(strKeyword, "MV_DBPVT_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_DBPVT]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_DBPVT]);
                         }
                     else if (strcmp(strKeyword, "MV_COLOCAL_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_COLOCAL]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_COLOCAL]);
                         }
                     else if (strcmp(strKeyword, "MV_MTLOCAL_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_MTLOCAL]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_MTLOCAL]);
                         }
                     else if (strcmp(strKeyword, "MV_PIVOT_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_PIVOT]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_PIVOT]);
                         }
                     else if (strcmp(strKeyword, "MV_BRROT_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_BRROT]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_BRROT]);
                         }
                     else if (strcmp(strKeyword, "MV_PR_SMCLSTR") == 0)
                         {
-                            sscanf(strLine, "%*s %f", &fMCFreq[MV_PR_SMCLSTR]);
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_PR_SMCLSTR]);
                         }
                     else if (strcmp(strKeyword, "RESTART_FILE") == 0)
                         {
-                            sscanf(strLine, "%*s %s", strRestartFile);
+                            sscanf(strLine, "%*s %s", strRestartFile_glb);
                         }
                     else if (strcmp(strKeyword, "STRUCT_FILETYPE") == 0)
                         {
@@ -193,48 +193,48 @@ int Parse_Keyfile(char* filename)
                         }
                     else if (strcmp(strKeyword, "RANDOM_SEED") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &nRNG_Seed);
-                            nRNG_Seed = nRNG_Seed == 0 ? time(NULL) : nRNG_Seed;
+                            sscanf(strLine, "%*s %d", &nRNG_Seed_glb);
+                            nRNG_Seed_glb = nRNG_Seed_glb == 0 ? time(NULL) : nRNG_Seed_glb;
                         }
                     else if (strcmp(strKeyword, "REPORT_PREFIX") == 0)
                         {
-                            sscanf(strLine, "%*s %s", strReportPrefix);
+                            sscanf(strLine, "%*s %s", strReportPrefix_glb);
                         }
                     else if (strcmp(strKeyword, "REPORT_LOG_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %ld", &nReport[REPORT_LOG]);
+                            sscanf(strLine, "%*s %ld", &naReportFreqs_glb[REPORT_LOG]);
                         }
                     else if (strcmp(strKeyword, "REPORT_ENERGY_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %ld", &nReport[REPORT_ENERGY]);
+                            sscanf(strLine, "%*s %ld", &naReportFreqs_glb[REPORT_ENERGY]);
                         }
                     else if (strcmp(strKeyword, "REPORT_CONFIG_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %ld", &nReport[REPORT_CONFIG]);
+                            sscanf(strLine, "%*s %ld", &naReportFreqs_glb[REPORT_CONFIG]);
                         }
                     else if (strcmp(strKeyword, "REPORT_MCMOVE_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %ld", &nReport[REPORT_MCMOVE]);
+                            sscanf(strLine, "%*s %ld", &naReportFreqs_glb[REPORT_MCMOVE]);
                         }
                     else if (strcmp(strKeyword, "REPORT_NETWORK_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %ld", &nReport[REPORT_NETWORK]);
+                            sscanf(strLine, "%*s %ld", &naReportFreqs_glb[REPORT_NETWORK]);
                         }
                     else if (strcmp(strKeyword, "REPORT_RDFTOT_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %ld", &nReport[REPORT_RDFTOT]);
+                            sscanf(strLine, "%*s %ld", &naReportFreqs_glb[REPORT_RDFTOT]);
                         }
                     else if (strcmp(strKeyword, "REPORT_COMDEN_FREQ") == 0)
                         {
-                            sscanf(strLine, "%*s %ld", &nReport[REPORT_COMDEN]);
+                            sscanf(strLine, "%*s %ld", &naReportFreqs_glb[REPORT_COMDEN]);
                         }
                     else if (strcmp(strKeyword, "ANALYSIS_CLUSTER_MODE") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &nClusteringMode);
+                            sscanf(strLine, "%*s %d", &nClusteringMode_glb);
                         }
                     else if (strcmp(strKeyword, "REPORT_CONFIG_MODE") == 0)
                         {
-                            sscanf(strLine, "%*s %ld", &nTrajMode);
+                            sscanf(strLine, "%*s %ld", &nTrajMode_glb);
                         }
                     else
                         {
@@ -249,21 +249,21 @@ int Parse_Keyfile(char* filename)
     float freq_tot = 0.0f;
     for (i = MV_NULL + 1; i < MAX_MV; i++)
         {
-            freq_tot += fMCFreq[i];
+            freq_tot += faMCFreq_glb[i];
         }
 
     if (freq_tot == 0)
         {
             for (i = MV_NULL + 1; i < MAX_MV; i++)
                 {
-                    fMCFreq[i] = 1.0f / (float) (MAX_MV - 1);
+                    faMCFreq_glb[i] = 1.0f / (float) (MAX_MV - 1);
                 }
         }
     else
         {
             for (i = MV_NULL + 1; i < MAX_MV; i++)
                 {
-                    fMCFreq[i] /= freq_tot;
+                    faMCFreq_glb[i] /= freq_tot;
                 }
         }
 
@@ -275,21 +275,21 @@ int Parse_Keyfile(char* filename)
     if (strStructFile[0] != '\0')
         {
 
-            Parse_StructureFile_CalcBeadsAndChains(strStructFile, &tot_beads, &tot_chains, &tot_chain_types);
+            Parse_StructureFile_CalcBeadsAndChains(strStructFile, &tot_beads_glb, &tot_chains_glb, &tot_chain_types_glb);
 
-            CreateBeadsAndChains(tot_beads, tot_chains);
+            CreateBeadsAndChains(tot_beads_glb, tot_chains_glb);
 
             Parse_StructureFile(strStructFile);
 
             if (nStructFiletype == 0)
                 {
-                    bReadConf = 0;
+                    bReadConf_glb = 0;
                 }
             else if (nStructFiletype == 1)
                 {
                     printf("Reading restart file provided to generate initial "
                            "configuration.\n");
-                    bReadConf = 1;
+                    bReadConf_glb = 1;
                 }
             else
                 {
@@ -299,13 +299,13 @@ int Parse_Keyfile(char* filename)
         }
     else
         {
-            bReadConf = -1;
+            bReadConf_glb = -1;
         }
-    if (bReadConf == 1)
+    if (bReadConf_glb == 1)
         {
-            if (strRestartFile[0] != '\0')
+            if (strRestartFile_glb[0] != '\0')
                 {
-                    printf("Restart file is %s\n", strRestartFile);
+                    printf("Restart file is %s\n", strRestartFile_glb);
                 }
             else
                 {
@@ -328,7 +328,7 @@ void ForEnergyMatrix_FillWithZeros()
                 {
                     for (k = 0; k < MAX_E; k++)
                         {
-                            fEnergy[i][j][k] = 0.f;
+                            faEnergy_glb[i][j][k] = 0.f;
                         }
                 }
         }
@@ -431,8 +431,8 @@ int Parse_EnergyFile(char* strEnFile)
                 { // ignore empty lines
                     if (nFlag == -1)
                         { // sticker
-                            sscanf(strLine, "%d", &nBeadTypes);
-                            if (nBeadTypes > MAX_AA)
+                            sscanf(strLine, "%d", &nBeadTypes_glb);
+                            if (nBeadTypes_glb > MAX_AA)
                                 {
                                     fprintf(stderr, "ERROR: the number of AA types exceeds MAX_AA in %s.\n", strEnFile);
                                     nRes = 3;
@@ -442,15 +442,15 @@ int Parse_EnergyFile(char* strEnFile)
                         }
                     else if (nFlag == -3)
                         { // linker_length
-                            sscanf(strLine, "%f", &fLinkerLength);
+                            sscanf(strLine, "%f", &fLinkerLength_glb);
                         }
                     else if (nFlag == -4)
                         { // linker_sprcon
-                            sscanf(strLine, "%f", &fLinkerSprCon);
+                            sscanf(strLine, "%f", &fLinkerSprCon_glb);
                         }
                     else if (nFlag == -5)
                         { // linker_eqlen
-                            sscanf(strLine, "%f", &fLinkerEqLen);
+                            sscanf(strLine, "%f", &fLinkerEqLen_glb);
                         }
                     else if (nFlag == 0)
                         {
@@ -461,22 +461,22 @@ int Parse_EnergyFile(char* strEnFile)
                     else
                         {                                      // Saving energy and radius matrices
                             nEntry = str2farr(strLine, fTemp); // Counting how many columns
-                            if (nEntry != nBeadTypes)
+                            if (nEntry != nBeadTypes_glb)
                                 { // If columns not the same as sticker number
                                     if (nEntry == 1)
                                         { // If only 1-value, all-values in  that
                                           // matrix are this one
-                                            for (i = 0; i < nBeadTypes; i++)
+                                            for (i = 0; i < nBeadTypes_glb; i++)
                                                 {
-                                                    for (j = 0; j < nBeadTypes; j++)
+                                                    for (j = 0; j < nBeadTypes_glb; j++)
                                                         {
                                                             if (nFlag % 2 == 0)
                                                                 { // energy
-                                                                    fEnergy[i][j][(int) (nFlag / 2)] = fTemp[0];
+                                                                    faEnergy_glb[i][j][(int) (nFlag / 2)] = fTemp[0];
                                                                 }
                                                             else
                                                                 { // radius
-                                                                    fEnRad[i][j][(int) (nFlag / 2)] = fTemp[0];
+                                                                    faEnRad_glb[i][j][(int) (nFlag / 2)] = fTemp[0];
                                                                 }
                                                         }
                                                 }
@@ -496,16 +496,16 @@ int Parse_EnergyFile(char* strEnFile)
                                   // matrix
                                     if (nFlag % 2 == 0)
                                         { // energy
-                                            for (i = 0; i < nBeadTypes; i++)
+                                            for (i = 0; i < nBeadTypes_glb; i++)
                                                 {
-                                                    fEnergy[nRow][i][(int) (nFlag / 2)] = fTemp[i];
+                                                    faEnergy_glb[nRow][i][(int) (nFlag / 2)] = fTemp[i];
                                                 }
                                         }
                                     else
                                         { // radius
-                                            for (i = 0; i < nBeadTypes; i++)
+                                            for (i = 0; i < nBeadTypes_glb; i++)
                                                 {
-                                                    fEnRad[nRow][i][(int) (nFlag / 2)] = fTemp[i];
+                                                    faEnRad_glb[nRow][i][(int) (nFlag / 2)] = fTemp[i];
                                                 }
                                         }
                                     nRow++;
@@ -587,8 +587,8 @@ void Parse_StructureFile(char* filename)
     }END
     ####
     As such, each molecule is independent and all molecule beads start from 0!
-    For each listed bead, linker_len[i][j] corresponds to the linker constraint
-    between bead i, and bead (topo_info[i][j]). After each molecule is read,
+    For each listed bead, linker_len_glb[i][j] corresponds to the linker constraint
+    between bead i, and bead (topo_info_glb[i][j]). After each molecule is read,
     nCopies copies are made, and THEN, the next line in the file is read.
     */
     FILE* inFile;
@@ -610,25 +610,25 @@ void Parse_StructureFile(char* filename)
     int nFlag;      // Internal flag used to see which keyword is being read!
     int nBEADS;     // Internal counter to count unique beads in each chain!
 
-    // Initialize the bead_info and chain_info
-    for (i = 0; i < tot_beads; i++)
+    // Initialize the bead_info_glb and chain_info_glb
+    for (i = 0; i < tot_beads_glb; i++)
         {
             for (j = 0; j < BEADINFO_MAX; j++)
                 {
-                    bead_info[i][j] = -1;
+                    bead_info_glb[i][j] = -1;
                 }
             for (j = 0; j < MAX_BONDS; j++)
                 {
-                    topo_info[i][j]  = -1;
-                    linker_len[i][j] = -1;
+                    topo_info_glb[i][j]  = -1;
+                    linker_len_glb[i][j] = -1;
                 }
         }
 
-    for (i = 0; i < tot_chains; i++)
+    for (i = 0; i < tot_chains_glb; i++)
         {
             for (j = 0; j < CHAININFO_MAX; j++)
                 {
-                    chain_info[i][j] = -1;
+                    chain_info_glb[i][j] = -1;
                 }
         }
 
@@ -693,12 +693,12 @@ void Parse_StructureFile(char* filename)
                                 }
                             sscanf(strLine, "%d %d %d %d", &curID, &curType, &curLinker, &curPartner);
                             curID += nChainStart; // Accounting for previously defined beads
-                            if (bead_info[curID][BEAD_TYPE] == -1)
+                            if (bead_info_glb[curID][BEAD_TYPE] == -1)
                                 { // This is to make sure that each bead is counted
                                   // once only even if it has many bonds.
                                     nBEADS++;
-                                    bead_info[curID][BEAD_TYPE]    = curType;
-                                    bead_info[curID][BEAD_CHAINID] = nChainID;
+                                    bead_info_glb[curID][BEAD_TYPE]    = curType;
+                                    bead_info_glb[curID][BEAD_CHAINID] = nChainID;
                                     nCursor                        = 0; // This is a counter for number of bonds, which
                                                                         // should reset when you have a 'new' bead.
                                 }
@@ -713,38 +713,38 @@ void Parse_StructureFile(char* filename)
                                         }
                                     curPartner += nChainStart;              // Accounts for all beads before,
                                                                             // like above.
-                                    topo_info[curID][nCursor] = curPartner; // Adding the ID of the partner
-                                    linker_len[curID][nCursor] =
-                                        curLinker * (int) fLinkerLength; // Adding the linker constraint.
+                                    topo_info_glb[curID][nCursor] = curPartner; // Adding the ID of the partner
+                                    linker_len_glb[curID][nCursor] =
+                                        curLinker * (int) fLinkerLength_glb; // Adding the linker constraint.
                                     nCursor++;
                                 }
                         }
-                    chain_info[nChainID][CHAIN_START]  = nChainStart;
-                    chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
-                    chain_info[nChainID][CHAIN_TYPE]   = nChainType;
+                    chain_info_glb[nChainID][CHAIN_START]  = nChainStart;
+                    chain_info_glb[nChainID][CHAIN_LENGTH] = nBEADS;
+                    chain_info_glb[nChainID][CHAIN_TYPE]   = nChainType;
                     // We just fully store the first chain 'manually'. Now we just copy
                     // the chain nCopies times.
                     for (k = 1; k < nCopies; k++)
                         {                          // Now we just copy this molecule nMOL-1 times
                             nChainStart += nBEADS; // This accounts for chain lengths.
                             nChainID++;            // Going to the next chainID
-                            chain_info[nChainID][CHAIN_START]  = nChainStart;
-                            chain_info[nChainID][CHAIN_LENGTH] = nBEADS;
-                            chain_info[nChainID][CHAIN_TYPE]   = nChainType;
+                            chain_info_glb[nChainID][CHAIN_START]  = nChainStart;
+                            chain_info_glb[nChainID][CHAIN_LENGTH] = nBEADS;
+                            chain_info_glb[nChainID][CHAIN_TYPE]   = nChainType;
 
                             for (i = 0; i < nBEADS; i++)
                                 {
                                     curID                          = i + nChainStart;
                                     nTemp                          = curID - nBEADS;
-                                    bead_info[curID][BEAD_TYPE]    = bead_info[nTemp][BEAD_TYPE];
-                                    bead_info[curID][BEAD_CHAINID] = nChainID;
+                                    bead_info_glb[curID][BEAD_TYPE]    = bead_info_glb[nTemp][BEAD_TYPE];
+                                    bead_info_glb[curID][BEAD_CHAINID] = nChainID;
                                     for (j = 0; j < MAX_BONDS; j++)
                                         {
-                                            linker_len[curID][j] = linker_len[nTemp][j];
-                                            if (topo_info[nTemp][j] != -1)
+                                            linker_len_glb[curID][j] = linker_len_glb[nTemp][j];
+                                            if (topo_info_glb[nTemp][j] != -1)
                                                 {
-                                                    topo_info[curID][j] =
-                                                        topo_info[nTemp][j] + nBEADS; // Because we must account for
+                                                    topo_info_glb[curID][j] =
+                                                        topo_info_glb[nTemp][j] + nBEADS; // Because we must account for
                                                                                       // chain lengths
                                                 }
                                         }
@@ -869,17 +869,17 @@ void CreateBeadsAndChains(size_t n_bead_num, size_t n_chain_num)
     char strTemp[100];
 
     strcpy(strTemp, "Chain Info.");
-    chain_info = Create2DInt(CHAININFO_MAX, n_chain_num, strTemp);
+    chain_info_glb = Create2DInt(CHAININFO_MAX, n_chain_num, strTemp);
 
     strcpy(strTemp, "Topo Info.");
-    topo_info = Create2DInt(MAX_BONDS, n_bead_num, strTemp);
+    topo_info_glb = Create2DInt(MAX_BONDS, n_bead_num, strTemp);
 
     strcpy(strTemp, "Linker Len.");
-    linker_len = Create2DInt(MAX_BONDS, n_bead_num, strTemp);
+    linker_len_glb = Create2DInt(MAX_BONDS, n_bead_num, strTemp);
 
     strcpy(strTemp, "Bead Info.");
-    bead_info = Create2DInt(BEADINFO_MAX, n_bead_num, strTemp);
+    bead_info_glb = Create2DInt(BEADINFO_MAX, n_bead_num, strTemp);
 
     strcpy(strTemp, "Old Bead.");
-    old_bead = Create2DInt(BEADINFO_MAX, n_bead_num, strTemp);
+    old_bead_glb = Create2DInt(BEADINFO_MAX, n_bead_num, strTemp);
 }
