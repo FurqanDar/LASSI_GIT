@@ -558,6 +558,8 @@ void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle)
 
     ScreenIO_Print_SystemEnergy();
     ScreenIO_Print_AcceptanceRatios();
+
+    printf("\n%d\n", Clus_Aniso_OfSystem());
 }
 
 /// Write_RDF_ComponentWise - old implementation of printing the RDF, component

@@ -1880,3 +1880,64 @@ int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable
 
     return clusSize;
 }
+
+int Clus_Aniso_OfSystem(void)
+{
+    int nCumulativeSize = 0;
+    int nClusNum        = 0;
+
+    int* naTmpClusList       = (int*) malloc(sizeof(int) * (tot_chains_glb + 1));
+    int* naTmpClusIDsList    = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+    char* caTmpClusCheckList = (char*) calloc(tot_chains_glb + 1, sizeof(char));
+
+    int nThisChainID = 0;
+    int nThisClusSize;
+
+    while (nThisChainID < tot_chains_glb)
+        {
+            nThisClusSize = Clus_Aniso_OfChain(nThisChainID, caTmpClusCheckList, naTmpClusList + nCumulativeSize);
+
+            nCumulativeSize += nThisClusSize;
+            nClusNum++;
+            naTmpClusIDsList[nClusNum] = nCumulativeSize;
+
+            nThisChainID  = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
+
+        }
+
+    if (nClusNum < 400)
+    {
+        int j;
+        for (j=0; j<nClusNum; j++)
+
+            {
+                int i;
+                int stIt = naTmpClusIDsList[j];
+                int enIt = naTmpClusIDsList[j+1];
+                printf("%-10d ", enIt-stIt);
+                for (i = stIt; i < enIt; i++)
+                    {
+                        printf("%-4d ", naTmpClusList[i]);
+                    }
+                printf("\n");
+            }
+    }
+
+    free(naTmpClusList);
+    free(caTmpClusCheckList);
+    free(naTmpClusIDsList);
+
+    return nClusNum;
+}
+
+int ClusUtil_NextUnvisitedChain(int const nChainID, const char* const caTotClusTable)
+{
+    int nNewChainID = nChainID;
+
+    while(caTotClusTable[nNewChainID] == 1)
+    {
+        nNewChainID++;
+    }
+
+    return nNewChainID;
+}

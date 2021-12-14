@@ -83,4 +83,8 @@ int Clus_Aniso_OfChain(const int chainID, char* restrict caTotClusTable, int* re
 int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                 int const maxSize);
 
+int Clus_Aniso_OfSystem(void);
+
+int ClusUtil_NextUnvisitedChain(int const nChainID, const char* const caTotClusTable);
+
 #endif // _CLUSTER_H_
