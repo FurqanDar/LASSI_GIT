@@ -1807,6 +1807,20 @@ int ChainListOP_AddUniqueChains_wSize_Check(const int clusSize, int* clusList, c
     return newClusSize;
 }
 
+
+/// ChainListOP_GetChainTypes - Given a list that contains chainIDs, we get the type of each of the chains.
+/// \param naTypesList Array where the chain-types will be recorded.
+/// \param naChainIDs Array that contains all the chainIDs.
+/// \param nListSize Number of chains in the naChainIDs array
+void ChainListOP_GetChainTypes(int* const naTypesList, const int* const naChainIDs, const int nListSize)
+{
+    int i;
+    for (i=0; i<nListSize; i++)
+    {
+        naTypesList[i] = chain_info_glb[i][CHAIN_TYPE];
+    }
+
+}
 /// ClusListOP_AddChainID - Given a cluster-chainIDs list containing clusSize chains, we try to add the proposed
 /// chainID. Assumes that clusList[0] is the smallest, and clusList[clusSize-1] is the largest.
 /// - If the chain is smaller than the smallest, we add it to become the first element of the chain, because it is now
@@ -1860,7 +1874,7 @@ int ClusListOP_AddIfUniqueChainID(const int clusSize, int* clusList, const int c
 /// point at r_pos0 as well.
 /// \param r_pos0
 /// \param numList - MUST be at least 27 = 3^3 elements long. Undefined behavior if not that long.
-void LatticeUtil_GetOvlpLattIndecies(const int* restrict r_pos0, int* restrict numList)
+void LatticeUtil_GetOvlpLattIndecies(const int* restrict const r_pos0, int* restrict numList)
 {
     int i               = 0;
     int r_disp[POS_MAX] = {0};
@@ -1879,7 +1893,6 @@ void LatticeUtil_GetOvlpLattIndecies(const int* restrict r_pos0, int* restrict n
                             LatPos_add_wPBC_ofComp(r_chck, r_pos0, r_disp, POS_Z);
                             tmpBead      = Lat_Ind_FromVec(r_chck);
                             numList[i++] = tmpBead;
-                            //                *(numList++) = tmpBead;
                         }
                 }
         }
@@ -1889,7 +1902,7 @@ void LatticeUtil_GetOvlpLattIndecies(const int* restrict r_pos0, int* restrict n
 /// Note that this will include -1 values as well, or empty sites.
 /// \param nIndexList
 /// \param nLatValsList - Must be at least 27 elements long.
-void LatticeUtil_GetLattVals_FromList(const int* restrict nIndexList, int* restrict nLatValsList, const int listSize)
+void LatticeUtil_GetLattVals_FromList(const int* restrict const nIndexList, int* restrict nLatValsList, const int listSize)
 {
     int i;
     for (i = 0; i < listSize; ++i)
@@ -1903,7 +1916,7 @@ void LatticeUtil_GetLattVals_FromList(const int* restrict nIndexList, int* restr
 /// \param nLatValsList
 /// \param nBeadsList
 /// \return
-int LatticeUtil_GetBeadIDs_FromList(const int* restrict nLatValsList, int* restrict nBeadsList, const int listSize)
+int LatticeUtil_GetBeadIDs_FromList(const int* restrict const nLatValsList, int* restrict nBeadsList, const int listSize)
 {
     int nBeadsNum = 0;
     int tmpBead;
@@ -1924,7 +1937,7 @@ int LatticeUtil_GetBeadIDs_FromList(const int* restrict nLatValsList, int* restr
 /// \param r_pos0
 /// \param nBeadsList
 /// \return
-int LatticeUtil_GetNeighBeads_AtPos(const int* restrict r_pos0, int* restrict nBeadsList)
+int LatticeUtil_GetNeighBeads_AtPos(const int* restrict const r_pos0, int* restrict nBeadsList)
 {
 
     int nLatInd[CLUS_CONTACT_NEIGHS];

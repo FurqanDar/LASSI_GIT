@@ -1881,6 +1881,23 @@ int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable
     return clusSize;
 }
 
+
+/// ClusUtil_NextUnvisitedChain -
+/// \param nChainID
+/// \param caTotClusTable
+/// \return
+int ClusUtil_NextUnvisitedChain(int const nChainID, const char* const caTotClusTable)
+{
+    int nNewChainID = nChainID;
+
+    while(caTotClusTable[nNewChainID] == 1)
+    {
+        nNewChainID++;
+    }
+
+    return nNewChainID;
+}
+
 int Clus_Aniso_OfSystem(void)
 {
     int nCumulativeSize = 0;
@@ -1905,22 +1922,36 @@ int Clus_Aniso_OfSystem(void)
 
         }
 
-    if (nClusNum < 400)
-    {
-        int j;
-        for (j=0; j<nClusNum; j++)
+    free(naTmpClusList);
+    free(caTmpClusCheckList);
+    free(naTmpClusIDsList);
 
-            {
-                int i;
-                int stIt = naTmpClusIDsList[j];
-                int enIt = naTmpClusIDsList[j+1];
-                printf("%-10d ", enIt-stIt);
-                for (i = stIt; i < enIt; i++)
-                    {
-                        printf("%-4d ", naTmpClusList[i]);
-                    }
-                printf("\n");
-            }
+    return nClusNum;
+}
+
+
+int Clus_Ovlp_OfSystem(void)
+{
+    int nCumulativeSize = 0;
+    int nClusNum        = 0;
+
+    int* naTmpClusList       = (int*) malloc(sizeof(int) * (tot_chains_glb + 1));
+    int* naTmpClusIDsList    = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+    char* caTmpClusCheckList = (char*) calloc(tot_chains_glb + 1, sizeof(char));
+
+    int nThisChainID = 0;
+    int nThisClusSize;
+
+    while (nThisChainID < tot_chains_glb)
+    {
+        nThisClusSize = Clus_Ovlp_OfChain(nThisChainID, caTmpClusCheckList, naTmpClusList + nCumulativeSize);
+
+        nCumulativeSize += nThisClusSize;
+        nClusNum++;
+        naTmpClusIDsList[nClusNum] = nCumulativeSize;
+
+        nThisChainID  = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
+
     }
 
     free(naTmpClusList);
@@ -1930,14 +1961,160 @@ int Clus_Aniso_OfSystem(void)
     return nClusNum;
 }
 
-int ClusUtil_NextUnvisitedChain(int const nChainID, const char* const caTotClusTable)
+int Clus_Ovlp_OfSystem_New(int* const naFullClusList, int* const naCumClusSizes)
 {
-    int nNewChainID = nChainID;
+    int nCumulativeSize = 0;
+    int nClusNum        = 0;
 
-    while(caTotClusTable[nNewChainID] == 1)
+
+    char* caTmpClusCheckList = (char*) calloc(tot_chains_glb + 1, sizeof(char));
+
+    int nThisChainID = 0;
+    int nThisClusSize;
+
+    while (nThisChainID < tot_chains_glb)
     {
-        nNewChainID++;
+        nThisClusSize = Clus_Ovlp_OfChain(nThisChainID, caTmpClusCheckList, naFullClusList + nCumulativeSize);
+
+        nCumulativeSize += nThisClusSize;
+        nClusNum++;
+        naCumClusSizes[nClusNum] = nCumulativeSize;
+
+        nThisChainID  = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
+
     }
 
-    return nNewChainID;
+    free(caTmpClusCheckList);
+
+
+    return nClusNum;
+}
+
+void ClusUtil_GenClusSizesFromCumulativeSizes(int *const naSizeList, const int *const naCumClusSizes, int const nClusNum)
+{
+    int i;
+
+    for (i=0; i<nClusNum; i++)
+    {
+        naSizeList[i] = naCumClusSizes[i+1]-naCumClusSizes[i];
+    }
+}
+
+void ClusHistUtil_AddToHist_FromCountsList(lLong* const laHist, const int* const naCounts, const int nBins)
+{
+    int i;
+    for (i=0; i < nBins; i++)
+    {
+        laHist[naCounts[i]]++;
+    }
+}
+
+void ClusUtil_GenHistFromCumulativeSizes(int* const restrict naClusSizeHist, const int* const restrict naCumClusSizes,
+                                         int const nClusNum)
+{
+    int* naTmpSizeList = (int*) calloc((nClusNum), sizeof(int));
+
+    ClusUtil_GenClusSizesFromCumulativeSizes(naTmpSizeList, naCumClusSizes, nClusNum);
+
+    ClusHistUtil_AddToHist_FromCountsList(naClusSizeHist, naTmpSizeList, nClusNum);
+
+    free(naTmpSizeList);
+}
+
+
+void ClusUtil_AddToGlobalClusHist(const int* const naClusSizes, const int nClusNum)
+{
+    int i;
+    for (i=0; i<nClusNum; i++)
+    {
+        naClusHistList_glb[naClusSizes[i]]++;
+    }
+}
+
+
+
+int ClusUtil_GetCluster_FromFullClusAndCumSizes(const int nClusID, int* const naOutClusList,
+                                                const int* const naFullClusList, const int* const naCumSizes,
+                                                const int* const naClusSizes, const int nClusNum)
+{
+#if DEBUG
+    if (nClusID > nClusNum)
+        {
+            fprintf(stderr, "Incorrect cluster-ID (%d) is greater than number of clusters (%d)\n", nClusID, nClusNum);
+            fprintf(stderr, "Crashing.");
+            exit(1);
+        }
+    if (nClusID < 0)
+        {
+            fprintf(stderr, "Negative cluster-ID (%d)\n", nClusID);
+            fprintf(stderr, "Crashing.");
+            exit(1);
+        }
+#endif
+
+    int i;
+    const int thisSize = naClusSizes[nClusID];
+    const int nStart   = naCumSizes[nClusID];
+
+    for (i = 0; i < thisSize; i++)
+        {
+            naOutClusList[i] = naFullClusList[i + nStart];
+        }
+
+    return thisSize;
+}
+
+void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromCluster(lLDub* const restrict ldaMolWiseHist, const int* const restrict naClusList,
+                                           const int nClusSize)
+{
+    int i;
+    int chainID, chainType, histBin;
+    for (i = 0; i < nClusSize; i++)
+        {
+            chainID   = naClusList[i];
+            chainType = chain_info_glb[chainID][CHAIN_TYPE];
+            histBin   = MolClusArr_Index(0, chainType, nClusSize);
+            ldaMolWiseHist[histBin]++;
+        }
+}
+
+void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromFullClusAndCumSizes(lLDub* const ldaMolWiseHist,
+                                                                      const int* const naClusChainIDs,
+                                                                      const int* const naCumClusSizes,
+                                                                      const int* const naClusSizes, int const nClusNum)
+{
+    int* thisCluster = calloc(tot_chains_glb + 1, sizeof(int));
+
+    int i;
+    int thisSize;
+    for (i = 0; i < nClusNum; i++)
+        {
+            thisSize = ClusUtil_GetCluster_FromFullClusAndCumSizes(i, thisCluster, naClusChainIDs, naCumClusSizes,
+                                                                   naClusSizes, nClusNum);
+            ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromCluster(ldaMolWiseHist, thisCluster, thisSize);
+        }
+
+    free(thisCluster);
+}
+
+void ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(lLong* const restrict naSizeHist,
+                                                           lLDub* const restrict ldaMolWiseHist)
+{
+    int* naFullClusList = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+    int* naCumClusSizes = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+
+    const int nClusNum = Clus_Ovlp_OfSystem_New(naFullClusList, naCumClusSizes);
+
+    int* naClusSizes = (int*) calloc((nClusNum + 1), sizeof(int));
+
+    ClusUtil_GenClusSizesFromCumulativeSizes(naClusSizes, naCumClusSizes, nClusNum);
+
+    ClusHistUtil_AddToHist_FromCountsList(naSizeHist, naClusSizes, nClusNum);
+
+    ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromFullClusAndCumSizes(ldaMolWiseHist, naFullClusList, naCumClusSizes,
+                                                                     naClusSizes, nClusNum);
+
+    free(naFullClusList);
+    free(naCumClusSizes);
+    free(naClusSizes);
 }

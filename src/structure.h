@@ -126,6 +126,8 @@ int ClusListOP_AddIfUniqueChainID(const int clusSize, int* clusList, const int c
 int ChainListOP_AddUniqueChains_wSize_Check(const int clusSize, int* clusList, const int newChainNums,
                                             const int* chainList, const int maxClus, const int* oldList);
 
+void ChainListOP_GetChainTypes(int* const naTypesList, const int* const naChainIDs, const int nListSize);
+
 void LatticeUtil_GetOvlpLattIndecies(const int* r_pos0, int* numList);
 
 void LatticeUtil_GetLattVals_FromList(const int* nIndexList, int* nLatValsList, const int listSize);
@@ -133,5 +135,6 @@ void LatticeUtil_GetLattVals_FromList(const int* nIndexList, int* nLatValsList, 
 int LatticeUtil_GetBeadIDs_FromList(const int* nLatValsList, int* nBeadsList, const int listSize);
 
 int LatticeUtil_GetNeighBeads_AtPos(const int* restrict r_pos0, int* restrict nBeadsList);
+
 
 #endif // _STRUCTURE_H_

@@ -83,8 +83,12 @@ int Clus_Aniso_OfChain(const int chainID, char* restrict caTotClusTable, int* re
 int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                 int const maxSize);
 
+int ClusUtil_NextUnvisitedChain(int const nChainID, const char* const caTotClusTable);
+
 int Clus_Aniso_OfSystem(void);
 
-int ClusUtil_NextUnvisitedChain(int const nChainID, const char* const caTotClusTable);
+int Clus_Ovlp_OfSystem(void);
+
+void ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(lLong *const restrict naSizeHist, lLDub *const restrict ldaMolWiseHist);
 
 #endif // _CLUSTER_H_
