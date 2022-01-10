@@ -1630,7 +1630,7 @@ int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict caTotClusTab
     return endSize;
 }
 
-///
+/// ClusUtil_AddOvlpCluster_OfBead_CheckForSame -
 /// \param beadID
 /// \param caTotClusTable
 /// \return
@@ -1703,14 +1703,15 @@ int ClusUtil_AddOvlpCluster_OfChain_CheckForSame(const int chainID, const char* 
     return 1;
 }
 
-///
+/// Clus_Ovlp_OfChain Calculate the Ovlp-bases cluster of molecule chainID. Returns the size of the cluster. The cluster
+/// will be written on naClusList, and caTotClusTable will contain the cluster for chainID.
 /// \param chainID
-/// \param caTotClusTable
-/// \param clusList
-/// \return
-int Clus_Ovlp_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList)
+/// \param caTotClusTable Boolean-like array that contains which chains have been already looked at in the system.
+/// \param naClusList Array that will contain the chain indices of the chains in the cluster.
+/// \return Total size of the cluster chainID is a part of.
+int Clus_Ovlp_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict naClusList)
 {
-    clusList[0]            = chainID;
+    naClusList[0]            = chainID;
     caTotClusTable[chainID] = 1;
 
     int clusSize = 1;
@@ -1719,8 +1720,8 @@ int Clus_Ovlp_OfChain(const int chainID, char* restrict caTotClusTable, int* res
     int i;
     for (i = 0; i < clusSize; ++i)
         {
-            tmpChain = clusList[i];
-            ClusUtil_AddOvlpCluster_OfChain(tmpChain, caTotClusTable, clusList, &clusSize);
+            tmpChain = naClusList[i];
+            ClusUtil_AddOvlpCluster_OfChain(tmpChain, caTotClusTable, naClusList, &clusSize);
         }
 
     return clusSize;
@@ -1882,10 +1883,11 @@ int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable
 }
 
 
-/// ClusUtil_NextUnvisitedChain -
-/// \param nChainID
-/// \param caTotClusTable
-/// \return
+/// ClusUtil_NextUnvisitedChain - Given that we are on chain nChainID, we use caTotClusTable to find the index of the
+/// next unvisited chain.
+/// \param nChainID Starting chain.
+/// \param caTotClusTable Boolean-like array that stores if a chain has been visited before.
+/// \return Index of an unvisited chain.
 int ClusUtil_NextUnvisitedChain(int const nChainID, const char* const caTotClusTable)
 {
     int nNewChainID = nChainID;
@@ -1929,7 +1931,6 @@ int Clus_Aniso_OfSystem(void)
     return nClusNum;
 }
 
-
 int Clus_Ovlp_OfSystem(void)
 {
     int nCumulativeSize = 0;
@@ -1961,11 +1962,17 @@ int Clus_Ovlp_OfSystem(void)
     return nClusNum;
 }
 
+/// Clus_Ovlp_OfSystem_New - Calculates the Ovlp-based cluster of the whole system. Writes over the provided arrays
+/// to save the cluster-list and the cumulative sizes.
+/// \param naFullClusList Array that will contain all the clusters.
+/// \param naCumClusSizes Array that will contain the cumulative sizes of the clusters. Allows for cluster extraction
+/// later by doing some index-based arithmetic.
+/// \return The total number of clusters in the system. 1 would mean every molecule is part of a single cluster.
+/// While tot_chains_glb would mean that every molecule is only a part of its own cluster.
 int Clus_Ovlp_OfSystem_New(int* const naFullClusList, int* const naCumClusSizes)
 {
     int nCumulativeSize = 0;
     int nClusNum        = 0;
-
 
     char* caTmpClusCheckList = (char*) calloc(tot_chains_glb + 1, sizeof(char));
 
@@ -1986,20 +1993,31 @@ int Clus_Ovlp_OfSystem_New(int* const naFullClusList, int* const naCumClusSizes)
 
     free(caTmpClusCheckList);
 
-
     return nClusNum;
 }
 
-void ClusUtil_GenClusSizesFromCumulativeSizes(int *const naSizeList, const int *const naCumClusSizes, int const nClusNum)
+/// ClusUtil_GenClusSizesFromCumulativeSizes - Given the total number of clusters nClusNum, and the cumulative-sizes of
+/// the clusters naCumClusSizes, we update the naSizeList to contain all the cluster sizes. Remember that the sizes
+/// will be unordered. size[i] = cum_size[i+1]-cum_size[i]
+/// \param naSizeList Will contain sizes of clusters.
+/// \param naCumClusSizes Contains cumulative sizes.
+/// \param nClusNum Total number of clusters.
+void ClusUtil_GenClusSizesFromCumulativeSizes(int* const naSizeList, const int* const naCumClusSizes,
+                                              int const nClusNum)
 {
     int i;
 
-    for (i=0; i<nClusNum; i++)
-    {
-        naSizeList[i] = naCumClusSizes[i+1]-naCumClusSizes[i];
-    }
+    for (i = 0; i < nClusNum; i++)
+        {
+            naSizeList[i] = naCumClusSizes[i + 1] - naCumClusSizes[i];
+        }
 }
 
+/// ClusHistUtil_AddToHist_FromCountsList - Using the occurences in naCounts, we add to the histogram laHist, which
+/// is a long-double. naCounts[i] represents the index of the histogram.
+/// \param laHist Histogram to be added on to.
+/// \param naCounts Array that has the occurences.
+/// \param nBins Total number of bins to look at.
 void ClusHistUtil_AddToHist_FromCountsList(lLong* const laHist, const int* const naCounts, const int nBins)
 {
     int i;
@@ -2031,13 +2049,20 @@ void ClusUtil_AddToGlobalClusHist(const int* const naClusSizes, const int nClusN
     }
 }
 
-
-
+/// ClusUtil_GetCluster_FromFullClusAndCumSizes - Given the cluster-list, cumulative sizes, cluster sizes and total
+/// number of clusters, we get the cluster specific to nClusID and also return the size.
+/// \param nClusID Index of cluster in naFullClusList
+/// \param naOutClusList Array that will contain the chainIDs of the cluster
+/// \param naFullClusList Array that contains the clusters
+/// \param naCumSizes Array containing the cumulative sizes of the clusters.
+/// \param naClusSizes Array containing the cluster sizes.
+/// \param nClusNum Total number of clusters. Mostly used for debugging.
+/// \return The size of this particular cluster.
 int ClusUtil_GetCluster_FromFullClusAndCumSizes(const int nClusID, int* const naOutClusList,
                                                 const int* const naFullClusList, const int* const naCumSizes,
                                                 const int* const naClusSizes, const int nClusNum)
 {
-#if DEBUG
+#if DEBUG_BUILD
     if (nClusID > nClusNum)
         {
             fprintf(stderr, "Incorrect cluster-ID (%d) is greater than number of clusters (%d)\n", nClusID, nClusNum);
@@ -2064,8 +2089,13 @@ int ClusUtil_GetCluster_FromFullClusAndCumSizes(const int nClusID, int* const na
     return thisSize;
 }
 
-void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromCluster(lLDub* const restrict ldaMolWiseHist, const int* const restrict naClusList,
-                                           const int nClusSize)
+/// ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromCluster - For the cluster in naClusList (of size nClusSize) we
+/// calculate the cluster composition, and add to the ldaMolWiseHist array.
+/// \param ldaMolWiseHist Histogram array. Bins are calculated using MolClusArr_Index()
+/// \param naClusList The chainIDs of this cluster.
+/// \param nClusSize The size of this cluster.
+void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromCluster(lLDub* const restrict ldaMolWiseHist,
+                                                          const int* const restrict naClusList, const int nClusSize)
 {
     int i;
     int chainID, chainType, histBin;
@@ -2078,6 +2108,13 @@ void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromCluster(lLDub* const restrict 
         }
 }
 
+/// ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromFullClusAndCumSizes - Goes over every cluster and adds the cluster
+/// composition to ldaMolWiseHist array.
+/// \param ldaMolWiseHist
+/// \param naClusChainIDs Contains the clusters (chainIDs within every cluster)
+/// \param naCumClusSizes  Contains the cumulative sizes given the clusters.
+/// \param naClusSizes Contains the cluster sizes.
+/// \param nClusNum Contains the total number of clusters.
 void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromFullClusAndCumSizes(lLDub* const ldaMolWiseHist,
                                                                       const int* const naClusChainIDs,
                                                                       const int* const naCumClusSizes,
@@ -2097,6 +2134,12 @@ void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromFullClusAndCumSizes(lLDub* con
     free(thisCluster);
 }
 
+/// ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes - Performs a total clustering analysis of the system, and also
+/// gets the composition of each cluster. naSizeHist is the histogram for the cluster sizes. ldaMolWiseHist is the
+/// histogram for the composition of each cluster. The composition corresponds to the number of different chain types
+/// within each cluster (or cluster-size)
+/// \param naSizeHist
+/// \param ldaMolWiseHist
 void ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(lLong* const restrict naSizeHist,
                                                            lLDub* const restrict ldaMolWiseHist)
 {

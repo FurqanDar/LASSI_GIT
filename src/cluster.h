@@ -61,7 +61,7 @@ int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict caTotClusTab
 int ClusUtil_AddOvlpCluster_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                     int* restrict clusSize);
 
-int Clus_Ovlp_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList);
+int Clus_Ovlp_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict naClusList);
 
 int Clus_Ovlp_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                int const maxSize);

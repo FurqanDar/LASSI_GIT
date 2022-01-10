@@ -918,7 +918,7 @@ float Temperature_Function(const int mode, const long nGen)
 int* Create1DInt(const size_t xDim, const char* ArrName)
 {
     int* dumPtr;
-#if DEBUG
+#if DEBUG_BUILD
     printf("%s is being allocated ... ", ArrName);
 #endif
     dumPtr = (int*) malloc(xDim * sizeof(int));
@@ -928,7 +928,7 @@ int* Create1DInt(const size_t xDim, const char* ArrName)
             printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
             exit(1);
         }
-#if DEBUG
+#if DEBUG_BUILD
     printf(" ... and allocated!\n");
 #endif
     return dumPtr;
@@ -941,7 +941,7 @@ int* Create1DInt(const size_t xDim, const char* ArrName)
 long* Create1DLong(const size_t xDim, const char* ArrName)
 {
     long* dumPtr;
-#if DEBUG
+#if DEBUG_BUILD
     printf("%s is being allocated ... ", ArrName);
 #endif
     dumPtr = (long*) malloc(xDim * sizeof(long));
@@ -951,7 +951,7 @@ long* Create1DLong(const size_t xDim, const char* ArrName)
             printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
             exit(1);
         }
-#if DEBUG
+#if DEBUG_BUILD
     printf(" ... and allocated!\n");
 #endif
     return dumPtr;
@@ -964,7 +964,7 @@ long* Create1DLong(const size_t xDim, const char* ArrName)
 float* Create1DFloat(const size_t xDim, const char* ArrName)
 {
     float* dumPtr;
-#if DEBUG
+#if DEBUG_BUILD
     printf("%s is being allocated ... ", ArrName);
 #endif
     dumPtr = (float*) malloc(xDim * sizeof(float));
@@ -974,7 +974,7 @@ float* Create1DFloat(const size_t xDim, const char* ArrName)
             printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
             exit(1);
         }
-#if DEBUG
+#if DEBUG_BUILD
     printf(" ... and allocated!\n");
 #endif
     return dumPtr;
@@ -987,7 +987,7 @@ float* Create1DFloat(const size_t xDim, const char* ArrName)
 long double* Create1DLongdouble(const size_t xDim, const char* ArrName)
 {
     long double* dumPtr;
-#if DEBUG
+#if DEBUG_BUILD
     printf("%s is being allocated ... ", ArrName);
 #endif
     dumPtr = (long double*) malloc(xDim * sizeof(long double));
@@ -997,7 +997,7 @@ long double* Create1DLongdouble(const size_t xDim, const char* ArrName)
             printf("Not enough memory!\n%s\nCrashing!\n", ArrName);
             exit(1);
         }
-#if DEBUG
+#if DEBUG_BUILD
     printf(" ... and allocated!\n");
 #endif
     return dumPtr;
@@ -1013,7 +1013,7 @@ long double* Create1DLongdouble(const size_t xDim, const char* ArrName)
 /// array.
 int** Create2DInt(const size_t xDim, const size_t yDim, const char* ArrName)
 {
-#if DEBUG
+#if DEBUG_BUILD
     printf("%s is being allocated ... ", ArrName);
 #endif
     int** dumPtr;
@@ -1036,7 +1036,7 @@ int** Create2DInt(const size_t xDim, const size_t yDim, const char* ArrName)
         {
             dumPtr[i] = &dumPtr[0][i * xDim];
         }
-#if DEBUG
+#if DEBUG_BUILD
     printf(" ... and allocated!\n");
 #endif
     return dumPtr;
@@ -1052,7 +1052,7 @@ int** Create2DInt(const size_t xDim, const size_t yDim, const char* ArrName)
 /// \return Pointer to array-of-pointers, or a 2D array.
 long double** Create2DLongdouble(const size_t xDim, const size_t yDim, const char* ArrName)
 {
-#if DEBUG
+#if DEBUG_BUILD
     printf("%s is being allocated ... ", ArrName);
 #endif
     long double** dumPtr;
@@ -1075,7 +1075,7 @@ long double** Create2DLongdouble(const size_t xDim, const size_t yDim, const cha
         {
             dumPtr[i] = &dumPtr[0][i * xDim];
         }
-#if DEBUG
+#if DEBUG_BUILD
     printf(" ... and allocated!\n");
 #endif
     return dumPtr;
