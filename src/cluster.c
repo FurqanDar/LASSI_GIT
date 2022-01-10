@@ -159,8 +159,8 @@ void Clus_Network_TotalAnalysis(void)
 /// finds the second largest cluster. Note that naList_glb[] now has the chainIDs of
 /// the second largest cluster! Furthermore, in the case where we have only one
 /// cluster, the function returns -1, which causes SmallClusMCMove to fail, and
-/// if we have multiple smallest clusters, randomly pick one. \return
-/// naClusterMatrix_glb[clusID][0] - the size of the second largest cluster
+/// if we have multiple smallest clusters, randomly pick one.
+/// \return naClusterMatrix_glb[clusID][0] - the size of the second largest cluster
 int Clus_Network_SecondLargestCluster(void)
 {
     /*
@@ -1620,7 +1620,7 @@ int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict caTotClusTab
             if (! caTotClusTable[tmpChain])
                 {
                     caTotClusTable[tmpChain] = 1;
-                    clusList[*clusSize]     = tmpChain;
+                    clusList[*clusSize]      = tmpChain;
                     (*clusSize)++;
                 }
         }
@@ -1711,7 +1711,7 @@ int ClusUtil_AddOvlpCluster_OfChain_CheckForSame(const int chainID, const char* 
 /// \return Total size of the cluster chainID is a part of.
 int Clus_Ovlp_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict naClusList)
 {
-    naClusList[0]            = chainID;
+    naClusList[0]           = chainID;
     caTotClusTable[chainID] = 1;
 
     int clusSize = 1;
@@ -1736,7 +1736,7 @@ int Clus_Ovlp_OfChain(const int chainID, char* restrict caTotClusTable, int* res
 int Clus_Ovlp_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                int const maxSize)
 {
-    clusList[0]            = chainID;
+    clusList[0]             = chainID;
     caTotClusTable[chainID] = 1;
 
     int clusSize = 1;
@@ -1797,7 +1797,7 @@ int ClusUtil_AddAnisoCluster_OfBead(const int beadID, char* restrict caTotClusTa
             if (! caTotClusTable[tmpChain])
                 {
                     caTotClusTable[tmpChain] = 1;
-                    clusList[*clusSize]     = tmpChain;
+                    clusList[*clusSize]      = tmpChain;
                     (*clusSize)++;
                     return 1;
                 }
@@ -1837,7 +1837,7 @@ int ClusUtil_AddAnisoCluster_OfChain(const int chainID, char* restrict caTotClus
 /// \return
 int Clus_Aniso_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList)
 {
-    clusList[0]            = chainID;
+    clusList[0]             = chainID;
     caTotClusTable[chainID] = 1;
 
     int clusSize = 1;
@@ -1862,7 +1862,7 @@ int Clus_Aniso_OfChain(const int chainID, char* restrict caTotClusTable, int* re
 int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                 int const maxSize)
 {
-    clusList[0]            = chainID;
+    clusList[0]             = chainID;
     caTotClusTable[chainID] = 1;
 
     int clusSize = 1;
@@ -1882,7 +1882,6 @@ int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable
     return clusSize;
 }
 
-
 /// ClusUtil_NextUnvisitedChain - Given that we are on chain nChainID, we use caTotClusTable to find the index of the
 /// next unvisited chain.
 /// \param nChainID Starting chain.
@@ -1892,10 +1891,10 @@ int ClusUtil_NextUnvisitedChain(int const nChainID, const char* const caTotClusT
 {
     int nNewChainID = nChainID;
 
-    while(caTotClusTable[nNewChainID] == 1)
-    {
-        nNewChainID++;
-    }
+    while (caTotClusTable[nNewChainID] == 1)
+        {
+            nNewChainID++;
+        }
 
     return nNewChainID;
 }
@@ -1920,8 +1919,7 @@ int Clus_Aniso_OfSystem(void)
             nClusNum++;
             naTmpClusIDsList[nClusNum] = nCumulativeSize;
 
-            nThisChainID  = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
-
+            nThisChainID = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
         }
 
     free(naTmpClusList);
@@ -1944,16 +1942,15 @@ int Clus_Ovlp_OfSystem(void)
     int nThisClusSize;
 
     while (nThisChainID < tot_chains_glb)
-    {
-        nThisClusSize = Clus_Ovlp_OfChain(nThisChainID, caTmpClusCheckList, naTmpClusList + nCumulativeSize);
+        {
+            nThisClusSize = Clus_Ovlp_OfChain(nThisChainID, caTmpClusCheckList, naTmpClusList + nCumulativeSize);
 
-        nCumulativeSize += nThisClusSize;
-        nClusNum++;
-        naTmpClusIDsList[nClusNum] = nCumulativeSize;
+            nCumulativeSize += nThisClusSize;
+            nClusNum++;
+            naTmpClusIDsList[nClusNum] = nCumulativeSize;
 
-        nThisChainID  = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
-
-    }
+            nThisChainID = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
+        }
 
     free(naTmpClusList);
     free(caTmpClusCheckList);
@@ -1980,16 +1977,15 @@ int Clus_Ovlp_OfSystem_New(int* const naFullClusList, int* const naCumClusSizes)
     int nThisClusSize;
 
     while (nThisChainID < tot_chains_glb)
-    {
-        nThisClusSize = Clus_Ovlp_OfChain(nThisChainID, caTmpClusCheckList, naFullClusList + nCumulativeSize);
+        {
+            nThisClusSize = Clus_Ovlp_OfChain(nThisChainID, caTmpClusCheckList, naFullClusList + nCumulativeSize);
 
-        nCumulativeSize += nThisClusSize;
-        nClusNum++;
-        naCumClusSizes[nClusNum] = nCumulativeSize;
+            nCumulativeSize += nThisClusSize;
+            nClusNum++;
+            naCumClusSizes[nClusNum] = nCumulativeSize;
 
-        nThisChainID  = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
-
-    }
+            nThisChainID = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
+        }
 
     free(caTmpClusCheckList);
 
@@ -2021,10 +2017,10 @@ void ClusUtil_GenClusSizesFromCumulativeSizes(int* const naSizeList, const int* 
 void ClusHistUtil_AddToHist_FromCountsList(lLong* const laHist, const int* const naCounts, const int nBins)
 {
     int i;
-    for (i=0; i < nBins; i++)
-    {
-        laHist[naCounts[i]]++;
-    }
+    for (i = 0; i < nBins; i++)
+        {
+            laHist[naCounts[i]]++;
+        }
 }
 
 void ClusUtil_GenHistFromCumulativeSizes(int* const restrict naClusSizeHist, const int* const restrict naCumClusSizes,
@@ -2039,14 +2035,13 @@ void ClusUtil_GenHistFromCumulativeSizes(int* const restrict naClusSizeHist, con
     free(naTmpSizeList);
 }
 
-
 void ClusUtil_AddToGlobalClusHist(const int* const naClusSizes, const int nClusNum)
 {
     int i;
-    for (i=0; i<nClusNum; i++)
-    {
-        naClusHistList_glb[naClusSizes[i]]++;
-    }
+    for (i = 0; i < nClusNum; i++)
+        {
+            naClusHistList_glb[naClusSizes[i]]++;
+        }
 }
 
 /// ClusUtil_GetCluster_FromFullClusAndCumSizes - Given the cluster-list, cumulative sizes, cluster sizes and total
