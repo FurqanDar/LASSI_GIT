@@ -669,13 +669,14 @@ int Move_Clus_Network(float MyTemp)
     // Attempts to move the second largest cluster
 
     int bAccept = 0; // Used in MC steps, assume that move fails initially.
+    int* naClusList = (int*) malloc(sizeof (int) * tot_chains_glb);
 
-    const int ClusSize = Clus_Network_SecondLargestCluster(); // Finding the second largest cluster
+    const int ClusSize = ClusUtil_AnisoCluster_OfSystem_SecondLargest(naClusList);
 
-    // Remember that naList_glb[] contains the chainID's of the network chainID is part of from 0 to ClusSize-1.
     if (ClusSize < 1)
         {
             bAccept = 0;
+            free(naClusList);
             return bAccept;
         }
 
@@ -688,11 +689,12 @@ int Move_Clus_Network(float MyTemp)
     LatPos_gen_rand_wRad(r_Disp, naBoxSize_glb[0] / 2);
     for (i = 0; i < ClusSize; i++)
         {
-            // printf("%d\n", naList_glb[i]);
-            yTemp = Check_ChainDisp(naList_glb[i], r_Disp); // Checking for steric clash
+            yTemp = Check_ChainDisp(naClusList[i], r_Disp); // Checking for steric clash
             if (yTemp == 0)
                 {
                     bAccept = 0;
+                    free(naClusList);
+
                     // printf("End CLUS - No space\n");
                     return bAccept;
                 }
@@ -708,7 +710,7 @@ int Move_Clus_Network(float MyTemp)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = naList_glb[j];
+                    thisChain = naClusList[j];
                     firstB    = chain_info_glb[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -722,7 +724,7 @@ int Move_Clus_Network(float MyTemp)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = naList_glb[j];
+                    thisChain = naClusList[j];
                     firstB    = chain_info_glb[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -735,14 +737,14 @@ int Move_Clus_Network(float MyTemp)
 
     for (j = 0; j < ClusSize; j++)
         {
-            OP_System_DispChain(naList_glb[j], r_Disp); // Moving the cluster properly
+            OP_System_DispChain(naClusList[j], r_Disp); // Moving the cluster properly
         }
 
     if (nInitialPotential_Mode_glb != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = naList_glb[j];
+                    thisChain = naClusList[j];
                     firstB    = chain_info_glb[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -756,7 +758,7 @@ int Move_Clus_Network(float MyTemp)
         {
             for (j = 0; j < ClusSize; j++)
                 {
-                    thisChain = naList_glb[j];
+                    thisChain = naClusList[j];
                     firstB    = chain_info_glb[thisChain][CHAIN_START];
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
@@ -772,6 +774,7 @@ int Move_Clus_Network(float MyTemp)
     if (MCProb < MHAcc)
         {                // Accept this state
             bAccept = 1; // Accept the move
+            free(naClusList);
             return bAccept;
             // printf("End CLUS - Yes\n");
         }
@@ -779,9 +782,10 @@ int Move_Clus_Network(float MyTemp)
         {
             for (i = 0; i < ClusSize; i++)
                 {
-                    OP_System_RestoreChain(naList_glb[i]); // Placing  the cluster back properly
+                    OP_System_RestoreChain(naClusList[i]); // Placing  the cluster back properly
                 }
             bAccept = 0;
+            free(naClusList);
             return bAccept;
             // printf("End CLUS - Failed.\n");
         }
@@ -1893,7 +1897,7 @@ int Move_Clus_Proximity(const float myTemp)
     int* oldClusList   = calloc(tot_chains_glb, sizeof(int));
     const int ClusSize =
         ClusUtil_OvlpCluster_OfSystem_SecondLargest(oldClusList);
-    printf("%d\n", ClusSize);
+//    printf("%d\n", ClusSize);
     if (ClusSize < 2)
     {
         bAccept = 0;

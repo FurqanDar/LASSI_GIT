@@ -2174,6 +2174,13 @@ int ClusAnalysis_Aniso_ForSystem_MolTypeWiseDecompAndSizes(lLong* const restrict
 
 }
 
+///
+/// \param naOutClusList
+/// \param naFullClusList
+/// \param naCumSizes
+/// \param naClusSizes
+/// \param nClusNum
+/// \return
 int ClusUtil_GetLargestCluster_FromFullClusAndCumSizes(int* const naOutClusList, const int* const naFullClusList,
                                                        const int* const naCumSizes, const int* const naClusSizes,
                                                        const int nClusNum)
@@ -2207,6 +2214,13 @@ int ClusUtil_GetLargestCluster_FromFullClusAndCumSizes(int* const naOutClusList,
     return thisSize;
 }
 
+///
+/// \param naOutClusList
+/// \param naFullClusList
+/// \param naCumSizes
+/// \param naClusSizes
+/// \param nClusNum
+/// \return
 int ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(int* const naOutClusList, const int* const naFullClusList,
                                                              const int* const naCumSizes, const int* const naClusSizes,
                                                              const int nClusNum)
@@ -2241,6 +2255,9 @@ int ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(int* const naOutClu
     return thisSize;
 }
 
+///
+/// \param naOutClusList
+/// \return
 int ClusUtil_OvlpCluster_OfSystem_SecondLargest(int* naOutClusList)
 {
     int thisSize;
@@ -2249,6 +2266,33 @@ int ClusUtil_OvlpCluster_OfSystem_SecondLargest(int* naOutClusList)
     int* naCumClusSizes = (int*) calloc((tot_chains_glb + 1), sizeof(int));
 
     const int nClusNum = ClusUtil_OvlpClusters_OfSystem(naFullClusList, naCumClusSizes);
+
+    int* naClusSizes = (int*) calloc((nClusNum + 1), sizeof(int));
+
+    ClusUtil_GenClusSizesFromCumulativeSizes(naClusSizes, naCumClusSizes, nClusNum);
+
+    thisSize = ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(naOutClusList, naFullClusList, naCumClusSizes,
+                                                                        naClusSizes, nClusNum);
+
+    free(naFullClusList);
+    free(naCumClusSizes);
+    free(naClusSizes);
+
+
+    return thisSize;
+}
+
+///
+/// \param naOutClusList
+/// \return
+int ClusUtil_AnsioCluster_OfSystem_SecondLargest(int* naOutClusList)
+{
+    int thisSize;
+
+    int* naFullClusList = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+    int* naCumClusSizes = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+
+    const int nClusNum = ClusUtil_AnisoClusters_OfSystem(naFullClusList, naCumClusSizes);
 
     int* naClusSizes = (int*) calloc((nClusNum + 1), sizeof(int));
 

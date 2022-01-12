@@ -123,6 +123,8 @@ int ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(int* const naOutClu
 
 int ClusUtil_OvlpCluster_OfSystem_SecondLargest(int* naOutClusList);
 
+int ClusUtil_AnisoCluster_OfSystem_SecondLargest(int* naOutClusList);
+
 
 
 #endif // _CLUSTER_H_
