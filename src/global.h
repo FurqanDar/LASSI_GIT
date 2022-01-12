@@ -37,7 +37,8 @@
 #define MV_BRROT      10
 #define MV_DBPVT      11
 #define MV_PR_SMCLSTR 12
-#define MAX_MV        13 // just for counting; must be the last number of this list
+#define MV_PR_CLSTR   13
+#define MAX_MV        14 // just for counting; must be the last number of this list
 
 // report parameters
 #define REPORT_NULL    0 // index zero
@@ -152,7 +153,7 @@ lLong naMCAccepMat_glb[2][MAX_MV];
 lInt nClusteringMode_glb;
 lInt** naClusterMatrix_glb;
 lInt* naList_glb;
-lLong* naClusHistList_glb;
+lLong* laClusHistList_glb;
 lInt* naChainCheckList_glb;
 lInt nTotClusCounter_glb;
 lLDub** ldaTOTCLUS_Arr_glb;

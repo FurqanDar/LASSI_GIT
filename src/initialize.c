@@ -13,8 +13,8 @@ void Memory_Initialization_AtStart(void)
 
     Memory_Allocate_NeighborLists();
 
-    strcpy(arr_name, "naClusHistList_glb");
-    naClusHistList_glb = Create1DLong((2 + tot_chains_glb), arr_name);
+    strcpy(arr_name, "laClusHistList_glb");
+    laClusHistList_glb = Create1DLong((2 + tot_chains_glb), arr_name);
 
     strcpy(arr_name, "naChainCheckList_glb");
     naChainCheckList_glb = Create1DInt(2 + tot_chains_glb, arr_name);
@@ -104,9 +104,9 @@ void Memory_Allocate_NeighborLists(void)
 
 void Memory_VerifyMalloc(void)
 {
-    if (naClusHistList_glb == NULL)
+    if (laClusHistList_glb == NULL)
         {
-            printf("naClusHistList_glb malloc failed\n");
+            printf("laClusHistList_glb malloc failed\n");
             exit(1);
         }
     if (naChainCheckList_glb == NULL)
@@ -317,7 +317,7 @@ void Global_Array_Initialization_AtStart(void)
     for (i = 0; i <= tot_chains_glb; i++)
         {
             naChainCheckList_glb[i] = 0;
-            naClusHistList_glb[i]   = 0;
+            laClusHistList_glb[i]   = 0;
             for (j = 0; j <= tot_chains_glb; j++)
                 {
                     naClusterMatrix_glb[i][j] = -1;
@@ -458,7 +458,7 @@ void Reset_Global_Arrays(void)
     for (i = 0; i <= tot_chains_glb; i++)
         {
             naChainCheckList_glb[i] = -1;
-            naClusHistList_glb[i]   = 0;
+            laClusHistList_glb[i]   = 0;
             for (j = 0; j <= tot_chains_glb; j++)
                 {
                     naClusterMatrix_glb[i][j] = -1;
@@ -1080,3 +1080,5 @@ long double** Create2DLongdouble(const size_t xDim, const size_t yDim, const cha
 #endif
     return dumPtr;
 }
+
+

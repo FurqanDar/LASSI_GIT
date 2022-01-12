@@ -177,6 +177,10 @@ int Parse_Keyfile(char* filename)
                         {
                             sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_PR_SMCLSTR]);
                         }
+                    else if (strcmp(strKeyword, "MV_PR_CLSTR") == 0)
+                    {
+                        sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_PR_CLSTR]);
+                    }
                     else if (strcmp(strKeyword, "RESTART_FILE") == 0)
                         {
                             sscanf(strLine, "%*s %s", strRestartFile_glb);
@@ -319,6 +323,7 @@ int Parse_Keyfile(char* filename)
 
     return nErr;
 }
+
 
 void ForEnergyMatrix_FillWithZeros()
 {

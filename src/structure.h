@@ -108,11 +108,11 @@ int BeadListOP_Filter_DbPvtLinkerConFwd(const int beadNum, int* beadList, const 
 
 int BeadListOP_Filter_DbPvtLinkerConBck(const int beadNum, int* beadList, const int thisBead);
 
-int BeadList_UniqueElements(const int size, int* sorted_list);
+int ListOP_UniqueElementsOfSortedList_Int(const int size, int* sorted_list);
 
 int BeadList_AppendBeads(const int old_size, int* old_list, const int* app_list, const int app_size);
 
-int compare_int(const void* a, const void* b);
+int UtilFunc_CompareInts(const void* a, const void* b);
 
 int BeadList_CanTopoAngle(const int size, int* beadList);
 
@@ -136,5 +136,12 @@ int LatticeUtil_GetBeadIDs_FromList(const int* nLatValsList, int* nBeadsList, co
 
 int LatticeUtil_GetNeighBeads_AtPos(const int* restrict r_pos0, int* restrict nBeadsList);
 
+int ListOP_GetMaxVal_Int(const int nListSize, const int* const naList);
+
+int ListOP_IndicesForVal_Int(const int nVal, int* const naOutList, const int nListSize, const int* const naList);
+
+int ListOP_GetRandomIndexForVal_Int(const int nVal, const int nListSize, const int* const naList);
+
+int ListOP_Get2ndLargestVal_Int(const int nListSize, const int* const naList);
 
 #endif // _STRUCTURE_H_

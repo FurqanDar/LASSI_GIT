@@ -43,7 +43,7 @@ void Clus_Proximity_Distribution_All_MolWise_Avg(void);
 
 void Clus_Proximity_IntOnly_MolWise_LargestClusters(void);
 
-void Clus_Perform_Analysis(void);
+void ClusAnalysis_Perform_Analysis(const int nMode);
 
 int Clus_Perform_ChainCluster_ForTotal(int const chainID);
 
@@ -61,16 +61,16 @@ int ClusUtil_AddOvlpCluster_OfBead(const int beadID, char* restrict caTotClusTab
 int ClusUtil_AddOvlpCluster_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                     int* restrict clusSize);
 
-int Clus_Ovlp_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict naClusList);
+int ClusUtil_OvlpCluster_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict naClusList);
 
-int Clus_Ovlp_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
+int ClusUtil_OvlpCluster_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                int const maxSize);
 
 int ClusUtil_AddOvlpCluster_OfBead_CheckForSame(const int beadID, const char* restrict const caTotClusTable);
 
 int ClusUtil_AddOvlpCluster_OfChain_CheckForSame(const int chainID, const char* restrict const caTotClusTable);
 
-int Clus_Ovlp_OfChain_CheckForSame(const char* const caTotClusTable, const int* const clusList, int const clusSize);
+int ClusUtil_OvlpCluster_OfChain_CheckForSame(const char* const caTotClusTable, const int* const clusList, int const clusSize);
 
 int ClusUtil_AddAnisoCluster_OfBead(const int beadID, char* restrict caTotClusTable, int* restrict clusList,
                                     int* restrict clusSize);
@@ -78,17 +78,51 @@ int ClusUtil_AddAnisoCluster_OfBead(const int beadID, char* restrict caTotClusTa
 int ClusUtil_AddAnisoCluster_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                      int* restrict clusSize);
 
-int Clus_Aniso_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList);
+int ClusUtil_AnisoCluster_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList);
 
-int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
+int ClusUtil_AnisoCluster_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                 int const maxSize);
 
 int ClusUtil_NextUnvisitedChain(int const nChainID, const char* const caTotClusTable);
 
-int Clus_Aniso_OfSystem(void);
+int ClusUtil_AnisoClusters_OfSystem(int* const naFullClusList, int* const naCumClusSizes);
 
-int Clus_Ovlp_OfSystem(void);
+int ClusUtil_OvlpClusters_OfSystem(int* const naFullClusList, int* const naCumClusSizes);
 
-void ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(lLong *const restrict naSizeHist, lLDub *const restrict ldaMolWiseHist);
+void ClusUtil_GenClusSizesFromCumulativeSizes(int* const naSizeList, const int* const naCumClusSizes,
+                                              int const nClusNum);
+
+void ClusHistUtil_AddToHist_FromCountsList(lLong* const laHist, const int* const naCounts, const int nBins);
+
+int ClusUtil_GetCluster_FromFullClusAndCumSizes(const int nClusID, int* const naOutClusList,
+                                                const int* const naFullClusList, const int* const naCumSizes,
+                                                const int* const naClusSizes, const int nClusNum);
+
+void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromCluster(lLDub* const restrict ldaMolWiseHist,
+                                                          const int* const restrict naClusList, const int nClusSize);
+
+void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromFullClusAndCumSizes(lLDub* const ldaMolWiseHist,
+                                                                      const int* const naClusChainIDs,
+                                                                      const int* const naCumClusSizes,
+                                                                      const int* const naClusSizes, int const nClusNum);
+
+int ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(lLong* const restrict naSizeHist,
+                                                           lLDub* const restrict ldaMolWiseHist);
+
+int ClusAnalysis_Aniso_ForSystem_MolTypeWiseDecompAndSizes(lLong* const restrict naSizeHist,
+                                                           lLDub* const restrict ldaMolWiseHist);
+
+
+int ClusUtil_GetLargestCluster_FromFullClusAndCumSizes(int* const naOutClusList, const int* const naFullClusList,
+                                                       const int* const naCumSizes, const int* const naClusSizes,
+                                                       const int nClusNum);
+
+int ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(int* const naOutClusList, const int* const naFullClusList,
+                                                             const int* const naCumSizes, const int* const naClusSizes,
+                                                             const int nClusNum);
+
+int ClusUtil_OvlpCluster_OfSystem_SecondLargest(int* naOutClusList);
+
+
 
 #endif // _CLUSTER_H_

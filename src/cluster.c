@@ -310,13 +310,13 @@ int Clus_Network_LimitedCluster(int const chainID)
 }
 
 /// Clus_Distribution_Avg - do what Clus_TotalAnalysis does but instead of
-/// remembering clusters in naClusterMatrix_glb, update naClusHistList_glb[] and keep making
+/// remembering clusters in naClusterMatrix_glb, update laClusHistList_glb[] and keep making
 /// the total cluster histogram for the system.
 void Clus_Network_Distribution_Avg(void)
 {
     /*
     Calculates the cluster distribution using total_network_analysis framework,
-    but keeps adding to naClusHistList_glb for total averaging at the end. Read
+    but keeps adding to laClusHistList_glb for total averaging at the end. Read
     total_network_analysis() for what's happening here LOL
     */
     int curID, Cluster_length, currentLargest, i;
@@ -332,7 +332,7 @@ void Clus_Network_Distribution_Avg(void)
         {
             Cluster_length = Clus_Network_ChainCluster_ForTotal(curID); // This is the length of curID cluster
             // printf("Clus Len: %d\n", Cluster_length);
-            naClusHistList_glb[Cluster_length]++; // Adding to that cluster-size bin
+            laClusHistList_glb[Cluster_length]++; // Adding to that cluster-size bin
             if (Cluster_length > currentLargest)
                 {
                     currentLargest = Cluster_length;
@@ -357,13 +357,13 @@ void Clus_Network_Distribution_Avg(void)
 }
 
 /// Clus_DistributionMolWise_Avg - do what Clus_TotalAnalysis does but instead
-/// of remembering clusters in naClusterMatrix_glb, update naClusHistList_glb[] and keep
+/// of remembering clusters in naClusterMatrix_glb, update laClusHistList_glb[] and keep
 /// making the total cluster histogram for the system.
 void Clus_Network_Distribution_MolWise_Avg(void)
 {
     /*
     Calculates the cluster distribution using total_network_analysis framework,
-    but keeps adding to naClusHistList_glb for total averaging at the end. Read
+    but keeps adding to laClusHistList_glb for total averaging at the end. Read
     total_network_analysis() for what's happening here LOL
     */
     int curID, Cluster_length, currentLargest, i;
@@ -380,7 +380,7 @@ void Clus_Network_Distribution_MolWise_Avg(void)
         {
             Cluster_length = Clus_Network_ChainCluster_ForTotal(curID); // This is the length of curID cluster
             // printf("Clus Len: %d\n", Cluster_length);
-            naClusHistList_glb[Cluster_length]++; // Adding to that cluster-size bin
+            laClusHistList_glb[Cluster_length]++; // Adding to that cluster-size bin
             if (Cluster_length > currentLargest)
                 {
                     currentLargest = Cluster_length;
@@ -403,7 +403,6 @@ void Clus_Network_Distribution_MolWise_Avg(void)
                         }
                 }
         }
-    nTotClusCounter_glb++;
     nLargestClusterRightNow_glb += currentLargest;
 }
 
@@ -1053,8 +1052,8 @@ int Clus_Proximity_LimitedCluster_All(int const chainID, int* clusList)
                     LatPos_copy(r_pos_curBead, bead_info_glb[i]);
                     curBeadNeighNum = NeighborSearch_ForCluster_Ovlp(i, r_pos_curBead, tmpNeighBeadList);
                     BeadListOP_GetChainIDs(curBeadNeighNum, tmpNeighBeadList, tmpNeighChainList);
-                    qsort(tmpNeighChainList, curBeadNeighNum, sizeof(int), compare_int);
-                    curChainNeighNum = BeadList_UniqueElements(curBeadNeighNum, tmpNeighChainList);
+                    qsort(tmpNeighChainList, curBeadNeighNum, sizeof(int), UtilFunc_CompareInts);
+                    curChainNeighNum = ListOP_UniqueElementsOfSortedList_Int(curBeadNeighNum, tmpNeighChainList);
                     clusSize         = ChainListOP_AddUniqueChains_wSize(clusSize, clusList, curChainNeighNum,
                                                                  tmpNeighChainList, ClusterLimit);
                     if (clusSize >= ClusterLimit)
@@ -1109,8 +1108,8 @@ int Clus_Proximity_LimitedCluster_All_Check(int const chainID, int const* OldLis
                     LatPos_copy(r_pos_curBead, bead_info_glb[i]);
                     curBeadNeighNum = NeighborSearch_ForCluster_Ovlp(i, r_pos_curBead, tmpNeighBeadList);
                     BeadListOP_GetChainIDs(curBeadNeighNum, tmpNeighBeadList, tmpNeighChainList);
-                    qsort(tmpNeighChainList, curBeadNeighNum, sizeof(int), compare_int);
-                    curChainNeighNum = BeadList_UniqueElements(curBeadNeighNum, tmpNeighChainList);
+                    qsort(tmpNeighChainList, curBeadNeighNum, sizeof(int), UtilFunc_CompareInts);
+                    curChainNeighNum = ListOP_UniqueElementsOfSortedList_Int(curBeadNeighNum, tmpNeighChainList);
                     clusSize         = ChainListOP_AddUniqueChains_wSize_Check(clusSize, NewList, curChainNeighNum,
                                                                        tmpNeighChainList, ClusterLimit, OldList);
                     if (clusSize >= ClusterLimit)
@@ -1130,7 +1129,7 @@ void Clus_Proximity_Distribution_Avg(void)
 {
     /*
     Calculates the cluster distribution using total_network_analysis framework,
-    but keeps adding to naClusHistList_glb for total averaging at the end. Read
+    but keeps adding to laClusHistList_glb for total averaging at the end. Read
     total_network_analysis() for what's happening here LOL
     */
     int curID, Cluster_length, currentLargest, i;
@@ -1146,7 +1145,7 @@ void Clus_Proximity_Distribution_Avg(void)
         {
             Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly(curID); // This is the length of curID cluster
             // printf("Clus Len: %d\n", Cluster_length);
-            naClusHistList_glb[Cluster_length]++; // Adding to that cluster-size bin
+            laClusHistList_glb[Cluster_length]++; // Adding to that cluster-size bin
             if (Cluster_length > currentLargest)
                 {
                     currentLargest = Cluster_length;
@@ -1174,7 +1173,7 @@ void Clus_Proximity_Distribution_IntOnly_MolWise_Avg(void)
 {
     /*
     Calculates the cluster distribution using total_network_analysis framework,
-    but keeps adding to naClusHistList_glb for total averaging at the end. Read
+    but keeps adding to laClusHistList_glb for total averaging at the end. Read
     total_network_analysis() for what's happening here LOL
     */
     int curID, Cluster_length, currentLargest, i;
@@ -1191,7 +1190,7 @@ void Clus_Proximity_Distribution_IntOnly_MolWise_Avg(void)
         {
             Cluster_length = Clus_Proximity_ChainCluster_ForTotal_IntOnly(curID); // This is the length of curID cluster
             // printf("Clus Len: %d\n", Cluster_length);
-            naClusHistList_glb[Cluster_length]++; // Adding to that cluster-size bin
+            laClusHistList_glb[Cluster_length]++; // Adding to that cluster-size bin
             if (Cluster_length > currentLargest)
                 {
                     currentLargest = Cluster_length;
@@ -1214,7 +1213,6 @@ void Clus_Proximity_Distribution_IntOnly_MolWise_Avg(void)
                         }
                 }
         }
-    nTotClusCounter_glb++;
     nLargestClusterRightNow_glb += currentLargest;
 }
 
@@ -1222,7 +1220,7 @@ void Clus_Proximity_Distribution_All_MolWise_Avg(void)
 {
     /*
     Calculates the cluster distribution using total_network_analysis framework,
-    but keeps adding to naClusHistList_glb for total averaging at the end. Read
+    but keeps adding to laClusHistList_glb for total averaging at the end. Read
     total_network_analysis() for what's happening here LOL
     */
     int curID, Cluster_length, currentLargest, i;
@@ -1239,7 +1237,7 @@ void Clus_Proximity_Distribution_All_MolWise_Avg(void)
         {
             Cluster_length = Clus_Proximity_ChainCluster_ForTotal_All(curID); // This is the length of curID cluster
             // printf("Clus Len: %d\n", Cluster_length);
-            naClusHistList_glb[Cluster_length]++; // Adding to that cluster-size bin
+            laClusHistList_glb[Cluster_length]++; // Adding to that cluster-size bin
             if (Cluster_length > currentLargest)
                 {
                     currentLargest = Cluster_length;
@@ -1262,7 +1260,6 @@ void Clus_Proximity_Distribution_All_MolWise_Avg(void)
                         }
                 }
         }
-    nTotClusCounter_glb++;
     nLargestClusterRightNow_glb += currentLargest;
 }
 
@@ -1424,22 +1421,29 @@ void Clus_Proximity_All_MolWise_LargestClusters(void)
     free(largestClus_of_type);
 }
 
-void Clus_Perform_Analysis(void)
+///
+/// \param nMode
+void ClusAnalysis_Perform_Analysis(const int nMode)
 {
     // Just a function that picks the right analysis routine given the mode
 
-    switch (nClusteringMode_glb)
+    int largestNow;
+    switch (nMode)
         {
             case 1:
-                Clus_Proximity_Distribution_IntOnly_MolWise_Avg();
+                largestNow=ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(laClusHistList_glb, ldaMOLCLUS_Arr_glb);
                 break;
             case 2:
-                Clus_Proximity_Distribution_All_MolWise_Avg();
+                largestNow=ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(laClusHistList_glb, ldaMOLCLUS_Arr_glb);
                 break;
             default:
-                Clus_Network_Distribution_MolWise_Avg();
+                largestNow=ClusAnalysis_Aniso_ForSystem_MolTypeWiseDecompAndSizes(laClusHistList_glb, ldaMOLCLUS_Arr_glb);
                 break;
         }
+
+    nTotClusCounter_glb++;
+    nLargestClusterRightNow_glb += largestNow;
+
 }
 
 int Clus_Perform_ChainCluster_ForTotal(int const chainID)
@@ -1703,13 +1707,13 @@ int ClusUtil_AddOvlpCluster_OfChain_CheckForSame(const int chainID, const char* 
     return 1;
 }
 
-/// Clus_Ovlp_OfChain Calculate the Ovlp-bases cluster of molecule chainID. Returns the size of the cluster. The cluster
+/// ClusUtil_OvlpCluster_OfChain Calculate the Ovlp-bases cluster of molecule chainID. Returns the size of the cluster. The cluster
 /// will be written on naClusList, and caTotClusTable will contain the cluster for chainID.
 /// \param chainID
 /// \param caTotClusTable Boolean-like array that contains which chains have been already looked at in the system.
 /// \param naClusList Array that will contain the chain indices of the chains in the cluster.
 /// \return Total size of the cluster chainID is a part of.
-int Clus_Ovlp_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict naClusList)
+int ClusUtil_OvlpCluster_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict naClusList)
 {
     naClusList[0]           = chainID;
     caTotClusTable[chainID] = 1;
@@ -1733,8 +1737,8 @@ int Clus_Ovlp_OfChain(const int chainID, char* restrict caTotClusTable, int* res
 /// \param clusList
 /// \param maxSize
 /// \return
-int Clus_Ovlp_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
-                               int const maxSize)
+int ClusUtil_OvlpCluster_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
+                                          int const maxSize)
 {
     clusList[0]             = chainID;
     caTotClusTable[chainID] = 1;
@@ -1761,7 +1765,7 @@ int Clus_Ovlp_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable,
 /// \param clusList
 /// \param clusSize
 /// \return
-int Clus_Ovlp_OfChain_CheckForSame(const char* const caTotClusTable, const int* const clusList, int const clusSize)
+int ClusUtil_OvlpCluster_OfChain_CheckForSame(const char* const caTotClusTable, const int* const clusList, int const clusSize)
 {
 
     int tmpChain;
@@ -1835,7 +1839,7 @@ int ClusUtil_AddAnisoCluster_OfChain(const int chainID, char* restrict caTotClus
 /// \param caTotClusTable
 /// \param clusList
 /// \return
-int Clus_Aniso_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList)
+int ClusUtil_AnisoCluster_OfChain(const int chainID, char* restrict caTotClusTable, int* restrict clusList)
 {
     clusList[0]             = chainID;
     caTotClusTable[chainID] = 1;
@@ -1859,7 +1863,7 @@ int Clus_Aniso_OfChain(const int chainID, char* restrict caTotClusTable, int* re
 /// \param clusList
 /// \param maxSize
 /// \return
-int Clus_Aniso_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
+int ClusUtil_AnisoCluster_OfChain_wMaxSize(const int chainID, char* restrict caTotClusTable, int* restrict clusList,
                                 int const maxSize)
 {
     clusList[0]             = chainID;
@@ -1899,74 +1903,49 @@ int ClusUtil_NextUnvisitedChain(int const nChainID, const char* const caTotClusT
     return nNewChainID;
 }
 
-int Clus_Aniso_OfSystem(void)
-{
-    int nCumulativeSize = 0;
-    int nClusNum        = 0;
-
-    int* naTmpClusList       = (int*) malloc(sizeof(int) * (tot_chains_glb + 1));
-    int* naTmpClusIDsList    = (int*) calloc((tot_chains_glb + 1), sizeof(int));
-    char* caTmpClusCheckList = (char*) calloc(tot_chains_glb + 1, sizeof(char));
-
-    int nThisChainID = 0;
-    int nThisClusSize;
-
-    while (nThisChainID < tot_chains_glb)
-        {
-            nThisClusSize = Clus_Aniso_OfChain(nThisChainID, caTmpClusCheckList, naTmpClusList + nCumulativeSize);
-
-            nCumulativeSize += nThisClusSize;
-            nClusNum++;
-            naTmpClusIDsList[nClusNum] = nCumulativeSize;
-
-            nThisChainID = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
-        }
-
-    free(naTmpClusList);
-    free(caTmpClusCheckList);
-    free(naTmpClusIDsList);
-
-    return nClusNum;
-}
-
-int Clus_Ovlp_OfSystem(void)
-{
-    int nCumulativeSize = 0;
-    int nClusNum        = 0;
-
-    int* naTmpClusList       = (int*) malloc(sizeof(int) * (tot_chains_glb + 1));
-    int* naTmpClusIDsList    = (int*) calloc((tot_chains_glb + 1), sizeof(int));
-    char* caTmpClusCheckList = (char*) calloc(tot_chains_glb + 1, sizeof(char));
-
-    int nThisChainID = 0;
-    int nThisClusSize;
-
-    while (nThisChainID < tot_chains_glb)
-        {
-            nThisClusSize = Clus_Ovlp_OfChain(nThisChainID, caTmpClusCheckList, naTmpClusList + nCumulativeSize);
-
-            nCumulativeSize += nThisClusSize;
-            nClusNum++;
-            naTmpClusIDsList[nClusNum] = nCumulativeSize;
-
-            nThisChainID = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
-        }
-
-    free(naTmpClusList);
-    free(caTmpClusCheckList);
-    free(naTmpClusIDsList);
-
-    return nClusNum;
-}
-
-/// Clus_Ovlp_OfSystem_New - Calculates the Ovlp-based cluster of the whole system. Writes over the provided arrays
+/// ClusUtil_AnisoClusters_OfSystem - Calculates the Aniso-based cluster of the whole system. Writes over the provided arrays
 /// to save the cluster-list and the cumulative sizes.
 /// \param naFullClusList Array that will contain all the clusters.
 /// \param naCumClusSizes Array that will contain the cumulative sizes of the clusters. Allows for cluster extraction
 /// later by doing some index-based arithmetic.
 /// \return The total number of clusters in the system. 1 would mean every molecule is part of a single cluster.
 /// While tot_chains_glb would mean that every molecule is only a part of its own cluster.
-int Clus_Ovlp_OfSystem_New(int* const naFullClusList, int* const naCumClusSizes)
+int ClusUtil_AnisoClusters_OfSystem(int* const restrict naFullClusList, int* const restrict naCumClusSizes)
+{
+    int nCumulativeSize = 0;
+    int nClusNum        = 0;
+
+    char* caTmpClusCheckList = (char*) calloc(tot_chains_glb + 1, sizeof(char));
+
+    int nThisChainID = 0;
+    int nThisClusSize;
+
+    while (nThisChainID < tot_chains_glb)
+    {
+        nThisClusSize =
+            ClusUtil_AnisoCluster_OfChain(nThisChainID, caTmpClusCheckList, naFullClusList + nCumulativeSize);
+
+        nCumulativeSize += nThisClusSize;
+        nClusNum++;
+        naCumClusSizes[nClusNum] = nCumulativeSize;
+
+        nThisChainID = ClusUtil_NextUnvisitedChain(nThisChainID, caTmpClusCheckList);
+    }
+
+
+    free(caTmpClusCheckList);
+
+    return nClusNum;
+}
+
+/// ClusUtil_OvlpClusters_OfSystem - Calculates the Ovlp-based cluster of the whole system. Writes over the provided arrays
+/// to save the cluster-list and the cumulative sizes.
+/// \param naFullClusList Array that will contain all the clusters.
+/// \param naCumClusSizes Array that will contain the cumulative sizes of the clusters. Allows for cluster extraction
+/// later by doing some index-based arithmetic.
+/// \return The total number of clusters in the system. 1 would mean every molecule is part of a single cluster.
+/// While tot_chains_glb would mean that every molecule is only a part of its own cluster.
+int ClusUtil_OvlpClusters_OfSystem(int* const naFullClusList, int* const naCumClusSizes)
 {
     int nCumulativeSize = 0;
     int nClusNum        = 0;
@@ -1978,7 +1957,8 @@ int Clus_Ovlp_OfSystem_New(int* const naFullClusList, int* const naCumClusSizes)
 
     while (nThisChainID < tot_chains_glb)
         {
-            nThisClusSize = Clus_Ovlp_OfChain(nThisChainID, caTmpClusCheckList, naFullClusList + nCumulativeSize);
+            nThisClusSize =
+                ClusUtil_OvlpCluster_OfChain(nThisChainID, caTmpClusCheckList, naFullClusList + nCumulativeSize);
 
             nCumulativeSize += nThisClusSize;
             nClusNum++;
@@ -2023,7 +2003,11 @@ void ClusHistUtil_AddToHist_FromCountsList(lLong* const laHist, const int* const
         }
 }
 
-void ClusUtil_GenHistFromCumulativeSizes(int* const restrict naClusSizeHist, const int* const restrict naCumClusSizes,
+///
+/// \param naClusSizeHist
+/// \param naCumClusSizes
+/// \param nClusNum
+void ClusUtil_GenHistFromCumulativeSizes(lLong* const restrict naClusSizeHist, const int* const restrict naCumClusSizes,
                                          int const nClusNum)
 {
     int* naTmpSizeList = (int*) calloc((nClusNum), sizeof(int));
@@ -2035,14 +2019,6 @@ void ClusUtil_GenHistFromCumulativeSizes(int* const restrict naClusSizeHist, con
     free(naTmpSizeList);
 }
 
-void ClusUtil_AddToGlobalClusHist(const int* const naClusSizes, const int nClusNum)
-{
-    int i;
-    for (i = 0; i < nClusNum; i++)
-        {
-            naClusHistList_glb[naClusSizes[i]]++;
-        }
-}
 
 /// ClusUtil_GetCluster_FromFullClusAndCumSizes - Given the cluster-list, cumulative sizes, cluster sizes and total
 /// number of clusters, we get the cluster specific to nClusID and also return the size.
@@ -2098,7 +2074,7 @@ void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromCluster(lLDub* const restrict 
         {
             chainID   = naClusList[i];
             chainType = chain_info_glb[chainID][CHAIN_TYPE];
-            histBin   = MolClusArr_Index(0, chainType, nClusSize);
+            histBin   = MolClusArr_Index(0, chainType, nClusSize-1);
             ldaMolWiseHist[histBin]++;
         }
 }
@@ -2135,13 +2111,13 @@ void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromFullClusAndCumSizes(lLDub* con
 /// within each cluster (or cluster-size)
 /// \param naSizeHist
 /// \param ldaMolWiseHist
-void ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(lLong* const restrict naSizeHist,
+int ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(lLong* const restrict naSizeHist,
                                                            lLDub* const restrict ldaMolWiseHist)
 {
     int* naFullClusList = (int*) calloc((tot_chains_glb + 1), sizeof(int));
     int* naCumClusSizes = (int*) calloc((tot_chains_glb + 1), sizeof(int));
 
-    const int nClusNum = Clus_Ovlp_OfSystem_New(naFullClusList, naCumClusSizes);
+    const int nClusNum = ClusUtil_OvlpClusters_OfSystem(naFullClusList, naCumClusSizes);
 
     int* naClusSizes = (int*) calloc((nClusNum + 1), sizeof(int));
 
@@ -2152,7 +2128,139 @@ void ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(lLong* const restrict
     ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromFullClusAndCumSizes(ldaMolWiseHist, naFullClusList, naCumClusSizes,
                                                                      naClusSizes, nClusNum);
 
+    const int currentLargest = ListOP_GetMaxVal_Int(nClusNum, naClusSizes);
+
+
+
     free(naFullClusList);
     free(naCumClusSizes);
     free(naClusSizes);
+
+    return currentLargest;
+}
+
+
+/// ClusAnalysis_Aniso_ForSystem_MolTypeWiseDecompAndSizes - Performs a total clustering analysis of the system, and also
+/// gets the composition of each cluster. naSizeHist is the histogram for the cluster sizes. ldaMolWiseHist is the
+/// histogram for the composition of each cluster. The composition corresponds to the number of different chain types
+/// within each cluster (or cluster-size)
+/// \param naSizeHist
+/// \param ldaMolWiseHist
+int ClusAnalysis_Aniso_ForSystem_MolTypeWiseDecompAndSizes(lLong* const restrict naSizeHist,
+                                                           lLDub* const restrict ldaMolWiseHist)
+{
+    int* naFullClusList = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+    int* naCumClusSizes = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+
+    const int nClusNum = ClusUtil_AnisoClusters_OfSystem(naFullClusList, naCumClusSizes);
+
+    int* naClusSizes = (int*) calloc((nClusNum + 1), sizeof(int));
+
+    ClusUtil_GenClusSizesFromCumulativeSizes(naClusSizes, naCumClusSizes, nClusNum);
+
+    ClusHistUtil_AddToHist_FromCountsList(naSizeHist, naClusSizes, nClusNum);
+
+    ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromFullClusAndCumSizes(ldaMolWiseHist, naFullClusList, naCumClusSizes,
+                                                                     naClusSizes, nClusNum);
+
+
+    const int currentLargest = ListOP_GetMaxVal_Int(nClusNum, naClusSizes);
+
+    free(naFullClusList);
+    free(naCumClusSizes);
+    free(naClusSizes);
+
+    return currentLargest;
+
+}
+
+int ClusUtil_GetLargestCluster_FromFullClusAndCumSizes(int* const naOutClusList, const int* const naFullClusList,
+                                                       const int* const naCumSizes, const int* const naClusSizes,
+                                                       const int nClusNum)
+{
+
+
+    int i;
+    const int thisSize  = ListOP_GetMaxVal_Int(nClusNum, naClusSizes);
+    const int nClusID   = ListOP_GetRandomIndexForVal_Int(thisSize, nClusNum, naClusSizes);
+#if DEBUG_BUILD
+    if (nClusID > nClusNum)
+        {
+            fprintf(stderr, "Incorrect cluster-ID (%d) is greater than number of clusters (%d)\n", nClusID, nClusNum);
+            fprintf(stderr, "Crashing.");
+            exit(1);
+        }
+    if (nClusID < 0)
+        {
+            fprintf(stderr, "Negative cluster-ID (%d)\n", nClusID);
+            fprintf(stderr, "Crashing.");
+            exit(1);
+        }
+#endif
+    const int nStart    = naCumSizes[nClusID];
+
+    for (i = 0; i < thisSize; i++)
+    {
+        naOutClusList[i] = naFullClusList[i + nStart];
+    }
+
+    return thisSize;
+}
+
+int ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(int* const naOutClusList, const int* const naFullClusList,
+                                                             const int* const naCumSizes, const int* const naClusSizes,
+                                                             const int nClusNum)
+{
+
+
+    int i;
+
+    const int thisSize  = ListOP_Get2ndLargestVal_Int(nClusNum, naClusSizes);
+    const int nClusID   = ListOP_GetRandomIndexForVal_Int(thisSize, nClusNum, naClusSizes);
+#if DEBUG_BUILD
+    if (nClusID > nClusNum)
+        {
+            fprintf(stderr, "Incorrect cluster-ID (%d) is greater than number of clusters (%d)\n", nClusID, nClusNum);
+            fprintf(stderr, "Crashing.");
+            exit(1);
+        }
+    if (nClusID < 0)
+        {
+            fprintf(stderr, "Negative cluster-ID (%d)\n", nClusID);
+            fprintf(stderr, "Crashing.");
+            exit(1);
+        }
+#endif
+    const int nStart    = naCumSizes[nClusID];
+
+    for (i = 0; i < thisSize; i++)
+    {
+        naOutClusList[i] = naFullClusList[i + nStart];
+    }
+
+    return thisSize;
+}
+
+int ClusUtil_OvlpCluster_OfSystem_SecondLargest(int* naOutClusList)
+{
+    int thisSize;
+
+    int* naFullClusList = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+    int* naCumClusSizes = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+
+    const int nClusNum = ClusUtil_OvlpClusters_OfSystem(naFullClusList, naCumClusSizes);
+
+    int* naClusSizes = (int*) calloc((nClusNum + 1), sizeof(int));
+
+    ClusUtil_GenClusSizesFromCumulativeSizes(naClusSizes, naCumClusSizes, nClusNum);
+
+    thisSize = ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(naOutClusList, naFullClusList, naCumClusSizes,
+                                                                        naClusSizes, nClusNum);
+
+    free(naFullClusList);
+    free(naCumClusSizes);
+    free(naClusSizes);
+
+
+    return thisSize;
 }

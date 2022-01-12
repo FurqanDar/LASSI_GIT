@@ -94,6 +94,9 @@ int MC_Step(float fMCTemp)
                 i       = rand() % tot_chains_glb;
                 nAccept = Move_SmallClus_Proximity(i, fMCTemp);
                 break;
+
+            case MV_PR_CLSTR:
+                nAccept = Move_Clus_Proximity(fMCTemp);
             default:
                 nAccept = 0;
                 break;
@@ -810,7 +813,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
     char* oldHashTab = calloc(tot_chains_glb, sizeof(char));
     int* clusList    = calloc(tot_chains_glb, sizeof(int));
 
-    const int ClusSize = Clus_Aniso_OfChain_wMaxSize(chainID, oldHashTab, clusList, nLimitedClusterSize_glb);
+    const int ClusSize = ClusUtil_AnisoCluster_OfChain_wMaxSize(chainID, oldHashTab, clusList, nLimitedClusterSize_glb);
     if ((ClusSize < 2))
         {
             bAccept = 0;
@@ -1158,8 +1161,8 @@ int Move_CoLocal(int thisBeadID, float MyTemp)
             bondNum     = BeadList_AppendBeads(0, bondList, bond_tmpList, bond_tmpNum);
             bond_tmpNum = OP_GetTopoBonds(otherBeadID, bond_tmpList);
             bondNum     = BeadList_AppendBeads(bondNum, bondList, bond_tmpList, bond_tmpNum);
-            qsort(bondList, bondNum, sizeof(int), compare_int);
-            bondNum = BeadList_UniqueElements(bondNum, bondList);
+            qsort(bondList, bondNum, sizeof(int), UtilFunc_CompareInts);
+            bondNum = ListOP_UniqueElementsOfSortedList_Int(bondNum, bondList);
             bondNum = BeadList_CanTopoAngle(bondNum, bondList);
         }
     else
@@ -1305,8 +1308,8 @@ int Move_MultiLocal(int beadID, float MyTemp)
                     yTemp      = OP_GetTopoBonds(tmpBead, tmpAngList);
                     bondAngNum = BeadList_AppendBeads(bondAngNum, bondAngList, tmpAngList, yTemp);
                 }
-            qsort(bondAngList, bondAngNum, sizeof(int), compare_int);
-            bondAngNum = BeadList_UniqueElements(bondAngNum, bondAngList);
+            qsort(bondAngList, bondAngNum, sizeof(int), UtilFunc_CompareInts);
+            bondAngNum = ListOP_UniqueElementsOfSortedList_Int(bondAngNum, bondAngList);
         }
     else
         {
@@ -1738,9 +1741,10 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
 
     int* oldClusList   = calloc(tot_chains_glb, sizeof(int));
     char* oldHashTab   = calloc(tot_chains_glb, sizeof(char));
-    const int ClusSize = Clus_Ovlp_OfChain_wMaxSize(chainID, oldHashTab, oldClusList, nLimitedClusterSize_glb);
+    const int ClusSize =
+        ClusUtil_OvlpCluster_OfChain_wMaxSize(chainID, oldHashTab, oldClusList, nLimitedClusterSize_glb);
 
-    if ((ClusSize < 2))
+    if (ClusSize < 2)
         {
             bAccept = 0;
             free(oldClusList);
@@ -1811,7 +1815,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
         }
     // Recalculating cluster to see if we have the same cluster or not. If not, we reject.
 
-    const int ClusCheckN = Clus_Ovlp_OfChain_CheckForSame(oldHashTab, oldClusList, ClusSize);
+    const int ClusCheckN = ClusUtil_OvlpCluster_OfChain_CheckForSame(oldHashTab, oldClusList, ClusSize);
     free(oldHashTab);
 
     if (ClusCheckN == -1)
@@ -1875,6 +1879,163 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
             // printf("End CLUS - Failed.\n");
         }
 }
+
+///Move_Clus_Proximity - Attempts to move the second largest cluster in the system
+/// \param myTemp
+/// \return
+int Move_Clus_Proximity(const float myTemp)
+{
+    // Performs a cluster move where a given chain and it's cluster are moved.
+    // No new 'bonds' are made so the move is reversible.... So we have to check if we get the same cluster back
+
+    int bAccept = 0; // Used in MC steps, assume that move fails initially.
+
+    int* oldClusList   = calloc(tot_chains_glb, sizeof(int));
+    const int ClusSize =
+        ClusUtil_OvlpCluster_OfSystem_SecondLargest(oldClusList);
+    printf("%d\n", ClusSize);
+    if (ClusSize < 2)
+    {
+        bAccept = 0;
+        free(oldClusList);
+        return bAccept;
+    }
+    //    printf("\n%d\n", ClusSize);
+
+    // Radii for translation moves. All moves are L/2 radius
+    int r_Disp[POS_MAX];
+    int yTemp;
+    int i, j;
+    LatPos_gen_rand_wRad(r_Disp, naBoxSize_glb[0] / 2);
+
+    for (i = 0; i < ClusSize; i++)
+    {
+        yTemp = Check_ChainDisp(oldClusList[i], r_Disp); // Checking for steric clash
+        if (yTemp == 0)
+        {
+            bAccept = 0;
+            free(oldClusList);
+            return bAccept;
+        }
+    }
+    // No  clash
+
+    char* oldHashTab   = calloc(tot_chains_glb, sizeof(char));
+
+    for (i=0; i<ClusSize; i++)
+    {
+        oldHashTab[oldClusList[i]] = 1;
+    }
+
+
+    int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
+    int thisChain, firstB, lastB;
+
+    lLDub oldEn = 0.;
+    lLDub newEn = 0.;
+    if (nInitialPotential_Mode_glb != -1)
+    {
+        for (j = 0; j < ClusSize; j++)
+        {
+            thisChain = oldClusList[j];
+            firstB    = chain_info_glb[thisChain][CHAIN_START];
+            lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
+            for (i = firstB; i < lastB; i++)
+            {
+                oldEn += Energy_InitPotential(i);
+            }
+        }
+    }
+
+    // If no CONT interactions, then just checking the cluster is enough. If we have a different cluster, we immediately
+    // reject. Therefore, the clusters are moved as rigid bodies and will have the same OVLP energies before and after.
+    // If we have CONT interactions, we could have different energies. Therefore, we should calculate the energies.
+    if (bSystemHasCont_glb)
+    {
+        for (j = 0; j < ClusSize; j++)
+        {
+            thisChain = oldClusList[j];
+            firstB    = chain_info_glb[thisChain][CHAIN_START];
+            lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
+            for (i = firstB; i < lastB; i++)
+            {
+                Energy_Iso_ForChains(i, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, naOldOvlpNeighs_glb,
+                                     naOldContNeighs_glb);
+            }
+        }
+    }
+
+    for (i = 0; i < ClusSize; i++)
+    {
+        OP_System_DispChain(oldClusList[i], r_Disp); // Moving the cluster properly
+    }
+    // Recalculating cluster to see if we have the same cluster or not. If not, we reject.
+
+    const int ClusCheckN = ClusUtil_OvlpCluster_OfChain_CheckForSame(oldHashTab, oldClusList, ClusSize);
+    free(oldHashTab);
+
+    if (ClusCheckN == -1)
+    {
+        for (i = 0; i < ClusSize; i++)
+        {
+            OP_System_RestoreChain(oldClusList[i]); // Placing  the cluster back properly
+        }
+        bAccept = 0;
+        free(oldClusList);
+        return bAccept;
+    }
+
+    if (nInitialPotential_Mode_glb != -1)
+    {
+        for (j = 0; j < ClusSize; j++)
+        {
+            thisChain = oldClusList[j];
+            firstB    = chain_info_glb[thisChain][CHAIN_START];
+            lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
+            for (i = firstB; i < lastB; i++)
+            {
+                newEn += Energy_InitPotential(i);
+            }
+        }
+    }
+
+    if (bSystemHasCont_glb)
+    {
+        for (j = 0; j < ClusSize; j++)
+        {
+            thisChain = oldClusList[j];
+            firstB    = chain_info_glb[thisChain][CHAIN_START];
+            lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
+            for (i = firstB; i < lastB; i++)
+            {
+                Energy_Iso_ForChains(i, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, naNewOvlpNeighs_glb,
+                                     naNewContNeighs_glb);
+            }
+        }
+    }
+
+    const lLDub MCProb = (lLDub) rand() / (lLDub) RAND_MAX;
+    const lLDub MHAcc  = OP_GenMHValue(0., 0., oldEn - newEn, (lLDub) myTemp);
+    if (MCProb < MHAcc)
+    {                // Accept this state
+        bAccept = 1; // Accept the move
+        free(oldClusList);
+        return bAccept;
+        // printf("End CLUS - Yes\n");
+    }
+    else
+    {
+        for (i = 0; i < ClusSize; i++)
+        {
+            OP_System_RestoreChain(oldClusList[i]); // Placing  the cluster back properly
+        }
+        bAccept = 0;
+        free(oldClusList);
+        return bAccept;
+        // printf("End CLUS - Failed.\n");
+    }
+}
+
 
 // All the _Equil variants of the moves are spatially the same as their non
 // _Equil variants. The only difference is that the aniso-tropic interaction is
@@ -2246,8 +2407,8 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp)
                     yTemp      = OP_GetTopoBonds(tmpBead, tmpAngList);
                     bondAngNum = BeadList_AppendBeads(bondAngNum, bondAngList, tmpAngList, yTemp);
                 }
-            qsort(bondAngList, bondAngNum, sizeof(int), compare_int);
-            bondAngNum = BeadList_UniqueElements(bondAngNum, bondAngList);
+            qsort(bondAngList, bondAngNum, sizeof(int), UtilFunc_CompareInts);
+            bondAngNum = ListOP_UniqueElementsOfSortedList_Int(bondAngNum, bondAngList);
         }
     else
         {

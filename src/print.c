@@ -78,7 +78,7 @@ void Write_ClusterDist(char* filename, long nGen)
             fprintf(fp, "#%ld\n", nGen);
             for (i = 0; i <= tot_chains_glb; i++)
                 {
-                    fprintf(fp, "%ld\t", naClusHistList_glb[i]);
+                    fprintf(fp, "%ld\t", laClusHistList_glb[i]);
                 }
             fprintf(fp, "\n");
         }
@@ -389,6 +389,8 @@ void PrintToScreen_MCMoveFreqs(void)
     MoveName[MV_SNAKE]      = "Slithering Snake";
     MoveName[MV_TRANS]      = "Translation     ";
     MoveName[MV_PR_SMCLSTR] = "Pr. Smal Cluster";
+    MoveName[MV_PR_CLSTR]   = "Pr. Cluster     ";
+
 
     float freqMin = 1e10f;
     int i;
@@ -499,6 +501,8 @@ void ScreenIO_Print_AcceptanceRatios(void)
     MoveName[MV_SNAKE]      = "Sli. Snake  ";
     MoveName[MV_TRANS]      = "Translation ";
     MoveName[MV_PR_SMCLSTR] = "Pr. Sm. Cls.";
+    MoveName[MV_PR_CLSTR]   = "Pr. Cls.    ";
+
 
     int i, j;
     float fAccRatio = 0.f;
@@ -559,13 +563,11 @@ void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle)
     ScreenIO_Print_SystemEnergy();
     ScreenIO_Print_AcceptanceRatios();
 
-//    printf("\n%d\n", Clus_Ovlp_OfSystem());
-//    printf("\n%d\n", Clus_Aniso_OfSystem());
 
     lLong* dumClusHist = (lLong*) calloc(tot_chains_glb+1, sizeof (lLong));
     lLDub* dumMolHist   = (lLDub*) calloc(tot_chain_types_glb*(tot_chains_glb+1), sizeof (lLDub));
 
-    ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(dumClusHist, dumMolHist);
+    printf("%d\n",ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(dumClusHist, dumMolHist));
 
     free(dumClusHist);
     free(dumMolHist);
@@ -707,7 +709,7 @@ void Write_SysProp(char* filename)
     fprintf(fp, "%f\t", (float) nLargestClusterRightNow_glb / (float) nTotClusCounter_glb);
     for (i = 1; i <= tot_chains_glb; i++)
         {
-            fprintf(fp, "%f\t", (float) naClusHistList_glb[i] / (float) nTotClusCounter_glb);
+            fprintf(fp, "%f\t", (float) laClusHistList_glb[i] / (float) nTotClusCounter_glb);
         }
     // Split RDFs
     fprintf(fp, "\n#Split RDFs. ALL-ALL; DIAGONALS and then from 0 onwards \n");
@@ -1109,7 +1111,7 @@ void DataAnalysis_DuringRunCycles(const long nGen, const int run_it)
         { // SysProp is printed outside of this function in main.c, lol
             if (nGen % naReportFreqs_glb[REPORT_NETWORK] == 0)
                 {
-                    Clus_Perform_Analysis();
+                    ClusAnalysis_Perform_Analysis(nClusteringMode_glb);
                     GyrTensor_GyrRad_Avg();
                 }
         }
@@ -1185,12 +1187,13 @@ void CopyData_All(const int run_it)
 void CopyData_RDF(const int run_it)
 {
     int i, j;
+    const long double normFactor = 1.0 / (long double) nRDFCounter_glb;
     for (i = 0; i < nRDF_TotComps_glb; i++)
         {
             for (j = 0; j < nRDF_TotBins_glb; j++)
                 {
                     ldaTOTRDF_Arr_glb[RDFArr_Index(run_it, i, j)] =
-                        ldaRDF_Arr_glb[RDFArr_Index(0, i, j)] / (long double) nRDFCounter_glb;
+                        ldaRDF_Arr_glb[RDFArr_Index(0, i, j)] * normFactor;
                 }
         }
 }
@@ -1200,34 +1203,37 @@ void CopyData_RDF(const int run_it)
 void CopyData_COMDen(const int run_it)
 {
     int i, j;
+    const long double normFactor = 1.0 / (long double) nRadDenCounter_glb;
     for (i = 0; i < nRadDen_TotComps_glb; i++)
         {
             for (j = 0; j < nRDF_TotBins_glb; j++)
                 {
                     ldaTOTRadDen_Arr_glb[RadDenArr_Index(run_it, i, j)] =
-                        ldaRadDen_Arr_glb[RadDenArr_Index(0, i, j)] / (long double) nRadDenCounter_glb;
+                        ldaRadDen_Arr_glb[RadDenArr_Index(0, i, j)] * normFactor;
                 }
         }
 }
 
-/// CopyData_Clus - Copies ldMOLClUS_Arr into ldaTOTMOLCLUS_Arr_glb. Also copies naClusHistList_glb into
-/// ldaTOTCLUS_Arr_glb. And stores the Gyration radius. \param run_it: which run cycle we are on. Should be >= 0.
+/// CopyData_Clus - Copies ldMOLClUS_Arr into ldaTOTMOLCLUS_Arr_glb. Also copies laClusHistList_glb into
+/// ldaTOTCLUS_Arr_glb. And stores the Gyration radius.
+/// \param run_it: which run cycle we are on. Should be >= 0.
 void CopyData_Clus(const int run_it)
 {
     int i, j;
-    ldaTOTCLUS_Arr_glb[run_it][0] = (long double) nLargestClusterRightNow_glb / (long double) nTotClusCounter_glb;
+    const long double normFactor = 1.0 / (long double) nTotClusCounter_glb;
+    ldaTOTCLUS_Arr_glb[run_it][0] = (long double) nLargestClusterRightNow_glb * normFactor;
     for (i = 1; i <= tot_chains_glb; i++)
         {
-            ldaTOTCLUS_Arr_glb[run_it][i] = (long double) naClusHistList_glb[i] / (long double) nTotClusCounter_glb;
+            ldaTOTCLUS_Arr_glb[run_it][i] = (long double) laClusHistList_glb[i] * normFactor;
         }
     for (i = 0; i < tot_chains_glb; i++)
         {
             for (j = 0; j < tot_chain_types_glb; j++)
                 {
                     ldaTOTMOLCLUS_Arr_glb[MolClusArr_Index(run_it, j, i)] =
-                        ldaMOLCLUS_Arr_glb[MolClusArr_Index(0, j, i)] / (long double) nTotClusCounter_glb;
+                        ldaMOLCLUS_Arr_glb[MolClusArr_Index(0, j, i)] * normFactor;
                 }
         }
     ldaTOTRg_Arr_glb[run_it][0] = (long double) faSysGyrRad_glb / (long double) nTotGyrRadCounter_glb;
-    ldaTOTRg_Arr_glb[run_it][1] = (long double) naBoxSize_glb[0] / 2.;
+    ldaTOTRg_Arr_glb[run_it][1] = (long double) naBoxSize_glb[0] / 2.0;
 }

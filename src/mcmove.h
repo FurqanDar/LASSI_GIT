@@ -31,6 +31,8 @@ int Move_BranchedRot(int chainID, float MyTemp);
 
 int Move_SmallClus_Proximity(const int chainID, const float myTemp);
 
+int Move_Clus_Proximity(const float myTemp);
+
 int Move_Local_Equil(int beadID, float MyTemp);
 
 int Move_Snake_Equil(int chainID, float MyTemp);

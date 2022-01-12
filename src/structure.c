@@ -1683,13 +1683,13 @@ int BeadListOP_Filter_DbPvtLinkerConBck(const int beadNum, int* beadList, const 
     return newSize;
 }
 
-/// BeadList_UniqueElements: Overwrite the provided _sorted_ list of integers with only the unique elements, and
+/// ListOP_UniqueElementsOfSortedList_Int: Overwrite the provided _sorted_ list of integers with only the unique elements, and
 /// return the size of the new array.
 /// The overwritten list is also sorted.
 /// The implementation only works on sorted lists.
 /// \param dum_list: Sorted list of beadID's (or integers)
 /// \return number of unique elements.
-int BeadList_UniqueElements(const int size, int* sorted_list)
+int ListOP_UniqueElementsOfSortedList_Int(const int size, int* sorted_list)
 {
     int* first  = sorted_list;
     int* second = first;
@@ -1704,6 +1704,8 @@ int BeadList_UniqueElements(const int size, int* sorted_list)
         }
     return newSize;
 }
+
+
 
 /// BeadList_AppendBeads
 /// Note that old_list should be at least as big as old_size + app_size. No bounds checking is done since
@@ -1724,11 +1726,11 @@ int BeadList_AppendBeads(const int old_size, int* old_list, const int* app_list,
     return old_size + app_size;
 }
 
-/// compare_int: A simple function that is used in CSTDLIB qsort for integers.
+/// UtilFunc_CompareInts: A simple function that is used in CSTDLIB qsort for integers.
 /// \param a
 /// \param b
 /// \return
-int compare_int(const void* a, const void* b)
+int UtilFunc_CompareInts(const void* a, const void* b)
 {
     return (*(int*) a - *(int*) b);
 }
@@ -1781,7 +1783,10 @@ int ChainListOP_AddUniqueChains_wSize(const int clusSize, int* clusList, const i
 
 /// ChainListOP_AddUniqueChains_wSize: Add any chains that are not in clusList from chainList. This function assumes
 /// that chainList contains only unique elements, and that clusList has the smallest chainID as the first element, and
-/// the largest chainID the last element (at clusList[clusSize-1]). \param clusSize \param clusList \param newChainNums
+/// the largest chainID the last element (at clusList[clusSize-1]).
+/// \param clusSize
+/// \param clusList
+/// \param newChainNums
 /// \param chainList
 int ChainListOP_AddUniqueChains_wSize_Check(const int clusSize, int* clusList, const int newChainNums,
                                             const int* chainList, const int maxClus, const int* oldList)
@@ -1807,7 +1812,6 @@ int ChainListOP_AddUniqueChains_wSize_Check(const int clusSize, int* clusList, c
     return newClusSize;
 }
 
-
 /// ChainListOP_GetChainTypes - Given a list that contains chainIDs, we get the type of each of the chains.
 /// \param naTypesList Array where the chain-types will be recorded.
 /// \param naChainIDs Array that contains all the chainIDs.
@@ -1815,12 +1819,14 @@ int ChainListOP_AddUniqueChains_wSize_Check(const int clusSize, int* clusList, c
 void ChainListOP_GetChainTypes(int* const naTypesList, const int* const naChainIDs, const int nListSize)
 {
     int i;
-    for (i=0; i<nListSize; i++)
-    {
-        naTypesList[i] = chain_info_glb[i][CHAIN_TYPE];
-    }
-
+    int tmpChain;
+    for (i = 0; i < nListSize; i++)
+        {
+            tmpChain       = naChainIDs[i];
+            naTypesList[i] = chain_info_glb[tmpChain][CHAIN_TYPE];
+        }
 }
+
 /// ClusListOP_AddChainID - Given a cluster-chainIDs list containing clusSize chains, we try to add the proposed
 /// chainID. Assumes that clusList[0] is the smallest, and clusList[clusSize-1] is the largest.
 /// - If the chain is smaller than the smallest, we add it to become the first element of the chain, because it is now
@@ -1902,7 +1908,8 @@ void LatticeUtil_GetOvlpLattIndecies(const int* restrict const r_pos0, int* rest
 /// Note that this will include -1 values as well, or empty sites.
 /// \param nIndexList
 /// \param nLatValsList - Must be at least 27 elements long.
-void LatticeUtil_GetLattVals_FromList(const int* restrict const nIndexList, int* restrict nLatValsList, const int listSize)
+void LatticeUtil_GetLattVals_FromList(const int* restrict const nIndexList, int* restrict nLatValsList,
+                                      const int listSize)
 {
     int i;
     for (i = 0; i < listSize; ++i)
@@ -1916,13 +1923,14 @@ void LatticeUtil_GetLattVals_FromList(const int* restrict const nIndexList, int*
 /// \param nLatValsList
 /// \param nBeadsList
 /// \return
-int LatticeUtil_GetBeadIDs_FromList(const int* restrict const nLatValsList, int* restrict nBeadsList, const int listSize)
+int LatticeUtil_GetBeadIDs_FromList(const int* restrict const nLatValsList, int* restrict nBeadsList,
+                                    const int nListSize)
 {
     int nBeadsNum = 0;
     int tmpBead;
     int i;
 
-    for (i = 0; i < CLUS_CONTACT_NEIGHS; ++i)
+    for (i = 0; i < nListSize; ++i)
         {
             tmpBead = nLatValsList[i];
             if (tmpBead != -1)
@@ -1947,4 +1955,110 @@ int LatticeUtil_GetNeighBeads_AtPos(const int* restrict const r_pos0, int* restr
     LatticeUtil_GetLattVals_FromList(nLatInd, nLatVals, CLUS_CONTACT_NEIGHS);
 
     return LatticeUtil_GetBeadIDs_FromList(nLatVals, nBeadsList, CLUS_CONTACT_NEIGHS);
+}
+
+
+/// ListOP_GetMaxVal_Int - Given an integer array naList, of size nListSize, we return the max val
+/// \param nListSize
+/// \param naList
+/// \return Maximum value in the supplied array.
+int ListOP_GetMaxVal_Int(const int nListSize, const int* const naList)
+{
+    int i;
+    int maxVal = naList[0];
+
+    for(i=0; i<nListSize; i++)
+    {
+        if (naList[i] > maxVal)
+        {
+            maxVal = naList[i];
+        }
+    }
+
+    return maxVal;
+}
+
+///
+/// \param nVal
+/// \param naOutList
+/// \param nListSize
+/// \param naList
+/// \return
+int ListOP_IndicesForVal_Int(const int nVal, int* const naOutList, const int nListSize, const int* const naList)
+{
+    int i;
+    int nOutSize=0;
+    for (i=0; i<nListSize; i++)
+    {
+        if (naList[i] == nVal)
+        {
+            naOutList[nOutSize] = i;
+            nOutSize++;
+        }
+    }
+    return nOutSize;
+}
+
+///
+/// \param nVal
+/// \param nListSize
+/// \param naList
+/// \return
+int ListOP_GetRandomIndexForVal_Int(const int nVal, const int nListSize, const int* const naList)
+{
+    int nOutIdx=0;
+    int* naIdxList = (int*) malloc(sizeof (int) * nListSize);
+
+    const int nTotIds = ListOP_IndicesForVal_Int(nVal, naIdxList, nListSize, naList);
+
+    if (nTotIds > 1)
+    {
+        nOutIdx = rand() % nTotIds;
+    }
+
+    free(naIdxList);
+
+    return nOutIdx;
+}
+
+/// ListOP_UniqueElementsOfList_Int: Overwrite the provided _unsorted_ list of integers with only the unique elements, and
+/// return the size of the new array. The list is sorted first, and then ListOP_UniqueElementsOfSortedList_Int is run
+/// on that newly sorted list. This is a wrapper-like function for ease.
+/// The overwritten list is also sorted.
+/// \param naUnsortedList: Array of ints
+/// \return number of unique elements.
+int ListOP_UniqueElementsOfList_Int(const int size, int* naUnsortedList)
+{
+    qsort(naUnsortedList, size, sizeof(*naUnsortedList), UtilFunc_CompareInts);
+    return ListOP_UniqueElementsOfSortedList_Int(size, naUnsortedList);
+}
+
+
+/// ListOP_Get2ndLargestVal_Int - Given an integer array naList, of size nListSize, we return the second largest value
+/// in the array. If the array only has one value, we just return that value back.
+/// We get the sorted unique elements in the input array and return the second last.
+/// \param nListSize
+/// \param naList
+/// \return 2nd largest value in the input array.
+int ListOP_Get2ndLargestVal_Int(const int nListSize, const int* const naList)
+{
+    int* naTmpList = (int*) malloc(nListSize * sizeof (int));
+    int i;
+    for (i=0; i<nListSize; i++)
+    {
+        naTmpList[i] = naList[i];
+    }
+
+    int nUniqueVals = ListOP_UniqueElementsOfList_Int(nListSize, naTmpList);
+
+    int thisVal = naTmpList[0];
+
+    if (nUniqueVals >= 2)
+    {
+        thisVal = naTmpList[nUniqueVals-2];
+    }
+
+    free(naTmpList);
+
+    return thisVal;
 }
