@@ -2181,15 +2181,14 @@ int ClusAnalysis_Aniso_ForSystem_MolTypeWiseDecompAndSizes(lLong* const restrict
 /// \param naClusSizes
 /// \param nClusNum
 /// \return
-int ClusUtil_GetLargestCluster_FromFullClusAndCumSizes(int* const naOutClusList, const int* const naFullClusList,
-                                                       const int* const naCumSizes, const int* const naClusSizes,
-                                                       const int nClusNum)
+int ClusUtil_GetLargestCluster_FromFullClusAndCumSizes(int* const restrict naOutClusList,
+                                                       const int* const restrict naFullClusList,
+                                                       const int* const restrict naCumSizes,
+                                                       const int* const restrict naClusSizes, const int nClusNum)
 {
-
-
     int i;
-    const int thisSize  = ListOP_GetMaxVal_Int(nClusNum, naClusSizes);
-    const int nClusID   = ListOP_GetRandomIndexForVal_Int(thisSize, nClusNum, naClusSizes);
+    const int thisSize = ListOP_GetMaxVal_Int(nClusNum, naClusSizes);
+    const int nClusID  = ListOP_GetRandomIndexForVal_Int(thisSize, nClusNum, naClusSizes);
 #if DEBUG_BUILD
     if (nClusID > nClusNum)
         {
@@ -2204,12 +2203,13 @@ int ClusUtil_GetLargestCluster_FromFullClusAndCumSizes(int* const naOutClusList,
             exit(1);
         }
 #endif
-    const int nStart    = naCumSizes[nClusID];
+
+    const int nStart = naCumSizes[nClusID];
 
     for (i = 0; i < thisSize; i++)
-    {
-        naOutClusList[i] = naFullClusList[i + nStart];
-    }
+        {
+            naOutClusList[i] = naFullClusList[i + nStart];
+        }
 
     return thisSize;
 }
@@ -2221,16 +2221,18 @@ int ClusUtil_GetLargestCluster_FromFullClusAndCumSizes(int* const naOutClusList,
 /// \param naClusSizes
 /// \param nClusNum
 /// \return
-int ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(int* const naOutClusList, const int* const naFullClusList,
-                                                             const int* const naCumSizes, const int* const naClusSizes,
-                                                             const int nClusNum)
+int ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(int* const restrict naOutClusList,
+                                                             const int* const restrict naFullClusList,
+                                                             const int* const restrict naCumSizes,
+                                                             const int* const restrict naClusSizes, const int nClusNum)
 {
-
-
     int i;
 
-    const int thisSize  = ListOP_Get2ndLargestVal_Int(nClusNum, naClusSizes);
-    const int nClusID   = ListOP_GetRandomIndexForVal_Int(thisSize, nClusNum, naClusSizes);
+    const int thisSize = ListOP_Get2ndLargestVal_Int(nClusNum, naClusSizes);
+
+    const int nClusID  = ListOP_GetRandomIndexForVal_Int(thisSize, nClusNum, naClusSizes);
+
+
 #if DEBUG_BUILD
     if (nClusID > nClusNum)
         {
@@ -2245,19 +2247,38 @@ int ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(int* const naOutClu
             exit(1);
         }
 #endif
-    const int nStart    = naCumSizes[nClusID];
+    const int nStart = naCumSizes[nClusID];
 
     for (i = 0; i < thisSize; i++)
-    {
-        naOutClusList[i] = naFullClusList[i + nStart];
-    }
+        {
+            naOutClusList[i] = naFullClusList[i + nStart];
+        }
 
     return thisSize;
 }
 
+int ClusUtil_OfSystem_SecondLargest(int* const naOutClusList, const int nMode)
+{
+    int clusterSize;
+    switch (nMode)
+    {
+        case 1:
+            clusterSize=ClusUtil_OvlpCluster_OfSystem_SecondLargest(naOutClusList);
+            break;
+        case 2:
+            clusterSize=ClusUtil_OvlpCluster_OfSystem_SecondLargest(naOutClusList);
+            break;
+        default:
+            clusterSize=ClusUtil_AnisoCluster_OfSystem_SecondLargest(naOutClusList);
+            break;
+    }
+
+    return clusterSize;
+}
+
 ///
 /// \param naOutClusList
-/// \return
+/// \return Size of the cluster
 int ClusUtil_OvlpCluster_OfSystem_SecondLargest(int* naOutClusList)
 {
     int thisSize;
@@ -2274,18 +2295,21 @@ int ClusUtil_OvlpCluster_OfSystem_SecondLargest(int* naOutClusList)
     thisSize = ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(naOutClusList, naFullClusList, naCumClusSizes,
                                                                         naClusSizes, nClusNum);
 
+//    thisSize = ClusUtil_GetLargestCluster_FromFullClusAndCumSizes(naOutClusList, naFullClusList, naCumClusSizes,
+//                                                                  naClusSizes, nClusNum);
+
     free(naFullClusList);
     free(naCumClusSizes);
     free(naClusSizes);
 
-
+//    printf("Size %d\n\n", thisSize);
     return thisSize;
 }
 
 ///
 /// \param naOutClusList
-/// \return
-int ClusUtil_AnsioCluster_OfSystem_SecondLargest(int* naOutClusList)
+/// \return Size of the cluster
+int ClusUtil_AnisoCluster_OfSystem_SecondLargest(int* naOutClusList)
 {
     int thisSize;
 
@@ -2301,10 +2325,82 @@ int ClusUtil_AnsioCluster_OfSystem_SecondLargest(int* naOutClusList)
     thisSize = ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(naOutClusList, naFullClusList, naCumClusSizes,
                                                                         naClusSizes, nClusNum);
 
+//    thisSize = ClusUtil_GetLargestCluster_FromFullClusAndCumSizes(naOutClusList, naFullClusList, naCumClusSizes,
+//                                                                  naClusSizes, nClusNum);
+
     free(naFullClusList);
     free(naCumClusSizes);
     free(naClusSizes);
 
 
     return thisSize;
+}
+
+void ClusUtil_MolWise_GetLargestClusters(int* const restrict naClusIDList_out, int* const naClusChainList_out,
+                                         int* const restrict naClusSizes_out, int* const restrict naCumSizes_out)
+{
+
+    int* const naFullClusList = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+    int* const naCumClusSizes = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+
+    const int nClusNum = ClusUtil_OvlpClusters_OfSystem(naFullClusList, naCumClusSizes);
+
+    int* const naClusSizes = (int*) calloc((nClusNum + 1), sizeof(int));
+
+    ClusUtil_GenClusSizesFromCumulativeSizes(naClusSizes, naCumClusSizes, nClusNum);
+
+    int* const naChainTypes = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+
+    ChainListOP_GetChainTypes(naChainTypes, naFullClusList, tot_chains_glb);
+
+//    ClusUtil_MolWise_FindLargestClusters(naChainTypes, naClusSizes, naCumClusSizes, nClusNum)
+
+
+    free(naFullClusList);
+    free(naCumClusSizes);
+    free(naClusSizes);
+    free(naChainTypes);
+
+}
+
+void ClusUtil_MolWise_FindLargestClusters(int* restrict naChainTypes, int* restrict naClusSizes,
+                                          int* restrict naCumClusSizes, const int nClusNum)
+{
+
+    int i;
+    int thisSize=0;
+    int* const thisClus = malloc((tot_chains_glb+1)*sizeof(int));
+
+    int* const tmpList  = calloc(tot_chain_types_glb, sizeof(int));
+
+    for(i=0; i<nClusNum; i++)
+    {
+        thisSize=ClusUtil_GetCluster_FromFullClusAndCumSizes(i, thisClus, naChainTypes, naCumClusSizes, naClusSizes, nClusNum);
+        ListOP_GenHistFromCounts_Int(tmpList, thisClus, thisSize);
+
+
+    }
+
+    free(thisClus);
+    free(tmpList);
+
+}
+
+
+
+/// ListOP_ReplaceIfLarger_Int - naOutList will have the max(naOutList[i], naInList[i]).
+/// \param naOutList
+/// \param naInList
+/// \param nSize
+void ListOP_ReplaceWithLarger_Int(int* const restrict naOutList, const int* const restrict naInList, const int nSize)
+{
+    int i;
+    for (i=0; i<nSize; i++)
+    {
+        if (naInList[i] >= naOutList[i])
+        {
+            naOutList[i] = naInList[i];
+        }
+    }
+
 }

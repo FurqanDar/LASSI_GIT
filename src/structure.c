@@ -1031,6 +1031,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen(void)
 
     // Perform clustering analysis
     Clus_Perform_MolWise_LargestClusters();
+    //ClusUtil_MolWiseLargestClusters(naClusIDList, naClusSizeList, naClusCumSizeList);
     // Remember the cluster ID's
     for (i = 0; i <= tot_chain_types_glb; i++)
         {
@@ -1982,21 +1983,21 @@ int ListOP_GetMaxVal_Int(const int nListSize, const int* const naList)
 /// \param nVal
 /// \param naOutList
 /// \param nListSize
-/// \param naList
+/// \param naInputList
 /// \return
-int ListOP_IndicesForVal_Int(const int nVal, int* const naOutList, const int nListSize, const int* const naList)
+int ListOP_IndicesForVal_Int(const int nVal, int* const naOutList, const int nListSize, const int* const naInputList)
 {
     int i;
-    int nOutSize=0;
+    int nNumberOfInds =0;
     for (i=0; i<nListSize; i++)
     {
-        if (naList[i] == nVal)
+        if (naInputList[i] == nVal)
         {
-            naOutList[nOutSize] = i;
-            nOutSize++;
+            naOutList[nNumberOfInds] = i;
+            nNumberOfInds++;
         }
     }
-    return nOutSize;
+    return nNumberOfInds;
 }
 
 ///
@@ -2006,14 +2007,18 @@ int ListOP_IndicesForVal_Int(const int nVal, int* const naOutList, const int nLi
 /// \return
 int ListOP_GetRandomIndexForVal_Int(const int nVal, const int nListSize, const int* const naList)
 {
-    int nOutIdx=0;
-    int* naIdxList = (int*) malloc(sizeof (int) * nListSize);
+    int nOutIdx=-1;
+    int* const naIdxList = (int*) malloc(sizeof (int) * nListSize);
 
     const int nTotIds = ListOP_IndicesForVal_Int(nVal, naIdxList, nListSize, naList);
 
-    if (nTotIds > 1)
+    if (nTotIds == 1)
     {
-        nOutIdx = rand() % nTotIds;
+        nOutIdx = naIdxList[0];
+    }
+    else if (nTotIds > 1)
+    {
+        nOutIdx = naIdxList[rand() % nTotIds];
     }
 
     free(naIdxList);
@@ -2022,38 +2027,39 @@ int ListOP_GetRandomIndexForVal_Int(const int nVal, const int nListSize, const i
 }
 
 /// ListOP_UniqueElementsOfList_Int: Overwrite the provided _unsorted_ list of integers with only the unique elements, and
-/// return the size of the new array. The list is sorted first, and then ListOP_UniqueElementsOfSortedList_Int is run
+/// return the nSize of the new array. The list is sorted first, and then ListOP_UniqueElementsOfSortedList_Int is run
 /// on that newly sorted list. This is a wrapper-like function for ease.
 /// The overwritten list is also sorted.
 /// \param naUnsortedList: Array of ints
 /// \return number of unique elements.
-int ListOP_UniqueElementsOfList_Int(const int size, int* naUnsortedList)
+int ListOP_UniqueElementsOfList_Int(const int nSize, int* const naUnsortedList)
 {
-    qsort(naUnsortedList, size, sizeof(*naUnsortedList), UtilFunc_CompareInts);
-    return ListOP_UniqueElementsOfSortedList_Int(size, naUnsortedList);
+    qsort(naUnsortedList, nSize, sizeof(int), UtilFunc_CompareInts);
+    return ListOP_UniqueElementsOfSortedList_Int(nSize, naUnsortedList);
 }
 
 
-/// ListOP_Get2ndLargestVal_Int - Given an integer array naList, of size nListSize, we return the second largest value
+/// ListOP_Get2ndLargestVal_Int - Given an integer array naInputList, of size nListSize, we return the second largest value
 /// in the array. If the array only has one value, we just return that value back.
 /// We get the sorted unique elements in the input array and return the second last.
 /// \param nListSize
-/// \param naList
+/// \param naInputList
 /// \return 2nd largest value in the input array.
-int ListOP_Get2ndLargestVal_Int(const int nListSize, const int* const naList)
+int ListOP_Get2ndLargestVal_Int(const int nListSize, const int* const naInputList)
 {
     int* naTmpList = (int*) malloc(nListSize * sizeof (int));
     int i;
     for (i=0; i<nListSize; i++)
     {
-        naTmpList[i] = naList[i];
+        naTmpList[i] = naInputList[i];
     }
 
-    int nUniqueVals = ListOP_UniqueElementsOfList_Int(nListSize, naTmpList);
+    //Extract Unique-sizes (this is sorted)
+    const int nUniqueVals = ListOP_UniqueElementsOfList_Int(nListSize, naTmpList);
 
     int thisVal = naTmpList[0];
 
-    if (nUniqueVals >= 2)
+    if (nUniqueVals > 1)
     {
         thisVal = naTmpList[nUniqueVals-2];
     }
@@ -2061,4 +2067,22 @@ int ListOP_Get2ndLargestVal_Int(const int nListSize, const int* const naList)
     free(naTmpList);
 
     return thisVal;
+}
+
+
+/// ListOP_GenHistFromCounts_Int - For every occurence in the naInputList, we increment that index by 1 in naOutFreqHist
+/// naOutFreqHist[naInputList[i]]++ over all elements
+/// \param naOutFreqHist
+/// \param naInputList
+/// \param nSize
+void ListOP_GenHistFromCounts_Int(int* const restrict naOutFreqHist, const int* const restrict naInputList,
+                                  const int nSize)
+{
+    int i;
+    for (i=0; i < nSize; i++)
+    {
+        naOutFreqHist[naInputList[i]]++;
+    }
+
+
 }

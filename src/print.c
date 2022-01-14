@@ -562,16 +562,6 @@ void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle)
 
     ScreenIO_Print_SystemEnergy();
     ScreenIO_Print_AcceptanceRatios();
-
-
-    lLong* dumClusHist = (lLong*) calloc(tot_chains_glb+1, sizeof (lLong));
-    lLDub* dumMolHist   = (lLDub*) calloc(tot_chain_types_glb*(tot_chains_glb+1), sizeof (lLDub));
-
-    printf("%d\n",ClusAnalysis_Ovlp_ForSystem_MolTypeWiseDecompAndSizes(dumClusHist, dumMolHist));
-
-    free(dumClusHist);
-    free(dumMolHist);
-
 }
 
 /// Write_RDF_ComponentWise - old implementation of printing the RDF, component

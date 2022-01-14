@@ -669,7 +669,7 @@ int Move_Clus_Network(float MyTemp)
     // Attempts to move the second largest cluster
 
     int bAccept = 0; // Used in MC steps, assume that move fails initially.
-    int* naClusList = (int*) malloc(sizeof (int) * tot_chains_glb);
+    int* naClusList = (int*) malloc(sizeof (int) * (tot_chains_glb+1));
 
     const int ClusSize = ClusUtil_AnisoCluster_OfSystem_SecondLargest(naClusList);
 
@@ -1813,11 +1813,13 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
                 }
         }
 
+
     for (i = 0; i < ClusSize; i++)
         {
             OP_System_DispChain(oldClusList[i], r_Disp); // Moving the cluster properly
         }
     // Recalculating cluster to see if we have the same cluster or not. If not, we reject.
+
 
     const int ClusCheckN = ClusUtil_OvlpCluster_OfChain_CheckForSame(oldHashTab, oldClusList, ClusSize);
     free(oldHashTab);
@@ -1894,14 +1896,14 @@ int Move_Clus_Proximity(const float myTemp)
 
     int bAccept = 0; // Used in MC steps, assume that move fails initially.
 
-    int* oldClusList   = calloc(tot_chains_glb, sizeof(int));
+    int* naClusList = (int*) malloc(sizeof (int) * (tot_chains_glb+1));
     const int ClusSize =
-        ClusUtil_OvlpCluster_OfSystem_SecondLargest(oldClusList);
+        ClusUtil_OvlpCluster_OfSystem_SecondLargest(naClusList);
 //    printf("%d\n", ClusSize);
     if (ClusSize < 2)
     {
         bAccept = 0;
-        free(oldClusList);
+        free(naClusList);
         return bAccept;
     }
     //    printf("\n%d\n", ClusSize);
@@ -1914,11 +1916,11 @@ int Move_Clus_Proximity(const float myTemp)
 
     for (i = 0; i < ClusSize; i++)
     {
-        yTemp = Check_ChainDisp(oldClusList[i], r_Disp); // Checking for steric clash
+        yTemp = Check_ChainDisp(naClusList[i], r_Disp); // Checking for steric clash
         if (yTemp == 0)
         {
             bAccept = 0;
-            free(oldClusList);
+            free(naClusList);
             return bAccept;
         }
     }
@@ -1928,7 +1930,7 @@ int Move_Clus_Proximity(const float myTemp)
 
     for (i=0; i<ClusSize; i++)
     {
-        oldHashTab[oldClusList[i]] = 1;
+        oldHashTab[naClusList[i]] = 1;
     }
 
 
@@ -1941,7 +1943,7 @@ int Move_Clus_Proximity(const float myTemp)
     {
         for (j = 0; j < ClusSize; j++)
         {
-            thisChain = oldClusList[j];
+            thisChain = naClusList[j];
             firstB    = chain_info_glb[thisChain][CHAIN_START];
             lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
             for (i = firstB; i < lastB; i++)
@@ -1958,7 +1960,7 @@ int Move_Clus_Proximity(const float myTemp)
     {
         for (j = 0; j < ClusSize; j++)
         {
-            thisChain = oldClusList[j];
+            thisChain = naClusList[j];
             firstB    = chain_info_glb[thisChain][CHAIN_START];
             lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
             for (i = firstB; i < lastB; i++)
@@ -1971,29 +1973,29 @@ int Move_Clus_Proximity(const float myTemp)
 
     for (i = 0; i < ClusSize; i++)
     {
-        OP_System_DispChain(oldClusList[i], r_Disp); // Moving the cluster properly
+        OP_System_DispChain(naClusList[i], r_Disp); // Moving the cluster properly
     }
     // Recalculating cluster to see if we have the same cluster or not. If not, we reject.
-
-    const int ClusCheckN = ClusUtil_OvlpCluster_OfChain_CheckForSame(oldHashTab, oldClusList, ClusSize);
+    const int ClusCheckN = ClusUtil_OvlpCluster_OfChain_CheckForSame(oldHashTab, naClusList, ClusSize);
     free(oldHashTab);
 
     if (ClusCheckN == -1)
     {
         for (i = 0; i < ClusSize; i++)
         {
-            OP_System_RestoreChain(oldClusList[i]); // Placing  the cluster back properly
+            OP_System_RestoreChain(naClusList[i]); // Placing  the cluster back properly
         }
         bAccept = 0;
-        free(oldClusList);
+        free(naClusList);
         return bAccept;
     }
+
 
     if (nInitialPotential_Mode_glb != -1)
     {
         for (j = 0; j < ClusSize; j++)
         {
-            thisChain = oldClusList[j];
+            thisChain = naClusList[j];
             firstB    = chain_info_glb[thisChain][CHAIN_START];
             lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
             for (i = firstB; i < lastB; i++)
@@ -2007,7 +2009,7 @@ int Move_Clus_Proximity(const float myTemp)
     {
         for (j = 0; j < ClusSize; j++)
         {
-            thisChain = oldClusList[j];
+            thisChain = naClusList[j];
             firstB    = chain_info_glb[thisChain][CHAIN_START];
             lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
             for (i = firstB; i < lastB; i++)
@@ -2023,7 +2025,7 @@ int Move_Clus_Proximity(const float myTemp)
     if (MCProb < MHAcc)
     {                // Accept this state
         bAccept = 1; // Accept the move
-        free(oldClusList);
+        free(naClusList);
         return bAccept;
         // printf("End CLUS - Yes\n");
     }
@@ -2031,10 +2033,10 @@ int Move_Clus_Proximity(const float myTemp)
     {
         for (i = 0; i < ClusSize; i++)
         {
-            OP_System_RestoreChain(oldClusList[i]); // Placing  the cluster back properly
+            OP_System_RestoreChain(naClusList[i]); // Placing  the cluster back properly
         }
         bAccept = 0;
-        free(oldClusList);
+        free(naClusList);
         return bAccept;
         // printf("End CLUS - Failed.\n");
     }

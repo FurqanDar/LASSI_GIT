@@ -125,6 +125,7 @@ int ClusUtil_OvlpCluster_OfSystem_SecondLargest(int* naOutClusList);
 
 int ClusUtil_AnisoCluster_OfSystem_SecondLargest(int* naOutClusList);
 
+int ClusUtil_OfSystem_SecondLargest(int* naOutClusList, const int nMode);
 
 
 #endif // _CLUSTER_H_

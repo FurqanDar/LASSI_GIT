@@ -138,10 +138,13 @@ int LatticeUtil_GetNeighBeads_AtPos(const int* restrict r_pos0, int* restrict nB
 
 int ListOP_GetMaxVal_Int(const int nListSize, const int* const naList);
 
-int ListOP_IndicesForVal_Int(const int nVal, int* const naOutList, const int nListSize, const int* const naList);
+int ListOP_IndicesForVal_Int(const int nVal, int* const naOutList, const int nListSize, const int* const naInputList);
 
 int ListOP_GetRandomIndexForVal_Int(const int nVal, const int nListSize, const int* const naList);
 
-int ListOP_Get2ndLargestVal_Int(const int nListSize, const int* const naList);
+int ListOP_Get2ndLargestVal_Int(const int nListSize, const int* const naInputList);
+
+void ListOP_GenHistFromCounts_Int(int* const restrict naOutFreqHist, const int* const restrict naInputList,
+                                  const int nSize);
 
 #endif // _STRUCTURE_H_
