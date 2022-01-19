@@ -45,7 +45,7 @@ int MolClusArr_Index(const int run_cycle, const int chain_type, const int clus_s
 
 void Calc_SystemCenterOfMass(lDub* tmpR);
 
-void Calc_CenterOfMass_OfCluster(lDub* tmpR, const int cluster_size, const int* ClusList);
+void Calc_CenterOfMass_OfCluster(lDub* naCOM_out, const int cluster_size, const int* const restrict naClusList_in);
 
 void Calc_CenterOfMass_OfSystem_OfMolType(lDub* tmpR, const int thisType);
 
@@ -53,7 +53,11 @@ void Calc_CenterOfMass_OfSystem_WithoutMolType(lDub* tmpR, const int thisType);
 
 void RadDen_Avg_MolTypeWise_FromSysCen(void);
 
-void RadDen_Avg_MolTypeWise_FromMolTypeCen(void);
+void RadDenHistUtil_ForSystem_FromLargestClusterOfMolTypes(void);
+
+void RadDenHistUtil_ForSystem_FromCenterOfMassOfMolTypes(void);
+
+void RadialDensityAnalysis_Perform_Analysis(void);
 
 void GyrTensor_GyrRad_Avg(void);
 

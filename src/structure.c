@@ -16,7 +16,7 @@ int Lat_Ind_FromCoords(const int i, const int j, const int k)
 /// Lat_Ind_FromVec - returns the 1D index given the array xArr
 /// \param xArr
 /// \return
-int Lat_Ind_FromVec(const int* xArr)
+int Lat_Ind_FromVec(const int* const xArr)
 { // Just the vector form of the above function. Easier to read sometimes.
     return xArr[POS_X] + naBoxSize_glb[POS_X] * (xArr[POS_Y] + naBoxSize_glb[POS_Y] * xArr[POS_Z]);
 }
@@ -53,7 +53,7 @@ float Dist_PointToPoint_Float(const float* f1, const float* f2)
 /// \param f1
 /// \param f2
 /// \return
-float Dist_PointToPoint(const int* f1, const int* f2)
+float Dist_PointToPoint(const int* const restrict f1, const int* const restrict f2)
 {
     int d[POS_MAX];
     int i;
@@ -70,7 +70,7 @@ float Dist_PointToPoint(const int* f1, const int* f2)
 /// \param beadID
 /// \param f1
 /// \return
-float Dist_BeadToPoint(const int beadID, const int* f1)
+float Dist_BeadToPoint(const int beadID, const int* const f1)
 {
     int d[POS_MAX];
     int i;
@@ -414,7 +414,7 @@ void GyrTensor_GyrRad_Avg(void)
             for (j = 0; j < POS_MAX; j++)
                 {
                     dumArg[j] = abs(bead_info_glb[i][j] - (int) tot_COM[j]);
-                    dumArg[j] = dumArg[j] > naBoxSize_glb[i] / 2 ? naBoxSize_glb[i] - dumArg[j] : dumArg[j];
+                    dumArg[j] = dumArg[j] > naBoxSize_glb[j] / 2 ? naBoxSize_glb[j] - dumArg[j] : dumArg[j];
                     faGyrTensor_glb[j] += (float) (dumArg[j] * dumArg[j]);
                 }
         }
@@ -638,7 +638,9 @@ int Check_BeadID_InList(const int thisBeadID, const int listSize, const int bead
     return 0;
 }
 
-void Calc_SystemCenterOfMass(lDub* tmpR)
+///
+/// \param tmpR
+void Calc_SystemCenterOfMass(lDub* const tmpR)
 {
 
     int i, j;                     // Iterators
@@ -699,7 +701,11 @@ void Calc_SystemCenterOfMass(lDub* tmpR)
         }
 }
 
-void Calc_CenterOfMass_OfCluster(lDub* tmpR, const int cluster_size, const int* ClusList)
+///
+/// \param naCOM_out
+/// \param cluster_size
+/// \param naClusList_in
+void Calc_CenterOfMass_OfCluster(lDub* const naCOM_out, const int cluster_size, const int* const restrict naClusList_in)
 {
     // This version measures the COM of a cluster of size c
     //  cluster size, given the molecule ID's in naList_glb.
@@ -721,7 +727,7 @@ void Calc_CenterOfMass_OfCluster(lDub* tmpR, const int cluster_size, const int* 
 
     for (k = 0; k < cluster_size; k++)
         {
-            thisMol = ClusList[k];
+            thisMol = naClusList_in[k];
             fB      = chain_info_glb[thisMol][CHAIN_START];
             lB      = fB + chain_info_glb[thisMol][CHAIN_LENGTH];
             for (i = fB; i < lB; i++)
@@ -762,10 +768,13 @@ void Calc_CenterOfMass_OfCluster(lDub* tmpR, const int cluster_size, const int* 
 
     for (j = 0; j < POS_MAX; j++)
         {
-            tmpR[j] = tot_COM[j];
+            naCOM_out[j] = tot_COM[j];
         }
 }
 
+///
+/// \param tmpR
+/// \param thisType
 void Calc_SystemCenterOfMass_OfMolType(lDub* tmpR, const int thisType)
 {
     // This version measures the COM of only type thisType
@@ -839,6 +848,9 @@ void Calc_SystemCenterOfMass_OfMolType(lDub* tmpR, const int thisType)
         }
 }
 
+///
+/// \param tmpR
+/// \param thisType
 void Calc_SystemCenterOfMass_WithoutMolType(lDub* tmpR, const int thisType)
 {
     // This version measures the COM of everything except type thisType
@@ -919,7 +931,6 @@ void RadDen_Avg_MolTypeWise_FromSysCen(void)
     float xDis = 0.; // Tracks the distance between the COM and the specific bead
 
     Calc_SystemCenterOfMass(sysCOM);
-    // printf("SYS COM = (%d, %d, %d) \n", sysCOM[0], sysCOM[1], sysCOM[2]);
     for (i = 0; i < tot_beads_glb; i++)
         {
             thisType = bead_info_glb[i][BEAD_CHAINID];
@@ -1008,99 +1019,119 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void)
     nRadDenCounter_glb++;
 }
 
-void RadDen_Avg_MolTypeWise_FromMolTypeCen(void)
+void RadialDensityAnalysis_Perform_Analysis(void){
+
+    RadDenHistUtil_ForSystem_FromLargestClusterOfMolTypes();
+    RadDenHistUtil_ForSystem_FromCenterOfMassOfMolTypes();
+
+    nRadDenCounter_glb++;
+}
+
+void RadDenHistUtil_ForSystem_FromCenterOfMassOfMolTypes(void)
+{
+
+    int i, j, k;
+    int naCOM_r[POS_MAX]  = {0};
+    int nBin;
+    float fDis   = 0.f; // Tracks the distance between the COM and the specific bead
+    int nCurrentType;
+    int thisType, thisComp;
+    lDub LaTypeCOM_r[POS_MAX];
+    int fB, lB;
+
+    for (nCurrentType = 0; nCurrentType < tot_chain_types_glb+1; nCurrentType++)
+    {
+        if (nCurrentType == 0)
+        {
+            Calc_SystemCenterOfMass(LaTypeCOM_r);
+        }
+        else
+        {
+            Calc_SystemCenterOfMass_OfMolType(LaTypeCOM_r, nCurrentType - 1);
+        }
+        for (j = 0; j < POS_MAX; j++)
+        {
+            naCOM_r[j] = (int) LaTypeCOM_r[j];
+        }
+
+        for (k=0; k < tot_chains_glb; k++)
+        {
+            fB = chain_info_glb[k][CHAIN_START];
+            lB = fB + chain_info_glb[k][CHAIN_LENGTH];
+            thisType = chain_info_glb[k][CHAIN_TYPE];
+            thisComp = nRadDen_CompShift_glb + RadDen_ComponentIndex(nCurrentType - 1, thisType);
+            for (i=fB; i<lB; i++)
+            {
+                fDis     = Dist_BeadToPoint(i, naCOM_r);
+                nBin     = (int) (4.f * fDis);
+                ldaRadDen_Arr_glb[RadDenArr_Index(0, thisComp, nBin)] += 1.0;
+            }
+        }
+    }
+
+}
+
+void RadDenHistUtil_ForSystem_FromLargestClusterOfMolTypes(void)
 {
 
     int i, j, k;  // Iterators for loop
     int thisType; // Tracks the type of the chain
-    int thisComp; // Tracks which component of ldRadDen
-    lDub typeCOM[POS_MAX] = {0.};
-    int COM_int[POS_MAX]  = {0};
-    int myBin;
-    float xDis   = 0.; // Tracks the distance between the COM and the specific bead
-    int cur_type = 0;
+    int nRadDenMolComp; // Tracks which component of ldRadDen
+    int thisChain;
+    lDub LaTypeCOM_r[POS_MAX] = {0.};
+    int naCOM_r[POS_MAX]  = {0};
+    int nRadBin;
+    float fDis   = 0.f; // Tracks the distance between the COM and the specific bead
+    int nCurrentType = 0;
     int fB, lB;
-    int clus_size = 0;
-    int clus_id   = -1;
-    int* clus_id_list; // Tracks the cluster ID's after the clustering analysis.
-    clus_id_list = malloc((tot_chain_types_glb + 1) * sizeof(lInt));
-    for (i = 0; i <= tot_chain_types_glb; i++)
-        {
-            clus_id_list[i] = -1;
-        }
+    int nMolWiseClusSize = 0;
 
-    // Perform clustering analysis
-    Clus_Perform_MolWise_LargestClusters();
-    //ClusUtil_MolWiseLargestClusters(naClusIDList, naClusSizeList, naClusCumSizeList);
-    // Remember the cluster ID's
-    for (i = 0; i <= tot_chain_types_glb; i++)
-        {
-            clus_id_list[i] = naList_glb[i];
-        }
+    int* const naMolWiseClusIDs   = malloc((tot_chain_types_glb + 2) * sizeof(int));
+    int* const naTmpClusChainList = malloc((tot_chains_glb + 1) * sizeof(int));
+    int* const naFullClusList     = malloc((tot_chains_glb + 1) * sizeof(int));
+    int* const naFullClusSizes    = calloc((tot_chains_glb + 1), sizeof(int));
+    int* const naFullClusCumSizes = calloc((tot_chains_glb + 1), sizeof(int));
 
-    for (cur_type = 0; cur_type <= tot_chain_types_glb; cur_type++)
-        {
-            clus_id   = clus_id_list[cur_type];
-            clus_size = naClusterMatrix_glb[clus_id][0];
-            // printf("(%d %d) ", clus_id, clus_size);
-            for (i = 0; i < clus_size; i++)
-                {
-                    naList_glb[i] = naClusterMatrix_glb[clus_id][i + 1];
-                }
+    const int nMolWiseClusNum = ClusUtil_OfSystem_MolWise_GetLargestClusters(naMolWiseClusIDs, naFullClusList,
+                                                                             naFullClusCumSizes, naFullClusSizes);
 
-            Calc_CenterOfMass_OfCluster(typeCOM, clus_size, naList_glb);
+    for (nCurrentType = 0; nCurrentType < tot_chain_types_glb+1; nCurrentType++)
+        {
+
+            nMolWiseClusSize = ClusUtil_GetCluster_FromFullClusAndCumSizes(
+                naMolWiseClusIDs[nCurrentType], naTmpClusChainList, naFullClusList, naFullClusCumSizes, naFullClusSizes,
+                nMolWiseClusNum);
+
+            Calc_CenterOfMass_OfCluster(LaTypeCOM_r, nMolWiseClusSize, naTmpClusChainList);
+
             for (j = 0; j < POS_MAX; j++)
                 {
-                    COM_int[j] = (int) typeCOM[j];
+                    naCOM_r[j] = (int) LaTypeCOM_r[j];
                 }
 
-            for (k = 0; k < clus_size; k++)
+            for (k = 0; k < nMolWiseClusSize; k++)
                 {
-                    fB = chain_info_glb[naList_glb[k]][CHAIN_START];
-                    lB = fB + chain_info_glb[naList_glb[k]][CHAIN_LENGTH];
+                    thisChain = naTmpClusChainList[k];
+                    fB = chain_info_glb[thisChain][CHAIN_START];
+                    lB = fB + chain_info_glb[thisChain][CHAIN_LENGTH];
+                    thisType = chain_info_glb[thisChain][CHAIN_TYPE];
+                    nRadDenMolComp = RadDen_ComponentIndex(nCurrentType - 1, thisType);
                     for (i = fB; i < lB; i++)
                         {
-                            thisType = bead_info_glb[i][BEAD_CHAINID];
-                            thisType = chain_info_glb[thisType][CHAIN_TYPE];
-                            thisComp = RadDen_ComponentIndex(cur_type - 1, thisType);
-                            xDis     = Dist_BeadToPoint(i, COM_int);
-                            myBin    = (int) (4. * xDis);
-                            ldaRadDen_Arr_glb[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
+                            fDis     = Dist_BeadToPoint(i, naCOM_r);
+                            nRadBin  = (int) (4.f * fDis);
+                            ldaRadDen_Arr_glb[RadDenArr_Index(0, nRadDenMolComp, nRadBin)] += 1.0;
                         }
                 }
         }
 
-    for (cur_type = 0; cur_type <= tot_chain_types_glb; cur_type++)
-        {
-            if (cur_type == 0)
-                {
-                    Calc_SystemCenterOfMass(typeCOM);
-                }
-            else
-                {
-                    Calc_SystemCenterOfMass_OfMolType(typeCOM, cur_type - 1);
-                }
-            for (j = 0; j < POS_MAX; j++)
-                {
-                    COM_int[j] = (int) typeCOM[j];
-                }
 
-            for (i = 0; i < tot_beads_glb; i++)
-                {
-                    thisType = bead_info_glb[i][BEAD_CHAINID];
-                    thisType = chain_info_glb[thisType][CHAIN_TYPE];
-                    thisComp = nRadDen_CompShift_glb + RadDen_ComponentIndex(cur_type - 1, thisType);
-                    xDis     = Dist_BeadToPoint(i, COM_int);
-                    myBin    = (int) (4. * xDis);
-                    ldaRadDen_Arr_glb[RadDenArr_Index(0, thisComp, myBin)] += 1.0;
-                }
-        }
+    free(naTmpClusChainList);
+    free(naFullClusSizes);
+    free(naFullClusList);
+    free(naFullClusCumSizes);
+    free(naMolWiseClusIDs);
 
-    // printf("\n");
-
-    nRadDenCounter_glb++;
-
-    free(clus_id_list);
 }
 
 void Calculate_Distances_For_Radius(float* thisList, const int nRad)

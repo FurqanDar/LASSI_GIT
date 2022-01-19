@@ -1087,6 +1087,7 @@ void DataAnalysis_DuringRunCycles(const long nGen, const int run_it)
         { // SysProp is printed outside of this function in main.c, lol
             if (nGen % naReportFreqs_glb[REPORT_RDFTOT] == 0)
                 {
+                    //TODO: Update RDF Calculations
                     RDF_ComponentWise_Avg();
                 }
         }
@@ -1094,7 +1095,7 @@ void DataAnalysis_DuringRunCycles(const long nGen, const int run_it)
         { // SysProp is printed outside of this function in main.c, lol
             if (nGen % naReportFreqs_glb[REPORT_COMDEN] == 0)
                 {
-                    RadDen_Avg_MolTypeWise_FromMolTypeCen();
+                    RadialDensityAnalysis_Perform_Analysis();
                 }
         }
     if (naReportFreqs_glb[REPORT_NETWORK])
@@ -1102,6 +1103,7 @@ void DataAnalysis_DuringRunCycles(const long nGen, const int run_it)
             if (nGen % naReportFreqs_glb[REPORT_NETWORK] == 0)
                 {
                     ClusAnalysis_Perform_Analysis(nClusteringMode_glb);
+                    //TODO: Update Gyration calculations
                     GyrTensor_GyrRad_Avg();
                 }
         }

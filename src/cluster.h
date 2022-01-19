@@ -128,4 +128,19 @@ int ClusUtil_AnisoCluster_OfSystem_SecondLargest(int* naOutClusList);
 int ClusUtil_OfSystem_SecondLargest(int* naOutClusList, const int nMode);
 
 
+void ClusUtil_MolWise_FindLargestClusters(int* const restrict naClusIDs_out, const int* const restrict naChainTypes_in,
+                                          const int* const restrict naClusSizes_in,
+                                          const int* const restrict naCumClusSizes_in, const int nClusNum_in);
+
+int ClusUtil_OfSystem_MolWise_GetLargestClusters(int* const naClusIDsList_out, int* const naFullClusList_out,
+                                                  int* const naClusSizes_out, int* const naCumSizes_out);
+
+void ClusUtil_SelectSubsetOfClusters(int* const restrict naSubsetClusChains_out, int* const restrict naSubsetClusSizes_out,
+                                     int* const restrict naSubsetCumSizes_out, const int nSubsetNum_in,
+                                     const int* const restrict naSubSetClusIDs_in,
+                                     const int* const restrict naFullClusList_in,
+                                     const int* const restrict naClusSizes_in,
+                                     const int* const restrict naCumClusSizes_in);
+
+
 #endif // _CLUSTER_H_
