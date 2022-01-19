@@ -1019,7 +1019,8 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void)
     nRadDenCounter_glb++;
 }
 
-void RadialDensityAnalysis_Perform_Analysis(void){
+void RadialDensityAnalysis_Perform_Analysis(void)
+{
 
     RadDenHistUtil_ForSystem_FromLargestClusterOfMolTypes();
     RadDenHistUtil_ForSystem_FromCenterOfMassOfMolTypes();
@@ -1031,57 +1032,56 @@ void RadDenHistUtil_ForSystem_FromCenterOfMassOfMolTypes(void)
 {
 
     int i, j, k;
-    int naCOM_r[POS_MAX]  = {0};
+    int naCOM_r[POS_MAX] = {0};
     int nBin;
-    float fDis   = 0.f; // Tracks the distance between the COM and the specific bead
+    float fDis = 0.f; // Tracks the distance between the COM and the specific bead
     int nCurrentType;
     int thisType, thisComp;
     lDub LaTypeCOM_r[POS_MAX];
     int fB, lB;
 
-    for (nCurrentType = 0; nCurrentType < tot_chain_types_glb+1; nCurrentType++)
-    {
-        if (nCurrentType == 0)
+    for (nCurrentType = 0; nCurrentType < tot_chain_types_glb + 1; nCurrentType++)
         {
-            Calc_SystemCenterOfMass(LaTypeCOM_r);
-        }
-        else
-        {
-            Calc_SystemCenterOfMass_OfMolType(LaTypeCOM_r, nCurrentType - 1);
-        }
-        for (j = 0; j < POS_MAX; j++)
-        {
-            naCOM_r[j] = (int) LaTypeCOM_r[j];
-        }
+            if (nCurrentType == 0)
+                {
+                    Calc_SystemCenterOfMass(LaTypeCOM_r);
+                }
+            else
+                {
+                    Calc_SystemCenterOfMass_OfMolType(LaTypeCOM_r, nCurrentType - 1);
+                }
+            for (j = 0; j < POS_MAX; j++)
+                {
+                    naCOM_r[j] = (int) LaTypeCOM_r[j];
+                }
 
-        for (k=0; k < tot_chains_glb; k++)
-        {
-            fB = chain_info_glb[k][CHAIN_START];
-            lB = fB + chain_info_glb[k][CHAIN_LENGTH];
-            thisType = chain_info_glb[k][CHAIN_TYPE];
-            thisComp = nRadDen_CompShift_glb + RadDen_ComponentIndex(nCurrentType - 1, thisType);
-            for (i=fB; i<lB; i++)
-            {
-                fDis     = Dist_BeadToPoint(i, naCOM_r);
-                nBin     = (int) (4.f * fDis);
-                ldaRadDen_Arr_glb[RadDenArr_Index(0, thisComp, nBin)] += 1.0;
-            }
+            for (k = 0; k < tot_chains_glb; k++)
+                {
+                    fB       = chain_info_glb[k][CHAIN_START];
+                    lB       = fB + chain_info_glb[k][CHAIN_LENGTH];
+                    thisType = chain_info_glb[k][CHAIN_TYPE];
+                    thisComp = nRadDen_CompShift_glb + RadDen_ComponentIndex(nCurrentType - 1, thisType);
+                    for (i = fB; i < lB; i++)
+                        {
+                            fDis = Dist_BeadToPoint(i, naCOM_r);
+                            nBin = (int) (4.f * fDis);
+                            ldaRadDen_Arr_glb[RadDenArr_Index(0, thisComp, nBin)] += 1.0;
+                        }
+                }
         }
-    }
-
 }
 
 void RadDenHistUtil_ForSystem_FromLargestClusterOfMolTypes(void)
 {
 
-    int i, j, k;  // Iterators for loop
-    int thisType; // Tracks the type of the chain
+    int i, j, k;        // Iterators for loop
+    int thisType;       // Tracks the type of the chain
     int nRadDenMolComp; // Tracks which component of ldRadDen
     int thisChain;
     lDub LaTypeCOM_r[POS_MAX] = {0.};
-    int naCOM_r[POS_MAX]  = {0};
+    int naCOM_r[POS_MAX]      = {0};
     int nRadBin;
-    float fDis   = 0.f; // Tracks the distance between the COM and the specific bead
+    float fDis       = 0.f; // Tracks the distance between the COM and the specific bead
     int nCurrentType = 0;
     int fB, lB;
     int nMolWiseClusSize = 0;
@@ -1095,7 +1095,7 @@ void RadDenHistUtil_ForSystem_FromLargestClusterOfMolTypes(void)
     const int nMolWiseClusNum = ClusUtil_OfSystem_MolWise_GetLargestClusters(naMolWiseClusIDs, naFullClusList,
                                                                              naFullClusCumSizes, naFullClusSizes);
 
-    for (nCurrentType = 0; nCurrentType < tot_chain_types_glb+1; nCurrentType++)
+    for (nCurrentType = 0; nCurrentType < tot_chain_types_glb + 1; nCurrentType++)
         {
 
             nMolWiseClusSize = ClusUtil_GetCluster_FromFullClusAndCumSizes(
@@ -1111,27 +1111,25 @@ void RadDenHistUtil_ForSystem_FromLargestClusterOfMolTypes(void)
 
             for (k = 0; k < nMolWiseClusSize; k++)
                 {
-                    thisChain = naTmpClusChainList[k];
-                    fB = chain_info_glb[thisChain][CHAIN_START];
-                    lB = fB + chain_info_glb[thisChain][CHAIN_LENGTH];
-                    thisType = chain_info_glb[thisChain][CHAIN_TYPE];
+                    thisChain      = naTmpClusChainList[k];
+                    fB             = chain_info_glb[thisChain][CHAIN_START];
+                    lB             = fB + chain_info_glb[thisChain][CHAIN_LENGTH];
+                    thisType       = chain_info_glb[thisChain][CHAIN_TYPE];
                     nRadDenMolComp = RadDen_ComponentIndex(nCurrentType - 1, thisType);
                     for (i = fB; i < lB; i++)
                         {
-                            fDis     = Dist_BeadToPoint(i, naCOM_r);
-                            nRadBin  = (int) (4.f * fDis);
+                            fDis    = Dist_BeadToPoint(i, naCOM_r);
+                            nRadBin = (int) (4.f * fDis);
                             ldaRadDen_Arr_glb[RadDenArr_Index(0, nRadDenMolComp, nRadBin)] += 1.0;
                         }
                 }
         }
-
 
     free(naTmpClusChainList);
     free(naFullClusSizes);
     free(naFullClusList);
     free(naFullClusCumSizes);
     free(naMolWiseClusIDs);
-
 }
 
 void Calculate_Distances_For_Radius(float* thisList, const int nRad)
@@ -1715,12 +1713,9 @@ int BeadListOP_Filter_DbPvtLinkerConBck(const int beadNum, int* beadList, const 
     return newSize;
 }
 
-/// ListOP_UniqueElementsOfSortedList_Int: Overwrite the provided _sorted_ list of integers with only the unique elements, and
-/// return the size of the new array.
-/// The overwritten list is also sorted.
-/// The implementation only works on sorted lists.
-/// \param dum_list: Sorted list of beadID's (or integers)
-/// \return number of unique elements.
+/// ListOP_UniqueElementsOfSortedList_Int: Overwrite the provided _sorted_ list of integers with only the unique
+/// elements, and return the size of the new array. The overwritten list is also sorted. The implementation only works
+/// on sorted lists. \param dum_list: Sorted list of beadID's (or integers) \return number of unique elements.
 int ListOP_UniqueElementsOfSortedList_Int(const int size, int* sorted_list)
 {
     int* first  = sorted_list;
@@ -1736,8 +1731,6 @@ int ListOP_UniqueElementsOfSortedList_Int(const int size, int* sorted_list)
         }
     return newSize;
 }
-
-
 
 /// BeadList_AppendBeads
 /// Note that old_list should be at least as big as old_size + app_size. No bounds checking is done since
@@ -1989,7 +1982,6 @@ int LatticeUtil_GetNeighBeads_AtPos(const int* restrict const r_pos0, int* restr
     return LatticeUtil_GetBeadIDs_FromList(nLatVals, nBeadsList, CLUS_CONTACT_NEIGHS);
 }
 
-
 /// ListOP_GetMaxVal_Int - Given an integer array naList, of size nListSize, we return the max val
 /// \param nListSize
 /// \param naList
@@ -1999,13 +1991,13 @@ int ListOP_GetMaxVal_Int(const int nListSize, const int* const naList)
     int i;
     int maxVal = naList[0];
 
-    for(i=0; i<nListSize; i++)
-    {
-        if (naList[i] > maxVal)
+    for (i = 0; i < nListSize; i++)
         {
-            maxVal = naList[i];
+            if (naList[i] > maxVal)
+                {
+                    maxVal = naList[i];
+                }
         }
-    }
 
     return maxVal;
 }
@@ -2019,15 +2011,15 @@ int ListOP_GetMaxVal_Int(const int nListSize, const int* const naList)
 int ListOP_IndicesForVal_Int(const int nVal, int* const naOutList, const int nListSize, const int* const naInputList)
 {
     int i;
-    int nNumberOfInds =0;
-    for (i=0; i<nListSize; i++)
-    {
-        if (naInputList[i] == nVal)
+    int nNumberOfInds = 0;
+    for (i = 0; i < nListSize; i++)
         {
-            naOutList[nNumberOfInds] = i;
-            nNumberOfInds++;
+            if (naInputList[i] == nVal)
+                {
+                    naOutList[nNumberOfInds] = i;
+                    nNumberOfInds++;
+                }
         }
-    }
     return nNumberOfInds;
 }
 
@@ -2038,68 +2030,62 @@ int ListOP_IndicesForVal_Int(const int nVal, int* const naOutList, const int nLi
 /// \return
 int ListOP_GetRandomIndexForVal_Int(const int nVal, const int nListSize, const int* const naList)
 {
-    int nOutIdx=-1;
-    int* const naIdxList = (int*) malloc(sizeof (int) * nListSize);
+    int nOutIdx          = -1;
+    int* const naIdxList = (int*) malloc(sizeof(int) * nListSize);
 
     const int nTotIds = ListOP_IndicesForVal_Int(nVal, naIdxList, nListSize, naList);
 
     if (nTotIds == 1)
-    {
-        nOutIdx = naIdxList[0];
-    }
+        {
+            nOutIdx = naIdxList[0];
+        }
     else if (nTotIds > 1)
-    {
-        nOutIdx = naIdxList[rand() % nTotIds];
-    }
+        {
+            nOutIdx = naIdxList[rand() % nTotIds];
+        }
 
     free(naIdxList);
 
     return nOutIdx;
 }
 
-/// ListOP_UniqueElementsOfList_Int: Overwrite the provided _unsorted_ list of integers with only the unique elements, and
-/// return the nSize of the new array. The list is sorted first, and then ListOP_UniqueElementsOfSortedList_Int is run
-/// on that newly sorted list. This is a wrapper-like function for ease.
-/// The overwritten list is also sorted.
-/// \param naUnsortedList: Array of ints
-/// \return number of unique elements.
+/// ListOP_UniqueElementsOfList_Int: Overwrite the provided _unsorted_ list of integers with only the unique elements,
+/// and return the nSize of the new array. The list is sorted first, and then ListOP_UniqueElementsOfSortedList_Int is
+/// run on that newly sorted list. This is a wrapper-like function for ease. The overwritten list is also sorted. \param
+/// naUnsortedList: Array of ints \return number of unique elements.
 int ListOP_UniqueElementsOfList_Int(const int nSize, int* const naUnsortedList)
 {
     qsort(naUnsortedList, nSize, sizeof(int), UtilFunc_CompareInts);
     return ListOP_UniqueElementsOfSortedList_Int(nSize, naUnsortedList);
 }
 
-
-/// ListOP_Get2ndLargestVal_Int - Given an integer array naInputList, of size nListSize, we return the second largest value
-/// in the array. If the array only has one value, we just return that value back.
-/// We get the sorted unique elements in the input array and return the second last.
-/// \param nListSize
-/// \param naInputList
-/// \return 2nd largest value in the input array.
+/// ListOP_Get2ndLargestVal_Int - Given an integer array naInputList, of size nListSize, we return the second largest
+/// value in the array. If the array only has one value, we just return that value back. We get the sorted unique
+/// elements in the input array and return the second last. \param nListSize \param naInputList \return 2nd largest
+/// value in the input array.
 int ListOP_Get2ndLargestVal_Int(const int nListSize, const int* const naInputList)
 {
-    int* naTmpList = (int*) malloc(nListSize * sizeof (int));
+    int* naTmpList = (int*) malloc(nListSize * sizeof(int));
     int i;
-    for (i=0; i<nListSize; i++)
-    {
-        naTmpList[i] = naInputList[i];
-    }
+    for (i = 0; i < nListSize; i++)
+        {
+            naTmpList[i] = naInputList[i];
+        }
 
-    //Extract Unique-sizes (this is sorted)
+    // Extract Unique-sizes (this is sorted)
     const int nUniqueVals = ListOP_UniqueElementsOfList_Int(nListSize, naTmpList);
 
     int thisVal = naTmpList[0];
 
     if (nUniqueVals > 1)
-    {
-        thisVal = naTmpList[nUniqueVals-2];
-    }
+        {
+            thisVal = naTmpList[nUniqueVals - 2];
+        }
 
     free(naTmpList);
 
     return thisVal;
 }
-
 
 /// ListOP_GenHistFromCounts_Int - For every occurence in the naInputList, we increment that index by 1 in naOutFreqHist
 /// naOutFreqHist[naInputList[i]]++ over all elements
@@ -2110,10 +2096,8 @@ void ListOP_GenHistFromCounts_Int(int* const restrict naOutFreqHist, const int* 
                                   const int nSize)
 {
     int i;
-    for (i=0; i < nSize; i++)
-    {
-        naOutFreqHist[naInputList[i]]++;
-    }
-
-
+    for (i = 0; i < nSize; i++)
+        {
+            naOutFreqHist[naInputList[i]]++;
+        }
 }

@@ -391,7 +391,6 @@ void PrintToScreen_MCMoveFreqs(void)
     MoveName[MV_PR_SMCLSTR] = "Pr. Smal Cluster";
     MoveName[MV_PR_CLSTR]   = "Pr. Cluster     ";
 
-
     float freqMin = 1e10f;
     int i;
     for (i = MV_NULL + 1; i < MAX_MV; i++)
@@ -502,7 +501,6 @@ void ScreenIO_Print_AcceptanceRatios(void)
     MoveName[MV_TRANS]      = "Translation ";
     MoveName[MV_PR_SMCLSTR] = "Pr. Sm. Cls.";
     MoveName[MV_PR_CLSTR]   = "Pr. Cls.    ";
-
 
     int i, j;
     float fAccRatio = 0.f;
@@ -1087,7 +1085,7 @@ void DataAnalysis_DuringRunCycles(const long nGen, const int run_it)
         { // SysProp is printed outside of this function in main.c, lol
             if (nGen % naReportFreqs_glb[REPORT_RDFTOT] == 0)
                 {
-                    //TODO: Update RDF Calculations
+                    // TODO: Update RDF Calculations
                     RDF_ComponentWise_Avg();
                 }
         }
@@ -1103,7 +1101,7 @@ void DataAnalysis_DuringRunCycles(const long nGen, const int run_it)
             if (nGen % naReportFreqs_glb[REPORT_NETWORK] == 0)
                 {
                     ClusAnalysis_Perform_Analysis(nClusteringMode_glb);
-                    //TODO: Update Gyration calculations
+                    // TODO: Update Gyration calculations
                     GyrTensor_GyrRad_Avg();
                 }
         }
@@ -1184,8 +1182,7 @@ void CopyData_RDF(const int run_it)
         {
             for (j = 0; j < nRDF_TotBins_glb; j++)
                 {
-                    ldaTOTRDF_Arr_glb[RDFArr_Index(run_it, i, j)] =
-                        ldaRDF_Arr_glb[RDFArr_Index(0, i, j)] * normFactor;
+                    ldaTOTRDF_Arr_glb[RDFArr_Index(run_it, i, j)] = ldaRDF_Arr_glb[RDFArr_Index(0, i, j)] * normFactor;
                 }
         }
 }
@@ -1212,7 +1209,7 @@ void CopyData_COMDen(const int run_it)
 void CopyData_Clus(const int run_it)
 {
     int i, j;
-    const long double normFactor = 1.0 / (long double) nTotClusCounter_glb;
+    const long double normFactor  = 1.0 / (long double) nTotClusCounter_glb;
     ldaTOTCLUS_Arr_glb[run_it][0] = (long double) nLargestClusterRightNow_glb * normFactor;
     for (i = 1; i <= tot_chains_glb; i++)
         {

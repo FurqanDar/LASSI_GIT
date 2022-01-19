@@ -2329,7 +2329,6 @@ int ClusUtil_OfSystem_MolWise_GetLargestClusters(int* const restrict naClusIDsLi
                                                  int* const restrict naCumClusSizes_out)
 {
 
-
     const int nClusNum = ClusUtil_OvlpClusters_OfSystem(naFullClusList_out, naCumClusSizes_out);
 
     ClusUtil_GenClusSizesFromCumulativeSizes(naClusSizes_out, naCumClusSizes_out, nClusNum);
@@ -2338,20 +2337,21 @@ int ClusUtil_OfSystem_MolWise_GetLargestClusters(int* const restrict naClusIDsLi
 
     ChainListOP_GetChainTypes(naChainTypes, naFullClusList_out, tot_chains_glb);
 
-
-    ClusUtil_MolWise_FindLargestClusters(naClusIDsList_out, naChainTypes, naClusSizes_out, naCumClusSizes_out, nClusNum);
+    ClusUtil_MolWise_FindLargestClusters(naClusIDsList_out, naChainTypes, naClusSizes_out, naCumClusSizes_out,
+                                         nClusNum);
 
     free(naChainTypes);
 
     return nClusNum;
 }
 
-/// ClusUtil_SelectSubsetOfClusters - Assuming that we have a complete cluster list, cumulative sizes, and cluster sizes,
-/// and a small set of cluster IDs from that complete list, we generate a new _cluster_ list that only has the subset of
-/// cluster IDs supplied. The new list will have chainIDs for each of the subset of clusters, and we will also
-/// write the cumulative size and cluster size of each of those. Thus, we can use ClusUtil_GetCluster_FromFullClusAndCumSizes
-/// on the new cluster with the new sizes. Since this appends the clusters one after the other, the newer cluster list
-/// _could_ be larger than the total number of chains in the system by having redundant clusters.
+/// ClusUtil_SelectSubsetOfClusters - Assuming that we have a complete cluster list, cumulative sizes, and cluster
+/// sizes, and a small set of cluster IDs from that complete list, we generate a new _cluster_ list that only has the
+/// subset of cluster IDs supplied. The new list will have chainIDs for each of the subset of clusters, and we will also
+/// write the cumulative size and cluster size of each of those. Thus, we can use
+/// ClusUtil_GetCluster_FromFullClusAndCumSizes on the new cluster with the new sizes. Since this appends the clusters
+/// one after the other, the newer cluster list _could_ be larger than the total number of chains in the system by
+/// having redundant clusters.
 ///
 /// \param naSubsetClusChains_out
 /// \param naSubsetClusSizes_out
@@ -2361,7 +2361,8 @@ int ClusUtil_OfSystem_MolWise_GetLargestClusters(int* const restrict naClusIDsLi
 /// \param naFullClusList_in
 /// \param naClusSizes_in
 /// \param naCumClusSizes_in
-void ClusUtil_SelectSubsetOfClusters(int* const restrict naSubsetClusChains_out, int* const restrict naSubsetClusSizes_out,
+void ClusUtil_SelectSubsetOfClusters(int* const restrict naSubsetClusChains_out,
+                                     int* const restrict naSubsetClusSizes_out,
                                      int* const restrict naSubsetCumSizes_out, const int nSubsetNum_in,
                                      const int* const restrict naSubSetClusIDs_in,
                                      const int* const restrict naFullClusList_in,
@@ -2370,19 +2371,17 @@ void ClusUtil_SelectSubsetOfClusters(int* const restrict naSubsetClusChains_out,
 {
     int i, thisSize;
 
-    int cumSize       = 0;
+    int cumSize             = 0;
     naSubsetCumSizes_out[0] = 0;
     for (i = 0; i < nSubsetNum_in; i++)
         {
             thisSize = ClusUtil_GetCluster_FromFullClusAndCumSizes(naSubSetClusIDs_in[i],
-                                                                   naSubsetClusChains_out + cumSize,
-                                                                   naFullClusList_in, naCumClusSizes_in, naClusSizes_in,
-                                                                   nSubsetNum_in);
+                                                                   naSubsetClusChains_out + cumSize, naFullClusList_in,
+                                                                   naCumClusSizes_in, naClusSizes_in, nSubsetNum_in);
             cumSize += thisSize;
             naSubsetClusSizes_out[i]    = thisSize;
             naSubsetCumSizes_out[i + 1] = cumSize;
         }
-
 }
 
 ///
@@ -2400,7 +2399,7 @@ void ClusUtil_MolWise_FindLargestClusters(int* const restrict naClusIDs_out, con
     int j;
     int thisSize = 0;
 
-    int* const thisClus = malloc((tot_chains_glb + 1) * sizeof(int));
+    int* const thisClus       = malloc((tot_chains_glb + 1) * sizeof(int));
     int* const naLargestSizes = calloc(tot_chain_types_glb + 1, sizeof(int));
     int* const tmpSizesList   = calloc(tot_chain_types_glb + 1, sizeof(int));
 
