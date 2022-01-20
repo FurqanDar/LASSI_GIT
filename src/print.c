@@ -376,7 +376,7 @@ void PrintToScreen_AllEnergyMatrices(void)
 /// PrintToScreen_MCMoveFreqs
 void PrintToScreen_MCMoveFreqs(void)
 {
-    char* MoveName[MAX_MV];
+    const char* MoveName[MAX_MV];
     MoveName[MV_PIVOT]      = "Pivot           ";
     MoveName[MV_DBPVT]      = "Double Pivot    ";
     MoveName[MV_CLSTR]      = "Larger Cluster  ";
@@ -417,6 +417,26 @@ void PrintToScreen_MCMoveFreqs(void)
         }
 }
 
+void ScreenIOUtil_PrintTemperatures(void)
+{
+    printf("Thermalizing Temperature       = %.2f\n", fPreKT_glb);
+
+    if (nTemp_inv_glb == 1)
+        {
+            puts("Temperature Inverted           = YES");
+            printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", fKT_glb,
+                   1.f / (fKT_glb + (float) (nTotCycleNum_glb - 1) * fDeltaTemp_glb));
+        }
+    else
+        {
+            puts("Temperature Inverted           = NO");
+            printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", fKT_glb,
+                   fKT_glb + (float) (nTotCycleNum_glb - 1) * fDeltaTemp_glb);
+        }
+
+    printf("Temperature Annealing Mode     = %d\n", nAnnealing_Mode_glb);
+}
+
 /// ScreenIO_Print_KeyFile - print the keyfile that was read in to the screen
 void ScreenIO_Print_KeyFile(void)
 { // should be output-dependent (stdout, stderr, other files)
@@ -429,8 +449,8 @@ void ScreenIO_Print_KeyFile(void)
     printf("Number of Beads      = %ld\n", tot_beads_glb);
     printf("Number of Chains     = %ld\n", tot_chains_glb);
     printf("Number of Components = %ld\n", tot_chain_types_glb);
-    printf("Box Sizes            = %3d %3d %3d\n", naBoxSize_glb[0], naBoxSize_glb[1], naBoxSize_glb[2]);
-    printf("Monomer density      = %1.1e\n",
+    printf("Lattice Dimensions   = %3d %3d %3d\n", naBoxSize_glb[0], naBoxSize_glb[1], naBoxSize_glb[2]);
+    printf("Monomer Density      = %1.2e\n",
            (float) tot_beads_glb / (float) naBoxSize_glb[0] / (float) naBoxSize_glb[1] / (float) naBoxSize_glb[2]);
     printf("\n");
 
@@ -445,15 +465,12 @@ void ScreenIO_Print_KeyFile(void)
     printf("\n");
 
     printf("%s MC Setup %s\n", lBrace, rBrace);
-    printf("Temperature Inverted           = %d\n", nTemp_inv_glb);
-    printf("MC Temperatures: (First, Last) = (%.2f, %.2f)\n", fKT_glb,
-           fKT_glb + (float) (nTotCycleNum_glb - 1) * fDeltaTemp_glb);
-    printf("Temperature Mode               = %d\n", nAnnealing_Mode_glb);
+    ScreenIOUtil_PrintTemperatures();
+
     printf("Indent Mode                    = %d\n", nInitialPotential_Mode_glb);
-    printf("Rotational Bias Mode           = %d\n", RotBias_Mode_glb);
+//    printf("Rotational Bias Mode           = %d\n", RotBias_Mode_glb);
     printf("Number of MC Cycles            = %d\n", nTotCycleNum_glb);
     printf("Number of MC Steps/Cycle       = %e\n", (float) nMCStepsPerCycle_glb);
-    printf("Thermalizing Temperature       = %.2f\n", fPreKT_glb);
     printf("Number of Thermalizing Steps   = %e\n", (float) nMCStepsForTherm_glb);
     printf("RNG Seed                       = %d\n", nRNG_Seed_glb);
     printf("Clustering Mode                = %d\n", nClusteringMode_glb);
@@ -469,11 +486,11 @@ void ScreenIO_Print_SystemEnergy(void)
     int i;
 
     char sSectionHead[32];
-    memset(sSectionHead, '-', 17);
-    sSectionHead[17] = '\0';
+    memset(sSectionHead, '-', 19);
+    sSectionHead[19] = '\0';
 
     printf("%s\n", sSectionHead);
-    printf("Energies\n");
+    puts("Energies          |");
     printf("Tot  : %-10.2e |\n", faCurrEn_glb[E_TOT]);
     printf("Ovlp : %-10.2e |\n", faCurrEn_glb[E_OVLP]);
     printf("Cont : %-10.2e |\n", faCurrEn_glb[E_CONT]);
@@ -487,7 +504,7 @@ void ScreenIO_Print_SystemEnergy(void)
 void ScreenIO_Print_AcceptanceRatios(void)
 {
 
-    char* MoveName[MAX_MV];
+    const char* MoveName[MAX_MV];
     MoveName[MV_PIVOT]      = "Pivot       ";
     MoveName[MV_DBPVT]      = "Double Pivot";
     MoveName[MV_CLSTR]      = "La Cluster  ";
@@ -504,14 +521,14 @@ void ScreenIO_Print_AcceptanceRatios(void)
 
     int i, j;
     float fAccRatio = 0.f;
-    lLong nMoveSum  = 0;
+    lLong nMoveSum  = 0L;
 
     char sSectionHead[32];
     memset(sSectionHead, '-', 22);
     sSectionHead[22] = '\0';
 
     printf("%s\n", sSectionHead);
-    printf("Acceptance Ratios:\n");
+    puts("Acceptance Ratios    |");
     for (i = 1; i < MAX_MV; i++)
         {
             nMoveSum = naMCAccepMat_glb[0][i] + naMCAccepMat_glb[1][i];
