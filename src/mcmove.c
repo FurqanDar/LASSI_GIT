@@ -671,7 +671,7 @@ int Move_Clus_Network(float MyTemp)
     int bAccept = 0; // Used in MC steps, assume that move fails initially.
     int* naClusList = (int*) malloc(sizeof (int) * (tot_chains_glb+1));
 
-    const int ClusSize = ClusUtil_AnisoCluster_OfSystem_SecondLargest(naClusList);
+    const int ClusSize = ClusUtil_AnisoCluster_OfSystem_SecondLargest_ForMCMove(naClusList);
 
     if (ClusSize < 1)
         {
@@ -1898,15 +1898,13 @@ int Move_Clus_Proximity(const float myTemp)
 
     int* naClusList = (int*) malloc(sizeof (int) * (tot_chains_glb+1));
     const int ClusSize =
-        ClusUtil_OvlpCluster_OfSystem_SecondLargest(naClusList);
-//    printf("%d\n", ClusSize);
+        ClusUtil_OvlpCluster_OfSystem_SecondLargest_ForMCMove(naClusList);
     if (ClusSize < 2)
     {
         bAccept = 0;
         free(naClusList);
         return bAccept;
     }
-    //    printf("\n%d\n", ClusSize);
 
     // Radii for translation moves. All moves are L/2 radius
     int r_Disp[POS_MAX];

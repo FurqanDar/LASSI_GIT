@@ -2295,6 +2295,39 @@ int ClusUtil_OvlpCluster_OfSystem_SecondLargest(int* naOutClusList)
 
 ///
 /// \param naOutClusList
+/// \return Size of the cluster. If there is only 1 cluster, return -1 so the move fails.
+int ClusUtil_OvlpCluster_OfSystem_SecondLargest_ForMCMove(int* naOutClusList)
+{
+    int thisSize;
+
+    int* naFullClusList = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+    int* naCumClusSizes = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+
+    const int nClusNum = ClusUtil_OvlpClusters_OfSystem(naFullClusList, naCumClusSizes);
+
+    int* naClusSizes = (int*) calloc((nClusNum + 1), sizeof(int));
+
+    if (nClusNum == 1)
+        {
+            thisSize = -1;
+        }
+    else
+        {
+            ClusUtil_GenClusSizesFromCumulativeSizes(naClusSizes, naCumClusSizes, nClusNum);
+
+            thisSize = ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(naOutClusList, naFullClusList,
+                                                                                naCumClusSizes, naClusSizes, nClusNum);
+        }
+
+    free(naFullClusList);
+    free(naCumClusSizes);
+    free(naClusSizes);
+
+    return thisSize;
+}
+
+///
+/// \param naOutClusList
 /// \return Size of the cluster
 int ClusUtil_AnisoCluster_OfSystem_SecondLargest(int* naOutClusList)
 {
@@ -2318,6 +2351,41 @@ int ClusUtil_AnisoCluster_OfSystem_SecondLargest(int* naOutClusList)
 
     return thisSize;
 }
+
+
+///
+/// \param naOutClusList
+/// \return Size of the cluster. If there is only 1 cluster, return -1 so the move fails.
+int ClusUtil_AnisoCluster_OfSystem_SecondLargest_ForMCMove(int* naOutClusList)
+{
+    int thisSize;
+
+    int* naFullClusList = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+    int* naCumClusSizes = (int*) calloc((tot_chains_glb + 1), sizeof(int));
+
+    const int nClusNum = ClusUtil_AnisoClusters_OfSystem(naFullClusList, naCumClusSizes);
+
+    int* naClusSizes = (int*) calloc((nClusNum + 1), sizeof(int));
+
+    if (nClusNum == 1)
+    {
+        thisSize = -1;
+    }
+    else
+    {
+        ClusUtil_GenClusSizesFromCumulativeSizes(naClusSizes, naCumClusSizes, nClusNum);
+
+        thisSize = ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(naOutClusList, naFullClusList,
+                                                                            naCumClusSizes, naClusSizes, nClusNum);
+    }
+
+    free(naFullClusList);
+    free(naCumClusSizes);
+    free(naClusSizes);
+
+    return thisSize;
+}
+
 
 ///
 /// \param naClusIDsList_out
