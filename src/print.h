@@ -41,13 +41,13 @@ void CopyData_COMDen(const int run_it);
 
 void CopyData_Clus(const int run_it);
 
-void FileIO_CreateFile(const char* fileName);
+void FileIOUtil_CreateFile_Overwrite(const char* fileName);
 
 void FileIO_CreateRunningDataFiles(void);
 
 void FileIO_WriteTo_MCMoveFile(const char* filename, const long nGen, const float fMCTemp);
 
-void FileIO_PreCycle_Init(const int run_it);
+void FileIOUtil_PreCycle_Init(const int run_it);
 
 void FileIO_AppendEnergyTo_EnergyFile(const char* fileNameStr, const long nGen);
 
@@ -61,6 +61,6 @@ void FileIO_WriteRestart_ForThermalization(void);
 
 void FileIO_WriteRestart_ForRun(const int run_it);
 
-void FileIO_Write_TotalSysProp(const int run_it);
+void FileIO_Write_TotalSysProp_TotFromGLB(const int run_it);
 
 #endif // _PRINT_H_

@@ -730,9 +730,9 @@ void Write_SysProp(char* filename)
     fprintf(fp, "\n#Done");
 }
 
-/// FileIO_WriteTo_RDFTotFile - writes the RDFTot file.
+/// FileIO_WriteTo_RDFFile_TotFromGLB - writes the RDFTot file.
 /// \param run_it Number of temperature cycles.
-void FileIO_WriteTo_RDFTotFile(const int run_it)
+void FileIO_WriteTo_RDFFile_TotFromGLB(const int run_it)
 {
     FILE* fp;
     int i, j, k;
@@ -757,9 +757,9 @@ void FileIO_WriteTo_RDFTotFile(const int run_it)
     fclose(fp);
 }
 
-/// FileIO_WriteTo_COMDenFile - writes the COMDenTot file.
+/// FileIO_WriteTo_COMDenFile_TotFromGLB - writes the COMDenTot file.
 /// \param run_it Number of temperature cycles.
-void FileIO_WriteTo_COMDenFile(const int run_it)
+void FileIO_WriteTo_COMDenFile_TotFromGLB(const int run_it)
 {
     FILE* fp;
     int i, j, k;
@@ -785,9 +785,9 @@ void FileIO_WriteTo_COMDenFile(const int run_it)
     fclose(fp);
 }
 
-/// FileIO_WriteTo_ClusFile - writes the CLUS file.
+/// FileIO_WriteTo_ClusFile_TotFromGLB - writes the CLUS file.
 /// \param run_it Number of temperature cycles.
-void FileIO_WriteTo_ClusFile(const int run_it)
+void FileIO_WriteTo_ClusFile_TotFromGLB(const int run_it)
 {
     FILE* fp;
     int i, j, k;
@@ -809,9 +809,9 @@ void FileIO_WriteTo_ClusFile(const int run_it)
     fclose(fp);
 }
 
-/// FileIO_WriteTo_MolClus - writes the MolClus file.
+/// FileIO_WriteTo_MolClus - writes the MolClus file
 /// \param run_it Number of temperature cycles.
-void FileIO_WriteTo_MolClusFile(const int run_it)
+void FileIO_WriteTo_MolClusFile_TotFromGLB(const int run_it)
 {
     FILE* fp;
     int i, j, k;
@@ -839,7 +839,7 @@ void FileIO_WriteTo_MolClusFile(const int run_it)
 
 /// FileIO_WriteTo_GyrRad - writes the GR file.
 /// \param run_it Number of temperature cycles.
-void FileIO_WriteTo_GyrRadFile(const int run_it)
+void FileIO_WriteTo_GyrRadFile_TotFromGLB(const int run_it)
 {
     FILE* fp;
     int i, j, k;
@@ -859,11 +859,11 @@ void FileIO_WriteTo_GyrRadFile(const int run_it)
     fclose(fp);
 }
 
-/// FileIO_Write_TotalSysProp - writes the RDF, CLUS and GyrTen arrays to their
+/// FileIO_Write_TotalSysProp_TotFromGLB - writes the RDF, CLUS and GyrTen arrays to their
 /// respective files. These arrays store the data over the course of an ENTIRE
 /// run, or over all the temp cycles.
 /// \param run_it
-void FileIO_Write_TotalSysProp(const int run_it)
+void FileIO_Write_TotalSysProp_TotFromGLB(const int run_it)
 {
     /* This function writes one large file with all the averaged values from
      * each run_cycle. run_it let's the function know how many cycles to write.
@@ -875,25 +875,25 @@ void FileIO_Write_TotalSysProp(const int run_it)
      */
     if (naReportFreqs_glb[REPORT_RDFTOT] != 0)
         {
-            FileIO_WriteTo_RDFTotFile(run_it);
+            FileIO_WriteTo_RDFFile_TotFromGLB(run_it);
         }
 
     if (naReportFreqs_glb[REPORT_COMDEN] != 0)
         {
-            FileIO_WriteTo_COMDenFile(run_it);
+            FileIO_WriteTo_COMDenFile_TotFromGLB(run_it);
         }
 
     if (naReportFreqs_glb[REPORT_NETWORK] != 0)
         {
-            FileIO_WriteTo_ClusFile(run_it);
-            FileIO_WriteTo_MolClusFile(run_it);
-            FileIO_WriteTo_GyrRadFile(run_it);
+            FileIO_WriteTo_ClusFile_TotFromGLB(run_it);
+            FileIO_WriteTo_MolClusFile_TotFromGLB(run_it);
+            FileIO_WriteTo_GyrRadFile_TotFromGLB(run_it);
         }
 }
 
-/// FileIO_CreateFile - Creates a new overwritten file with the given name.
+/// FileIOUtil_CreateFile_Overwrite - Creates a new overwritten file with the given name.
 /// \param fileName
-void FileIO_CreateFile(const char* fileName)
+void FileIOUtil_CreateFile_Overwrite(const char* fileName)
 {
     FILE* fp = fopen(fileName, "w+");
     fclose(fp);
@@ -912,7 +912,7 @@ void FileIO_CreateRunningDataFiles(void)
                 {
                     sprintf(strFileTraj_glb, "%s_trj.lammpstrj",
                             strReportPrefix_glb); // Naming convention for trajectory files.
-                    FileIO_CreateFile(
+                    FileIOUtil_CreateFile_Overwrite(
                         strFileTraj_glb); // This opens a new trajectory file; each run_it will have its own
                 }
         }
@@ -921,7 +921,7 @@ void FileIO_CreateRunningDataFiles(void)
     if (naReportFreqs_glb[REPORT_ENERGY])
         {
             sprintf(strFileEnergy_glb, "%s_energy.dat", strReportPrefix_glb);
-            FileIO_CreateFile(strFileEnergy_glb); // Open a new energy file; each run_it will have its own
+            FileIOUtil_CreateFile_Overwrite(strFileEnergy_glb); // Open a new energy file; each run_it will have its own
             FileIO_Write_EnergyHeader(strFileEnergy_glb);
         }
 
@@ -929,7 +929,7 @@ void FileIO_CreateRunningDataFiles(void)
     if (naReportFreqs_glb[REPORT_MCMOVE])
         {
             sprintf(strFileMCMove_glb, "%s_mcmove.dat", strReportPrefix_glb);
-            FileIO_CreateFile(strFileMCMove_glb); // Open a new MCInfo file; each run_it will have its own
+            FileIOUtil_CreateFile_Overwrite(strFileMCMove_glb); // Open a new MCInfo file; each run_it will have its own
             FileIO_Write_MCMoveHeader(strFileMCMove_glb);
         }
 }
@@ -1124,9 +1124,9 @@ void DataAnalysis_DuringRunCycles(const long nGen, const int run_it)
         }
 }
 
-/// FileIO_PreCycle_Init
+/// FileIOUtil_PreCycle_Init
 /// \param run_it
-void FileIO_PreCycle_Init(const int run_it)
+void FileIOUtil_PreCycle_Init(const int run_it)
 {
     if (naReportFreqs_glb[REPORT_CONFIG])
         {
@@ -1139,21 +1139,22 @@ void FileIO_PreCycle_Init(const int run_it)
     if (naReportFreqs_glb[REPORT_ENERGY] != 0)
         {
             sprintf(strFileEnergy_glb, "%s_%d_energy.dat", strReportPrefix_glb, run_it);
-            FileIO_CreateFile(strFileEnergy_glb); // Open a new Energy file; each run_it will have its own
+            FileIOUtil_CreateFile_Overwrite(strFileEnergy_glb); // Open a new Energy file; each run_it will have its own
         }
     if (naReportFreqs_glb[REPORT_MCMOVE] != 0)
         {
             sprintf(strFileMCMove_glb, "%s_%d_mcmove.dat", strReportPrefix_glb, run_it);
-            FileIO_CreateFile(strFileMCMove_glb); // Open a new MCInfo file; each run_it will have its own
+            FileIOUtil_CreateFile_Overwrite(strFileMCMove_glb); // Open a new MCInfo file; each run_it will have its own
         }
 }
+
 /// FileIO_WriteRestart_ForRun
 /// \param run_it
 void FileIO_WriteRestart_ForRun(const int run_it)
 {
     sprintf(strFileTraj_glb, "%s_%d_restart.lammpstrj", strReportPrefix_glb,
             run_it); // Naming convention for trajectory files.
-    FileIO_CreateFile(strFileTraj_glb);
+    FileIOUtil_CreateFile_Overwrite(strFileTraj_glb);
     FileIO_AppendTrajFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb + (run_it + 1) * nMCStepsPerCycle_glb);
 }
 
@@ -1164,7 +1165,7 @@ void FileIO_WriteRestart_ForThermalization(void)
         {
             sprintf(strFileTraj_glb, "%s_EQ_restart.lammpstrj",
                     strReportPrefix_glb); // Naming convention for trajectory files.
-            FileIO_CreateFile(strFileTraj_glb);
+            FileIOUtil_CreateFile_Overwrite(strFileTraj_glb);
             FileIO_AppendTrajFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb);
         }
 }
@@ -1242,4 +1243,37 @@ void CopyData_Clus(const int run_it)
         }
     ldaTOTRg_Arr_glb[run_it][0] = (long double) faSysGyrRad_glb / (long double) nTotGyrRadCounter_glb;
     ldaTOTRg_Arr_glb[run_it][1] = (long double) naBoxSize_glb[0] / 2.0;
+}
+
+
+
+void FileIOUtil_WriteArrayAsLine_ToFile(const char* const filename, const int* const naInArr, const int nSize)
+{
+    int i;
+
+    FILE *fPtr = fopen(filename, "a");
+
+    for (i=0; i<nSize; i++)
+    {
+        fprintf(fPtr, "%d ", naInArr[i]);
+    }
+    fprintf(fPtr, "\n");
+    fclose(fPtr);
+}
+
+
+void FileIOUtil_Write2DArrayAsLine_ToFile(const char* const filename, const int* const * const naaInArr, const int nY, const int nX)
+{
+    int i, j;
+    FILE *fPtr = fopen(filename, "a");
+
+    for (j=0; j<nY; j++)
+    {
+        for (i=0; i<nX; i++)
+        {
+            fprintf(fPtr, "%d ", naaInArr[j][i]);
+        }
+        fprintf(fPtr, "\n");
+    }
+    fclose(fPtr);
 }

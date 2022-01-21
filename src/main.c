@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
              */
             fKT_glb = faKT_Cycle_glb[run_cycle];
             Calculate_Rot_Bias(fKT_glb);
-            FileIO_PreCycle_Init(run_cycle);
+            FileIOUtil_PreCycle_Init(run_cycle);
             for (nGen = 0; nGen < nMCStepsPerCycle_glb / 2; nGen++)
                 {
                     fCuTemp_glb = nAnnealing_Mode_glb == -1 ? fKT_glb : Temperature_Function(nAnnealing_Mode_glb, nGen);
@@ -146,11 +146,12 @@ int main(int argc, char* argv[])
             nInitialPotential_Mode_glb = -1;
             FileIO_WriteRestart_ForRun(run_cycle);
             CopyData_All(run_cycle);
+            FileIO_WriteData_ForRun(run_cycle);
             Reset_Global_Arrays();
         }
 
     // Writing everything
-    FileIO_Write_TotalSysProp(run_cycle);
+    FileIO_Write_TotalSysProp_TotFromGLB(run_cycle);
 
     tEnd         = clock();
     elapsed_time = (double) (tEnd - tStart) / (double) CLOCKS_PER_SEC;
