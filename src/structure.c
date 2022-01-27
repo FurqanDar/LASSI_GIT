@@ -474,7 +474,7 @@ int RadDenArr_Index(const int run_cycle, const int rad_comp, const int x_pos)
 
 int MolClusArr_Index(const int run_cycle, const int chain_type, const int clus_size)
 {
-    return clus_size + tot_chains_glb * (chain_type + tot_chain_types_glb * run_cycle);
+    return clus_size + (int) tot_chains_glb * (chain_type + (int) tot_chain_types_glb * run_cycle);
 }
 
 /// RDF_ComponentWise_Avg - calculates the pair-distribution of the system where every bead acts as the center
@@ -505,7 +505,7 @@ void RDF_ComponentWise_Avg(void)
                     ldaRDF_Arr_glb[RDFArr_Index(0, array_pos, myBin)] += 2.0;
                 }
         }
-    nRDFCounter_glb++;
+    nTotRDFCounter_glb++;
 }
 
 /// Check_LinkerConstraint - if I move beadID to tmpR, do I still satisfy the linker lengths for beadID?
@@ -939,7 +939,7 @@ void RadDen_Avg_MolTypeWise_FromSysCen(void)
             myBin    = (int) floor(4. * xDis);
             ldaRadDen_Arr_glb[RadDenArr_Index(0, thisType, myBin)] += 1.0;
         }
-    nRadDenCounter_glb++;
+    nTotRadDenCounter_glb++;
 }
 
 void RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void)
@@ -1016,7 +1016,7 @@ void RadDen_Avg_MolTypeWise_FromMolTypeCen_Old_CorrectVersion(void)
     }
     */
 
-    nRadDenCounter_glb++;
+    nTotRadDenCounter_glb++;
 }
 
 void RadialDensityAnalysis_Perform_Analysis(void)
@@ -1025,7 +1025,7 @@ void RadialDensityAnalysis_Perform_Analysis(void)
     RadDenHistUtil_ForSystem_FromLargestClusterOfMolTypes();
     RadDenHistUtil_ForSystem_FromCenterOfMassOfMolTypes();
 
-    nRadDenCounter_glb++;
+    nTotRadDenCounter_glb++;
 }
 
 void RadDenHistUtil_ForSystem_FromCenterOfMassOfMolTypes(void)

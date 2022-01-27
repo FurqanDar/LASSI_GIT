@@ -442,8 +442,8 @@ void Reset_Counters(void)
 {
     faSysGyrRad_glb             = 0.f;
     nTotGyrRadCounter_glb       = 0;
-    nRDFCounter_glb             = 0;
-    nRadDenCounter_glb          = 0;
+    nTotRDFCounter_glb          = 0;
+    nTotRadDenCounter_glb       = 0;
     nTotClusCounter_glb         = 0;
     nLargestClusterRightNow_glb = 0;
     nTrajCurFrame_glb           = 0;

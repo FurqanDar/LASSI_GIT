@@ -55,11 +55,13 @@ void FileIO_WriteTo_TopFile(const char* filename);
 
 void FileIO_HandleTrajectory(const char* fileNameStr, const int run_it, const long nGen);
 
-void FileIO_AppendTrajFrame_ToFile(const char* filename, const long nGen);
+void FileIOUtil_AppendTrajFrame_ToFile(const char* filename, const long nGen);
 
 void FileIO_WriteRestart_ForThermalization(void);
 
-void FileIO_WriteRestart_ForRun(const int run_it);
+void FileIO_PostCycle_WriteSystemRestart(const int run_it);
+
+void FileIO_PostCycle_WriteCycleAvgData(const int run_it);
 
 void FileIO_Write_TotalSysProp_TotFromGLB(const int run_it);
 

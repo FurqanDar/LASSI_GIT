@@ -125,9 +125,9 @@ void Write_GyrTen(char* filename, long nGen)
     fclose(fp);
 }
 
-/// FileIO_Write_MCMoveHeader - write the header for the MC move acceptance file.
+/// FileIOUtil_WriteHeader_ForMCMove - write the header for the MC move acceptance file.
 /// \param fileName
-void FileIO_Write_MCMoveHeader(const char* fileName)
+void FileIOUtil_WriteHeader_ForMCMove(const char* fileName)
 {
     FILE* fp = fopen(fileName, "a");
     fprintf(fp, "#Steps, and Temp, are followed by (rej, acc) for each MC Move.\n");
@@ -182,13 +182,59 @@ void Print_LogToScreen(long nGen, const int run_it)
     ScreenIO_Print_Log_FullRun(nGen, run_it);
 }
 
-/// FileIO_Write_EnergyHeader - write the header for the energy file.
+void FileIOUtil_WriteHeader_ForRDF(const char* strFileName)
+{
+    FILE* fp = fopen(strFileName, "w");
+
+    fprintf(fp, "#Split RDFs. ALL-ALL; DIAGONALS (0-0, 1-1, ..) and then off-diagonals (0-1, 0-2, ..., 1-2, ...)\n");
+
+    fclose(fp);
+}
+
+void FileIOUtil_WriteHeader_ForCOMDen(const char* strFileName)
+{
+    FILE* fp = fopen(strFileName, "w");
+
+    fprintf(fp, "#Density Distribution from the COM outwards. Order is ChainType.\n");
+
+    fclose(fp);
+}
+
+void FileIOUtil_WriteHeader_ForGyrRad(const char* strFileName)
+{
+    FILE* fp = fopen(strFileName, "w");
+
+    fprintf(fp, "#Gyration Radius Of ENTIRE System & BoxSize.\n");
+
+    fclose(fp);
+}
+
+void FileIOUtil_WriteHeader_ForCLUS(const char* strFileName)
+{
+    FILE* fp = fopen(strFileName, "w");
+
+    fprintf(fp, "#Cluster size histograms. First is largest cluster, then n=1, n=2, and so on.\n");
+
+    fclose(fp);
+}
+
+void FileIOUtil_WriteHeader_ForMolClus(const char* strFileName)
+{
+    FILE* fp = fopen(strFileName, "w");
+
+    fprintf(fp, "#Cluster size histograms, split by molecule type. Each row is a ChainType, and each column is the "
+                "cluster size starting from 1.\n");
+
+    fclose(fp);
+}
+
+/// FileIOUtil_WriteHeader_ForEnergy - write the header for the energy file.
 /// \param fileName
-void FileIO_Write_EnergyHeader(const char* fileName)
+void FileIOUtil_WriteHeader_ForEnergy(const char* fileName)
 {
     FILE* fp = fopen(fileName, "a+");
-    fprintf(fp, "#           "
-                "STEP        "
+    fprintf(fp, "#"
+                "STEP         "
                 "TOT         "
                 "OVLP        "
                 "CONT        "
@@ -209,10 +255,10 @@ void FileIO_AppendEnergyTo_EnergyFile(const char* fileNameStr, const long nGen)
     FILE* fp = fopen(fileNameStr, "a");
 
     int i;
-    fprintf(fp, "%-10ld", nGen);
+    fprintf(fp, "%-12ld", nGen);
     for (i = 0; i < (MAX_E); i++)
         {
-            fprintf(fp, "  %-10.2e", faCurrEn_glb[i]);
+            fprintf(fp, "  %-10.2E", faCurrEn_glb[i]);
         }
     fprintf(fp, "\n");
 
@@ -234,21 +280,21 @@ void FileIO_HandleTrajectory(const char* fileNameStr, const int run_it, const lo
         {
             if (run_it >= 0)
                 {
-                    FileIO_AppendTrajFrame_ToFile(fileNameStr,
-                                                  nGen + nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb);
+                    FileIOUtil_AppendTrajFrame_ToFile(fileNameStr,
+                                                      nGen + nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb);
                 }
             else
                 {
-                    FileIO_AppendTrajFrame_ToFile(fileNameStr, nGen);
+                    FileIOUtil_AppendTrajFrame_ToFile(fileNameStr, nGen);
                 }
         }
 }
 
-/// FileIO_AppendTrajFrame_ToFile -  write a LAMMPS style trajectory file for the system.
+/// FileIOUtil_AppendTrajFrame_ToFile -  write a LAMMPS style trajectory file for the system.
 /// Appends to the file for this run.
 /// \param filename
 /// \param nGen
-void FileIO_AppendTrajFrame_ToFile(const char* filename, const long nGen)
+void FileIOUtil_AppendTrajFrame_ToFile(const char* filename, const long nGen)
 {
     // Writes the trajectory in LAMMPS format. To be viewed with VMD (hopefully). Read the LAMMPS dump documentation for
     // the actual format of the file
@@ -468,7 +514,7 @@ void ScreenIO_Print_KeyFile(void)
     ScreenIOUtil_PrintTemperatures();
 
     printf("Indent Mode                    = %d\n", nInitialPotential_Mode_glb);
-//    printf("Rotational Bias Mode           = %d\n", RotBias_Mode_glb);
+    //    printf("Rotational Bias Mode           = %d\n", RotBias_Mode_glb);
     printf("Number of MC Cycles            = %d\n", nTotCycleNum_glb);
     printf("Number of MC Steps/Cycle       = %e\n", (float) nMCStepsPerCycle_glb);
     printf("Number of Thermalizing Steps   = %e\n", (float) nMCStepsForTherm_glb);
@@ -722,8 +768,8 @@ void Write_SysProp(char* filename)
         {
             for (i = 0; i < nRDF_TotBins_glb; i++)
                 {
-                    // fprintf(fp, "%LE\t", ldRDF_ARR[j][i] / (float)nRDFCounter_glb);
-                    fprintf(fp, "%LE\t", ldaRDF_Arr_glb[RDFArr_Index(0, j, i)] / (float) nRDFCounter_glb);
+                    // fprintf(fp, "%LE\t", ldRDF_ARR[j][i] / (float)nTotRDFCounter_glb);
+                    fprintf(fp, "%LE\t", ldaRDF_Arr_glb[RDFArr_Index(0, j, i)] / (float) nTotRDFCounter_glb);
                 }
             fprintf(fp, "\n");
         }
@@ -767,8 +813,7 @@ void FileIO_WriteTo_COMDenFile_TotFromGLB(const int run_it)
     sprintf(dumFile, "%s_COMDen.dat",
             strReportPrefix_glb); // Name Of the COM Density Distribution
     fp = fopen(dumFile, "w");
-    fprintf(fp, "#Density distribution from the COM outwards. Order is "
-                "ChainType.\n");
+    fprintf(fp, "#Density distribution from the COM outwards. Order is ChainType.\n");
     for (i = 0; i < run_it; i++)
         {
             fprintf(fp, "#Run_Cycle = %d\n", i);
@@ -922,7 +967,7 @@ void FileIO_CreateRunningDataFiles(void)
         {
             sprintf(strFileEnergy_glb, "%s_energy.dat", strReportPrefix_glb);
             FileIOUtil_CreateFile_Overwrite(strFileEnergy_glb); // Open a new energy file; each run_it will have its own
-            FileIO_Write_EnergyHeader(strFileEnergy_glb);
+            FileIOUtil_WriteHeader_ForEnergy(strFileEnergy_glb);
         }
 
     // MC Move Acceptance
@@ -930,7 +975,38 @@ void FileIO_CreateRunningDataFiles(void)
         {
             sprintf(strFileMCMove_glb, "%s_mcmove.dat", strReportPrefix_glb);
             FileIOUtil_CreateFile_Overwrite(strFileMCMove_glb); // Open a new MCInfo file; each run_it will have its own
-            FileIO_Write_MCMoveHeader(strFileMCMove_glb);
+            FileIOUtil_WriteHeader_ForMCMove(strFileMCMove_glb);
+        }
+
+    char strFileName[512];
+
+    if (naReportFreqs_glb[REPORT_COMDEN])
+        {
+            sprintf(strFileName, "%s_COMDen.dat", strReportPrefix_glb);
+            FileIOUtil_CreateFile_Overwrite(strFileName);
+            FileIOUtil_WriteHeader_ForCOMDen(strFileName);
+        }
+
+    if (naReportFreqs_glb[REPORT_NETWORK])
+        {
+            sprintf(strFileName, "%s_CLUS.dat", strReportPrefix_glb);
+            FileIOUtil_CreateFile_Overwrite(strFileName);
+            FileIOUtil_WriteHeader_ForCLUS(strFileName);
+
+            sprintf(strFileName, "%s_MolClus.dat", strReportPrefix_glb);
+            FileIOUtil_CreateFile_Overwrite(strFileName);
+            FileIOUtil_WriteHeader_ForMolClus(strFileName);
+
+            sprintf(strFileName, "%s_GR.dat", strReportPrefix_glb);
+            FileIOUtil_CreateFile_Overwrite(strFileName);
+            FileIOUtil_WriteHeader_ForGyrRad(strFileName);
+        }
+
+    if (naReportFreqs_glb[REPORT_COMDEN])
+        {
+            sprintf(strFileName, "%s_RDF.dat", strReportPrefix_glb);
+            FileIOUtil_CreateFile_Overwrite(strFileName);
+            FileIOUtil_WriteHeader_ForRDF(strFileName);
         }
 }
 
@@ -1140,22 +1216,24 @@ void FileIOUtil_PreCycle_Init(const int run_it)
         {
             sprintf(strFileEnergy_glb, "%s_%d_energy.dat", strReportPrefix_glb, run_it);
             FileIOUtil_CreateFile_Overwrite(strFileEnergy_glb); // Open a new Energy file; each run_it will have its own
+            FileIOUtil_WriteHeader_ForEnergy(strFileEnergy_glb);
         }
     if (naReportFreqs_glb[REPORT_MCMOVE] != 0)
         {
             sprintf(strFileMCMove_glb, "%s_%d_mcmove.dat", strReportPrefix_glb, run_it);
             FileIOUtil_CreateFile_Overwrite(strFileMCMove_glb); // Open a new MCInfo file; each run_it will have its own
+            FileIOUtil_WriteHeader_ForMCMove(strFileMCMove_glb);
         }
 }
 
-/// FileIO_WriteRestart_ForRun
+/// FileIO_PostCycle_WriteSystemRestart
 /// \param run_it
-void FileIO_WriteRestart_ForRun(const int run_it)
+void FileIO_PostCycle_WriteSystemRestart(const int run_it)
 {
     sprintf(strFileTraj_glb, "%s_%d_restart.lammpstrj", strReportPrefix_glb,
             run_it); // Naming convention for trajectory files.
     FileIOUtil_CreateFile_Overwrite(strFileTraj_glb);
-    FileIO_AppendTrajFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb + (run_it + 1) * nMCStepsPerCycle_glb);
+    FileIOUtil_AppendTrajFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb + (run_it + 1) * nMCStepsPerCycle_glb);
 }
 
 /// FileIO_WriteRestart_ForThermalization
@@ -1166,7 +1244,7 @@ void FileIO_WriteRestart_ForThermalization(void)
             sprintf(strFileTraj_glb, "%s_EQ_restart.lammpstrj",
                     strReportPrefix_glb); // Naming convention for trajectory files.
             FileIOUtil_CreateFile_Overwrite(strFileTraj_glb);
-            FileIO_AppendTrajFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb);
+            FileIOUtil_AppendTrajFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb);
         }
 }
 
@@ -1195,7 +1273,7 @@ void CopyData_All(const int run_it)
 void CopyData_RDF(const int run_it)
 {
     int i, j;
-    const long double normFactor = 1.0 / (long double) nRDFCounter_glb;
+    const long double normFactor = 1.0 / (long double) nTotRDFCounter_glb;
     for (i = 0; i < nRDF_TotComps_glb; i++)
         {
             for (j = 0; j < nRDF_TotBins_glb; j++)
@@ -1210,7 +1288,7 @@ void CopyData_RDF(const int run_it)
 void CopyData_COMDen(const int run_it)
 {
     int i, j;
-    const long double normFactor = 1.0 / (long double) nRadDenCounter_glb;
+    const long double normFactor = 1.0 / (long double) nTotRadDenCounter_glb;
     for (i = 0; i < nRadDen_TotComps_glb; i++)
         {
             for (j = 0; j < nRDF_TotBins_glb; j++)
@@ -1245,35 +1323,132 @@ void CopyData_Clus(const int run_it)
     ldaTOTRg_Arr_glb[run_it][1] = (long double) naBoxSize_glb[0] / 2.0;
 }
 
-
-
-void FileIOUtil_WriteArrayAsLine_ToFile(const char* const filename, const int* const naInArr, const int nSize)
+///
+/// \param run_it
+void FileIOUtil_AppendTo_GyrRadFile_ForRun(const int run_it)
 {
-    int i;
+    FILE* fp;
+    char dumFile[512];
+    sprintf(dumFile, "%s_GR.dat", strReportPrefix_glb); // Name Of the ClusterHistogram Files
+    fp = fopen(dumFile, "a");
 
-    FILE *fPtr = fopen(filename, "a");
+    fprintf(fp, "#Run_Cycle = %d; Avg Over %d Samples\n", run_it, nTotClusCounter_glb);
+    fprintf(fp, "%LE\t", (long double) faSysGyrRad_glb / (long double) nTotGyrRadCounter_glb);
+    fprintf(fp, "%LE\n", (long double) naBoxSize_glb[0] / 2.0);
 
-    for (i=0; i<nSize; i++)
-    {
-        fprintf(fPtr, "%d ", naInArr[i]);
-    }
-    fprintf(fPtr, "\n");
-    fclose(fPtr);
+    fclose(fp);
 }
 
-
-void FileIOUtil_Write2DArrayAsLine_ToFile(const char* const filename, const int* const * const naaInArr, const int nY, const int nX)
+///
+/// \param run_it
+void FileIOUtil_AppendTo_ClusFile_ForRun(const int run_it)
 {
-    int i, j;
-    FILE *fPtr = fopen(filename, "a");
+    FILE* fp;
+    int i;
+    char dumFile[512];
+    sprintf(dumFile, "%s_CLUS.dat", strReportPrefix_glb); // Name Of the ClusterHistogram Files
+    fp = fopen(dumFile, "a");
+    fprintf(fp, "#Run_Cycle = %d; Avg Over %d Samples\n", run_it, nTotClusCounter_glb);
+    const double normFactor = 1.0 / (double) nTotClusCounter_glb;
 
-    for (j=0; j<nY; j++)
-    {
-        for (i=0; i<nX; i++)
+    laClusHistList_glb[0] = nLargestClusterRightNow_glb ;
+
+    for (i = 0; i <= tot_chains_glb; i++)
         {
-            fprintf(fPtr, "%d ", naaInArr[j][i]);
+            fprintf(fp, "%E\t", (double) laClusHistList_glb[i] * normFactor);
         }
-        fprintf(fPtr, "\n");
-    }
-    fclose(fPtr);
+    fprintf(fp, "\n");
+    fclose(fp);
+}
+
+///
+/// \param run_it
+void FileIOUtil_AppendTo_MolClusFile_ForRun(const int run_it)
+{
+    FILE* fp;
+    int i, j;
+    char dumFile[512];
+    sprintf(dumFile, "%s_MolClus.dat", strReportPrefix_glb); // Name Of the ClusterHistogram Files
+    fp = fopen(dumFile, "a");
+    fprintf(fp, "#Run_Cycle = %d; Avg Over %d Samples\n", run_it, nTotClusCounter_glb);
+
+    const long double normFactor = 1.0 / (long double) nTotClusCounter_glb;
+
+    for (j = 0; j < tot_chain_types_glb; j++)
+        {
+            for (i = 0; i < tot_chains_glb; i++)
+                {
+                    fprintf(fp, "%LE\t", ldaMOLCLUS_Arr_glb[MolClusArr_Index(0, j, i)] * normFactor);
+                }
+            fprintf(fp, "\n");
+        }
+    fclose(fp);
+}
+
+///
+/// \param run_it
+void FileIOUtil_AppendTo_RDFFile_ForRun(const int run_it)
+{
+    FILE* fp;
+    int i, j;
+    char dumFile[512];
+    sprintf(dumFile, "%s_RDF.dat", strReportPrefix_glb); // Name Of the ClusterHistogram Files
+    fp = fopen(dumFile, "a");
+    fprintf(fp, "#Run_Cycle = %d; Avg Over %d Samples\n", run_it, nTotRDFCounter_glb);
+
+    const long double normFactor = 1.0 / (long double) nTotRDFCounter_glb;
+
+    for (j = 0; j < nRDF_TotComps_glb; j++)
+        {
+            for (i = 0; i < nRDF_TotBins_glb; i++)
+                {
+                    fprintf(fp, "%LE\t", ldaRDF_Arr_glb[RDFArr_Index(0, j, i)] * normFactor);
+                }
+            fprintf(fp, "\n");
+        }
+    fclose(fp);
+}
+
+///
+/// \param run_it
+void FileIOUtil_AppendTo_COMDenFile_ForRun(const int run_it)
+{
+    FILE* fp;
+    int i, j;
+    char dumFile[512];
+    sprintf(dumFile, "%s_COMDen.dat", strReportPrefix_glb);
+    fp = fopen(dumFile, "a");
+    fprintf(fp, "#Run_Cycle = %d; Avg Over %d Samples\n", run_it, nTotRadDenCounter_glb);
+
+    const long double normFactor = 1.0 / (long double) nTotRadDenCounter_glb;
+
+    for (j = 0; j < nRadDen_TotComps_glb; j++)
+        {
+            for (i = 0; i < nRDF_TotBins_glb; i++)
+                {
+                    fprintf(fp, "%LE\t", ldaRadDen_Arr_glb[RadDenArr_Index(0, j, i)] * normFactor);
+                }
+            fprintf(fp, "\n");
+        }
+    fclose(fp);
+}
+
+///
+/// \param run_it
+void FileIO_PostCycle_WriteCycleAvgData(const int run_it)
+{
+    if (naReportFreqs_glb[REPORT_RDFTOT])
+        {
+            FileIOUtil_AppendTo_RDFFile_ForRun(run_it);
+        }
+    if (naReportFreqs_glb[REPORT_COMDEN])
+        {
+            FileIOUtil_AppendTo_COMDenFile_ForRun(run_it);
+        }
+    if (naReportFreqs_glb[REPORT_NETWORK])
+        {
+            FileIOUtil_AppendTo_ClusFile_ForRun(run_it);
+            FileIOUtil_AppendTo_MolClusFile_ForRun(run_it);
+            FileIOUtil_AppendTo_GyrRadFile_ForRun(run_it);
+        }
 }

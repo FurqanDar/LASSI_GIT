@@ -175,11 +175,11 @@ lLDub* ldaTOTRadDen_Arr_glb;
 lLDub* ldaRDF_Arr_glb;
 lLDub* ldaRadDen_Arr_glb;
 lInt nRDF_TotComps_glb;
-lInt nRDFCounter_glb; // This counts how many times the RDF has been calculated for averaging at the end.
+lInt nTotRDFCounter_glb; // This counts how many times the RDF has been calculated for averaging at the end.
 lInt nRDF_TotBins_glb;
 lInt nRadDen_TotComps_glb;
 lInt nRadDen_CompShift_glb;
-lInt nRadDenCounter_glb; // This counts for the Radial Density histograms
+lInt nTotRadDenCounter_glb; // This counts for the Radial Density histograms
 
 // Gyration tensor
 float faGyrTensor_glb[7]; // Gyration tensor
