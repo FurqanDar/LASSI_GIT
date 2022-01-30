@@ -9,9 +9,9 @@
 
 #define MAX_AA         10
 #define MAX_CHAINTYPES 10
-#define MAX_CHAINLEN   100
+#define MAX_CHAINLEN   500
 #define MAX_BONDS      4
-#define MAX_VALENCY    100
+#define MAX_VALENCY    500
 
 // energy parameters
 #define E_TOT   0 // index zero must be assigned for total energy
