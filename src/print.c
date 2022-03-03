@@ -276,25 +276,29 @@ void FileIO_HandleTrajectory(const char* fileNameStr, const int run_it, const lo
             Save_Trajectory(nGen, nTrajCurFrame_glb);
             nTrajCurFrame_glb++;
         }
+    else if (nTrajMode_glb == 2)
+    {
+        FileIOUtil_Traj_Bin_AppendFrame_ToFile(fileNameStr, 0);
+    }
     else
         {
             if (run_it >= 0)
                 {
-                    FileIOUtil_AppendTrajFrame_ToFile(fileNameStr,
-                                                      nGen + nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb);
+                    FileIOUtil_Traj_Txt_AppendFrame_ToFile(fileNameStr,
+                                                           nGen + nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb);
                 }
             else
                 {
-                    FileIOUtil_AppendTrajFrame_ToFile(fileNameStr, nGen);
+                    FileIOUtil_Traj_Txt_AppendFrame_ToFile(fileNameStr, nGen);
                 }
         }
 }
 
-/// FileIOUtil_AppendTrajFrame_ToFile -  write a LAMMPS style trajectory file for the system.
+/// FileIOUtil_Traj_Txt_AppendFrame_ToFile -  write a LAMMPS style trajectory file for the system.
 /// Appends to the file for this run.
 /// \param filename
 /// \param nGen
-void FileIOUtil_AppendTrajFrame_ToFile(const char* filename, const long nGen)
+void FileIOUtil_Traj_Txt_AppendFrame_ToFile(const char* filename, const long nGen)
 {
     // Writes the trajectory in LAMMPS format. To be viewed with VMD (hopefully). Read the LAMMPS dump documentation for
     // the actual format of the file
@@ -953,7 +957,12 @@ void FileIO_CreateRunningDataFiles(void)
         {
             sprintf(strFileTraj_glb, "%s_topo.lammpstrj", strReportPrefix_glb); // Name of the topology file
             FileIO_WriteTo_TopFile(strFileTraj_glb); // Write the topology file. Only need to write once
-            if (nTrajMode_glb != 1)
+
+            if (nTrajMode_glb == 1)
+                {
+
+                }
+            else
                 {
                     sprintf(strFileTraj_glb, "%s_trj.lammpstrj",
                             strReportPrefix_glb); // Naming convention for trajectory files.
@@ -1002,7 +1011,7 @@ void FileIO_CreateRunningDataFiles(void)
             FileIOUtil_WriteHeader_ForGyrRad(strFileName);
         }
 
-    if (naReportFreqs_glb[REPORT_COMDEN])
+    if (naReportFreqs_glb[REPORT_RDFTOT])
         {
             sprintf(strFileName, "%s_RDF.dat", strReportPrefix_glb);
             FileIOUtil_CreateFile_Overwrite(strFileName);
@@ -1132,6 +1141,7 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
                     cConfigFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_CONFIG]);
                     if (cConfigFlag)
                         {
+                            // TODO: No renaming files like this.
                             sprintf(strFileTraj_glb, "%s_trj.lammpstrj", strReportPrefix_glb);
                             FileIO_HandleTrajectory(strFileTraj_glb, run_it, nGen);
                         }
@@ -1208,7 +1218,7 @@ void FileIOUtil_PreCycle_Init(const int run_it)
         {
             if (nTrajMode_glb != 1)
                 {
-                    sprintf(strFileEnergy_glb, "%s_trj.dat", strReportPrefix_glb);
+                    sprintf(strFileTraj_glb, "%s_trj.dat", strReportPrefix_glb);
                 }
         }
 
@@ -1233,7 +1243,7 @@ void FileIO_PostCycle_WriteSystemRestart(const int run_it)
     sprintf(strFileTraj_glb, "%s_%d_restart.lammpstrj", strReportPrefix_glb,
             run_it); // Naming convention for trajectory files.
     FileIOUtil_CreateFile_Overwrite(strFileTraj_glb);
-    FileIOUtil_AppendTrajFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb + (run_it + 1) * nMCStepsPerCycle_glb);
+    FileIOUtil_Traj_Txt_AppendFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb + (run_it + 1) * nMCStepsPerCycle_glb);
 }
 
 /// FileIO_WriteRestart_ForThermalization
@@ -1244,7 +1254,7 @@ void FileIO_WriteRestart_ForThermalization(void)
             sprintf(strFileTraj_glb, "%s_EQ_restart.lammpstrj",
                     strReportPrefix_glb); // Naming convention for trajectory files.
             FileIOUtil_CreateFile_Overwrite(strFileTraj_glb);
-            FileIOUtil_AppendTrajFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb);
+            FileIOUtil_Traj_Txt_AppendFrame_ToFile(strFileTraj_glb, nMCStepsForTherm_glb);
         }
 }
 

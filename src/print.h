@@ -55,7 +55,9 @@ void FileIO_WriteTo_TopFile(const char* filename);
 
 void FileIO_HandleTrajectory(const char* fileNameStr, const int run_it, const long nGen);
 
-void FileIOUtil_AppendTrajFrame_ToFile(const char* filename, const long nGen);
+void FileIOUtil_Traj_Txt_AppendFrame_ToFile(const char* filename, const long nGen);
+
+void FileIOUtil_Traj_Bin_AppendFrame_ToFile(const char* filename, const long nGen);
 
 void FileIO_WriteRestart_ForThermalization(void);
 
