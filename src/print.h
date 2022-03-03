@@ -43,6 +43,8 @@ void CopyData_Clus(const int run_it);
 
 void FileIOUtil_CreateFile_Overwrite(const char* fileName);
 
+void FileIOUtil_CreateFile_Binary_Overwrite(const char* fileName);
+
 void FileIO_CreateRunningDataFiles(void);
 
 void FileIO_WriteTo_MCMoveFile(const char* filename, const long nGen, const float fMCTemp);
@@ -53,7 +55,7 @@ void FileIO_AppendEnergyTo_EnergyFile(const char* fileNameStr, const long nGen);
 
 void FileIO_WriteTo_TopFile(const char* filename);
 
-void FileIO_HandleTrajectory(const char* fileNameStr, const int run_it, const long nGen);
+void FileIO_Trajectory_AppendFrame(const char* fileNameStr, const int run_it, const long nGen);
 
 void FileIOUtil_Traj_Txt_AppendFrame_ToFile(const char* filename, const long nGen);
 

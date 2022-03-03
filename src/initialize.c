@@ -67,9 +67,10 @@ void Memory_Initialization_AtStart(void)
             ldaTOTRadDen_Arr_glb =
                 Create1DLongdouble(nRadDen_TotComps_glb * nTotCycleNum_glb * nRDF_TotBins_glb, arr_name);
         }
-    if (nTrajMode_glb != 0)
+
+    if (nTrajMode_glb == -1)
         {
-            nTraj_FramesPerCycle_glb = nMCStepsPerCycle_glb / naReportFreqs_glb[REPORT_CONFIG];
+            nTraj_FramesPerCycle_glb = nMCStepsPerCycle_glb / naReportFreqs_glb[REPORT_CONFIG] + 1;
             printf("\n***********************************************\n");
             printf("This feature is still experimental!\n");
             printf("\n***********************************************\n");

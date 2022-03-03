@@ -1,7 +1,7 @@
 #include "print.h"
+#include "initialize.h"
 #include "cluster.h"
 #include "energy.h"
-#include "global.h"
 #include "structure.h"
 
 /// PrintToScreen_EnergyMatrix - fancy function to print symmetric matrices with labels
@@ -228,6 +228,14 @@ void FileIOUtil_WriteHeader_ForMolClus(const char* strFileName)
     fclose(fp);
 }
 
+
+void FileIOUtil_WriteHeader_ForBinaryTraj(const char* strFileName)
+{
+    FILE* fp = fopen(strFileName, "ab");
+    fwrite(&tot_beads_glb, sizeof (size_t), 1 , fp);
+    fclose(fp);
+}
+
 /// FileIOUtil_WriteHeader_ForEnergy - write the header for the energy file.
 /// \param fileName
 void FileIOUtil_WriteHeader_ForEnergy(const char* fileName)
@@ -265,21 +273,16 @@ void FileIO_AppendEnergyTo_EnergyFile(const char* fileNameStr, const long nGen)
     fclose(fp);
 }
 
-/// FileIO_HandleTrajectory -
+/// FileIO_Trajectory_AppendFrame -
 /// \param fileNameStr
 /// \param run_it
 /// \param nGen
-void FileIO_HandleTrajectory(const char* fileNameStr, const int run_it, const long nGen)
+void FileIO_Trajectory_AppendFrame(const char* fileNameStr, const int run_it, const long nGen)
 {
     if (nTrajMode_glb == 1)
         {
-            Save_Trajectory(nGen, nTrajCurFrame_glb);
-            nTrajCurFrame_glb++;
+          FileIOUtil_Traj_Bin_AppendFrame_ToFile(fileNameStr, 0);
         }
-    else if (nTrajMode_glb == 2)
-    {
-        FileIOUtil_Traj_Bin_AppendFrame_ToFile(fileNameStr, 0);
-    }
     else
         {
             if (run_it >= 0)
@@ -324,6 +327,43 @@ void FileIOUtil_Traj_Txt_AppendFrame_ToFile(const char* filename, const long nGe
         }
 
     fclose(fp);
+}
+
+/// TrajUtil_SubselectDataFromBeadInfo - Assuming that sub_beads is a 2D array with enough space (nAtoms * 4),
+/// we extract POS_X, POS_Y, POS_Z, and BEAD_FACE from each bead.
+/// \param sub_beads
+/// \param input_beads
+void TrajUtil_SubselectDataFromBeadInfo(int** restrict sub_beads, int** restrict input_beads)
+{
+    int i;
+
+    for (i = 0; i < tot_beads_glb; i++)
+        {
+            sub_beads[i][0] = input_beads[i][POS_X];
+            sub_beads[i][1] = input_beads[i][POS_Y];
+            sub_beads[i][2] = input_beads[i][POS_Z];
+            sub_beads[i][3] = input_beads[i][BEAD_FACE];
+        }
+}
+
+/// FileIOUtil_Traj_Bin_AppendFrame_ToFile - Appends the current frame in binary format. The format is flat,
+/// and for every bead, in order of beadID, we write X, Y, Z, bP
+/// \param filename
+/// \param nGen
+void FileIOUtil_Traj_Bin_AppendFrame_ToFile(const char* filename, const long nGen)
+{
+    const int nCrds = 4;
+
+    int** subBeadInfo = Create2DInt(nCrds, tot_beads_glb, "TrajBinSubArr");
+
+    TrajUtil_SubselectDataFromBeadInfo(subBeadInfo, bead_info_glb);
+
+    FILE* fp = fopen(filename, "ab");
+    fwrite(subBeadInfo[0], sizeof (int), nCrds * tot_beads_glb, fp);
+    fclose(fp);
+
+    free(subBeadInfo[0]);
+    free(subBeadInfo);
 }
 
 /// Save_Trajectory -  saves the current position onto the total array
@@ -948,6 +988,14 @@ void FileIOUtil_CreateFile_Overwrite(const char* fileName)
     fclose(fp);
 }
 
+/// FileIOUtil_CreateFile_Overwrite - Creates a new overwritten file with the given name.
+/// \param fileName
+void FileIOUtil_CreateFile_Binary_Overwrite(const char* fileName)
+{
+  FILE* fp = fopen(fileName, "wb");
+  fclose(fp);
+}
+
 /// FileIO_CreateRunningDataFiles - Creates the necessary files that are continuously written to over the course
 /// of a simulation.
 void FileIO_CreateRunningDataFiles(void)
@@ -960,7 +1008,9 @@ void FileIO_CreateRunningDataFiles(void)
 
             if (nTrajMode_glb == 1)
                 {
-
+                  sprintf(strFileTraj_glb, "%s_EQ_trj.lassi", strReportPrefix_glb);
+                  FileIOUtil_CreateFile_Binary_Overwrite(strFileTraj_glb); // Opens a new binary file.
+                  FileIOUtil_WriteHeader_ForBinaryTraj(strFileTraj_glb);
                 }
             else
                 {
@@ -1074,7 +1124,7 @@ void DataPrinting_Thermalization(const long nGen)
                     cConfigFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_CONFIG]);
                     if (cConfigFlag)
                         {
-                            FileIO_HandleTrajectory(strFileTraj_glb, -1, nGen);
+                            FileIO_Trajectory_AppendFrame(strFileTraj_glb, -1, nGen);
                         }
                 }
 
@@ -1141,9 +1191,7 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
                     cConfigFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_CONFIG]);
                     if (cConfigFlag)
                         {
-                            // TODO: No renaming files like this.
-                            sprintf(strFileTraj_glb, "%s_trj.lammpstrj", strReportPrefix_glb);
-                            FileIO_HandleTrajectory(strFileTraj_glb, run_it, nGen);
+                            FileIO_Trajectory_AppendFrame(strFileTraj_glb, run_it, nGen);
                         }
                 }
 
@@ -1216,19 +1264,28 @@ void FileIOUtil_PreCycle_Init(const int run_it)
 {
     if (naReportFreqs_glb[REPORT_CONFIG])
         {
-            if (nTrajMode_glb != 1)
+            if (nTrajMode_glb == 1)
                 {
-                    sprintf(strFileTraj_glb, "%s_trj.dat", strReportPrefix_glb);
+                    sprintf(strFileTraj_glb, "%s_trj.lassi", strReportPrefix_glb);
+                    if (run_it == 0)
+                        {
+                            FileIOUtil_CreateFile_Binary_Overwrite(strFileTraj_glb); // Opens a new binary file.
+                            FileIOUtil_WriteHeader_ForBinaryTraj(strFileTraj_glb);
+                        }
+                }
+            else
+                {
+                    sprintf(strFileTraj_glb, "%s.lammpstrj", strReportPrefix_glb);
                 }
         }
 
-    if (naReportFreqs_glb[REPORT_ENERGY] != 0)
+    if (naReportFreqs_glb[REPORT_ENERGY])
         {
             sprintf(strFileEnergy_glb, "%s_%d_energy.dat", strReportPrefix_glb, run_it);
             FileIOUtil_CreateFile_Overwrite(strFileEnergy_glb); // Open a new Energy file; each run_it will have its own
             FileIOUtil_WriteHeader_ForEnergy(strFileEnergy_glb);
         }
-    if (naReportFreqs_glb[REPORT_MCMOVE] != 0)
+    if (naReportFreqs_glb[REPORT_MCMOVE])
         {
             sprintf(strFileMCMove_glb, "%s_%d_mcmove.dat", strReportPrefix_glb, run_it);
             FileIOUtil_CreateFile_Overwrite(strFileMCMove_glb); // Open a new MCInfo file; each run_it will have its own
