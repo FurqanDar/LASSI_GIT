@@ -228,14 +228,6 @@ void FileIOUtil_WriteHeader_ForMolClus(const char* strFileName)
     fclose(fp);
 }
 
-
-void FileIOUtil_WriteHeader_ForBinaryTraj(const char* strFileName)
-{
-    FILE* fp = fopen(strFileName, "ab");
-    fwrite(&tot_beads_glb, sizeof (size_t), 1 , fp);
-    fclose(fp);
-}
-
 /// FileIOUtil_WriteHeader_ForEnergy - write the header for the energy file.
 /// \param fileName
 void FileIOUtil_WriteHeader_ForEnergy(const char* fileName)
@@ -359,6 +351,7 @@ void FileIOUtil_Traj_Bin_AppendFrame_ToFile(const char* filename, const long nGe
     TrajUtil_SubselectDataFromBeadInfo(subBeadInfo, bead_info_glb);
 
     FILE* fp = fopen(filename, "ab");
+    fwrite(&tot_beads_glb, sizeof (size_t), 1, fp);
     fwrite(subBeadInfo[0], sizeof (int), nCrds * tot_beads_glb, fp);
     fclose(fp);
 
@@ -1010,11 +1003,10 @@ void FileIO_CreateRunningDataFiles(void)
                 {
                   sprintf(strFileTraj_glb, "%s_EQ_trj.lassi", strReportPrefix_glb);
                   FileIOUtil_CreateFile_Binary_Overwrite(strFileTraj_glb); // Opens a new binary file.
-                  FileIOUtil_WriteHeader_ForBinaryTraj(strFileTraj_glb);
                 }
             else
                 {
-                    sprintf(strFileTraj_glb, "%s_trj.lammpstrj",
+                    sprintf(strFileTraj_glb, "%s_EQ_trj.lammpstrj",
                             strReportPrefix_glb); // Naming convention for trajectory files.
                     FileIOUtil_CreateFile_Overwrite(
                         strFileTraj_glb); // This opens a new trajectory file; each run_it will have its own
@@ -1270,12 +1262,11 @@ void FileIOUtil_PreCycle_Init(const int run_it)
                     if (run_it == 0)
                         {
                             FileIOUtil_CreateFile_Binary_Overwrite(strFileTraj_glb); // Opens a new binary file.
-                            FileIOUtil_WriteHeader_ForBinaryTraj(strFileTraj_glb);
                         }
                 }
             else
                 {
-                    sprintf(strFileTraj_glb, "%s.lammpstrj", strReportPrefix_glb);
+                    sprintf(strFileTraj_glb, "%s_trj.lammpstrj", strReportPrefix_glb);
                 }
         }
 

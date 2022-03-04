@@ -145,7 +145,7 @@ void Memory_VerifyMalloc(void)
             printf("ldaTOTMOLCLUS_Arr_glb malloc failed\n");
             exit(1);
         }
-    if (naTOTTRAJ_Arr_glb == NULL && nTrajMode_glb != 0)
+    if ((naTOTTRAJ_Arr_glb == NULL) && (nTrajMode_glb == -1))
         {
             printf("naTOTTRAJ_Arr_glb malloc failed\n");
             exit(1);
