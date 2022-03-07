@@ -351,7 +351,10 @@ void FileIOUtil_Traj_Bin_AppendFrame_ToFile(const char* filename, const long nGe
     TrajUtil_SubselectDataFromBeadInfo(subBeadInfo, bead_info_glb);
 
     FILE* fp = fopen(filename, "ab");
-    fwrite(&tot_beads_glb, sizeof (size_t), 1, fp);
+
+    const int nBeads = (int) tot_beads_glb;
+
+    fwrite(&nBeads, sizeof (int), 1, fp);
     fwrite(subBeadInfo[0], sizeof (int), nCrds * tot_beads_glb, fp);
     fclose(fp);
 
