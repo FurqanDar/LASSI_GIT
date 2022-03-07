@@ -273,18 +273,18 @@ void FileIO_Trajectory_AppendFrame(const char* fileNameStr, const int run_it, co
 {
     if (nTrajMode_glb == 1)
         {
-          FileIOUtil_Traj_Bin_AppendFrame_ToFile(fileNameStr, 0);
+            FileIOUtil_Traj_Bin_AppendFrame_ToFile(fileNameStr, 0);
         }
     else
         {
-            if (run_it >= 0)
+            if (run_it == -1) // Thermalization cycle
                 {
-                    FileIOUtil_Traj_Txt_AppendFrame_ToFile(fileNameStr,
-                                                           nGen + nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb);
+                    FileIOUtil_Traj_Txt_AppendFrame_ToFile(fileNameStr, nGen);
                 }
             else
                 {
-                    FileIOUtil_Traj_Txt_AppendFrame_ToFile(fileNameStr, nGen);
+                    FileIOUtil_Traj_Txt_AppendFrame_ToFile(fileNameStr,
+                                                           nGen + nMCStepsForTherm_glb + run_it * nMCStepsPerCycle_glb);
                 }
         }
 }
@@ -1267,6 +1267,10 @@ void FileIOUtil_PreCycle_Init(const int run_it)
             else
                 {
                     sprintf(strFileTraj_glb, "%s_trj.lammpstrj", strReportPrefix_glb);
+                    if (run_it == 0)
+                    {
+                        FileIOUtil_CreateFile_Overwrite(strFileTraj_glb);
+                    }
                 }
         }
 
