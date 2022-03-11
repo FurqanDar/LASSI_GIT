@@ -88,6 +88,7 @@ size_t tot_chains_glb;
 size_t tot_chain_types_glb;
 lInt nAnnealing_Mode_glb, nTemp_inv_glb;
 lInt nInitialPotential_Mode_glb, RotBias_Mode_glb;
+char cKeepInitialPotentialON_glb;
 
 // system setup
 lInt naBoxSize_glb[POS_MAX];

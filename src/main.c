@@ -143,7 +143,10 @@ int main(int argc, char* argv[])
              * Post run-cycle specific cleanup.
              */
             nAnnealing_Mode_glb        = -1;
-            nInitialPotential_Mode_glb = -1;
+            nInitialPotential_Mode_glb = cKeepInitialPotentialON_glb ? nInitialPotential_Mode_glb : -1;
+
+
+
             FileIO_PostCycle_WriteSystemRestart(run_cycle);
             FileIO_PostCycle_WriteCycleAvgData(run_cycle);
 //            CopyData_All(run_cycle);

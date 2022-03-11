@@ -250,6 +250,11 @@ int Parse_Keyfile(char* filename)
                         {
                             sscanf(strLine, "%*s %f", &fSquish_Stiff_glb);
                         }
+                    else if (strcmp(strKeyword, "BIAS_KEEP_ON") == 0)
+                        {
+                            sscanf(strLine, "%*s %s", &cKeepInitialPotentialON_glb);
+                            cKeepInitialPotentialON_glb = cKeepInitialPotentialON_glb ? 1 : 0;
+                        }
                     else
                         {
                             fprintf(stderr, "ERROR: unable to parse line %d in %s.\n%s", nLine, filename, strLine);
