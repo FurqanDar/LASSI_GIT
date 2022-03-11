@@ -127,7 +127,7 @@ float fLinkerEqLen_glb;
 
 // MC setup
 float fKT_glb, fPreKT_glb, fCuTemp_glb, fRot_Bias_glb, fRotBias_glb, fDeltaTemp_glb, fMC_TempRate_glb, fSquishRad_glb,
-    fSquishRad_Sq_glb;
+    fSquishRad_Sq_glb, fSquish_Stiff_glb;
 float* faKT_Cycle_glb;
 lLong nMCStepsPerCycle_glb, nMCStepsForTherm_glb;
 float faMCFreq_glb[MAX_MV];

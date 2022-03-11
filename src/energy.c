@@ -73,7 +73,7 @@ float Energy_InitPotential(const int beadID)
                         totEn = (float) Dist_VecMagSq(posDiff);
                         if (totEn > fSquishRad_Sq_glb)
                             {
-                                totEn = fCuTemp_glb * totEn;
+                                totEn = fCuTemp_glb * totEn * f;
                             }
                         else
                             {

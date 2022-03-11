@@ -242,6 +242,14 @@ int Parse_Keyfile(char* filename)
                         {
                             sscanf(strLine, "%*s %ld", &nTrajMode_glb);
                         }
+                    else if (strcmp(strKeyword, "BIAS_INDENT_RADIUS") == 0)
+                        {
+                            sscanf(strLine, "%*s %f", &fSquishRad_glb);
+                        }
+                    else if (strcmp(strKeyword, "BIAS_INDENT_STIFF") == 0)
+                        {
+                            sscanf(strLine, "%*s %f", &fSquish_Stiff_glb);
+                        }
                     else
                         {
                             fprintf(stderr, "ERROR: unable to parse line %d in %s.\n%s", nLine, filename, strLine);

@@ -417,21 +417,6 @@ void Global_Array_Initialization_AtStart(void)
                 }
         }
 
-    const float VolumeConst = 4.f / 3.f * (float) M_PI;
-    const float IntendedDensity = 0.75f;
-    if (nInitialPotential_Mode_glb == 7)
-        {
-            fSquishRad_glb = cbrtf((float) (tot_beads_glb - 5000 * 4) / VolumeConst / IntendedDensity);
-        }
-    else if (nInitialPotential_Mode_glb == 8)
-        {
-            fSquishRad_glb = cbrtf((float) (5000 * (4 + 4 + 3)) / VolumeConst / IntendedDensity);
-        }
-    else
-        {
-            fSquishRad_glb = cbrtf((float) (tot_beads_glb) / VolumeConst / IntendedDensity);
-        }
-
     fSquishRad_Sq_glb               = fSquishRad_glb * fSquishRad_glb;
     ldLogOfSmallestPossibleProb_glb = logl((lLDub) 1. / (lLDub) RAND_MAX);
     nLimitedClusterSize_glb         = (int) tot_chains_glb / 2;
