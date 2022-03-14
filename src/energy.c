@@ -15,11 +15,17 @@ float Energy_InitPotential(const int beadID)
     switch (nInitialPotential_Mode_glb)
         {
             case 1:
+                /*
+                 * The potential has the form (r-r_{cen})^2
+                 */
                 totEn = (float) Dist_VecMagSq(posDiff);
                 totEn = fCuTemp_glb * totEn;
                 break;
 
             case 2:
+                /*
+                 * The potential has the form (r-r_{cen})^2 if the bead is outside the indent radius
+                 */
                 totEn = (float) Dist_VecMagSq(posDiff);
                 if (totEn > fSquishRad_Sq_glb)
                     {
@@ -378,7 +384,6 @@ float Energy_OfOvlp_wNeighList_ForChains(int const beadID, const int* neighList,
             tmpID   = neighList[i];
             resj    = bead_info_glb[tmpID][BEAD_TYPE];
             chain_j = bead_info_glb[tmpID][BEAD_CHAINID];
-            //            xDis    = Dist_BeadToBead(beadID, tmpID);
             if (chain_i == chain_j)
                 {
                     totEn += Energy_Iso_Ovlp(resi, resj, xDis) * 0.5f;
@@ -830,14 +835,14 @@ float Energy_Isotropic_For_Chain(const int beadID)
                                     if (bead_info_glb[secBi][BEAD_CHAINID] == bead_info_glb[beadID][BEAD_CHAINID])
                                         { // Intra-molecular
                                             totEn +=
-                                                Energy_Iso_Ovlp(resi, resj, xDis) / 2.; // / xDis / xDis / xDis /2.;
+                                                Energy_Iso_Ovlp(resi, resj, xDis) / 2.f;
 
-                                            totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.;
+                                            totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.f;
                                         }
                                     else
                                         { // Inter-molecular
                                             totEn += Energy_Iso_Ovlp(resi, resj,
-                                                                     xDis); // xDis / xDis / xDis;
+                                                                     xDis);
 
                                             totEn += Energy_Iso_Cont(resi, resj, xDis);
                                         }

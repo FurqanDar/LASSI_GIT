@@ -145,8 +145,6 @@ int main(int argc, char* argv[])
             nAnnealing_Mode_glb        = -1;
             nInitialPotential_Mode_glb = cKeepInitialPotentialON_glb ? nInitialPotential_Mode_glb : -1;
 
-
-
             FileIO_PostCycle_WriteSystemRestart(run_cycle);
             FileIO_PostCycle_WriteCycleAvgData(run_cycle);
             Reset_Global_Arrays();
