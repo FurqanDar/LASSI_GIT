@@ -15,8 +15,9 @@ float Energy_InitPotential(const int beadID)
     const float fDeltaTemp  = fCuTemp_glb - fKT_glb;
     const char cFlagCompute = fDeltaTemp > 0.005 ? 1 : 0;
 
-    if (cFlagCompute)
+    if (cFlagCompute && cKeepInitialPotentialON_glb)
         {
+
             switch (nInitialPotential_Mode_glb)
                 {
                     case 1:
@@ -25,51 +26,6 @@ float Energy_InitPotential(const int beadID)
                         break;
 
                     case 2:
-                        totEn = (float) Dist_VecMagSq(posDiff);
-                        if (totEn >= 250.f)
-                            {
-                                totEn = (fCuTemp_glb - fKT_glb) * (totEn);
-                            }
-                        else if (totEn <= 600.f)
-                            {
-                                totEn = fCuTemp_glb * ((float) tot_beads_glb + 1.f / (totEn + 0.02f));
-                            }
-                        else
-                            {
-                                totEn = 0.f;
-                            }
-                        break;
-
-                    case 3:
-                        totEn = (float) Dist_VecMagSq(posDiff);
-                        if (totEn >= 35 * 35)
-                            {
-                                totEn = (fCuTemp_glb) *totEn;
-                            }
-                        else
-                            {
-                                totEn = 0.f;
-                            }
-                        break;
-
-                    case 4:
-                        totEn = (float) Dist_VecMagSq(posDiff);
-                        if (totEn <= 100.)
-                            {
-                                totEn = fCuTemp_glb * (totEn + 0.2f);
-                            }
-                        else
-                            {
-                                totEn = 0.f;
-                            }
-                        break;
-
-                    case 5:
-                        totEn = (float) (posDiff[0] * posDiff[0]);
-                        totEn = fCuTemp_glb * totEn;
-                        break;
-
-                    case 6:
                         totEn = (float) Dist_VecMagSq(posDiff);
                         if (totEn > fSquishRad_Sq_glb)
                             {
@@ -81,82 +37,6 @@ float Energy_InitPotential(const int beadID)
                             }
                         break;
 
-                    case 7:
-                        totEn = (float) Dist_VecMagSq(posDiff);
-                        if (bead_info_glb[beadID][BEAD_TYPE] == 7) // Crowder
-                            {
-                                if (totEn < fSquishRad_Sq_glb)
-                                    {
-                                        totEn = fCuTemp_glb * sqrtf(totEn);
-                                    }
-                                else
-                                    {
-                                        totEn = 0.f;
-                                    }
-                            }
-                        else // Non-crowder
-                            {
-                                if (totEn > fSquishRad_Sq_glb)
-                                    {
-                                        totEn = fCuTemp_glb * sqrtf(totEn);
-                                    }
-                                else
-                                    {
-                                        totEn = 0.f;
-                                    }
-                            }
-                        break;
-
-                    case 8:
-                        totEn = (float) Dist_VecMagSq(posDiff);
-                        if (bead_info_glb[beadID][BEAD_TYPE] >= 5) // DNA & RNA & Crowder
-                            {
-                                if (totEn < fSquishRad_Sq_glb)
-                                    {
-                                        totEn = fCuTemp_glb * sqrtf(totEn);
-                                    }
-                                else
-                                    {
-                                        totEn = 0.f;
-                                    }
-                            }
-                        else // Non-crowder
-                            {
-                                if (totEn > fSquishRad_Sq_glb)
-                                    {
-                                        totEn = fCuTemp_glb * sqrtf(totEn);
-                                    }
-                                else
-                                    {
-                                        totEn = 0.f;
-                                    }
-                            }
-                        break;
-
-                    case 9:
-                        totEn = (float) (posDiff[2] * posDiff[2]);
-                        if (totEn > fSquishRad_Sq_glb / 2.f)
-                            {
-                                totEn = fCuTemp_glb * totEn;
-                            }
-                        else
-                            {
-                                totEn = 0.f;
-                            }
-                        break;
-
-                    case 10:
-                        totEn = (float) (posDiff[2] * posDiff[2]);
-                        if (totEn > fSquishRad_Sq_glb / 2.f)
-                            {
-                                totEn = fCuTemp_glb * totEn;
-                            }
-                        else
-                            {
-                                totEn = fCuTemp_glb * powf(totEn, 0.25f);
-                            }
-                        break;
-
                     default:
                         totEn = 0.f;
                         break;
@@ -164,9 +44,8 @@ float Energy_InitPotential(const int beadID)
         }
     else
         {
-            totEn = 0.f;
+            return 0.f;
         }
-
     return totEn;
 }
 
