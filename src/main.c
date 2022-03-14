@@ -149,12 +149,9 @@ int main(int argc, char* argv[])
 
             FileIO_PostCycle_WriteSystemRestart(run_cycle);
             FileIO_PostCycle_WriteCycleAvgData(run_cycle);
-//            CopyData_All(run_cycle);
             Reset_Global_Arrays();
         }
 
-    // Writing everything
-//    FileIO_Write_TotalSysProp_TotFromGLB(run_cycle);
 
     tEnd         = clock();
     elapsed_time = (double) (tEnd - tStart) / (double) CLOCKS_PER_SEC;

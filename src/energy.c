@@ -15,7 +15,7 @@ float Energy_InitPotential(const int beadID)
     const float fDeltaTemp  = fCuTemp_glb - fKT_glb;
     const char cFlagCompute = fDeltaTemp > 0.005 ? 1 : 0;
 
-    if (cFlagCompute && cKeepInitialPotentialON_glb)
+    if (cFlagCompute || cKeepInitialPotentialON_glb)
         {
 
             switch (nInitialPotential_Mode_glb)
@@ -669,7 +669,7 @@ float Energy_Isotropic(const int beadID)
     int secBi, resj; // Second bead index
     float xDis = 0.; // Distance between beads.
     int resi   = bead_info_glb[beadID][BEAD_TYPE];
-    totEn += nInitialPotential_Mode_glb == -1 ? 0. : Energy_InitPotential(beadID);
+    totEn += nInitialPotential_Mode_glb == -1 ? 0.f : Energy_InitPotential(beadID);
 
     if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
         nBeadTypeCanTInd_glb[resi] == 0)
@@ -693,13 +693,6 @@ float Energy_Isotropic(const int beadID)
                         {
                             r_disp[2] = z;
                             LatPos_add_wPBC(r_chck, r_pos_0, r_disp);
-                            //                for (j = 0; j < POS_MAX; j++){
-                            //                    r_chck[j] = r_pos_0[j] + r_disp[j];
-                            //                    r_chck[j] = r_chck[j] < 0 ? r_chck[j] +
-                            //                    naBoxSize_glb[j] : r_chck[j]; r_chck[j] =
-                            //                    r_chck[j] >= naBoxSize_glb[j] ? r_chck[j] -
-                            //                    naBoxSize_glb[j] : r_chck[j];
-                            //                }
                             secBi = naTotLattice_glb[Lat_Ind_FromVec(r_chck)];
                             if (secBi != -1 && secBi != beadID)
                                 {

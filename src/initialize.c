@@ -892,7 +892,6 @@ float Temperature_Function(const int mode, const long nGen)
             puts("Annealing Is Being Turned Off");
             puts("\n******************************\n\n");
             nAnnealing_Mode_glb        = -1;
-            nInitialPotential_Mode_glb = -1;
         }
     return end_val;
 }
