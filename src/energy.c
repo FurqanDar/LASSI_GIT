@@ -12,39 +12,28 @@ float Energy_InitPotential(const int beadID)
     const int tmpPos[POS_MAX]  = {bead_info_glb[beadID][0], bead_info_glb[beadID][1], bead_info_glb[beadID][2]};
     const int posDiff[POS_MAX] = {tmpPos[0] - centPos[0], tmpPos[1] - centPos[1], tmpPos[2] - centPos[2]};
 
-    const float fDeltaTemp  = fCuTemp_glb - fKT_glb;
-    const char cFlagCompute = fDeltaTemp > 0.005 ? 1 : 0;
-
-    if (cFlagCompute || cKeepInitialPotentialON_glb)
+    switch (nInitialPotential_Mode_glb)
         {
+            case 1:
+                totEn = (float) Dist_VecMagSq(posDiff);
+                totEn = fCuTemp_glb * totEn;
+                break;
 
-            switch (nInitialPotential_Mode_glb)
-                {
-                    case 1:
-                        totEn = (float) Dist_VecMagSq(posDiff);
-                        totEn = fCuTemp_glb * totEn;
-                        break;
-
-                    case 2:
-                        totEn = (float) Dist_VecMagSq(posDiff);
-                        if (totEn > fSquishRad_Sq_glb)
-                            {
-                                totEn = fCuTemp_glb * totEn * fSquish_Stiff_glb;
-                            }
-                        else
-                            {
-                                totEn = 0.f;
-                            }
-                        break;
-
-                    default:
+            case 2:
+                totEn = (float) Dist_VecMagSq(posDiff);
+                if (totEn > fSquishRad_Sq_glb)
+                    {
+                        totEn = fCuTemp_glb * totEn * fSquish_Stiff_glb;
+                    }
+                else
+                    {
                         totEn = 0.f;
-                        break;
-                }
-        }
-    else
-        {
-            return 0.f;
+                    }
+                break;
+
+            default:
+                totEn = 0.f;
+                break;
         }
     return totEn;
 }
