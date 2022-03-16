@@ -107,9 +107,21 @@ int main(int argc, char* argv[])
      * */
     FileIO_WriteRestart_ForThermalization();
 
-    printf("____________________________\n");
-    printf("System has been thermalized!\n");
-    printf("----------------------------\n\n");
+    puts("____________________________");
+    puts("System has been thermalized!");
+    puts("----------------------------\n");
+
+    if (nAnnealing_Mode_glb == -1)
+        {
+            if (nBiasPotentialCoupledToTemp_glb)
+                {
+                    puts("******************************");
+                    puts("Bias Is Being Turned Off");
+                    puts("******************************\n");
+                    nInitialPotential_Mode_glb = -1;
+                }
+        }
+
     /*
     The system has thermalized!
     */
@@ -143,7 +155,7 @@ int main(int argc, char* argv[])
              * Post run-cycle specific cleanup.
              */
             nAnnealing_Mode_glb        = -1;
-            nInitialPotential_Mode_glb = cKeepInitialPotentialON_glb ? nInitialPotential_Mode_glb : -1;
+            nInitialPotential_Mode_glb = nKeepInitialPotentialON_glb ? nInitialPotential_Mode_glb : -1;
 
             FileIO_PostCycle_WriteSystemRestart(run_cycle);
             FileIO_PostCycle_WriteCycleAvgData(run_cycle);

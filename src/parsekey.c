@@ -252,9 +252,12 @@ int Parse_Keyfile(char* filename)
                         }
                     else if (strcmp(strKeyword, "BIAS_KEEP_ON") == 0)
                         {
-                            sscanf(strLine, "%*s %s", &cKeepInitialPotentialON_glb);
-                            cKeepInitialPotentialON_glb = cKeepInitialPotentialON_glb ? 1 : 0;
+                            sscanf(strLine, "%*s %d", &nKeepInitialPotentialON_glb);
                         }
+                    else if (strcmp(strKeyword, "BIAS_COUPLED_TO_TEMP") == 0)
+                    {
+                        sscanf(strLine, "%*s %d", &nBiasPotentialCoupledToTemp_glb);
+                    }
                     else
                         {
                             fprintf(stderr, "ERROR: unable to parse line %d in %s.\n%s", nLine, filename, strLine);
@@ -264,6 +267,17 @@ int Parse_Keyfile(char* filename)
         }
 
     fclose(infile);
+
+    nKeepInitialPotentialON_glb     = nKeepInitialPotentialON_glb == 1 ? 1 : 0;
+    nBiasPotentialCoupledToTemp_glb = nBiasPotentialCoupledToTemp_glb == 1 ? 1 : 0;
+
+
+    if (nBiasPotentialCoupledToTemp_glb && nKeepInitialPotentialON_glb)
+    {
+        fprintf(stderr, "KeyFile error <%s>: Cannot have BIAS_COUPLED_TO_TEMP=1 and BIAS_KEEP_ON=1\n", filename);
+        exit(1);
+    }
+
 
     float freq_tot = 0.0f;
     for (i = MV_NULL + 1; i < MAX_MV; i++)

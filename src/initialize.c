@@ -800,53 +800,23 @@ void Calculate_Rot_Bias(const float CurrentTemp)
     fRot_Bias_glb = expf(-fRotBias_glb / CurrentTemp);
 }
 
-/// Temperature_Function - used to calculate what fCuTemp_glb should (current
-/// temperature) based on how long the run has been going. \param mode - which
+/// Temperature_Function - used to calculate what fCuTemp_glb should (current temperature) based on how long the
+/// run has been going.
+/// \param mode - which
 /// of the four functions to use. Note that the various modes are described
-/// below where $F(t)$ is the returned value, and t == nGen. If mode = 0:
-/// \f$F(t) = fKT_glb + \tanh(1.+ (nGen-nPre)/1250fPreKT\f$. A hyperbolic tangent to
-/// smoothly reduce temperature, after nPreSteps If mode = 1: \f$F(t) = fKT_glb +
-/// 5\exp(-(nGen-nPre)/4nPre)\abs(sin((nGen-nPre)/nPre))\f$. An exponentially
-/// decaying sinusoidal bouncing after nPreSteps If mode = 2: \f$F(t) = fKT_glb +
-/// 5\exp(-(nGen-10nPre)^2/10nPre^2)/fKT_glb\f$. Gaussian like decay after
-/// nPreSteps. If mode = 3: \f$F(t) = fKT_glb + \exp(-4nGen/nPre)/fKT_glb\f$.
-/// Exponential decay from the beginning. \param nGen - basically 'time' or how
-/// many MC Steps have been done. \return end_val - the current temperature.
+/// below where $F(t)$ is the returned value, and t == nGen.
+/// \param nGen - basically 'time' or how
+/// many MC Steps have been done.
+/// \return end_val - the current temperature.
 float Temperature_Function(const int mode, const long nGen)
 {
 
     float x_val;
-    float y_val;
     float end_val;
 
     switch (mode)
         {
-            case 0:
-                x_val   = (float) (nMCStepsForTherm_glb - nGen);
-                x_val   = x_val / 1250.f / fPreKT_glb;
-                x_val   = fPreKT_glb * (tanhf(x_val) + 1.f);
-                end_val = fKT_glb + x_val;
-
-                break;
-
             case 1:
-                x_val   = (float) (nGen - nMCStepsForTherm_glb) / (float) nMCStepsForTherm_glb;
-                y_val   = -x_val;
-                x_val   = fabsf(sinf(x_val));
-                y_val   = expf(y_val / 4.f);
-                end_val = fKT_glb + 5.f * fKT_glb * x_val * y_val;
-
-                break;
-
-            case 2:
-                x_val   = (float) (nGen - 10 * nMCStepsForTherm_glb);
-                x_val   = x_val * x_val;
-                y_val   = (float) (nMCStepsForTherm_glb * nMCStepsForTherm_glb) * 10.f;
-                end_val = fKT_glb + expf(-x_val / y_val) / fKT_glb / 10.f;
-
-                break;
-
-            case 3:
                 x_val   = -(float) (nGen);
                 x_val   = 4.f * x_val;
                 x_val   = x_val / (float) (nMCStepsForTherm_glb);
@@ -854,30 +824,11 @@ float Temperature_Function(const int mode, const long nGen)
 
                 break;
 
-            case 4:
+            case 2:
                 x_val   = -(float) (nGen);
                 x_val   = fMC_TempRate_glb * x_val;
                 x_val   = x_val / (float) (nMCStepsForTherm_glb);
                 end_val = fKT_glb + expf(x_val);
-
-                break;
-
-            case 5:
-                x_val = -(float) powf((float) nGen, 0.25f);
-                x_val *= 0.075f;
-                end_val = fKT_glb + fPreKT_glb * expf(x_val);
-
-                break;
-
-            case 6:
-                x_val   = powf((float) nGen, 0.5f);
-                end_val = fKT_glb + fPreKT_glb / (1.0f + x_val);
-
-                break;
-
-            case 7:
-                x_val   = (float) nGen * (0.00000002f);
-                end_val = fKT_glb + 2.f - x_val;
 
                 break;
 
@@ -886,13 +837,24 @@ float Temperature_Function(const int mode, const long nGen)
                 end_val = fKT_glb;
                 break;
         }
+
+
     if (end_val - fKT_glb < 0.005)
         {
             puts("\n\n******************************\n");
             puts("Annealing Is Being Turned Off");
             puts("\n******************************\n\n");
-            nAnnealing_Mode_glb        = -1;
+            nAnnealing_Mode_glb = -1;
+
+            if (nBiasPotentialCoupledToTemp_glb)
+                {
+                    puts("******************************");
+                    puts("Bias Is Being Turned Off");
+                    puts("******************************");
+                    nInitialPotential_Mode_glb = -1;
+                }
         }
+
     return end_val;
 }
 
