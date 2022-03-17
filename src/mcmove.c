@@ -322,7 +322,7 @@ int Move_Local(int beadID, float MyTemp)
 
     const int resi = bead_info_glb[beadID][BEAD_TYPE];
 
-    lLDub oldEn = nInitialPotential_Mode_glb == -1 ? 0. : Energy_InitPotential(beadID);
+    lLDub oldEn = nBiasPotential_Mode_glb == -1 ? 0. : Energy_BiasingPotential(beadID);
     lLDub newEn = 0.;
 
     Energy_Iso_ForLocal(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, naOldOvlpNeighs_glb,
@@ -338,7 +338,7 @@ int Move_Local(int beadID, float MyTemp)
 
     OP_System_MoveBeadTo(beadID, r_posNew);
 
-    newEn += nInitialPotential_Mode_glb == -1 ? 0.f : Energy_InitPotential(beadID);
+    newEn += nBiasPotential_Mode_glb == -1 ? 0.f : Energy_BiasingPotential(beadID);
 
     Energy_Iso_ForLocal(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, naNewOvlpNeighs_glb,
                         naNewContNeighs_glb);
@@ -467,11 +467,11 @@ int Move_Snake(int chainID, float MyTemp)
 
     lLDub newEn = 0.;
     lLDub oldEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
-                    oldEn += Energy_InitPotential(i);
+                    oldEn += Energy_BiasingPotential(i);
                 }
         }
 
@@ -509,11 +509,11 @@ int Move_Snake(int chainID, float MyTemp)
                 }
         }
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
-                    newEn += Energy_InitPotential(i);
+                    newEn += Energy_BiasingPotential(i);
                 }
         }
 
@@ -588,11 +588,11 @@ int Move_Trans(int chainID, float MyTemp)
 
     lLDub newEn = 0.;
     lLDub oldEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
-                    oldEn += Energy_InitPotential(i);
+                    oldEn += Energy_BiasingPotential(i);
                 }
         }
 
@@ -609,11 +609,11 @@ int Move_Trans(int chainID, float MyTemp)
 
     OP_System_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff.
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
-                    newEn += Energy_InitPotential(i);
+                    newEn += Energy_BiasingPotential(i);
                 }
         }
 
@@ -706,7 +706,7 @@ int Move_Clus_Network(float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -715,7 +715,7 @@ int Move_Clus_Network(float MyTemp)
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
                         {
-                            oldEn += Energy_InitPotential(i);
+                            oldEn += Energy_BiasingPotential(i);
                         }
                 }
         }
@@ -740,7 +740,7 @@ int Move_Clus_Network(float MyTemp)
             OP_System_DispChain(naClusList[j], r_Disp); // Moving the cluster properly
         }
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -749,7 +749,7 @@ int Move_Clus_Network(float MyTemp)
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
                         {
-                            newEn += Energy_InitPotential(i);
+                            newEn += Energy_BiasingPotential(i);
                         }
                 }
         }
@@ -853,7 +853,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -862,7 +862,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
                         {
-                            oldEn += Energy_InitPotential(i);
+                            oldEn += Energy_BiasingPotential(i);
                         }
                 }
         }
@@ -887,7 +887,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
             OP_System_DispChain(clusList[j], r_Disp); // Moving the cluster properly
         }
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -896,7 +896,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
                         {
-                            newEn += Energy_InitPotential(i);
+                            newEn += Energy_BiasingPotential(i);
                         }
                 }
         }
@@ -1143,10 +1143,10 @@ int Move_CoLocal(int thisBeadID, float MyTemp)
 
     lLDub newEn = 0.;
     lLDub oldEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
-            oldEn += Energy_InitPotential(thisBeadID);
-            oldEn += Energy_InitPotential(otherBeadID);
+            oldEn += Energy_BiasingPotential(thisBeadID);
+            oldEn += Energy_BiasingPotential(otherBeadID);
         }
 
     int ovlp_num, cont_num;
@@ -1179,10 +1179,10 @@ int Move_CoLocal(int thisBeadID, float MyTemp)
     OP_System_MoveBeadTo(thisBeadID, r_posNew1);
     OP_System_MoveBeadTo(otherBeadID, r_posNew2);
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
-            newEn += Energy_InitPotential(thisBeadID);
-            newEn += Energy_InitPotential(otherBeadID);
+            newEn += Energy_BiasingPotential(thisBeadID);
+            newEn += Energy_BiasingPotential(otherBeadID);
         }
 
     Energy_Iso_ForCoLocal(thisBeadID, otherBeadID, r_posNew1, &newEn, &oldEn, &ovlp_num, &cont_num, naOldOvlpNeighs_glb,
@@ -1280,12 +1280,12 @@ int Move_MultiLocal(int beadID, float MyTemp)
 
     lLDub oldEn = 0.;
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    oldEn += Energy_InitPotential(tmpBead);
+                    oldEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 
@@ -1325,12 +1325,12 @@ int Move_MultiLocal(int beadID, float MyTemp)
     OP_System_MoveBeadsInListToPos(beadNum, beadsList, beads_posNew);
     OP_Beads_BreakBondsInList(beadNum, beadsList);
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    newEn += Energy_InitPotential(tmpBead);
+                    newEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 
@@ -1485,12 +1485,12 @@ int Move_Pivot(int chainID, float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    oldEn += Energy_InitPotential(tmpBead);
+                    oldEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 
@@ -1519,12 +1519,12 @@ int Move_Pivot(int chainID, float MyTemp)
 
     OP_Beads_BreakBondsInList(beadNum, beadsList);
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    newEn += Energy_InitPotential(tmpBead);
+                    newEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 
@@ -1651,12 +1651,12 @@ int Move_BranchedRot(int chainID, float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    oldEn += Energy_InitPotential(tmpBead);
+                    oldEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 
@@ -1682,12 +1682,12 @@ int Move_BranchedRot(int chainID, float MyTemp)
 
     OP_Beads_BreakBondsInList(beadNum, beadsList);
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    newEn += Energy_InitPotential(tmpBead);
+                    newEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 
@@ -1781,7 +1781,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -1790,7 +1790,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
                         {
-                            oldEn += Energy_InitPotential(i);
+                            oldEn += Energy_BiasingPotential(i);
                         }
                 }
         }
@@ -1833,7 +1833,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
             return bAccept;
         }
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -1842,7 +1842,7 @@ int Move_SmallClus_Proximity(const int chainID, const float myTemp)
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
                         {
-                            newEn += Energy_InitPotential(i);
+                            newEn += Energy_BiasingPotential(i);
                         }
                 }
         }
@@ -1933,7 +1933,7 @@ int Move_Clus_Proximity(const float myTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -1942,7 +1942,7 @@ int Move_Clus_Proximity(const float myTemp)
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
                         {
-                            oldEn += Energy_InitPotential(i);
+                            oldEn += Energy_BiasingPotential(i);
                         }
                 }
         }
@@ -1984,7 +1984,7 @@ int Move_Clus_Proximity(const float myTemp)
             return bAccept;
         }
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (j = 0; j < ClusSize; j++)
                 {
@@ -1993,7 +1993,7 @@ int Move_Clus_Proximity(const float myTemp)
                     lastB     = firstB + chain_info_glb[thisChain][CHAIN_LENGTH];
                     for (i = firstB; i < lastB; i++)
                         {
-                            newEn += Energy_InitPotential(i);
+                            newEn += Energy_BiasingPotential(i);
                         }
                 }
         }
@@ -2078,7 +2078,7 @@ int Move_Local_Equil(int beadID, float MyTemp)
 
     const int resi = bead_info_glb[beadID][BEAD_TYPE];
 
-    oldEn = nInitialPotential_Mode_glb == -1 ? 0.f : Energy_InitPotential(beadID);
+    oldEn = nBiasPotential_Mode_glb == -1 ? 0.f : Energy_BiasingPotential(beadID);
     newEn = 0.;
 
     Energy_Iso_ForLocalEquil(beadID, resi, r_pos0, &oldEn, &newEn, &old_ovlp_num, &old_cont_num, naOldOvlpNeighs_glb,
@@ -2092,7 +2092,7 @@ int Move_Local_Equil(int beadID, float MyTemp)
 
     OP_System_MoveBeadTo(beadID, r_posNew);
 
-    newEn += nInitialPotential_Mode_glb == -1 ? 0.f : Energy_InitPotential(beadID);
+    newEn += nBiasPotential_Mode_glb == -1 ? 0.f : Energy_BiasingPotential(beadID);
 
     Energy_Iso_ForLocalEquil(beadID, resi, r_posNew, &newEn, &oldEn, &new_ovlp_num, &new_cont_num, naNewOvlpNeighs_glb,
                              naNewContNeighs_glb);
@@ -2182,11 +2182,11 @@ int Move_Snake_Equil(int chainID, float MyTemp)
 
     lLDub newEn = 0.;
     lLDub oldEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
-                    oldEn += Energy_InitPotential(i);
+                    oldEn += Energy_BiasingPotential(i);
                 }
         }
 
@@ -2209,11 +2209,11 @@ int Move_Snake_Equil(int chainID, float MyTemp)
             OP_System_Snake_SlitherBck(firstB, lastB, r_posNew);
         }
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
-                    newEn += Energy_InitPotential(i);
+                    newEn += Energy_BiasingPotential(i);
                 }
         }
 
@@ -2272,11 +2272,11 @@ int Move_Trans_Equil(int chainID, float MyTemp)
     int old_ovlp_num, old_cont_num, new_ovlp_num, new_cont_num;
 
     oldEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
-                    oldEn += Energy_InitPotential(i);
+                    oldEn += Energy_BiasingPotential(i);
                 }
         }
 
@@ -2289,11 +2289,11 @@ int Move_Trans_Equil(int chainID, float MyTemp)
     OP_System_DispChain_ForTrans(chainID, r_disp); // Moved the chain, broke bonds, and remembered stuff
 
     newEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = firstB; i < lastB; i++)
                 {
-                    newEn += Energy_InitPotential(i);
+                    newEn += Energy_BiasingPotential(i);
                 }
         }
 
@@ -2375,12 +2375,12 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp)
 
     lLDub oldEn = 0.;
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    oldEn += Energy_InitPotential(tmpBead);
+                    oldEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 
@@ -2417,12 +2417,12 @@ int Move_MultiLocal_Equil(int beadID, float MyTemp)
 
     OP_System_MoveBeadsInListToPos(beadNum, beadsList, beads_posNew);
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    newEn += Energy_InitPotential(tmpBead);
+                    newEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 
@@ -2545,12 +2545,12 @@ int Move_Pivot_Equil(int chainID, float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    oldEn += Energy_InitPotential(tmpBead);
+                    oldEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 
@@ -2574,12 +2574,12 @@ int Move_Pivot_Equil(int chainID, float MyTemp)
             OP_System_MoveBeadTo(tmpBead, naTempR_glb);
         }
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    newEn += Energy_InitPotential(tmpBead);
+                    newEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 
@@ -2687,12 +2687,12 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp)
 
     lLDub oldEn = 0.;
     lLDub newEn = 0.;
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    oldEn += Energy_InitPotential(tmpBead);
+                    oldEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 
@@ -2713,12 +2713,12 @@ int Move_BranchedRot_Equil(int chainID, float MyTemp)
             OP_System_MoveBeadTo(tmpBead, naTempR_glb);
         }
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < beadNum; i++)
                 {
                     tmpBead = beadsList[i];
-                    newEn += Energy_InitPotential(tmpBead);
+                    newEn += Energy_BiasingPotential(tmpBead);
                 }
         }
 

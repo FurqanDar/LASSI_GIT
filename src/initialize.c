@@ -404,11 +404,6 @@ void Global_Array_Initialization_AtStart(void)
             faKT_Cycle_glb[i] = fKT_glb + (float) i * fDeltaTemp_glb;
         }
 
-    if (RotBias_Mode_glb == 1)
-        {
-            fRot_Bias_glb = expf(-fRot_Bias_glb / faKT_Cycle_glb[0]);
-        }
-
     if (nTemp_inv_glb == 1)
         {
             for (i = 0; i < nTotCycleNum_glb; i++)
@@ -795,9 +790,6 @@ void Calculate_Rot_Bias(const float CurrentTemp)
                 }
             // printf("\n");
         }
-    // TODO: Make sure that fRot_Bias_glb can be used in the future to set a solvent
-    // 'anisotropy'
-    fRot_Bias_glb = expf(-fRotBias_glb / CurrentTemp);
 }
 
 /// Temperature_Function - used to calculate what fCuTemp_glb should (current temperature) based on how long the
@@ -845,12 +837,12 @@ float Temperature_Function(const int mode, const long nGen)
             puts("\n******************************\n\n");
             nAnnealing_Mode_glb = -1;
 
-            if (nBiasPotentialCoupledToTemp_glb)
+            if (nBiasPotential_CoupledToTemp_glb)
                 {
                     puts("******************************");
                     puts("Bias Is Being Turned Off");
                     puts("******************************");
-                    nInitialPotential_Mode_glb = -1;
+                    nBiasPotential_Mode_glb = -1;
                 }
         }
 

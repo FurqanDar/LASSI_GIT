@@ -35,7 +35,7 @@ int Parse_Keyfile(char* filename)
         {
             faMCFreq_glb[i] = 0.0f; // initialization; to be normalized
         }
-    nInitialPotential_Mode_glb = 0;
+    nBiasPotential_Mode_glb    = 0;
     nAnnealing_Mode_glb        = -1;
     while (fgets(strLine, sizeof(strLine), infile) != NULL)
         {
@@ -123,11 +123,7 @@ int Parse_Keyfile(char* filename)
                         }
                     else if (strcmp(strKeyword, "MC_INDENT_MODE") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &nInitialPotential_Mode_glb);
-                        }
-                    else if (strcmp(strKeyword, "ROT_ENERGY_BIAS") == 0)
-                        {
-                            sscanf(strLine, "%*s %f", &fRotBias_glb);
+                            sscanf(strLine, "%*s %d", &nBiasPotential_Mode_glb);
                         }
                     else if (strcmp(strKeyword, "MV_TRANS_FREQ") == 0)
                         {
@@ -252,11 +248,11 @@ int Parse_Keyfile(char* filename)
                         }
                     else if (strcmp(strKeyword, "BIAS_KEEP_ON") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &nKeepInitialPotentialON_glb);
+                            sscanf(strLine, "%*s %d", &nBiasPotential_KeepON_glb);
                         }
                     else if (strcmp(strKeyword, "BIAS_COUPLED_TO_TEMP") == 0)
                         {
-                            sscanf(strLine, "%*s %d", &nBiasPotentialCoupledToTemp_glb);
+                            sscanf(strLine, "%*s %d", &nBiasPotential_CoupledToTemp_glb);
                         }
                     else
                         {
@@ -268,10 +264,10 @@ int Parse_Keyfile(char* filename)
 
     fclose(infile);
 
-    nKeepInitialPotentialON_glb     = nKeepInitialPotentialON_glb == 1 ? 1 : 0;
-    nBiasPotentialCoupledToTemp_glb = nBiasPotentialCoupledToTemp_glb == 1 ? 1 : 0;
+    nBiasPotential_KeepON_glb       = nBiasPotential_KeepON_glb == 1 ? 1 : 0;
+    nBiasPotential_CoupledToTemp_glb = nBiasPotential_CoupledToTemp_glb == 1 ? 1 : 0;
 
-    if (nBiasPotentialCoupledToTemp_glb && nKeepInitialPotentialON_glb)
+    if (nBiasPotential_CoupledToTemp_glb && nBiasPotential_KeepON_glb)
         {
             fprintf(stderr, "KeyFile error <%s>: Cannot have BIAS_COUPLED_TO_TEMP=1 and BIAS_KEEP_ON=1\n", filename);
             exit(1);

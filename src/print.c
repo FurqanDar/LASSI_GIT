@@ -554,7 +554,7 @@ void ScreenIO_Print_KeyFile(void)
     printf("%s MC Setup %s\n", lBrace, rBrace);
     ScreenIOUtil_PrintTemperatures();
 
-    printf("Indent Mode                    = %d\n", nInitialPotential_Mode_glb);
+    printf("Indent Mode                    = %d\n", nBiasPotential_Mode_glb);
     //    printf("Rotational Bias Mode           = %d\n", RotBias_Mode_glb);
     printf("Number of MC Cycles            = %d\n", nTotCycleNum_glb);
     printf("Number of MC Steps/Cycle       = %e\n", (float) nMCStepsPerCycle_glb);

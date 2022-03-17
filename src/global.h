@@ -88,8 +88,8 @@ size_t tot_beads_glb;
 size_t tot_chains_glb;
 size_t tot_chain_types_glb;
 lInt nAnnealing_Mode_glb, nTemp_inv_glb;
-lInt nInitialPotential_Mode_glb, RotBias_Mode_glb;
-lInt nKeepInitialPotentialON_glb, nBiasPotentialCoupledToTemp_glb;
+lInt nBiasPotential_Mode_glb, RotBias_Mode_glb;
+lInt nBiasPotential_KeepON_glb, nBiasPotential_CoupledToTemp_glb;
 
 // system setup
 lInt naBoxSize_glb[POS_MAX];
@@ -128,7 +128,7 @@ float fLinkerSprCon_glb;
 float fLinkerEqLen_glb;
 
 // MC setup
-float fKT_glb, fPreKT_glb, fCuTemp_glb, fRot_Bias_glb, fRotBias_glb, fDeltaTemp_glb, fMC_TempRate_glb, fSquishRad_glb,
+float fKT_glb, fPreKT_glb, fCuTemp_glb, fDeltaTemp_glb, fMC_TempRate_glb, fSquishRad_glb,
     fSquishRad_Sq_glb, fSquish_Stiff_glb;
 float* faKT_Cycle_glb;
 lLong nMCStepsPerCycle_glb, nMCStepsForTherm_glb;

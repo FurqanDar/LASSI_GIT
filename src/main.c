@@ -113,12 +113,12 @@ int main(int argc, char* argv[])
 
     if (nAnnealing_Mode_glb == -1)
         {
-            if (nBiasPotentialCoupledToTemp_glb)
+            if (nBiasPotential_CoupledToTemp_glb)
                 {
                     puts("******************************");
                     puts("Bias Is Being Turned Off");
                     puts("******************************\n");
-                    nInitialPotential_Mode_glb = -1;
+                    nBiasPotential_Mode_glb = -1;
                 }
         }
 
@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
              * Post run-cycle specific cleanup.
              */
             nAnnealing_Mode_glb        = -1;
-            nInitialPotential_Mode_glb = nKeepInitialPotentialON_glb ? nInitialPotential_Mode_glb : -1;
+            nBiasPotential_Mode_glb    = nBiasPotential_KeepON_glb ? nBiasPotential_Mode_glb : -1;
 
             FileIO_PostCycle_WriteSystemRestart(run_cycle);
             FileIO_PostCycle_WriteCycleAvgData(run_cycle);

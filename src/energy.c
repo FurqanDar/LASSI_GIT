@@ -1,18 +1,18 @@
 #include "energy.h"
 #include "structure.h"
 
-/// Energy_InitPotential calculates the biasing potential used in the
+/// Energy_BiasingPotential calculates the biasing potential used in the
 /// thermalization/equilibration The function calculates (T_current - T_final)
-/// and if < 0.001, sets nInitialPotential_Mode_glb = 0. \param beadID \return The
-/// energy, given the nInitialPotential_Mode_glb
-float Energy_InitPotential(const int beadID)
+/// and if < 0.001, sets nBiasPotential_Mode_glb = 0. \param beadID \return The
+/// energy, given the nBiasPotential_Mode_glb
+float Energy_BiasingPotential(const int beadID)
 {
     float totEn                = 0.f;
     const int centPos[POS_MAX] = {naBoxSize_glb[0] / 2, naBoxSize_glb[1] / 2, naBoxSize_glb[2] / 2};
     const int tmpPos[POS_MAX]  = {bead_info_glb[beadID][0], bead_info_glb[beadID][1], bead_info_glb[beadID][2]};
     const int posDiff[POS_MAX] = {tmpPos[0] - centPos[0], tmpPos[1] - centPos[1], tmpPos[2] - centPos[2]};
 
-    switch (nInitialPotential_Mode_glb)
+    switch (nBiasPotential_Mode_glb)
         {
             case 1:
                 /*
@@ -578,7 +578,7 @@ float Energy_Isotropic_Old(const int beadID)
     int secBi, resj;  // Second bead index
     float xDis = 0.f; // Distance between beads.
     int resi   = bead_info_glb[beadID][BEAD_TYPE];
-    totEn += nInitialPotential_Mode_glb == -1 ? 0.f : Energy_InitPotential(beadID);
+    totEn += nBiasPotential_Mode_glb == -1 ? 0.f : Energy_BiasingPotential(beadID);
 
     if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
         nBeadTypeCanTInd_glb[resi] == 0)
@@ -663,7 +663,7 @@ float Energy_Isotropic(const int beadID)
     int secBi, resj; // Second bead index
     float xDis = 0.; // Distance between beads.
     int resi   = bead_info_glb[beadID][BEAD_TYPE];
-    totEn += nInitialPotential_Mode_glb == -1 ? 0.f : Energy_InitPotential(beadID);
+    totEn += nBiasPotential_Mode_glb == -1 ? 0.f : Energy_BiasingPotential(beadID);
 
     if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
         nBeadTypeCanTInd_glb[resi] == 0)
@@ -725,7 +725,7 @@ float Energy_Isotropic_Self(const int beadID)
     int secBi, resj; // Second bead index
     float xDis = 0.; // Distance between beads.
     int resi   = bead_info_glb[beadID][BEAD_TYPE];
-    // totEn += nInitialPotential_Mode_glb == -1 ? 0. : Energy_InitPotential(beadID);
+    // totEn += nBiasPotential_Mode_glb == -1 ? 0. : Energy_BiasingPotential(beadID);
 
     if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
         nBeadTypeCanTInd_glb[resi] == 0)
@@ -797,7 +797,7 @@ float Energy_Isotropic_For_Chain(const int beadID)
     int secBi, resj; // Second bead index
     float xDis = 0.; // Distance between beads.
     int resi   = bead_info_glb[beadID][BEAD_TYPE];
-    totEn += nInitialPotential_Mode_glb == -1 ? 0. : Energy_InitPotential(beadID);
+    totEn += nBiasPotential_Mode_glb == -1 ? 0. : Energy_BiasingPotential(beadID);
 
     if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
         nBeadTypeCanTInd_glb[resi] == 0)
@@ -877,7 +877,7 @@ float Energy_Isotropic_Contiguous_Range(const int beadID, const int smallest_bea
     int secBi, resj; // Second bead index
     float xDis = 0.; // Distance between beads.
     int resi   = bead_info_glb[beadID][BEAD_TYPE];
-    totEn += nInitialPotential_Mode_glb == -1 ? 0. : Energy_InitPotential(beadID);
+    totEn += nBiasPotential_Mode_glb == -1 ? 0. : Energy_BiasingPotential(beadID);
 
     if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
         nBeadTypeCanTInd_glb[resi] == 0)
@@ -965,7 +965,7 @@ float Energy_Isotropic_With_List(const int beadID, const int* bead_list, const i
     int secBi, resj; // Second bead index
     float xDis = 0.; // Distance between beads.
     int resi   = bead_info_glb[beadID][BEAD_TYPE];
-    totEn += nInitialPotential_Mode_glb == -1 ? 0.f : Energy_InitPotential(beadID);
+    totEn += nBiasPotential_Mode_glb == -1 ? 0.f : Energy_BiasingPotential(beadID);
 
     if (nBeadTypeCanOvlp_glb[resi] == 0 && nBeadTypeCanCont_glb[resi] == 0 && nBeadTypeCanFSol_glb[resi] == 0 &&
         nBeadTypeCanTInd_glb[resi] == 0)
@@ -1082,11 +1082,11 @@ void Energy_Total_System(void)
                 }
         }
 
-    if (nInitialPotential_Mode_glb != -1)
+    if (nBiasPotential_Mode_glb != -1)
         {
             for (i = 0; i < tot_beads_glb; i++)
                 {
-                    faCurrEn_glb[E_BIAS] += Energy_InitPotential(i);
+                    faCurrEn_glb[E_BIAS] += Energy_BiasingPotential(i);
                 }
         }
 
