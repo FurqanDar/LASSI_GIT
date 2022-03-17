@@ -242,6 +242,7 @@ void FileIOUtil_WriteHeader_ForEnergy(const char* fileName)
                 "FSOL        "
                 "T_IND       "
                 "STIFF       "
+                "BIAS        "
                 "\n");
     fclose(fp);
 }
@@ -583,6 +584,7 @@ void ScreenIO_Print_SystemEnergy(void)
     printf("Aniso: %-10.2e |\n", faCurrEn_glb[E_SC_SC]);
     printf("FSol : %-10.2e |\n", faCurrEn_glb[E_F_SOL]);
     printf("Stiff: %-10.2e |\n", faCurrEn_glb[E_STIFF]);
+    printf("Bias : %-10.2e |\n", faCurrEn_glb[E_BIAS]);
     printf("%s\n", sSectionHead);
 }
 
@@ -634,6 +636,7 @@ void ScreenIO_Print_AcceptanceRatios(void)
 /// ScreenIO_Print_Log_Thermalization - print the log to the screen.
 void ScreenIO_Print_Log_Thermalization(const long nGen)
 {
+    puts("****************************************");
     printf("Run Cycle: Thermalization\n");
     printf("Step     : %8.3e\n", (float) nGen);
     printf("MC Temp  : %8.3e\n", fCuTemp_glb);
@@ -646,11 +649,13 @@ void ScreenIO_Print_Log_Thermalization(const long nGen)
 
     ScreenIO_Print_SystemEnergy();
     ScreenIO_Print_AcceptanceRatios();
+    puts("****************************************");
 }
 
 /// ScreenIO_Print_Log_FullRun - print the log to the screen.
 void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle)
 {
+    puts("****************************************");
     printf("Run Cycle: %d\n", run_cycle);
     printf("Step     : %8.3e\n", (float) nGen);
     printf("MC Temp  : %8.3e\n", fCuTemp_glb);
@@ -663,6 +668,7 @@ void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle)
 
     ScreenIO_Print_SystemEnergy();
     ScreenIO_Print_AcceptanceRatios();
+    puts("****************************************");
 }
 
 /// Write_RDF_ComponentWise - old implementation of printing the RDF, component

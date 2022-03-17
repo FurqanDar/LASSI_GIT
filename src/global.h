@@ -21,7 +21,8 @@
 #define E_F_SOL 4
 #define E_T_IND 5
 #define E_STIFF 6
-#define MAX_E   7 // just for counting; must be the last number of this list
+#define E_BIAS  7
+#define MAX_E   8 // just for counting; must be the last number of this list
 
 // MC move parameters
 #define MV_NULL       0 // index zero indicates null move

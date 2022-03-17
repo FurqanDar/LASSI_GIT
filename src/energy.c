@@ -1084,6 +1084,14 @@ void Energy_Total_System(void)
                 }
         }
 
+    if (nInitialPotential_Mode_glb != -1)
+    {
+        for (i = 0; i < tot_beads_glb; i++)
+        {
+            faCurrEn_glb[E_BIAS] += Energy_InitPotential(i);
+        }
+    }
+
     // Taking care of double-counting energies.
     faCurrEn_glb[E_SC_SC] *= 0.5f;
     faCurrEn_glb[E_OVLP] *= 0.5f;
