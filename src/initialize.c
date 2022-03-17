@@ -838,7 +838,6 @@ float Temperature_Function(const int mode, const long nGen)
                 break;
         }
 
-
     if (end_val - fKT_glb < 0.005)
         {
             puts("\n\n******************************\n");
@@ -1027,5 +1026,3 @@ long double** Create2DLongdouble(const size_t xDim, const size_t yDim, const cha
 #endif
     return dumPtr;
 }
-
-

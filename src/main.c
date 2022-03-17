@@ -162,7 +162,6 @@ int main(int argc, char* argv[])
             Reset_Global_Arrays();
         }
 
-
     tEnd         = clock();
     elapsed_time = (double) (tEnd - tStart) / (double) CLOCKS_PER_SEC;
 

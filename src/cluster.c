@@ -2352,7 +2352,6 @@ int ClusUtil_AnisoCluster_OfSystem_SecondLargest(int* naOutClusList)
     return thisSize;
 }
 
-
 ///
 /// \param naOutClusList
 /// \return Size of the cluster. If there is only 1 cluster, return -1 so the move fails.
@@ -2368,16 +2367,16 @@ int ClusUtil_AnisoCluster_OfSystem_SecondLargest_ForMCMove(int* naOutClusList)
     int* naClusSizes = (int*) calloc((nClusNum + 1), sizeof(int));
 
     if (nClusNum == 1)
-    {
-        thisSize = -1;
-    }
+        {
+            thisSize = -1;
+        }
     else
-    {
-        ClusUtil_GenClusSizesFromCumulativeSizes(naClusSizes, naCumClusSizes, nClusNum);
+        {
+            ClusUtil_GenClusSizesFromCumulativeSizes(naClusSizes, naCumClusSizes, nClusNum);
 
-        thisSize = ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(naOutClusList, naFullClusList,
-                                                                            naCumClusSizes, naClusSizes, nClusNum);
-    }
+            thisSize = ClusUtil_GetSecondLargestCluster_FromFullClusAndCumSizes(naOutClusList, naFullClusList,
+                                                                                naCumClusSizes, naClusSizes, nClusNum);
+        }
 
     free(naFullClusList);
     free(naCumClusSizes);
@@ -2385,7 +2384,6 @@ int ClusUtil_AnisoCluster_OfSystem_SecondLargest_ForMCMove(int* naOutClusList)
 
     return thisSize;
 }
-
 
 ///
 /// \param naClusIDsList_out

@@ -178,9 +178,9 @@ int Parse_Keyfile(char* filename)
                             sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_PR_SMCLSTR]);
                         }
                     else if (strcmp(strKeyword, "MV_PR_CLSTR") == 0)
-                    {
-                        sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_PR_CLSTR]);
-                    }
+                        {
+                            sscanf(strLine, "%*s %f", &faMCFreq_glb[MV_PR_CLSTR]);
+                        }
                     else if (strcmp(strKeyword, "RESTART_FILE") == 0)
                         {
                             sscanf(strLine, "%*s %s", strRestartFile_glb);
@@ -255,9 +255,9 @@ int Parse_Keyfile(char* filename)
                             sscanf(strLine, "%*s %d", &nKeepInitialPotentialON_glb);
                         }
                     else if (strcmp(strKeyword, "BIAS_COUPLED_TO_TEMP") == 0)
-                    {
-                        sscanf(strLine, "%*s %d", &nBiasPotentialCoupledToTemp_glb);
-                    }
+                        {
+                            sscanf(strLine, "%*s %d", &nBiasPotentialCoupledToTemp_glb);
+                        }
                     else
                         {
                             fprintf(stderr, "ERROR: unable to parse line %d in %s.\n%s", nLine, filename, strLine);
@@ -271,13 +271,11 @@ int Parse_Keyfile(char* filename)
     nKeepInitialPotentialON_glb     = nKeepInitialPotentialON_glb == 1 ? 1 : 0;
     nBiasPotentialCoupledToTemp_glb = nBiasPotentialCoupledToTemp_glb == 1 ? 1 : 0;
 
-
     if (nBiasPotentialCoupledToTemp_glb && nKeepInitialPotentialON_glb)
-    {
-        fprintf(stderr, "KeyFile error <%s>: Cannot have BIAS_COUPLED_TO_TEMP=1 and BIAS_KEEP_ON=1\n", filename);
-        exit(1);
-    }
-
+        {
+            fprintf(stderr, "KeyFile error <%s>: Cannot have BIAS_COUPLED_TO_TEMP=1 and BIAS_KEEP_ON=1\n", filename);
+            exit(1);
+        }
 
     float freq_tot = 0.0f;
     for (i = MV_NULL + 1; i < MAX_MV; i++)
@@ -350,7 +348,6 @@ int Parse_Keyfile(char* filename)
 
     return nErr;
 }
-
 
 void ForEnergyMatrix_FillWithZeros()
 {

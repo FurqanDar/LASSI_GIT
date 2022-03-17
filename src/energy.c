@@ -834,15 +834,13 @@ float Energy_Isotropic_For_Chain(const int beadID)
                                     xDis = sqrtf((float) (x * x + y * y + z * z));
                                     if (bead_info_glb[secBi][BEAD_CHAINID] == bead_info_glb[beadID][BEAD_CHAINID])
                                         { // Intra-molecular
-                                            totEn +=
-                                                Energy_Iso_Ovlp(resi, resj, xDis) / 2.f;
+                                            totEn += Energy_Iso_Ovlp(resi, resj, xDis) / 2.f;
 
                                             totEn += Energy_Iso_Cont(resi, resj, xDis) / 2.f;
                                         }
                                     else
                                         { // Inter-molecular
-                                            totEn += Energy_Iso_Ovlp(resi, resj,
-                                                                     xDis);
+                                            totEn += Energy_Iso_Ovlp(resi, resj, xDis);
 
                                             totEn += Energy_Iso_Cont(resi, resj, xDis);
                                         }
@@ -1085,12 +1083,12 @@ void Energy_Total_System(void)
         }
 
     if (nInitialPotential_Mode_glb != -1)
-    {
-        for (i = 0; i < tot_beads_glb; i++)
         {
-            faCurrEn_glb[E_BIAS] += Energy_InitPotential(i);
+            for (i = 0; i < tot_beads_glb; i++)
+                {
+                    faCurrEn_glb[E_BIAS] += Energy_InitPotential(i);
+                }
         }
-    }
 
     // Taking care of double-counting energies.
     faCurrEn_glb[E_SC_SC] *= 0.5f;

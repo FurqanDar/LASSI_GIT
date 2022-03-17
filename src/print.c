@@ -355,8 +355,8 @@ void FileIOUtil_Traj_Bin_AppendFrame_ToFile(const char* filename, const long nGe
 
     const int nBeads = (int) tot_beads_glb;
 
-    fwrite(&nBeads, sizeof (int), 1, fp);
-    fwrite(subBeadInfo[0], sizeof (int), nCrds * tot_beads_glb, fp);
+    fwrite(&nBeads, sizeof(int), 1, fp);
+    fwrite(subBeadInfo[0], sizeof(int), nCrds * tot_beads_glb, fp);
     fclose(fp);
 
     free(subBeadInfo[0]);
@@ -994,8 +994,8 @@ void FileIOUtil_CreateFile_Overwrite(const char* fileName)
 /// \param fileName
 void FileIOUtil_CreateFile_Binary_Overwrite(const char* fileName)
 {
-  FILE* fp = fopen(fileName, "wb");
-  fclose(fp);
+    FILE* fp = fopen(fileName, "wb");
+    fclose(fp);
 }
 
 /// FileIO_CreateRunningDataFiles - Creates the necessary files that are continuously written to over the course
@@ -1010,8 +1010,8 @@ void FileIO_CreateRunningDataFiles(void)
 
             if (nTrajMode_glb == 1)
                 {
-                  sprintf(strFileTraj_glb, "%s_EQ_trj.lassi", strReportPrefix_glb);
-                  FileIOUtil_CreateFile_Binary_Overwrite(strFileTraj_glb); // Opens a new binary file.
+                    sprintf(strFileTraj_glb, "%s_EQ_trj.lassi", strReportPrefix_glb);
+                    FileIOUtil_CreateFile_Binary_Overwrite(strFileTraj_glb); // Opens a new binary file.
                 }
             else
                 {
@@ -1277,9 +1277,9 @@ void FileIOUtil_PreCycle_Init(const int run_it)
                 {
                     sprintf(strFileTraj_glb, "%s_trj.lammpstrj", strReportPrefix_glb);
                     if (run_it == 0)
-                    {
-                        FileIOUtil_CreateFile_Overwrite(strFileTraj_glb);
-                    }
+                        {
+                            FileIOUtil_CreateFile_Overwrite(strFileTraj_glb);
+                        }
                 }
         }
 
@@ -1422,7 +1422,7 @@ void FileIOUtil_AppendTo_ClusFile_ForRun(const int run_it)
     fprintf(fp, "#Run_Cycle = %d; Avg Over %d Samples\n", run_it, nTotClusCounter_glb);
     const double normFactor = 1.0 / (double) nTotClusCounter_glb;
 
-    laClusHistList_glb[0] = nLargestClusterRightNow_glb ;
+    laClusHistList_glb[0] = nLargestClusterRightNow_glb;
 
     for (i = 0; i <= tot_chains_glb; i++)
         {
