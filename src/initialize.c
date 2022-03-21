@@ -839,15 +839,21 @@ float Temperature_Function(const int mode, const long nGen)
 
             if (nBiasPotential_CoupledToTemp_glb)
                 {
-                    puts("******************************");
-                    puts("Bias Is Being Turned Off");
-                    puts("******************************");
-                    nBiasPotential_Mode_glb = -1;
+                    BiasPotential_TurnOFF();
                 }
         }
 
     return end_val;
 }
+
+void BiasPotential_TurnOFF(void)
+{
+    puts("******************************");
+    puts("Bias Is Being Turned Off");
+    puts("******************************");
+    nBiasPotential_Mode_glb = -1;
+}
+
 
 /// Create1DInt create an array of ints of size of xDim.
 /// \param xDim Length of array.

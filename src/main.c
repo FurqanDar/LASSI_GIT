@@ -111,15 +111,9 @@ int main(int argc, char* argv[])
     puts("System has been thermalized!");
     puts("----------------------------\n");
 
-    if (nAnnealing_Mode_glb == -1)
+    if ((nAnnealing_Mode_glb == -1) && (nBiasPotential_CoupledToTemp_glb))
         {
-            if (nBiasPotential_CoupledToTemp_glb)
-                {
-                    puts("******************************");
-                    puts("Bias Is Being Turned Off");
-                    puts("******************************\n");
-                    nBiasPotential_Mode_glb = -1;
-                }
+            BiasPotential_TurnOFF();
         }
 
     /*
@@ -155,7 +149,10 @@ int main(int argc, char* argv[])
              * Post run-cycle specific cleanup.
              */
             nAnnealing_Mode_glb        = -1;
-            nBiasPotential_Mode_glb    = nBiasPotential_KeepON_glb ? nBiasPotential_Mode_glb : -1;
+            if ((!nBiasPotential_KeepON_glb) && (nBiasPotential_Mode_glb != -1))
+            {
+                BiasPotential_TurnOFF();
+            }
 
             FileIO_PostCycle_WriteSystemRestart(run_cycle);
             FileIO_PostCycle_WriteCycleAvgData(run_cycle);

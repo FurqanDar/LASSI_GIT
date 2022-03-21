@@ -21,6 +21,8 @@ void Initial_Conditions_FromFile(void);
 
 void Initial_Conditions_BreakBonds(void);
 
+void BiasPotential_TurnOFF(void);
+
 float Temperature_Function(const int mode, const long nGen);
 
 void Calculate_Rot_Bias(const float CurrentTemp);
