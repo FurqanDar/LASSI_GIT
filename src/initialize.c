@@ -854,7 +854,6 @@ void BiasPotential_TurnOFF(void)
     nBiasPotential_Mode_glb = -1;
 }
 
-
 /// Create1DInt create an array of ints of size of xDim.
 /// \param xDim Length of array.
 /// \param ArrName Dummy name of the array for debugging.

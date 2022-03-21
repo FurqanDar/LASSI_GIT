@@ -149,10 +149,10 @@ int main(int argc, char* argv[])
              * Post run-cycle specific cleanup.
              */
             nAnnealing_Mode_glb        = -1;
-            if ((!nBiasPotential_KeepON_glb) && (nBiasPotential_Mode_glb != -1))
-            {
-                BiasPotential_TurnOFF();
-            }
+            if ((! nBiasPotential_KeepON_glb) && (nBiasPotential_Mode_glb != -1))
+                {
+                    BiasPotential_TurnOFF();
+                }
 
             FileIO_PostCycle_WriteSystemRestart(run_cycle);
             FileIO_PostCycle_WriteCycleAvgData(run_cycle);
