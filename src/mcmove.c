@@ -1344,11 +1344,13 @@ int Move_MultiLocal(int beadID, float MyTemp)
                 { // An appropriate partner has been selected. Form
                   // the bonds and add the energy
                     tmpBead = beadsList[i];
+#if DEBUG_BUILD
                     if (bead_info_glb[tmpBead][BEAD_FACE] != -1)
                         {
                             printf("HOW?!\n");
                             exit(1);
                         }
+#endif
                     bead_info_glb[tmpBead][BEAD_FACE] = yTemp;
                     bead_info_glb[yTemp][BEAD_FACE]   = tmpBead;
                     newEn += Energy_Anisotropic_For_List(tmpBead, beadNum, beadsList);

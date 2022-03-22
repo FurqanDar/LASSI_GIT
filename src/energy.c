@@ -3,8 +3,9 @@
 
 /// Energy_BiasingPotential calculates the biasing potential used in the
 /// thermalization/equilibration The function calculates (T_current - T_final)
-/// and if < 0.001, sets nBiasPotential_Mode_glb = 0. \param beadID \return The
-/// energy, given the nBiasPotential_Mode_glb
+/// and if < 0.001, sets nBiasPotential_Mode_glb = 0.
+/// \param beadID
+/// \return The energy, given the nBiasPotential_Mode_glb
 float Energy_BiasingPotential(const int beadID)
 {
     float totEn                = 0.f;
@@ -12,6 +13,7 @@ float Energy_BiasingPotential(const int beadID)
     const int tmpPos[POS_MAX]  = {bead_info_glb[beadID][0], bead_info_glb[beadID][1], bead_info_glb[beadID][2]};
     const int posDiff[POS_MAX] = {tmpPos[0] - centPos[0], tmpPos[1] - centPos[1], tmpPos[2] - centPos[2]};
 
+    const int thisType         = bead_info_glb[beadID][BEAD_TYPE];
     switch (nBiasPotential_Mode_glb)
         {
             case 1:
@@ -34,6 +36,36 @@ float Energy_BiasingPotential(const int beadID)
                 else
                     {
                         totEn = 0.f;
+                    }
+                break;
+
+            case 3:
+                /*
+                 * Same as case 2, BUT, ignores the last sticker-type. We can think of the last sticker-type
+                 * as a crowder.
+                 */
+                totEn = (float) Dist_VecMagSq(posDiff);
+                if (thisType == ((int) nBeadTypes_glb - 1))
+                    {
+                        if (totEn < fSquishRad_Sq_glb)
+                            {
+                                totEn = fCuTemp_glb * fSquish_Stiff_glb;
+                            }
+                        else
+                            {
+                                totEn = 0.f;
+                            }
+                    }
+                else
+                    {
+                        if (totEn > fSquishRad_Sq_glb)
+                            {
+                                totEn = fCuTemp_glb * totEn * fSquish_Stiff_glb;
+                            }
+                        else
+                            {
+                                totEn = 0.f;
+                            }
                     }
                 break;
 
