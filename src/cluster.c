@@ -2066,13 +2066,23 @@ int ClusUtil_GetCluster_FromFullClusAndCumSizes(const int nClusID, int* const na
 void ClusHistUtil_AddToHist_MolTypeWiseDecomp_FromCluster(lLDub* const restrict ldaMolWiseHist,
                                                           const int* const restrict naClusList, const int nClusSize)
 {
+#ifdef DEBUG_BUILD
+    if (nClusSize < 1)
+        {
+            fprintf(stderr, "Cluster size is %d\n", nClusSize);
+            fputs("Cluster sizes have to be positive integers\n", stderr);
+            fputs("Crashing!\n", stderr);
+            exit(1);
+        }
+#endif
     int i;
+    const int clusSizeBin = nClusSize - 1;
     int chainID, chainType, histBin;
     for (i = 0; i < nClusSize; i++)
         {
             chainID   = naClusList[i];
             chainType = chain_info_glb[chainID][CHAIN_TYPE];
-            histBin   = MolClusArr_Index(0, chainType, nClusSize - 1);
+            histBin   = MolClusArr_Index(0, chainType, clusSizeBin);
             ldaMolWiseHist[histBin]++;
         }
 }
@@ -2267,7 +2277,7 @@ int ClusUtil_OfSystem_SecondLargest(int* const naOutClusList, const int nMode)
     return clusterSize;
 }
 
-///
+/// ClusUtil_OvlpCluster_OfSystem_SecondLargest
 /// \param naOutClusList
 /// \return Size of the cluster
 int ClusUtil_OvlpCluster_OfSystem_SecondLargest(int* naOutClusList)
