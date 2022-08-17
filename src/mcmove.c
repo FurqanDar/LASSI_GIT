@@ -1741,7 +1741,6 @@ int Move_BranchedRot(int chainID, float MyTemp)
 int Move_SmallClus_Proximity(const int chainID, const float myTemp)
 {
     // Performs a cluster move where a given chain and it's cluster are moved.
-    // No new 'bonds' are made so the move is reversible....
 
     int bAccept = 0; // Used in MC steps, assume that move fails initially.
 

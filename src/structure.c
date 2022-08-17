@@ -1093,7 +1093,7 @@ void RadDenHistUtil_ForSystem_FromLargestClusterOfMolTypes(void)
     int* const naFullClusCumSizes = calloc((tot_chains_glb + 1), sizeof(int));
 
     const int nMolWiseClusNum = ClusUtil_OfSystem_MolWise_GetLargestClusters(naMolWiseClusIDs, naFullClusList,
-                                                                             naFullClusCumSizes, naFullClusSizes);
+                                                                             naFullClusSizes, naFullClusCumSizes);
 
     for (nCurrentType = 0; nCurrentType < tot_chain_types_glb + 1; nCurrentType++)
         {

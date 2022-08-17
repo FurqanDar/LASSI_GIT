@@ -2397,8 +2397,10 @@ int ClusUtil_AnisoCluster_OfSystem_SecondLargest_ForMCMove(int* naOutClusList)
 
 ///
 /// \param naClusIDsList_out
+/// \param naFullClusList_out
 /// \param naClusSizes_out
-/// \param naCumSizes_out
+/// \param naCumClusSizes_out
+/// \return
 int ClusUtil_OfSystem_MolWise_GetLargestClusters(int* const restrict naClusIDsList_out,
                                                  int* const restrict naFullClusList_out,
                                                  int* const restrict naClusSizes_out,
