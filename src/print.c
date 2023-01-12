@@ -1108,8 +1108,13 @@ void DataPrinting_Thermalization(const long nGen)
                     // TODO: I think this whole business can be abstracted away as well.
                     if (Check_System_Structure())
                         {
-                            fprintf(stderr, "Molecular structure is inconsistent with initial "
-                                            "structure.\nCRASHING\n\n");
+                            fprintf(stderr,
+                                    "Molecular structure is inconsistent with initial "
+                                    "structure.\nGracefully crashing.\n"
+                                    "(run_cycle: %d; mc_step: "
+                                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
+                                    -1, nGen);
+
                             exit(1);
                         }
                     Energy_Total_System();
@@ -1175,8 +1180,13 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
                     // TODO: I think this whole business can be abstracted away as well.
                     if (Check_System_Structure())
                         {
-                            fprintf(stderr, "Molecular structure is inconsistent with initial "
-                                            "structure.\nCRASHING\n\n");
+                            fprintf(stderr,
+                                    "Molecular structure is inconsistent with initial "
+                                    "structure.\nGracefully crashing.\n"
+                                    "(run_cycle: %d; mc_step: "
+                                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
+                                    run_it, nGen);
+
                             exit(1);
                         }
                     Energy_Total_System();

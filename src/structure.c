@@ -195,9 +195,9 @@ int CheckSystemUtil_MolecularStructuresOK(void)
 }
 
 
-/// CheckSystemUtil_BeadBondsOK. Loops over all beads and makes sure that the bead I am bonded to is also bonded to me.
+/// CheckSystemUtil_BeadBondsSymmetricOK. Loops over all beads and makes sure that the bead I am bonded to is also bonded to me.
 /// \return 0 if all good, 1 if something is wrong.
-int CheckSystemUtil_BeadBondsOK(void)
+int CheckSystemUtil_BeadBondsSymmetricOK(void)
 {
     int beadID;
 
@@ -218,7 +218,7 @@ int CheckSystemUtil_BeadBondsOK(void)
 }
 
 
-int Check_System_Structure_New(void)
+int Check_System_Structure(void)
 {
 
     int nFlag;
@@ -237,7 +237,7 @@ int Check_System_Structure_New(void)
             return nFlag;
         }
 
-    nFlag = CheckSystemUtil_BeadBondsOK();
+    nFlag = CheckSystemUtil_BeadBondsSymmetricOK();
 
     if (nFlag != 0)
         {
@@ -256,7 +256,7 @@ int Check_System_Structure_New(void)
 /// 4. Beads' locations correspond with actual lattice location.
 /// 5. Bonds are not between beads that are too far apart.
 /// \return 0 if everything is okay, beadID+1 if failed.
-int Check_System_Structure(void)
+int Check_System_Structure_New(void)
 {
     int i, j;          // Looping variables
     int idx;           // Internal iterators for covalent bonds.
@@ -338,7 +338,7 @@ int Check_System_Structure(void)
 /// Dist_Vec3n - non periodic boundary euclidean magnitude of vector
 /// \param f1: The array where indicies 0,1 and 3 correspond to x y and z.
 /// \return
-float Dist_Vec3n(const int* f1)
+float Dist_Vec3n(const int* const f1)
 { // Outputs the magnitude of the vector
     return sqrtf((float) (f1[0] * f1[0] + f1[1] * f1[1] + f1[2] * f1[2]));
 }
@@ -346,7 +346,7 @@ float Dist_Vec3n(const int* f1)
 /// Dist_VecMagSq - non periodic boundary euclidean magnitude of vector
 /// \param f1: The array where indicies 0,1 and 3 correspond to x y and z.
 /// \return Square of magnitude: x^2 + y^2 + z^2
-int Dist_VecMagSq(const int* f1)
+int Dist_VecMagSq(const int* const f1)
 { // Outputs the magnitude of the vector
     return (f1[0] * f1[0] + f1[1] * f1[1] + f1[2] * f1[2]);
 }
