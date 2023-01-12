@@ -194,19 +194,22 @@ int CheckSystemUtil_MolecularStructuresOK(void)
     return 0;
 }
 
+
+/// CheckSystemUtil_BeadBondsOK. Loops over all beads and makes sure that the bead I am bonded to is also bonded to me.
+/// \return 0 if all good, 1 if something is wrong.
 int CheckSystemUtil_BeadBondsOK(void)
 {
     int beadID;
-    int latt_pos_ind;
-    int latt_bead;
 
-    for (beadID=0; beadID < tot_beads_glb; beadID++){
-            latt_pos_ind = Lat_Ind_OfBead(beadID);
-            latt_bead = naTotLattice_glb[latt_pos_ind];
-            if (latt_bead != beadID)
+    for (beadID = 0; beadID < tot_beads_glb; beadID++)
+        {
+            int bondPartner = bead_info_glb[beadID][BEAD_FACE];
+            if (bondPartner != -1)
                 {
-
-                    return 1;
+                    if (bead_info_glb[bondPartner][BEAD_FACE] != beadID)
+                        {
+                            return 1;
+                        }
                 }
         }
 
