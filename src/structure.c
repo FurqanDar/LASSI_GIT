@@ -132,6 +132,29 @@ float Dist_BeadToBead(const int n1, const int n2)
     return sqrtf((float) (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
 }
 
+/// CheckSystemUtil_BeadPosAndLattPosSanity
+/// \return
+int CheckSystemUtil_BeadPosAndLattPosSanity(void)
+{
+    int beadID;
+    int latt_pos_ind;
+    int latt_bead;
+
+    for (beadID=0; beadID < tot_beads_glb; beadID++){
+            latt_pos_ind = Lat_Ind_OfBead(beadID);
+            latt_bead = naTotLattice_glb[latt_pos_ind];
+            if (latt_bead != beadID)
+                {
+
+                    return 1;
+                }
+        }
+
+    return 0;
+
+}
+
+
 /// Check_System_Structure - performs a intensive and extensive sanity check. Check:
 /// 1. All distances between beads in a molecule are legal.
 /// 2. All bonds are symmetric.

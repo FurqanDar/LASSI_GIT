@@ -84,9 +84,9 @@ lInt** chain_info_glb;
 lInt** topo_info_glb;
 lInt** linker_len_glb;
 
-size_t tot_beads_glb;
-size_t tot_chains_glb;
-size_t tot_chain_types_glb;
+int tot_beads_glb;
+int tot_chains_glb;
+int tot_chain_types_glb;
 lInt nAnnealing_Mode_glb, nTemp_inv_glb;
 lInt nBiasPotential_Mode_glb, RotBias_Mode_glb;
 lInt nBiasPotential_KeepON_glb, nBiasPotential_CoupledToTemp_glb;

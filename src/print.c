@@ -305,7 +305,7 @@ void FileIOUtil_Traj_Txt_AppendFrame_ToFile(const char* filename, const long nGe
     fprintf(fp, "%ld\n", nGen); // Timestep
 
     fprintf(fp, "ITEM: NUMBER OF ATOMS\n");
-    fprintf(fp, "%ld\n", tot_beads_glb); // Total atom number
+    fprintf(fp, "%ld\n", (size_t) tot_beads_glb); // Total atom number
 
     fprintf(fp, "ITEM: BOX BOUNDS pp pp pp\n"); // BCs are always periodic for now
     fprintf(fp, "0 %d\n0 %d\n0 %d\n", naBoxSize_glb[0], naBoxSize_glb[1], naBoxSize_glb[2]); // Box dimensions
@@ -411,7 +411,7 @@ void Write_Saved_Trajectory(char* filename, const int run_it)
                 }
 
             fprintf(fp, "ITEM: NUMBER OF ATOMS\n");
-            fprintf(fp, "%ld\n", tot_beads_glb); // Total atom number
+            fprintf(fp, "%ld\n", (size_t) tot_beads_glb); // Total atom number
 
             fprintf(fp, "ITEM: BOX BOUNDS pp pp pp\n"); // BCs are always periodic for now
             fprintf(fp, "0 %d\n0 %d\n0 %d\n", naBoxSize_glb[0], naBoxSize_glb[1], naBoxSize_glb[2]); // Box dimensions
@@ -533,9 +533,9 @@ void ScreenIO_Print_KeyFile(void)
     const char rBrace[] = "      ======>";
     printf("%s System Settings %s\n", lBrace, rBrace);
     printf("Number of Bead Types = %d\n", nBeadTypes_glb);
-    printf("Number of Beads      = %ld\n", tot_beads_glb);
-    printf("Number of Chains     = %ld\n", tot_chains_glb);
-    printf("Number of Components = %ld\n", tot_chain_types_glb);
+    printf("Number of Beads      = %ld\n", (size_t) tot_beads_glb);
+    printf("Number of Chains     = %ld\n", (size_t) tot_chains_glb);
+    printf("Number of Components = %ld\n", (size_t) tot_chain_types_glb);
     printf("Lattice Dimensions   = %3d %3d %3d\n", naBoxSize_glb[0], naBoxSize_glb[1], naBoxSize_glb[2]);
     printf("Monomer Density      = %1.2e\n",
            (float) tot_beads_glb / (float) naBoxSize_glb[0] / (float) naBoxSize_glb[1] / (float) naBoxSize_glb[2]);
@@ -728,7 +728,7 @@ void FileIO_WriteTo_TopFile(const char* filename)
     printf("Writing the topology file!\n");
     fprintf(fp, "LAMMPS Description\n");          // The file must start with this.
     fprintf(fp, "\n");                            // Empty line.
-    fprintf(fp, "\t%ld\tatoms\n", tot_beads_glb); // Listing total number of atoms
+    fprintf(fp, "\t%ld\tatoms\n", (size_t) tot_beads_glb); // Listing total number of atoms
     numBonds = 0;
     for (i = 0; i < tot_beads_glb; i++)
         {
