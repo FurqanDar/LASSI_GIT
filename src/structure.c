@@ -132,9 +132,69 @@ float Dist_BeadToBead(const int n1, const int n2)
     return sqrtf((float) (d[POS_X] * d[POS_X] + d[POS_Y] * d[POS_Y] + d[POS_Z] * d[POS_Z]));
 }
 
-/// CheckSystemUtil_BeadPosAndLattPosSanity
+/// CheckSystemUtil_BeadPosAndLattPosOK. Loop over all beads and make sure that the bead's internal position
+/// matches the beadID that is placed at that location.
+/// \return 0 if everything is good, 1 is failed.
+int CheckSystemUtil_BeadPosAndLattPosOK(void)
+{
+    int beadID;
+    int latt_pos_ind;
+    int latt_bead;
+
+    for (beadID = 0; beadID < tot_beads_glb; beadID++)
+        {
+            latt_pos_ind = Lat_Ind_OfBead(beadID);
+            latt_bead    = naTotLattice_glb[latt_pos_ind];
+            if (latt_bead != beadID)
+                {
+                    return 1;
+                }
+        }
+
+    return 0;
+}
+
+/// Check_LinkerConstraintForBead - we loop over all possible covalently bonded beads for beadID and check if the
+/// linkers are OK.
+/// \param beadID
+/// \return 1 if broken, 0 if all good.
+int Check_LinkerConstraintForBead(const int beadID)
+{
+    int idx; // Iterator to loop over bond Partners
+    int bondPartner;
+    idx         = 0;
+    bondPartner = topo_info_glb[beadID][idx]; // Initializing the two.
+    while (idx < MAX_BONDS && topo_info_glb[beadID][idx] != -1)
+        { // Keep going till we run out of partners
+            bondPartner = topo_info_glb[beadID][idx];
+            if (Dist_BeadToBead(beadID, bondPartner) > LINKER_RSCALE * (float) linker_len_glb[beadID][idx])
+                {
+                    return 1; // This means that we have broken one of the linkers.
+                }
+            idx++;
+        }
+    return 0; // This means that all linker constraints are satisfied.
+}
+
+/// CheckSystemUtil_MolecularStructuresOK. Loop over all beads and check if the linker constraints of all the
+/// beads are satisfied correctly.
 /// \return
-int CheckSystemUtil_BeadPosAndLattPosSanity(void)
+int CheckSystemUtil_MolecularStructuresOK(void)
+{
+    int beadID;
+
+    for (beadID = 0; beadID < tot_chains_glb; beadID++)
+        {
+            if (Check_LinkerConstraintForBead(beadID) != 0)
+                {
+                    return 1;
+                }
+        }
+
+    return 0;
+}
+
+int CheckSystemUtil_BeadBondsOK(void)
 {
     int beadID;
     int latt_pos_ind;
@@ -148,6 +208,37 @@ int CheckSystemUtil_BeadPosAndLattPosSanity(void)
 
                     return 1;
                 }
+        }
+
+    return 0;
+
+}
+
+
+int Check_System_Structure_New(void)
+{
+
+    int nFlag;
+
+    nFlag = CheckSystemUtil_BeadPosAndLattPosOK();
+
+    if (nFlag != 0)
+        {
+            return nFlag;
+        }
+
+    nFlag = CheckSystemUtil_MolecularStructuresOK();
+
+    if (nFlag != 0)
+        {
+            return nFlag;
+        }
+
+    nFlag = CheckSystemUtil_BeadBondsOK();
+
+    if (nFlag != 0)
+        {
+            return nFlag;
         }
 
     return 0;
@@ -537,7 +628,7 @@ void RDF_ComponentWise_Avg(void)
 /// \param beadID
 /// \param tmpR
 /// \return 1 means all is good, 0 means bad.
-int Check_LinkerConstraint(const int beadID, const int* tmpR)
+int Check_LinkerConstraint(const int beadID, const int* const tmpR)
 {
     // Check if the proposed new location for beadID is such that all the linkers are unbroken.
     int idx;         // Iterator to loop over bond Partners

@@ -800,16 +800,16 @@ void Parse_StructureFile(char* filename)
 /// \param n_bead_num: Stores how many total beads are in the structure file.
 /// \param n_chain_num: Stores how many total chains are in the structure file.
 /// \param n_chain_types: Stores how many different chain-types are in the file.
-void Parse_StructureFile_CalcBeadsAndChains(char* filename, size_t* n_bead_num, size_t* n_chain_num,
-                                            size_t* n_chain_types)
+void Parse_StructureFile_CalcBeadsAndChains(char* filename, int* n_bead_num, int* n_chain_num,
+                                            int* n_chain_types)
 {
-    size_t dum_beads       = 0;
-    size_t dum_chains      = 0;
-    size_t dum_chain_types = 0;
-    int per_chain_num      = 0;
-    int per_ch_bd_num      = 0;
-    int errCode            = 0;
-    int nFlag              = -1;
+    int dum_beads       = 0;
+    int dum_chains      = 0;
+    int dum_chain_types = 0;
+    int per_chain_num   = 0;
+    int per_ch_bd_num   = 0;
+    int errCode         = 0;
+    int nFlag           = -1;
     char strLine[1000];
     char strKey[1000];
 
