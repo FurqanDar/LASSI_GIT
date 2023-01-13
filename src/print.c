@@ -1083,6 +1083,26 @@ char ForPrinting_GetReportState(const long nGen, const long thisReport)
     return dum_log;
 }
 
+
+void FileIO_PrintCrashSnapshot(void)
+{
+    FILE* fp = fopen("crash_snapshot.txt", "w+");
+
+    int i, x, y, z, bP;
+    fputs("#CRASH SNAPSHOT\n#X, Y, Z, bondPartner\n",fp);
+    for (i=0; i<tot_beads_glb; i++)
+        {
+            x = bead_info_glb[i][POS_X];
+            y = bead_info_glb[i][POS_Y];
+            z = bead_info_glb[i][POS_Z];
+            bP = bead_info_glb[i][BEAD_FACE];
+            fprintf(fp, "%d %d %d %d\n", x, y, z, bP);
+        }
+
+
+    fclose(fp);
+}
+
 /// DataPrinting_Thermalization - helper function for printing out data during the thermalization cycle.
 /// No data analysis is performed during the thermalization procedure.
 /// This function decides if, given the MCStep, it is time to print the following:
@@ -1114,6 +1134,7 @@ void DataPrinting_Thermalization(const long nGen)
                                     "(run_cycle: %d; mc_step: "
                                     "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
                                     -1, nGen);
+                            FileIO_PrintCrashSnapshot();
 
                             exit(1);
                         }
@@ -1136,7 +1157,7 @@ void DataPrinting_Thermalization(const long nGen)
 
             if (naReportFreqs_glb[REPORT_ENERGY])
                 {
-                    // DO ENERGY SHIT
+                    // DO ENERGY FLAGS
                     cEnergyFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_ENERGY]);
                     if (cEnergyFlag)
                         {
@@ -1151,7 +1172,7 @@ void DataPrinting_Thermalization(const long nGen)
 
             if (naReportFreqs_glb[REPORT_MCMOVE])
                 {
-                    // DO MC_ACC SHIT
+                    // DO MC_ACC PRINTING
                     cAccFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_MCMOVE]);
                     if (cAccFlag)
                         {
@@ -1186,6 +1207,7 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
                                     "(run_cycle: %d; mc_step: "
                                     "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
                                     run_it, nGen);
+                            FileIO_PrintCrashSnapshot();
 
                             exit(1);
                         }
@@ -1208,7 +1230,7 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
 
             if (naReportFreqs_glb[REPORT_ENERGY])
                 {
-                    // DO ENERGY SHIT
+                    // DO ENERGY PRINTING
                     cEnergyFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_ENERGY]);
                     if (cEnergyFlag)
                         {
@@ -1223,7 +1245,7 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
 
             if (naReportFreqs_glb[REPORT_MCMOVE])
                 {
-                    // DO MC_ACC SHIT
+                    // DO MC_ACC PRINTING
                     cAccFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_MCMOVE]);
                     if (cAccFlag)
                         {
