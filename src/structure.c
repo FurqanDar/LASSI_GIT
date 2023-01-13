@@ -148,11 +148,11 @@ int CheckSystemUtil_BeadPosAndLattPosOK(void)
             latt_bead    = naTotLattice_glb[latt_pos_ind];
             if (latt_bead != beadID)
                 {
-                    return 1;
+                    return beadID;
                 }
         }
 
-    return 0;
+    return -1;
 }
 
 /// Check_LinkerConstraintForBead - we loop over all possible covalently bonded beads for beadID and check if the
@@ -274,7 +274,7 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
             fputs("Lattice positions and bead positions do not match!\n\n\n", stderr);
 
 
-            fputs("----------------------------------", stderr);
+            fputs("-----------------------------------------------------", stderr);
 //            exit(1);
         }
 
@@ -285,7 +285,7 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
             fputs("Molecular structure has been broken!\n\n\n", stderr);
 
 
-            fputs("----------------------------------", stderr);
+            fputs("-----------------------------------------------------", stderr);
 //            exit(1);
         }
 
@@ -296,7 +296,7 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
             fputs("Anisotropic bonds are not symmetric!\n\n\n", stderr);
 
 
-            fputs("----------------------------------", stderr);
+            fputs("-----------------------------------------------------", stderr);
 //            exit(1);
         }
     exit(1);

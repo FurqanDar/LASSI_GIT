@@ -67,21 +67,25 @@ int main(int argc, char* argv[])
 
     // Performing a sanity check to see if all the beads and structures are
     // correct.
+
+    //Causes lattice failure
+//    naTotLattice_glb[Lat_Ind_OfBead(0)]=5;
+//    naTotLattice_glb[Lat_Ind_OfBead(1)]=3;
+
     // Intentionally breaking structure and lattice position
     bead_info_glb[0][0] = 30;
     bead_info_glb[1][0] = 0;
-    bead_info_glb[0][BEAD_FACE] = 10;
 
+    // Rescues lattice failure
+    naTotLattice_glb[Lat_Ind_OfBead(0)]=0;
+    naTotLattice_glb[Lat_Ind_OfBead(1)]=1;
+
+    // Causes bond failure
+//    bead_info_glb[0][BEAD_FACE] = 10;
+//    bead_info_glb[10][BEAD_FACE] = 2;
+
+    puts("Performing initial sanity check.\n");
     PerformRuntimeSanityChecks(-1, -1);
-//    if (Check_System_Structure() == 0)
-//        {
-//            printf("Check structure sanity: OK\n");
-//        }
-//    else
-//        {
-//            printf("ERROR: wrong structure.\n");
-//            exit(1);
-//        }
 
     clock_t tEnd        = clock();
     double elapsed_time = (double) (tEnd - tStart) / (double) CLOCKS_PER_SEC;
