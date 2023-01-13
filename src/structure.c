@@ -290,29 +290,8 @@ int Check_System_Structure(void)
 }
 
 
-void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
+void PerformRuntimeSanityCheck_BeadPosAndLattPos(const long nGen, const int run_cycle)
 {
-
-    //Causes lattice failure only
-    naTotLattice_glb[Lat_Ind_OfBead(10)]=5;
-
-    //Causes structure failure only
-    bead_info_glb[2][0] = 30;
-    bead_info_glb[3][0] = 0;
-    naTotLattice_glb[Lat_Ind_OfBead(2)]=2;
-    naTotLattice_glb[Lat_Ind_OfBead(3)]=3;
-
-    //Causes bond-symmetry failure only
-    bead_info_glb[4][BEAD_FACE] = 5;
-    bead_info_glb[5][BEAD_FACE] = -1;
-
-    //Causes self-bond failure only
-    bead_info_glb[6][BEAD_FACE] = 6;
-
-    //Causes bond-distance failure only
-    bead_info_glb[2][BEAD_FACE] = 3;
-    bead_info_glb[3][BEAD_FACE] = 2;
-
     int badBead = CheckSystemUtil_BeadPosAndLattPosOK();
     if (badBead != - 1)
         {
@@ -323,10 +302,13 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
             ScreenIO_Print_SanityFail_BeadPosAndLattPos(badBead);
 
             fputs("-------------------------------------------------------------------------------", stderr);
-//            exit(1);
+            exit(1);
         }
+}
 
-    badBead = CheckSystemUtil_MolecularStructuresOK();
+void PerformRuntimeSanityCheck_MolecularStructure(const long nGen, const int run_cycle)
+{
+    const int badBead = CheckSystemUtil_MolecularStructuresOK();
     if (badBead != -1)
         {
             ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
@@ -336,11 +318,13 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
             ScreenIO_Print_SanityFail_MolecularStructure(badBead);
 
             fputs("-------------------------------------------------------------------------------", stderr);
-//            exit(1);
+            exit(1);
         }
+}
 
-
-    badBead = CheckSystemUtil_NoSelfBonds();
+void PerformRuntimeSanityCheck_SelfBonds(const long nGen, const int run_cycle)
+{
+    const int badBead = CheckSystemUtil_NoSelfBonds();
     if (badBead != -1)
         {
             ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
@@ -350,11 +334,13 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
             ScreenIO_Print_SanityFail_SelfBond(badBead);
 
             fputs("-------------------------------------------------------------------------------", stderr);
-            //            exit(1);
+            exit(1);
         }
+}
 
-
-    badBead = CheckSystemUtil_BeadBondsSymmetricOK();
+void PerformRuntimeSanityCheck_BondSymmetry(const long nGen, const int run_cycle)
+{
+    const int badBead = CheckSystemUtil_BeadBondsSymmetricOK();
     if (badBead != -1)
         {
             ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
@@ -364,11 +350,13 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
             ScreenIO_Print_SanityFail_BeadBondSymmetry(badBead);
 
             fputs("-------------------------------------------------------------------------------", stderr);
-//            exit(1);
+            exit(1);
         }
+}
 
-
-    badBead = CheckSystemUtil_BeadBondsDistanceOK();
+void PerformRuntimeSanityCheck_BondDistance(const long nGen, const int run_cycle)
+{
+    const int badBead = CheckSystemUtil_BeadBondsDistanceOK();
     if (badBead != -1)
         {
             ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
@@ -378,13 +366,46 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
             ScreenIO_Print_SanityFail_BeadBondDistance(badBead);
 
             fputs("-------------------------------------------------------------------------------", stderr);
-            //            exit(1);
+            exit(1);
         }
+}
+
+void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
+{
+/*
+ * The following set of snippets cause specific failures.
+ */
+//    //Causes lattice failure only
+//    naTotLattice_glb[Lat_Ind_OfBead(10)]=5;
+//
+//    //Causes structure failure only
+//    bead_info_glb[2][0] = 30;
+//    bead_info_glb[3][0] = 0;
+//    naTotLattice_glb[Lat_Ind_OfBead(2)]=2;
+//    naTotLattice_glb[Lat_Ind_OfBead(3)]=3;
+//
+//    //Causes bond-symmetry failure only
+//    bead_info_glb[4][BEAD_FACE] = 5;
+//    bead_info_glb[5][BEAD_FACE] = -1;
+//
+//    //Causes self-bond failure only
+//    bead_info_glb[6][BEAD_FACE] = 6;
+//
+//    //Causes bond-distance failure only
+//    bead_info_glb[2][BEAD_FACE] = 3;
+//    bead_info_glb[3][BEAD_FACE] = 2;
 
 
+    PerformRuntimeSanityCheck_BeadPosAndLattPos(nGen, run_cycle);
 
+    PerformRuntimeSanityCheck_MolecularStructure(nGen, run_cycle);
 
-    exit(1);
+    PerformRuntimeSanityCheck_SelfBonds(nGen, run_cycle);
+
+    PerformRuntimeSanityCheck_BondSymmetry(nGen, run_cycle);
+
+    PerformRuntimeSanityCheck_BondDistance(nGen, run_cycle);
+
 }
 
 

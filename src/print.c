@@ -777,7 +777,7 @@ void ScreenIO_Print_SanityFail_MolecularStructure(const int badBead)
 
 
             bdDist = Dist_BeadToBead(badBead, bondPart);
-            linkCons = linker_len_glb[badBead][idx]*LINKER_RSCALE;
+            linkCons = (float) linker_len_glb[badBead][idx]*LINKER_RSCALE;
 
             fprintf(stderr, "beads: (%d, %d) have dist: %5.3f with linker-constraint: %5.3f\n", badBead, bondPart,
                     bdDist, linkCons);
