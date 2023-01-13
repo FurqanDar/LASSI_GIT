@@ -67,9 +67,10 @@ int main(int argc, char* argv[])
 
     // Performing a sanity check to see if all the beads and structures are
     // correct.
-    // Intentionally breaking structure
+    // Intentionally breaking structure and lattice position
     bead_info_glb[0][0] = 30;
     bead_info_glb[1][0] = 0;
+    bead_info_glb[0][BEAD_FACE] = 10;
 
     PerformRuntimeSanityChecks(-1, -1);
 //    if (Check_System_Structure() == 0)

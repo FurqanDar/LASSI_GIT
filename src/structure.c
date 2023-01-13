@@ -188,11 +188,11 @@ int CheckSystemUtil_MolecularStructuresOK(void)
         {
             if (Check_LinkerConstraintForBead(beadID) != 0)
                 {
-                    return 1;
+                    return beadID;
                 }
         }
 
-    return 0;
+    return -1;
 }
 
 
@@ -209,12 +209,12 @@ int CheckSystemUtil_BeadBondsSymmetricOK(void)
                 {
                     if (bead_info_glb[bondPartner][BEAD_FACE] != beadID)
                         {
-                            return 1;
+                            return beadID;
                         }
                 }
         }
 
-    return 0;
+    return -1;
 
 }
 
@@ -226,21 +226,21 @@ int Check_System_Structure(void)
 
     nFlag = CheckSystemUtil_BeadPosAndLattPosOK();
 
-    if (nFlag != 0)
+    if (nFlag != -1)
         {
             return nFlag;
         }
 
     nFlag = CheckSystemUtil_MolecularStructuresOK();
 
-    if (nFlag != 0)
+    if (nFlag != -1)
         {
             return nFlag;
         }
 
     nFlag = CheckSystemUtil_BeadBondsSymmetricOK();
 
-    if (nFlag != 0)
+    if (nFlag != -1)
         {
             return nFlag;
         }
@@ -252,43 +252,58 @@ int Check_System_Structure(void)
 
 void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
 {
-    if (Check_System_Structure())
+//    const int bad_bead =
+
+//    if (Check_System_Structure())
+//        {
+//            fprintf(stderr,
+//                    "Molecular structure is inconsistent with initial "
+//                    "structure.\nGracefully crashing.\n"
+//                    "(run_cycle: %d; mc_step: "
+//                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
+//                    run_cycle, nGen);
+//            FileIO_PrintCrashSnapshot();
+//
+//            exit(1);
+//        }
+
+    if (CheckSystemUtil_BeadPosAndLattPosOK() != - 1)
         {
-            fprintf(stderr,
-                    "Molecular structure is inconsistent with initial "
-                    "structure.\nGracefully crashing.\n"
-                    "(run_cycle: %d; mc_step: "
-                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
+            fputs("ERROR! Sanity check failed! Crashing!\n", stderr);
+            fprintf(stderr, "Crash occurred at (run_cycle: %d; mc_step: %ld)\n",
                     run_cycle, nGen);
             FileIO_PrintCrashSnapshot();
+            fputs("Lattice positions and bead positions do not match!\n", stderr);
 
-            exit(1);
+            fputs("Snapshot of system saved to crash_snapshot.txt\n\n\n", stderr);
+//            exit(1);
         }
 
-//    if (CheckSystemUtil_BeadPosAndLattPosOK() != - 1)
-//        {
-//            FileIO_PrintCrashSnapshot();
-//            fputs("Lattice positions and bead positions do not match!", stderr);
-//
-//            exit(1);
-//        }
-//
-//    if (CheckSystemUtil_MolecularStructuresOK() != -1)
-//        {
-//            FileIO_PrintCrashSnapshot();
-//            fputs("Molecular structure has been broken!", stderr);
-//
-//            exit(1);
-//        }
-//
-//    if (CheckSystemUtil_BeadBondsSymmetricOK() != -1)
-//        {
-//            FileIO_PrintCrashSnapshot();
-//            fputs("Anisotropic bonds are not symmetric!", stderr);
-//
-//            exit(1);
-//        }
+    if (CheckSystemUtil_MolecularStructuresOK() != -1)
+        {
+            fputs("ERROR! Sanity check failed! Crashing!\n", stderr);
+            fprintf(stderr, "Crash occurred at (run_cycle: %d; mc_step: %ld)\n",
+                    run_cycle, nGen);
+            FileIO_PrintCrashSnapshot();
+            fputs("Molecular structure has been broken!\n", stderr);
 
+            fputs("Snapshot of system saved to crash_snapshot.txt\n\n\n", stderr);
+//            exit(1);
+        }
+
+    if (CheckSystemUtil_BeadBondsSymmetricOK() != -1)
+        {
+            fputs("ERROR! Sanity check failed! Crashing!\n", stderr);
+            fprintf(stderr, "Crash occurred at (run_cycle: %d; mc_step: %ld)\n",
+                    run_cycle, nGen);
+            FileIO_PrintCrashSnapshot();
+            fputs("Anisotropic bonds are not symmetric!\n", stderr);
+
+
+            fputs("Snapshot of system saved to crash_snapshot.txt\n\n\n", stderr);
+//            exit(1);
+        }
+    exit(1);
 }
 
 
