@@ -170,11 +170,11 @@ int Check_LinkerConstraintForBead(const int beadID)
             bondPartner = topo_info_glb[beadID][idx];
             if (Dist_BeadToBead(beadID, bondPartner) > LINKER_RSCALE * (float) linker_len_glb[beadID][idx])
                 {
-                    return 1; // This means that we have broken one of the linkers.
+                    return bondPartner; // This means that we have broken one of the linkers.
                 }
             idx++;
         }
-    return 0; // This means that all linker constraints are satisfied.
+    return -1; // This means that all linker constraints are satisfied.
 }
 
 /// CheckSystemUtil_MolecularStructuresOK. Loop over all beads and check if the linker constraints of all the
@@ -186,7 +186,7 @@ int CheckSystemUtil_MolecularStructuresOK(void)
 
     for (beadID = 0; beadID < tot_chains_glb; beadID++)
         {
-            if (Check_LinkerConstraintForBead(beadID) != 0)
+            if (Check_LinkerConstraintForBead(beadID) >= 0)
                 {
                     return beadID;
                 }
@@ -211,6 +211,24 @@ int CheckSystemUtil_BeadBondsSymmetricOK(void)
                         {
                             return beadID;
                         }
+                }
+        }
+
+    return -1;
+
+}
+
+
+int CheckSystemUtil_NoSelfBonds(void)
+{
+    int beadID;
+
+    for (beadID = 0; beadID < tot_beads_glb; beadID++)
+        {
+            int bondPartner = bead_info_glb[beadID][BEAD_FACE];
+            if (bondPartner == beadID)
+                {
+                            return beadID;
                 }
         }
 
@@ -252,51 +270,57 @@ int Check_System_Structure(void)
 
 void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
 {
-//    const int bad_bead =
-
-//    if (Check_System_Structure())
-//        {
-//            fprintf(stderr,
-//                    "Molecular structure is inconsistent with initial "
-//                    "structure.\nGracefully crashing.\n"
-//                    "(run_cycle: %d; mc_step: "
-//                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
-//                    run_cycle, nGen);
-//            FileIO_PrintCrashSnapshot();
-//
-//            exit(1);
-//        }
-
-    if (CheckSystemUtil_BeadPosAndLattPosOK() != - 1)
+    int badBead = CheckSystemUtil_BeadPosAndLattPosOK();
+    if (badBead != - 1)
         {
             ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
             FileIO_PrintCrashSnapshot();
-            fputs("Lattice positions and bead positions do not match!\n\n\n", stderr);
+            fputs("Lattice positions and bead positions do not match!\n\nDetails of crash:\n", stderr);
 
+            ScreenIO_Print_SanityFail_BeadPosAndLattPos(badBead);
 
-            fputs("-----------------------------------------------------", stderr);
+            fputs("-------------------------------------------------------------------------------", stderr);
 //            exit(1);
         }
 
-    if (CheckSystemUtil_MolecularStructuresOK() != -1)
+    badBead = CheckSystemUtil_MolecularStructuresOK();
+    if (badBead != -1)
         {
             ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
             FileIO_PrintCrashSnapshot();
-            fputs("Molecular structure has been broken!\n\n\n", stderr);
+            fputs("Molecular structure has been broken!\n\nDetails of crash:\n", stderr);
 
+            ScreenIO_Print_SanityFail_MolecularStructure(badBead);
 
-            fputs("-----------------------------------------------------", stderr);
+            fputs("-------------------------------------------------------------------------------", stderr);
 //            exit(1);
         }
 
-    if (CheckSystemUtil_BeadBondsSymmetricOK() != -1)
+
+    badBead = CheckSystemUtil_NoSelfBonds();
+    if (badBead != -1)
         {
             ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
             FileIO_PrintCrashSnapshot();
-            fputs("Anisotropic bonds are not symmetric!\n\n\n", stderr);
+            fputs("Anisotropic bonds are not symmetric!\n\nDetails of crash:\n", stderr);
+
+            ScreenIO_Print_SanityFail_SelfBond(badBead);
+
+            fputs("-------------------------------------------------------------------------------", stderr);
+            //            exit(1);
+        }
 
 
-            fputs("-----------------------------------------------------", stderr);
+    badBead = CheckSystemUtil_BeadBondsSymmetricOK();
+    if (badBead != -1)
+        {
+            ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
+            FileIO_PrintCrashSnapshot();
+            fputs("Anisotropic bonds are not symmetric!\n\nDetails of crash:\n", stderr);
+
+            ScreenIO_Print_SanityFail_BeadBondSymmetry(badBead);
+
+            fputs("-------------------------------------------------------------------------------", stderr);
 //            exit(1);
         }
     exit(1);
