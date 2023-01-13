@@ -671,6 +671,8 @@ void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle)
     puts("****************************************");
 }
 
+/// ScreenIO_PrintStdErr_BeadPosition. Prints the beadID and it's position to STDERR.
+/// \param beadID
 void ScreenIO_PrintStdErr_BeadPosition(const int beadID)
 {
     const int x = bead_info_glb[beadID][POS_X];
@@ -679,7 +681,10 @@ void ScreenIO_PrintStdErr_BeadPosition(const int beadID)
     fprintf(stderr, "bead: %d is a position: <%d, %d, %d>\n", beadID, x, y, z);
 }
 
-void ScreenIO_Print_SanityCheckFailure(const long nGen, const int run_cycle)
+/// ScreenIO_Print_SanityCheckFailurePreamble. Prints the preamble to the error message for sanity check failures.
+/// \param nGen Which MC Step this crash has occurred on.
+/// \param run_cycle Which run_cycle this crash has occurred on.
+void ScreenIO_Print_SanityCheckFailurePreamble(const long nGen, const int run_cycle)
 {
     fputs("\n-------------------------------------------------------------------------------", stderr);
     fputs("\nERROR! Sanity check failed! Crashing!\n", stderr);
@@ -689,46 +694,9 @@ void ScreenIO_Print_SanityCheckFailure(const long nGen, const int run_cycle)
     fputs("CRASH TYPE: ", stderr);
 }
 
-
-void ScreenIO_Print_SanityFail_SelfBond(const int badBead)
-{
-    fprintf(stderr, "bead: %d is bonded to itself!\n", badBead);
-}
-
-
-
-
-void ScreenIO_Print_SanityFail_BeadBondSymmetry(const int badBead)
-{
-    const int beadPart = bead_info_glb[badBead][BEAD_FACE];
-
-    fprintf(stderr, "bead: %d is bonded to bead: %d\n", badBead, beadPart);
-
-    const int partBond = bead_info_glb[beadPart][BEAD_FACE];
-
-    fprintf(stderr, "while\nbead: %d is bonded to bead: %d\n", beadPart, partBond);
-
-    ScreenIO_PrintStdErr_BeadPosition(badBead);
-    ScreenIO_PrintStdErr_BeadPosition(beadPart);
-
-}
-
-void ScreenIO_Print_SanityFail_BeadBondDistance(const int badBead)
-{
-    const int beadPart = bead_info_glb[badBead][BEAD_FACE];
-
-    fprintf(stderr, "bead: %d is bonded to bead: %d\n", badBead, beadPart);
-
-    const float bDist = Dist_BeadToBead(badBead, beadPart);
-    fprintf(stderr, "while\ndistance: %5.3f\n", bDist);
-
-    ScreenIO_PrintStdErr_BeadPosition(badBead);
-    ScreenIO_PrintStdErr_BeadPosition(beadPart);
-
-
-}
-
-
+/// ScreenIO_Print_SanityFail_BeadPosAndLattPos. Prints the crash information for when the bead position does not
+/// correspond to the lattice representation. Prints the bead position, and what the lattice thinks is at that position.
+/// \param badBead The bead for which to print the information.
 void ScreenIO_Print_SanityFail_BeadPosAndLattPos(const int badBead)
 {
 
@@ -745,8 +713,10 @@ void ScreenIO_Print_SanityFail_BeadPosAndLattPos(const int badBead)
 
 }
 
-
-
+/// ScreenIO_Print_SanityFail_MolecularStructure. Prints the crash information for when the linkers for badBead are
+/// broken. Prints out the chain badBead is in, all the bonded partners for badBead, where the beads are at, and the
+/// distances between the beads.
+/// \param badBead The bead for which to print the information.
 void ScreenIO_Print_SanityFail_MolecularStructure(const int badBead)
 {
 
@@ -787,12 +757,57 @@ void ScreenIO_Print_SanityFail_MolecularStructure(const int badBead)
         }
 }
 
+/// ScreenIO_Print_SanityFail_SelfBond. Prints the crash information for when the a bead is self-bonded. Prints out the
+/// id of the bead.
+/// \param badBead The bead for which to print the information.
+void ScreenIO_Print_SanityFail_SelfBond(const int badBead)
+{
+    fprintf(stderr, "bead: %d is bonded to itself!\n", badBead);
+}
+
+/// ScreenIO_Print_SanityFail_BeadBondSymmetry. Prints the crash information for when a bond is not symmetric. Prints
+/// out the id of the bead that failed, which bead badBead is bonded to, and which bead the beadPartner is bonded to.
+/// We also print the positions of the beads.
+/// \param badBead The bead for which to print the information.
+void ScreenIO_Print_SanityFail_BeadBondSymmetry(const int badBead)
+{
+    const int beadPart = bead_info_glb[badBead][BEAD_FACE];
+
+    fprintf(stderr, "bead: %d is bonded to bead: %d\n", badBead, beadPart);
+
+    const int partBond = bead_info_glb[beadPart][BEAD_FACE];
+
+    fprintf(stderr, "while\nbead: %d is bonded to bead: %d\n", beadPart, partBond);
+
+    ScreenIO_PrintStdErr_BeadPosition(badBead);
+    ScreenIO_PrintStdErr_BeadPosition(beadPart);
+
+}
+
+/// ScreenIO_Print_SanityFail_BeadBondDistance. Prints the crash information for when the distance between bonded beads
+/// is too large. Prints the relevant beads' ids, positions and the distance between them.
+/// \param badBead The bead for which to print the information.
+void ScreenIO_Print_SanityFail_BeadBondDistance(const int badBead)
+{
+    const int beadPart = bead_info_glb[badBead][BEAD_FACE];
+
+    fprintf(stderr, "bead: %d is bonded to bead: %d\n", badBead, beadPart);
+
+    const float bDist = Dist_BeadToBead(badBead, beadPart);
+    fprintf(stderr, "while\ndistance: %5.3f\n", bDist);
+
+    ScreenIO_PrintStdErr_BeadPosition(badBead);
+    ScreenIO_PrintStdErr_BeadPosition(beadPart);
+
+
+}
+
 
 /// Write_RDF_ComponentWise - old implementation of printing the RDF, component
 /// by component. Always appends to the file for this run. Stopped using it
 /// because the IO load was slowing things down at our cluster Would be a good
-/// way to gather proper statistics on clusters as the runs went on. TODO:
-/// update this to work with the new indexing
+/// way to gather proper statistics on clusters as the runs went on.
+/// TODO: update this to work with the new indexing
 /// \param filename
 /// \param nGen
 void Write_RDF_ComponentWise(char* filename, long nGen)
@@ -828,7 +843,8 @@ void Write_RDF_ComponentWise(char* filename, long nGen)
 
 /// FileIO_WriteTo_TopFile - write a LAMMPS DATA file, which can be read in VMD to store
 /// topological information for the system Only writes the topology once at the
-/// beginning of the runs. \param filename
+/// beginning of the runs.
+/// \param filename
 void FileIO_WriteTo_TopFile(const char* filename)
 {
     /*

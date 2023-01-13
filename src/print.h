@@ -17,7 +17,7 @@ void ScreenIO_Print_Log_Thermalization(const long nGen);
 
 void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle);
 
-void ScreenIO_Print_SanityCheckFailure(long nGen, int run_cycle);
+void ScreenIO_Print_SanityCheckFailurePreamble(long nGen, int run_cycle);
 
 void ScreenIO_Print_SanityFail_BeadPosAndLattPos(int badBead);
 
