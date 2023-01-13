@@ -67,15 +67,20 @@ int main(int argc, char* argv[])
 
     // Performing a sanity check to see if all the beads and structures are
     // correct.
-    if (Check_System_Structure() == 0)
-        {
-            printf("Check structure sanity: OK\n");
-        }
-    else
-        {
-            printf("ERROR: wrong structure.\n");
-            exit(1);
-        }
+    // Intentionally breaking structure
+    bead_info_glb[0][0] = 30;
+    bead_info_glb[1][0] = 0;
+
+    PerformRuntimeSanityChecks(-1, -1);
+//    if (Check_System_Structure() == 0)
+//        {
+//            printf("Check structure sanity: OK\n");
+//        }
+//    else
+//        {
+//            printf("ERROR: wrong structure.\n");
+//            exit(1);
+//        }
 
     clock_t tEnd        = clock();
     double elapsed_time = (double) (tEnd - tStart) / (double) CLOCKS_PER_SEC;

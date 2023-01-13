@@ -47,6 +47,8 @@ void FileIOUtil_CreateFile_Binary_Overwrite(const char* fileName);
 
 void FileIO_CreateRunningDataFiles(void);
 
+void FileIO_PrintCrashSnapshot(void);
+
 void FileIO_WriteTo_MCMoveFile(const char* filename, const long nGen, const float fMCTemp);
 
 void FileIOUtil_PreCycle_Init(const int run_it);

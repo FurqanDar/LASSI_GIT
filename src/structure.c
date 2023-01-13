@@ -2,6 +2,7 @@
 #include "cluster.h"
 #include "energy.h"
 #include "mcmove.h"
+#include "print.h"
 
 /// Lat_Ind_FromCoords - helper function to get the correct 1D index of this position
 /// \param i
@@ -245,6 +246,48 @@ int Check_System_Structure(void)
         }
 
     return 0;
+
+}
+
+
+void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
+{
+    if (Check_System_Structure())
+        {
+            fprintf(stderr,
+                    "Molecular structure is inconsistent with initial "
+                    "structure.\nGracefully crashing.\n"
+                    "(run_cycle: %d; mc_step: "
+                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
+                    run_cycle, nGen);
+            FileIO_PrintCrashSnapshot();
+
+            exit(1);
+        }
+
+//    if (CheckSystemUtil_BeadPosAndLattPosOK() != - 1)
+//        {
+//            FileIO_PrintCrashSnapshot();
+//            fputs("Lattice positions and bead positions do not match!", stderr);
+//
+//            exit(1);
+//        }
+//
+//    if (CheckSystemUtil_MolecularStructuresOK() != -1)
+//        {
+//            FileIO_PrintCrashSnapshot();
+//            fputs("Molecular structure has been broken!", stderr);
+//
+//            exit(1);
+//        }
+//
+//    if (CheckSystemUtil_BeadBondsSymmetricOK() != -1)
+//        {
+//            FileIO_PrintCrashSnapshot();
+//            fputs("Anisotropic bonds are not symmetric!", stderr);
+//
+//            exit(1);
+//        }
 
 }
 

@@ -1126,18 +1126,19 @@ void DataPrinting_Thermalization(const long nGen)
             if (cLogFlag)
                 {
                     // TODO: I think this whole business can be abstracted away as well.
-                    if (Check_System_Structure())
-                        {
-                            fprintf(stderr,
-                                    "Molecular structure is inconsistent with initial "
-                                    "structure.\nGracefully crashing.\n"
-                                    "(run_cycle: %d; mc_step: "
-                                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
-                                    -1, nGen);
-                            FileIO_PrintCrashSnapshot();
-
-                            exit(1);
-                        }
+//                    if (Check_System_Structure())
+//                        {
+//                            fprintf(stderr,
+//                                    "Molecular structure is inconsistent with initial "
+//                                    "structure.\nGracefully crashing.\n"
+//                                    "(run_cycle: %d; mc_step: "
+//                                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
+//                                    -1, nGen);
+//                            FileIO_PrintCrashSnapshot();
+//
+//                            exit(1);
+//                        }
+                    PerformRuntimeSanityChecks(nGen, -1);
                     Energy_Total_System();
                     cFlagForEnCal = 1;
                     ScreenIO_Print_Log_Thermalization(nGen);
@@ -1198,19 +1199,20 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
             cLogFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_LOG]);
             if (cLogFlag)
                 {
-                    // TODO: I think this whole business can be abstracted away as well.
-                    if (Check_System_Structure())
-                        {
-                            fprintf(stderr,
-                                    "Molecular structure is inconsistent with initial "
-                                    "structure.\nGracefully crashing.\n"
-                                    "(run_cycle: %d; mc_step: "
-                                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
-                                    run_it, nGen);
-                            FileIO_PrintCrashSnapshot();
-
-                            exit(1);
-                        }
+//                    // TODO: I think this whole business can be abstracted away as well.
+//                    if (Check_System_Structure())
+//                        {
+//                            fprintf(stderr,
+//                                    "Molecular structure is inconsistent with initial "
+//                                    "structure.\nGracefully crashing.\n"
+//                                    "(run_cycle: %d; mc_step: "
+//                                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
+//                                    run_it, nGen);
+//                            FileIO_PrintCrashSnapshot();
+//
+//                            exit(1);
+//                        }
+                    PerformRuntimeSanityChecks(nGen, run_it);
                     Energy_Total_System();
                     cFlagForEnCal = 1;
                     ScreenIO_Print_Log_FullRun(nGen, run_it);

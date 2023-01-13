@@ -29,6 +29,8 @@ int Check_LinkerConstraints_ForBeadList(const int listSize, const int* beadList)
 
 int Check_BeadID_InList(const int thisBeadID, const int listSize, const int beadList[MAX_BONDS + 1]);
 
+void PerformRuntimeSanityChecks(long nGen, int run_cycle);
+
 int Check_System_Structure(void);
 
 void RDF_ComponentWise_Avg(void);
