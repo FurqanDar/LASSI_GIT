@@ -269,38 +269,34 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
 
     if (CheckSystemUtil_BeadPosAndLattPosOK() != - 1)
         {
-            fputs("ERROR! Sanity check failed! Crashing!\n", stderr);
-            fprintf(stderr, "Crash occurred at (run_cycle: %d; mc_step: %ld)\n",
-                    run_cycle, nGen);
+            ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
             FileIO_PrintCrashSnapshot();
-            fputs("Lattice positions and bead positions do not match!\n", stderr);
+            fputs("Lattice positions and bead positions do not match!\n\n\n", stderr);
 
-            fputs("Snapshot of system saved to crash_snapshot.txt\n\n\n", stderr);
+
+            fputs("----------------------------------", stderr);
 //            exit(1);
         }
 
     if (CheckSystemUtil_MolecularStructuresOK() != -1)
         {
-            fputs("ERROR! Sanity check failed! Crashing!\n", stderr);
-            fprintf(stderr, "Crash occurred at (run_cycle: %d; mc_step: %ld)\n",
-                    run_cycle, nGen);
+            ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
             FileIO_PrintCrashSnapshot();
-            fputs("Molecular structure has been broken!\n", stderr);
+            fputs("Molecular structure has been broken!\n\n\n", stderr);
 
-            fputs("Snapshot of system saved to crash_snapshot.txt\n\n\n", stderr);
+
+            fputs("----------------------------------", stderr);
 //            exit(1);
         }
 
     if (CheckSystemUtil_BeadBondsSymmetricOK() != -1)
         {
-            fputs("ERROR! Sanity check failed! Crashing!\n", stderr);
-            fprintf(stderr, "Crash occurred at (run_cycle: %d; mc_step: %ld)\n",
-                    run_cycle, nGen);
+            ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
             FileIO_PrintCrashSnapshot();
-            fputs("Anisotropic bonds are not symmetric!\n", stderr);
+            fputs("Anisotropic bonds are not symmetric!\n\n\n", stderr);
 
 
-            fputs("Snapshot of system saved to crash_snapshot.txt\n\n\n", stderr);
+            fputs("----------------------------------", stderr);
 //            exit(1);
         }
     exit(1);
@@ -314,7 +310,7 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
 /// 4. Beads' locations correspond with actual lattice location.
 /// 5. Bonds are not between beads that are too far apart.
 /// \return 0 if everything is okay, beadID+1 if failed.
-int Check_System_Structure_New(void)
+int Check_System_Structure_OLD(void)
 {
     int i, j;          // Looping variables
     int idx;           // Internal iterators for covalent bonds.

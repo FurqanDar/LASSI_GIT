@@ -671,6 +671,15 @@ void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle)
     puts("****************************************");
 }
 
+void ScreenIO_Print_SanityCheckFailure(const long nGen, const int run_cycle)
+{
+    fputs("\nERROR! Sanity check failed! Crashing!\n", stderr);
+    fprintf(stderr, "Crash occurred at (run_cycle: %d; mc_step: %ld)\n",
+            run_cycle, nGen);
+    fputs("Snapshot of system saved to crash_snapshot.txt\n\n", stderr);
+}
+
+
 /// Write_RDF_ComponentWise - old implementation of printing the RDF, component
 /// by component. Always appends to the file for this run. Stopped using it
 /// because the IO load was slowing things down at our cluster Would be a good
@@ -1125,19 +1134,6 @@ void DataPrinting_Thermalization(const long nGen)
             cLogFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_LOG]);
             if (cLogFlag)
                 {
-                    // TODO: I think this whole business can be abstracted away as well.
-//                    if (Check_System_Structure())
-//                        {
-//                            fprintf(stderr,
-//                                    "Molecular structure is inconsistent with initial "
-//                                    "structure.\nGracefully crashing.\n"
-//                                    "(run_cycle: %d; mc_step: "
-//                                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
-//                                    -1, nGen);
-//                            FileIO_PrintCrashSnapshot();
-//
-//                            exit(1);
-//                        }
                     PerformRuntimeSanityChecks(nGen, -1);
                     Energy_Total_System();
                     cFlagForEnCal = 1;
@@ -1199,19 +1195,6 @@ void DataPrinting_DuringRunCycles(const long nGen, const int run_it)
             cLogFlag = ForPrinting_GetReportState(nGen, naReportFreqs_glb[REPORT_LOG]);
             if (cLogFlag)
                 {
-//                    // TODO: I think this whole business can be abstracted away as well.
-//                    if (Check_System_Structure())
-//                        {
-//                            fprintf(stderr,
-//                                    "Molecular structure is inconsistent with initial "
-//                                    "structure.\nGracefully crashing.\n"
-//                                    "(run_cycle: %d; mc_step: "
-//                                    "%ld)\ncrash_snapshot.txt has a snapshot of the last frame.\n\n",
-//                                    run_it, nGen);
-//                            FileIO_PrintCrashSnapshot();
-//
-//                            exit(1);
-//                        }
                     PerformRuntimeSanityChecks(nGen, run_it);
                     Energy_Total_System();
                     cFlagForEnCal = 1;

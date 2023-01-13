@@ -17,6 +17,8 @@ void ScreenIO_Print_Log_Thermalization(const long nGen);
 
 void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle);
 
+void ScreenIO_Print_SanityCheckFailure(long nGen, int run_cycle);
+
 char ForPrinting_GetReportState(const long nGen, const long thisReport);
 
 void DataPrinting_Thermalization(const long nGen);
