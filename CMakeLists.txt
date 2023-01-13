@@ -6,11 +6,11 @@ set(CMAKE_C_COMPILER "gcc")
 
 set(CMAKE_C_STANDARD 11)
 
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Og -g3 -march=native -mtune=native -Wall -Wextra -pedantic")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og -g3 -march=native -mtune=native -Wall -Wextra -pedantic")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Og -g3 -march=native -mtune=native -Wall -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og -g3 -march=native -mtune=native -Wall -Wextra -pedantic")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=native -mtune=native -fno-omit-frame-pointer")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -mtune=native -fno-omit-frame-pointer")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=native -mtune=native -fno-omit-frame-pointer")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -mtune=native -fno-omit-frame-pointer")
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -march=native -mtune=native")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -march=native -mtune=native")

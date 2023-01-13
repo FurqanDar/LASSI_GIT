@@ -688,8 +688,7 @@ void ScreenIO_Print_SanityCheckFailurePreamble(const long nGen, const int run_cy
 {
     fputs("\n-------------------------------------------------------------------------------", stderr);
     fputs("\nERROR! Sanity check failed! Crashing!\n", stderr);
-    fprintf(stderr, "Crash occurred at (run_cycle: %d; mc_step: %ld)\n",
-            run_cycle, nGen);
+    fprintf(stderr, "Crash occurred at (run_cycle: %d; mc_step: %ld)\n", run_cycle, nGen);
     fputs("Snapshot of system saved to crash_snapshot.txt\n", stderr);
     fputs("CRASH TYPE: ", stderr);
 }
@@ -709,8 +708,6 @@ void ScreenIO_Print_SanityFail_BeadPosAndLattPos(const int badBead)
     const int latVal = naTotLattice_glb[latInd];
 
     fprintf(stderr, "while\nlattice: <%d, %d, %d> (ind: %d) has: %d\n", x, y, z, latInd, latVal);
-
-
 }
 
 /// ScreenIO_Print_SanityFail_MolecularStructure. Prints the crash information for when the linkers for badBead are
@@ -726,7 +723,7 @@ void ScreenIO_Print_SanityFail_MolecularStructure(const int badBead)
     fprintf(stderr, "bead:  %d has broken linkers\n", badBead);
     ScreenIO_PrintStdErr_BeadPosition(badBead);
     fprintf(stderr, "\nbead:  %d has partners:\n", badBead);
-    int idx = 0;
+    int idx      = 0;
     int bondPart = topo_info_glb[badBead][idx];
     while (bondPart != -1)
         {
@@ -736,24 +733,21 @@ void ScreenIO_Print_SanityFail_MolecularStructure(const int badBead)
         }
     fputs("\n\nThe beads have the following distances and linker constraints:\n", stderr);
 
-
-    idx = 0;
-    bondPart = topo_info_glb[badBead][idx];
-    double bdDist = 0.;
-    double linkCons = 0.;
+    idx             = 0;
+    bondPart        = topo_info_glb[badBead][idx];
+    float bdDist   = 0.;
+    float linkCons = 0.;
 
     while (bondPart != -1)
         {
 
-
-            bdDist = Dist_BeadToBead(badBead, bondPart);
-            linkCons = (float) linker_len_glb[badBead][idx]*LINKER_RSCALE;
+            bdDist   = Dist_BeadToBead(badBead, bondPart);
+            linkCons = (float) linker_len_glb[badBead][idx] * LINKER_RSCALE;
 
             fprintf(stderr, "beads: (%d, %d) have dist: %5.3f with linker-constraint: %5.3f\n", badBead, bondPart,
                     bdDist, linkCons);
             idx++;
             bondPart = topo_info_glb[badBead][idx];
-
         }
 }
 
@@ -781,7 +775,6 @@ void ScreenIO_Print_SanityFail_BeadBondSymmetry(const int badBead)
 
     ScreenIO_PrintStdErr_BeadPosition(badBead);
     ScreenIO_PrintStdErr_BeadPosition(beadPart);
-
 }
 
 /// ScreenIO_Print_SanityFail_BeadBondDistance. Prints the crash information for when the distance between bonded beads
@@ -798,10 +791,7 @@ void ScreenIO_Print_SanityFail_BeadBondDistance(const int badBead)
 
     ScreenIO_PrintStdErr_BeadPosition(badBead);
     ScreenIO_PrintStdErr_BeadPosition(beadPart);
-
-
 }
-
 
 /// Write_RDF_ComponentWise - old implementation of printing the RDF, component
 /// by component. Always appends to the file for this run. Stopped using it
@@ -859,8 +849,8 @@ void FileIO_WriteTo_TopFile(const char* filename)
     int i, j, k;               // Loop iterators.
     int numBonds;              // Used to count total number of bonds!
     printf("Writing the topology file!\n");
-    fprintf(fp, "LAMMPS Description\n");          // The file must start with this.
-    fprintf(fp, "\n");                            // Empty line.
+    fprintf(fp, "LAMMPS Description\n");                   // The file must start with this.
+    fprintf(fp, "\n");                                     // Empty line.
     fprintf(fp, "\t%ld\tatoms\n", (size_t) tot_beads_glb); // Listing total number of atoms
     numBonds = 0;
     for (i = 0; i < tot_beads_glb; i++)
@@ -1216,22 +1206,20 @@ char ForPrinting_GetReportState(const long nGen, const long thisReport)
     return dum_log;
 }
 
-
 void FileIO_PrintCrashSnapshot(void)
 {
     FILE* fp = fopen("crash_snapshot.txt", "w+");
 
     int i, x, y, z, bP;
-    fputs("#CRASH SNAPSHOT\n#X, Y, Z, bondPartner\n",fp);
-    for (i=0; i<tot_beads_glb; i++)
+    fputs("#CRASH SNAPSHOT\n#X, Y, Z, bondPartner\n", fp);
+    for (i = 0; i < tot_beads_glb; i++)
         {
-            x = bead_info_glb[i][POS_X];
-            y = bead_info_glb[i][POS_Y];
-            z = bead_info_glb[i][POS_Z];
+            x  = bead_info_glb[i][POS_X];
+            y  = bead_info_glb[i][POS_Y];
+            z  = bead_info_glb[i][POS_Z];
             bP = bead_info_glb[i][BEAD_FACE];
             fprintf(fp, "%d %d %d %d\n", x, y, z, bP);
         }
-
 
     fclose(fp);
 }
