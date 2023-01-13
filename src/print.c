@@ -671,7 +671,13 @@ void ScreenIO_Print_Log_FullRun(const long nGen, const int run_cycle)
     puts("****************************************");
 }
 
-
+void ScreenIO_PrintStdErr_BeadPosition(const int beadID)
+{
+    const int x = bead_info_glb[beadID][POS_X];
+    const int y = bead_info_glb[beadID][POS_Y];
+    const int z = bead_info_glb[beadID][POS_Z];
+    fprintf(stderr, "bead: %d is a position: <%d, %d, %d>\n", beadID, x, y, z);
+}
 
 void ScreenIO_Print_SanityCheckFailure(const long nGen, const int run_cycle)
 {
@@ -690,9 +696,10 @@ void ScreenIO_Print_SanityFail_SelfBond(const int badBead)
 }
 
 
+
+
 void ScreenIO_Print_SanityFail_BeadBondSymmetry(const int badBead)
 {
-//    bead_info_glb[badBead][BEAD_FACE] = -1;
     const int beadPart = bead_info_glb[badBead][BEAD_FACE];
 
     fprintf(stderr, "bead: %d is bonded to bead: %d\n", badBead, beadPart);
@@ -700,6 +707,23 @@ void ScreenIO_Print_SanityFail_BeadBondSymmetry(const int badBead)
     const int partBond = bead_info_glb[beadPart][BEAD_FACE];
 
     fprintf(stderr, "while\nbead: %d is bonded to bead: %d\n", beadPart, partBond);
+
+    ScreenIO_PrintStdErr_BeadPosition(badBead);
+    ScreenIO_PrintStdErr_BeadPosition(beadPart);
+
+}
+
+void ScreenIO_Print_SanityFail_BeadBondDistance(const int badBead)
+{
+    const int beadPart = bead_info_glb[badBead][BEAD_FACE];
+
+    fprintf(stderr, "bead: %d is bonded to bead: %d\n", badBead, beadPart);
+
+    const float bDist = Dist_BeadToBead(badBead, beadPart);
+    fprintf(stderr, "while\ndistance: %5.3f\n", bDist);
+
+    ScreenIO_PrintStdErr_BeadPosition(badBead);
+    ScreenIO_PrintStdErr_BeadPosition(beadPart);
 
 
 }
@@ -730,17 +754,17 @@ void ScreenIO_Print_SanityFail_MolecularStructure(const int badBead)
 
     fprintf(stderr, "chain: %d has broken structure\n", badChain);
     fprintf(stderr, "bead:  %d has broken linkers\n", badBead);
-
-    fprintf(stderr, "bead:  %d has partners: ( ", badBead);
+    ScreenIO_PrintStdErr_BeadPosition(badBead);
+    fprintf(stderr, "\nbead:  %d has partners:\n", badBead);
     int idx = 0;
     int bondPart = topo_info_glb[badBead][idx];
     while (bondPart != -1)
         {
-            fprintf(stderr, "%d, ", bondPart);
+            ScreenIO_PrintStdErr_BeadPosition(bondPart);
             idx++;
             bondPart = topo_info_glb[badBead][idx];
         }
-    fputs(")\nThe beads have the following distances and linker constraints:\n", stderr);
+    fputs("\n\nThe beads have the following distances and linker constraints:\n", stderr);
 
 
     idx = 0;

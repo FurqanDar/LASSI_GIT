@@ -68,25 +68,6 @@ int main(int argc, char* argv[])
     // Performing a sanity check to see if all the beads and structures are
     // correct.
 
-    //Causes lattice failure
-    naTotLattice_glb[Lat_Ind_OfBead(2)]=5;
-    naTotLattice_glb[Lat_Ind_OfBead(3)]=9;
-
-    // Intentionally breaking structure and lattice position
-    bead_info_glb[2][0] = 30;
-    bead_info_glb[3][0] = 0;
-    // Rescues lattice failure
-//    naTotLattice_glb[Lat_Ind_OfBead(2)]=2;
-//    naTotLattice_glb[Lat_Ind_OfBead(3)]=3;
-
-    // Causes bond-symmetry failure
-    bead_info_glb[0][BEAD_FACE] = 10;
-    bead_info_glb[10][BEAD_FACE] = 2;
-
-
-    // Causes self-bond failure
-    bead_info_glb[5][BEAD_FACE] = 5;
-
 
     puts("Performing initial sanity check.\n");
     PerformRuntimeSanityChecks(-1, -1);

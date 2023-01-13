@@ -219,6 +219,28 @@ int CheckSystemUtil_BeadBondsSymmetricOK(void)
 }
 
 
+int CheckSystemUtil_BeadBondsDistanceOK(void)
+{
+    int beadID;
+//    float bDist;
+    for (beadID = 0; beadID < tot_beads_glb; beadID++)
+        {
+            int bondPartner = bead_info_glb[beadID][BEAD_FACE];
+            if (bondPartner != -1)
+                {
+                    const float bDist = Dist_BeadToBead(beadID, bondPartner);
+                    if (bDist > LINKER_RSCALE)
+                        {
+                            return beadID;
+                        }
+                }
+        }
+
+    return -1;
+
+}
+
+
 int CheckSystemUtil_NoSelfBonds(void)
 {
     int beadID;
@@ -270,6 +292,27 @@ int Check_System_Structure(void)
 
 void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
 {
+
+    //Causes lattice failure only
+    naTotLattice_glb[Lat_Ind_OfBead(10)]=5;
+
+    //Causes structure failure only
+    bead_info_glb[2][0] = 30;
+    bead_info_glb[3][0] = 0;
+    naTotLattice_glb[Lat_Ind_OfBead(2)]=2;
+    naTotLattice_glb[Lat_Ind_OfBead(3)]=3;
+
+    //Causes bond-symmetry failure only
+    bead_info_glb[4][BEAD_FACE] = 5;
+    bead_info_glb[5][BEAD_FACE] = -1;
+
+    //Causes self-bond failure only
+    bead_info_glb[6][BEAD_FACE] = 6;
+
+    //Causes bond-distance failure only
+    bead_info_glb[2][BEAD_FACE] = 3;
+    bead_info_glb[3][BEAD_FACE] = 2;
+
     int badBead = CheckSystemUtil_BeadPosAndLattPosOK();
     if (badBead != - 1)
         {
@@ -302,7 +345,7 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
         {
             ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
             FileIO_PrintCrashSnapshot();
-            fputs("Anisotropic bonds are not symmetric!\n\nDetails of crash:\n", stderr);
+            fputs("A bead is self-bonded!\n\nDetails of crash:\n", stderr);
 
             ScreenIO_Print_SanityFail_SelfBond(badBead);
 
@@ -323,6 +366,24 @@ void PerformRuntimeSanityChecks(const long nGen, const int run_cycle)
             fputs("-------------------------------------------------------------------------------", stderr);
 //            exit(1);
         }
+
+
+    badBead = CheckSystemUtil_BeadBondsDistanceOK();
+    if (badBead != -1)
+        {
+            ScreenIO_Print_SanityCheckFailure(nGen, run_cycle);
+            FileIO_PrintCrashSnapshot();
+            fputs("Bond distance is too large!\n\nDetails of crash:\n", stderr);
+
+            ScreenIO_Print_SanityFail_BeadBondDistance(badBead);
+
+            fputs("-------------------------------------------------------------------------------", stderr);
+            //            exit(1);
+        }
+
+
+
+
     exit(1);
 }
 

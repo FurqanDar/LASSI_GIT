@@ -27,6 +27,8 @@ void ScreenIO_Print_SanityFail_SelfBond(int badBead);
 
 void ScreenIO_Print_SanityFail_BeadBondSymmetry(int badBead);
 
+void ScreenIO_Print_SanityFail_BeadBondDistance(int badBead);
+
 char ForPrinting_GetReportState(const long nGen, const long thisReport);
 
 void DataPrinting_Thermalization(const long nGen);
