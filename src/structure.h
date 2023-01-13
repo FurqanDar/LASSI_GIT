@@ -31,8 +31,6 @@ int Check_BeadID_InList(const int thisBeadID, const int listSize, const int bead
 
 void PerformRuntimeSanityChecks(long nGen, int run_cycle);
 
-int Check_System_Structure(void);
-
 void RDF_ComponentWise_Avg(void);
 
 int RDF_ComponentIndex(const int i, const int j);
