@@ -1098,12 +1098,13 @@ void Energy_Total_System(void)
                                                       &ovlp_num);
                     faCurrEn_glb[E_CONT] += Energy_OfCont_wNeighList(i, naOldContNeighs_glb, cont_num);
                 }
-            else
+            else if (nBeadTypeCanOvlp_glb[resi] || nBeadTypeCanFSol_glb[resi])
                 {
                     ovlp_num = NeighborSearch_ForOvlp(i, bead_info_glb[i], naOldOvlpNeighs_glb);
+                    faCurrEn_glb[E_OVLP] += Energy_OfOvlp_wNeighList(i, naOldOvlpNeighs_glb, ovlp_num);
+                    faCurrEn_glb[E_F_SOL] += (float) (26 - ovlp_num) * faEnergy_glb[resi][resi][E_F_SOL];
                 }
-            faCurrEn_glb[E_OVLP] += Energy_OfOvlp_wNeighList(i, naOldOvlpNeighs_glb, ovlp_num);
-            faCurrEn_glb[E_F_SOL] += (float) (26 - ovlp_num) * faEnergy_glb[resi][resi][E_F_SOL];
+
         }
 
     if (bSystemHasTopo_glb)

@@ -250,7 +250,7 @@ int Clus_Network_LimitedCluster(int const chainID)
     // The idea is to check every bead and see if there is a unique bonded
     // chain, and to add it to naList_glb If Cluster becomes larger than 5, exit and
     // return -1
-    const size_t ClusterLimit = nLimitedClusterSize_glb;
+    const int ClusterLimit = nLimitedClusterSize_glb;
     int i, j; // Loop iterators
     for (i = 0; i < ClusterLimit; i++)
         {
