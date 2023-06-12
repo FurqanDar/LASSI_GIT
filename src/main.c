@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
 
     for (nGen = 0; nGen < nMCStepsForTherm_glb; nGen++)
         { // Intentionally not performing any data acquisition in the thermalization phase.
-            nMCInfo = MC_Step_Equil(fCuTemp_glb);
+            nMCInfo = MC_Step_Therm(fCuTemp_glb);
             //        printf("(%d,%d)\n", nMCInfo / 12, nMCInfo % 2);
             DataPrinting_Thermalization(nGen);
         }
