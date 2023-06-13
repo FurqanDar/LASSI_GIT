@@ -106,10 +106,10 @@ int MC_Step(float fMCTemp)
     return mode * 12 + nAccept;
 }
 
-/// MC_Step_Equil - given the MC move frequencies, picks non-anisotropic
+/// MC_Step_Therm - given the MC move frequencies, picks non-anisotropic
 /// variants of the moves. \param fMCTemp \return bAccept - the acceptance state
 /// where MCMove=bAccept/12 and MCAccept=bAccept%2.
-int MC_Step_Equil(float fMCTemp)
+int MC_Step_Therm(float fMCTemp)
 {
     int mode = 0; // Which move to do
     int nAccept;  // Used in MC steps
@@ -829,7 +829,7 @@ int Move_SmallClus_Network(int chainID, float MyTemp)
     int r_Disp[POS_MAX];
     int yTemp;
     int i, j;
-    // Radii for translation moves. All moves are L/4 radius
+    // Radii for translation moves. All moves are L/2 radius
     // I guess moving single chains around as well is not a bad idea
 
     LatPos_gen_rand_wRad(r_Disp, naBoxSize_glb[0] / 2);
@@ -2037,7 +2037,7 @@ int Move_Clus_Proximity(const float myTemp)
 }
 
 // All the _Equil variants of the moves are spatially the same as their non
-// _Equil variants. The only difference is that the aniso-tropic interaction is
+// _Equil variants. The only difference is that the anisotropic interaction is
 // ignored, and thus no bias is applied.
 
 int Move_Local_Equil(int beadID, float MyTemp)
@@ -3560,6 +3560,10 @@ lLDub OP_GenMHValue(lLDub fRos, lLDub bRos, lLDub Delta_En, lLDub Cur_Temp)
     return MH_Value;
 }
 
+///
+/// \param firstB
+/// \param lastB
+/// \param r_posNew
 void OP_System_Snake_SlitherFwd(const int firstB, const int lastB, const int* r_posNew)
 {
     int i;
