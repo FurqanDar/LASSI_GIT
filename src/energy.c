@@ -297,9 +297,9 @@ float Energy_Topo_Angle(int const beadID)
     BeadPos_sub_wPBC(vec1, r_pos0, r_posB);
     BeadPos_sub_wPBC(vec2, r_posF, r_pos0);
 
-    const float dumCosTheta = (1.f - Vec3n_CosTheta(vec1, vec2));
+    const float dumCosTheta = Vec3n_CosTheta(vec1, vec2);
 
-    return -faEnergy_glb[resi][resi][E_STIFF] * dumCosTheta * dumCosTheta;
+    return -faEnergy_glb[resi][resi][E_STIFF] * (1.f - dumCosTheta * dumCosTheta);
 }
 
 /// Energy_OfOvlp_wNeighList: Given this bead, and a supplied list of neighbors
